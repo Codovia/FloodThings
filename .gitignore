@@ -1,0 +1,154 @@
+# ==============================================================================
+# FloodPulse — .gitignore
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Environment and secrets
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+secrets/
+
+# ------------------------------------------------------------------------------
+# 2. Python
+# ------------------------------------------------------------------------------
+
+# Byte-compiled / optimised / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Testing / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+.mypy_cache/
+.ruff_cache/
+
+# ------------------------------------------------------------------------------
+# 3. Node / frontend
+# ------------------------------------------------------------------------------
+node_modules/
+dist/
+.vite/
+.cache/
+.npm/
+.eslintcache
+*.tsbuildinfo
+
+# ------------------------------------------------------------------------------
+# 4. IDE / editor
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.example.json
+.idea/
+*.swp
+*.swo
+*~
+
+# ------------------------------------------------------------------------------
+# 5. Operating-system files
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# 6. Logs and temporary files
+# ------------------------------------------------------------------------------
+*.log
+logs/
+tmp/
+temp/
+*.tmp
+
+# ------------------------------------------------------------------------------
+# 7. FloodPulse data directories
+#    Large downloaded/generated datasets must not be committed.
+#    Directory structure is preserved via .gitkeep files.
+# ------------------------------------------------------------------------------
+data/raw/*
+!data/raw/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+data/manifests/*
+!data/manifests/.gitkeep
+
+# ------------------------------------------------------------------------------
+# 8. ML model artifacts
+# ------------------------------------------------------------------------------
+models/*
+!models/.gitkeep
+*.joblib
+*.pkl
+*.pickle
+*.onnx
+*.pt
+*.pth
+
+# ------------------------------------------------------------------------------
+# 9. GIS-generated artifacts
+#    Protection from accidental large/generated-data commits.
+#    Authoritative small GIS files can be force-added after review.
+# ------------------------------------------------------------------------------
+*.tif
+*.tiff
+*.gpkg
+*.shp
+*.shx
+*.dbf
+*.prj
+*.cpg
+*.geojson
+
+# ------------------------------------------------------------------------------
+# 10. Local database artifacts
+# ------------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.db
+
+# ------------------------------------------------------------------------------
+# 11. Docker / local state
+#     Do NOT ignore docker-compose.yml, docker-compose.yaml, or Dockerfile —
+#     those are source-controlled project configuration.
+# ------------------------------------------------------------------------------
+.docker/
+docker-data/
