@@ -1,0 +1,870 @@
+{
+  "info": {
+    "_postman_id": "8f3b610c-3d29-4a94-8789-9a25997da672",
+    "name": "FloodPulse API Validation Lab",
+    "description": "Reproducible API testing and validation lab for Karnataka AI Flood Intelligence & Early-Warning System (Phase 2.3).\n\nValidates official endpoints across:\n- 01_IMD (India Meteorological Department)\n- 02_CWC (Central Water Commission / NWIC)\n- 03_NRSC_NDEM (National Database for Emergency Management)\n- 04_Bhuvan (ISRO Geoportal)\n- 05_India_WRIS (Water Resources Information System)\n- 06_Karnataka_OGD (Karnataka Open Government Data / OpenCity)\n- 07_Open_Meteo (Operational NWP & Reanalysis Feeds)\n- 08_OSM (OpenStreetMap / Overpass API)\n\nAdheres strictly to the zero-fabrication data policy: no mock responses, real HTTP status codes, and exact field specifications.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01_IMD",
+      "description": "Official India Meteorological Department (IMD) API Management Gateway endpoints.\n\nAuthentication: Requires API key obtained via official registration on https://api.imd.gov.in/public/register.php (restricted to government/institutional domains: gov.in, nic.in, cdac.in).\nUnauthenticated requests return HTTP 401 Unauthorized with {\"error\":\"API key missing\"}.",
+      "item": [
+        {
+          "name": "AWS / ARG Karnataka Telemetry (State ID 13)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{imd_api_base_url}}/aws_data?sid=13",
+              "host": [
+                "{{imd_api_base_url}}"
+              ],
+              "path": [
+                "aws_data"
+              ],
+              "query": [
+                {
+                  "key": "sid",
+                  "value": "13",
+                  "description": "State ID 13 corresponds to Karnataka"
+                }
+              ]
+            },
+            "description": "### IMD AWS/ARG Real-Time Station Telemetry\n- **Endpoint**: `https://api.imd.gov.in/api/v1/aws_data?sid=13`\n- **State**: Karnataka (sid=13)\n- **Authentication**: Required (API key missing -> 401)\n- **Expected Response**: HTTP 401 Unauthorized without key; JSON array of AWS station observations with key\n- **Actual Tested Status**: HTTP 401 Unauthorized\n- **Important Fields**: `Station_ID`, `Station_Name`, `Date`, `Time_UTC`, `Rainfall_mm`, `Temp_degC`, `Humidity_pct`, `Wind_Speed_kmph`\n- **Units**: Rainfall in mm, Temp in \u00b0C, Wind in km/h\n- **Status**: CREDENTIAL_BLOCKED / DOCUMENTED_ONLY"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 without API key\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});",
+                  "pm.test(\"Response returns API key missing error\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.error).to.eql(\"API key missing\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "District-wise Daily Rainfall",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{imd_api_base_url}}/districtrainfall?id=164",
+              "host": [
+                "{{imd_api_base_url}}"
+              ],
+              "path": [
+                "districtrainfall"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "164",
+                  "description": "District Object ID"
+                }
+              ]
+            },
+            "description": "### IMD District-wise Rainfall Observations\n- **Endpoint**: `https://api.imd.gov.in/api/v1/districtrainfall`\n- **Authentication**: Required (API key missing -> 401)\n- **Fields**: `OBJ_ID`, `District`, `Date`, `Daily Actual`, `Daily Normal`, `Daily Departure Per`, `Daily Category`, `Weekly Actual`, `Cumulative Actual`\n- **Units**: Rainfall in mm\n- **Actual Status**: HTTP 401 Unauthorized"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 without API key\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "District-wise Severe Weather Warnings",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{imd_api_base_url}}/districtwarning?id=573",
+              "host": [
+                "{{imd_api_base_url}}"
+              ],
+              "path": [
+                "districtwarning"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "573",
+                  "description": "District Object ID"
+                }
+              ]
+            },
+            "description": "### IMD District Warnings (5-Day Outlook)\n- **Endpoint**: `https://api.imd.gov.in/api/v1/districtwarning`\n- **Authentication**: Required\n- **Fields**: `Obj_id`, `Date`, `UTC`, `District`, `Day_1`..`Day_5` warning codes (1: No Warning, 2: Heavy Rain, 16: Very Heavy Rain, 17: Extremely Heavy Rain), `Day1_Color`..`Day5_Color` (1: Red, 2: Orange, 3: Yellow, 4: Green)\n- **Actual Status**: HTTP 401 Unauthorized"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 without API key\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Current Weather Station Observations",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{imd_api_base_url}}/current_wx",
+              "host": [
+                "{{imd_api_base_url}}"
+              ],
+              "path": [
+                "current_wx"
+              ]
+            },
+            "description": "### IMD Current Weather API\n- **Endpoint**: `https://api.imd.gov.in/api/v1/current_wx`\n- **Authentication**: Required\n- **Fields**: `Station Id`, `Station`, `Date of Observation`, `Time of Observation`, `M.S.L.P`, `Wind Direction`, `Wind Speed`, `Temperature`, `Weather Code`, `Nebulosity`, `Humidity`, `Last 24 hrs Rainfall`\n- **Units**: Pressure in hPa, Wind in km/h, Temp in \u00b0C, Humidity in %, Rainfall in mm\n- **Actual Status**: HTTP 401 Unauthorized"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 401 without API key\", function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "02_CWC",
+      "description": "Central Water Commission (CWC) & National Water Informatics Centre (NWIC) datasets.\n\nOpen CKAN REST API (`https://nwdp.nwic.gov.in/api/3/action/`) and public CSV datasets for reservoirs and river water level gauges.",
+      "item": [
+        {
+          "name": "NWIC CKAN Package Search - Karnataka",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{nwic_ckan_url}}/package_search?q=karnataka&rows=5",
+              "host": [
+                "{{nwic_ckan_url}}"
+              ],
+              "path": [
+                "package_search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "karnataka"
+                },
+                {
+                  "key": "rows",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "### NWIC CKAN Package Search\n- **Endpoint**: `https://nwdp.nwic.gov.in/api/3/action/package_search`\n- **Access**: Open HTTP GET\n- **Expected Response**: HTTP 200 OK with list of packages and resource download URLs\n- **Actual Tested Status**: HTTP 200 OK (45 packages found for Karnataka)\n- **Discovered Products**: Karnataka Reservoir Telemetry, Rainfall Manual Daily (1900-2030), Discharge Gauge Daily, Minor Irrigation Tanks\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Success is true\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.result.count).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Karnataka Reservoir Telemetry (CSV Range Header)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Range",
+                "value": "bytes=0-2048"
+              }
+            ],
+            "url": {
+              "raw": "https://nwdp.nwic.gov.in/dataset/e35dc28a-6f9c-486d-b598-87a21397018e/resource/26800982-045c-41de-821d-b1ca080a79a8/download/karnataka_man_reservoir_data.csv",
+              "protocol": "https",
+              "host": [
+                "nwdp",
+                "nwic",
+                "gov",
+                "in"
+              ],
+              "path": [
+                "dataset",
+                "e35dc28a-6f9c-486d-b598-87a21397018e",
+                "resource",
+                "26800982-045c-41de-821d-b1ca080a79a8",
+                "download",
+                "karnataka_man_reservoir_data.csv"
+              ]
+            },
+            "description": "### Karnataka Dam Telemetry Dataset\n- **Resource**: `karnataka_man_reservoir_data.csv` (16.4 MB, updated daily)\n- **Coverage**: 14+ major Karnataka dams (Almatti, KRS, Kabini, Tungabhadra, Bhadra, etc.), 1990-2026\n- **Columns**: `Reservoir Name`, `Basin`, `Sub Basin`, `River`, `Monitoring Date`, `Percentage Full`, `Reservoir Level (ft)`, `Gross Capacity (TMC)`, `Inflow (Cusecs)`, `Outflow to River (Cusecs)`\n- **Conversion Factor Requirements**:\n  - Level: ft -> metres (x 0.3048)\n  - Capacity: TMC -> MCM (x 28.3168)\n  - Inflow/Outflow: Cusecs -> m\u00b3/s (x 0.0283168)\n- **Actual Tested Status**: HTTP 206 Partial Content / HTTP 200 OK\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 or 206\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 206]);",
+                  "});",
+                  "pm.test(\"CSV headers contain reservoir metrics\", function () {",
+                  "    var body = pm.response.text();",
+                  "    pm.expect(body).to.include(\"Reservoir Name\");",
+                  "    pm.expect(body).to.include(\"Reservoir Level\");",
+                  "    pm.expect(body).to.include(\"Inflow\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CWC River Gauge Water Level (Cauvery Basin CSV Range)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Range",
+                "value": "bytes=0-2048"
+              }
+            ],
+            "url": {
+              "raw": "https://nwdp.nwic.gov.in/dataset/d951a09c-6cf8-470e-be77-e80116f13d34/resource/37cba82e-f745-4004-80d2-b05cad65b8e4/download/rwl_manual_hr_cwc_009_2026_2030.csv",
+              "protocol": "https",
+              "host": [
+                "nwdp",
+                "nwic",
+                "gov",
+                "in"
+              ],
+              "path": [
+                "dataset",
+                "d951a09c-6cf8-470e-be77-e80116f13d34",
+                "resource",
+                "37cba82e-f745-4004-80d2-b05cad65b8e4",
+                "download",
+                "rwl_manual_hr_cwc_009_2026_2030.csv"
+              ]
+            },
+            "description": "### CWC In-Situ River Gauge Water Level\n- **Resource**: `rwl_manual_hr_cwc_009_2026_2030.csv`\n- **Coverage**: Cauvery and southern Karnataka river basins, hourly readings\n- **Columns**: `Station`, `Agency`, `State LGD Code` (29), `District LGD Code` (e.g. 544), `District`, `River`, `Basin`, `Latitude`, `Longitude`, `Data Acquisition Time`, `River Water Level Manual Hourly (meter)`\n- **Units**: Level in metres (WGS84 lat/lon)\n- **Actual Tested Status**: HTTP 206 Partial Content / HTTP 200 OK\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 or 206\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 206]);",
+                  "});",
+                  "pm.test(\"CSV headers contain river water level fields\", function () {",
+                  "    var body = pm.response.text();",
+                  "    pm.expect(body).to.include(\"Station\");",
+                  "    pm.expect(body).to.include(\"State LGD Code\");",
+                  "    pm.expect(body).to.include(\"River Water Level Manual Hourly (meter)\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03_NRSC_NDEM",
+      "description": "National Database for Emergency Management (NDEM) \u2014 NRSC / ISRO.\n\nRestricted access platform: Full geospatial services, flood inundation layers, and decision-support databases require authorized government agency credentials (NDMA, SDMAs, MHA) with multi-factor authentication. No public open REST API exists.\n\nStatus: PORTAL PRODUCT \u2014 MACHINE-READABLE ACCESS NOT CONFIRMED / CREDENTIAL_BLOCKED.",
+      "item": [
+        {
+          "name": "NDEM Portal Access Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "https://ndem.nrsc.gov.in/",
+              "protocol": "https",
+              "host": [
+                "ndem",
+                "nrsc",
+                "gov",
+                "in"
+              ],
+              "path": [
+                ""
+              ]
+            },
+            "description": "### NDEM Portal Verification\n- **URL**: `https://ndem.nrsc.gov.in/`\n- **Access Policy**: Restricted government portal.\n- **Status**: CREDENTIAL_BLOCKED / PORTAL ONLY\n- **Note**: Cannot be consumed as an open unauthenticated REST API."
+          }
+        }
+      ]
+    },
+    {
+      "name": "04_Bhuvan",
+      "description": "ISRO Bhuvan Geoportal (National Remote Sensing Centre).\n\nHosts satellite imagery, thematic maps, and disaster visualization portals. Vector WMS services (`bhuvan-vec2`) are firewall-restricted or timed out from non-institutional networks. The Next.js web portal (`bhuvan.nrsc.gov.in/ngmaps`) is active.",
+      "item": [
+        {
+          "name": "Bhuvan Geoportal Web App Root",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "{{user_agent_floodpulse}}"
+              }
+            ],
+            "url": {
+              "raw": "https://bhuvan.nrsc.gov.in/ngmaps",
+              "protocol": "https",
+              "host": [
+                "bhuvan",
+                "nrsc",
+                "gov",
+                "in"
+              ],
+              "path": [
+                "ngmaps"
+              ]
+            },
+            "description": "### Bhuvan Next.js Geoportal Entry Point\n- **URL**: `https://bhuvan.nrsc.gov.in/ngmaps`\n- **Response**: HTTP 200 HTML / Next.js React application bundle\n- **Status**: PORTAL ONLY \u2014 Visualization interface"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 or 302\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 302]);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05_India_WRIS",
+      "description": "India Water Resources Information System (India-WRIS / NWIC).\n\nProvides GIS thematic layers and metadata for river basins, sub-basins, water bodies, and water spread areas across India.",
+      "item": [
+        {
+          "name": "Karnataka Water Spread Area Package Metadata",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{nwic_ckan_url}}/package_show?id=bbfedeba-9ea1-4b85-9b59-399bec4e93c3",
+              "host": [
+                "{{nwic_ckan_url}}"
+              ],
+              "path": [
+                "package_show"
+              ],
+              "query": [
+                {
+                  "key": "id",
+                  "value": "bbfedeba-9ea1-4b85-9b59-399bec4e93c3"
+                }
+              ]
+            },
+            "description": "### Karnataka Water Spread Area GIS Datasets\n- **Endpoint**: `https://nwdp.nwic.gov.in/api/3/action/package_show`\n- **Resources Verified**:\n  - Water Spread Area Phase I Karnataka (GeoJSON, KML, SHP)\n  - Water Spread Area Phase II Karnataka (GeoJSON, KML, SHP)\n- **CRS**: WGS84 (EPSG:4326)\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Contains Karnataka water spread resources\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    var found = jsonData.result.resources.some(function(r) { return r.name.indexOf(\"Karnataka\") >= 0; });",
+                  "    pm.expect(found).to.be.true;",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "06_Karnataka_OGD",
+      "description": "Karnataka Open Government Data & OpenCity (data.opencity.in) CKAN Portal.\n\nExposes curated datasets from Karnataka government departments (KSNDMC rainfall reports, municipal data).",
+      "item": [
+        {
+          "name": "OpenCity Karnataka Rainfall Catalog Search",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{opencity_ckan_url}}/package_search?q=rainfall+karnataka&rows=5",
+              "host": [
+                "{{opencity_ckan_url}}"
+              ],
+              "path": [
+                "package_search"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "rainfall karnataka"
+                },
+                {
+                  "key": "rows",
+                  "value": "5"
+                }
+              ]
+            },
+            "description": "### OpenCity KSNDMC Rainfall Search\n- **Endpoint**: `https://data.opencity.in/api/3/action/package_search`\n- **Access**: Open CKAN REST API\n- **Discovered Products**: Karnataka Annual Rainfall (Districts, Taluks, Hoblis) 2025\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Found rainfall datasets\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.success).to.be.true;",
+                  "    pm.expect(jsonData.result.count).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Karnataka District Rainfall 2025 CSV Range Check",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Range",
+                "value": "bytes=0-1024"
+              }
+            ],
+            "url": {
+              "raw": "https://data.opencity.in/dataset/03e23dd0-8f29-4249-a28a-67bdf8fd07b3/resource/1d99702f-8dfc-4676-bd60-bff8a3beb61b/download/ka_dist_rainfall_2025.csv",
+              "protocol": "https",
+              "host": [
+                "data",
+                "opencity",
+                "in"
+              ],
+              "path": [
+                "dataset",
+                "03e23dd0-8f29-4249-a28a-67bdf8fd07b3",
+                "resource",
+                "1d99702f-8dfc-4676-bd60-bff8a3beb61b",
+                "download",
+                "ka_dist_rainfall_2025.csv"
+              ]
+            },
+            "description": "### Karnataka District Rainfall Annual/Seasonal CSV\n- **Resource**: `ka_dist_rainfall_2025.csv`\n- **Columns**: `Sl No`, `District`, `Annual Normal`, `Annual Actual`, `Annual Departure (%)`, `Pre Monsoon Normal`, `Pre Monsoon Actual`, `SWM Normal`, `SWM Actual`, `NEM Normal`, `NEM Actual`\n- **Evaluation**: Aggregate annual/seasonal data suitable for reference baselines; not suitable for real-time daily operational predictions.\n- **Status**: VERIFIED (Reference)"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200 or 206\", function () {",
+                  "    pm.expect(pm.response.code).to.be.oneOf([200, 206]);",
+                  "});",
+                  "pm.test(\"CSV headers contain district rainfall metrics\", function () {",
+                  "    var body = pm.response.text();",
+                  "    pm.expect(body).to.include(\"District\");",
+                  "    pm.expect(body).to.include(\"Annual Actual\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07_Open_Meteo",
+      "description": "Open-Meteo Weather Forecast, Historical Archive, and GloFAS Flood APIs.\n\nProvides operational numerical weather prediction model output (ECMWF, GFS, ICON) and ERA5 reanalysis without credentials.",
+      "item": [
+        {
+          "name": "Operational Weather Forecast & Hourly Precipitation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{open_meteo_base_url}}/forecast?latitude={{mysuru_lat}}&longitude={{mysuru_lon}}&current=temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m&hourly=temperature_2m,precipitation,relative_humidity_2m,wind_speed_10m,surface_pressure&wind_speed_unit=ms&forecast_days=3&timezone=UTC",
+              "host": [
+                "{{open_meteo_base_url}}"
+              ],
+              "path": [
+                "forecast"
+              ],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "{{mysuru_lat}}"
+                },
+                {
+                  "key": "longitude",
+                  "value": "{{mysuru_lon}}"
+                },
+                {
+                  "key": "current",
+                  "value": "temperature_2m,relative_humidity_2m,precipitation,rain,wind_speed_10m"
+                },
+                {
+                  "key": "hourly",
+                  "value": "temperature_2m,precipitation,relative_humidity_2m,wind_speed_10m,surface_pressure"
+                },
+                {
+                  "key": "wind_speed_unit",
+                  "value": "ms"
+                },
+                {
+                  "key": "forecast_days",
+                  "value": "3"
+                },
+                {
+                  "key": "timezone",
+                  "value": "UTC"
+                }
+              ]
+            },
+            "description": "### Operational Weather & Precipitation Forecast\n- **Endpoint**: `https://api.open-meteo.com/v1/forecast`\n- **Target**: Mysuru, Karnataka (12.2958, 76.6394)\n- **Variables**: `temperature_2m` (\u00b0C), `precipitation` (mm), `rain` (mm), `relative_humidity_2m` (%), `wind_speed_10m` (m/s), `surface_pressure` (hPa)\n- **Units**: Strictly matches `DATA_CONTRACT.md` SI units\n- **Temporal**: Current + 72 hourly timestamps (ISO 8601 UTC)\n- **Attribution**: Must be recorded as `source=\"open_meteo\"` (MODEL_OUTPUT)\n- **Actual Tested Status**: HTTP 200 OK\n- **Status**: VERIFIED (Primary Operational)"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Response contains current and hourly precipitation\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property(\"current\");",
+                  "    pm.expect(jsonData.current).to.have.property(\"precipitation\");",
+                  "    pm.expect(jsonData).to.have.property(\"hourly\");",
+                  "    pm.expect(jsonData.hourly.precipitation.length).to.be.above(0);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Historical Reanalysis Daily Rainfall (2023 Flood Window)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{open_meteo_archive_url}}/archive?latitude={{mysuru_lat}}&longitude={{mysuru_lon}}&start_date=2023-07-01&end_date=2023-07-07&daily=precipitation_sum,rain_sum,temperature_2m_max,temperature_2m_min&timezone=UTC",
+              "host": [
+                "{{open_meteo_archive_url}}"
+              ],
+              "path": [
+                "archive"
+              ],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "{{mysuru_lat}}"
+                },
+                {
+                  "key": "longitude",
+                  "value": "{{mysuru_lon}}"
+                },
+                {
+                  "key": "start_date",
+                  "value": "2023-07-01"
+                },
+                {
+                  "key": "end_date",
+                  "value": "2023-07-07"
+                },
+                {
+                  "key": "daily",
+                  "value": "precipitation_sum,rain_sum,temperature_2m_max,temperature_2m_min"
+                },
+                {
+                  "key": "timezone",
+                  "value": "UTC"
+                }
+              ]
+            },
+            "description": "### Historical Daily Weather Archive (ERA5 Reanalysis)\n- **Endpoint**: `https://archive-api.open-meteo.com/v1/archive`\n- **Coverage**: 1940 to present (tested July 2023)\n- **Fields**: `precipitation_sum` (mm), `rain_sum` (mm), `temperature_2m_max` (\u00b0C), `temperature_2m_min` (\u00b0C)\n- **Actual Tested Status**: HTTP 200 OK\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns daily precipitation array\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.daily.precipitation_sum.length).to.eql(7);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "GloFAS River Discharge Forecast (7 Days)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{open_meteo_flood_url}}/flood?latitude={{mysuru_lat}}&longitude={{mysuru_lon}}&daily=river_discharge,river_discharge_mean,river_discharge_max,river_discharge_min&forecast_days=7",
+              "host": [
+                "{{open_meteo_flood_url}}"
+              ],
+              "path": [
+                "flood"
+              ],
+              "query": [
+                {
+                  "key": "latitude",
+                  "value": "{{mysuru_lat}}"
+                },
+                {
+                  "key": "longitude",
+                  "value": "{{mysuru_lon}}"
+                },
+                {
+                  "key": "daily",
+                  "value": "river_discharge,river_discharge_mean,river_discharge_max,river_discharge_min"
+                },
+                {
+                  "key": "forecast_days",
+                  "value": "7"
+                }
+              ]
+            },
+            "description": "### GloFAS Gridded River Discharge Forecast\n- **Endpoint**: `https://flood-api.open-meteo.com/v1/flood`\n- **Source**: Copernicus GloFAS seamless integration\n- **Variables**: `river_discharge`, `river_discharge_mean`, `river_discharge_max`, `river_discharge_min`\n- **Units**: `m\u00b3/s` (matches `_m3s` contract)\n- **Actual Tested Status**: HTTP 200 OK\n- **Status**: VERIFIED (Forecast Reference)"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Units are m\u00b3/s\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.daily_units.river_discharge).to.eql(\"m\u00b3/s\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "08_OSM",
+      "description": "OpenStreetMap / Overpass API.\n\nUsed strictly for supporting spatial facilities (hospitals, clinics, fire stations, police stations).\n\nCRITICAL POLICY: OSM places tagged `shelter` are NEVER imported as official flood relief shelters. Only hospitals, fire stations, and police stations are retrieved from OSM.",
+      "item": [
+        {
+          "name": "Overpass QL - Mysuru Hospitals & Clinics",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "{{user_agent_floodpulse}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "[out:json][timeout:20]; ( node[\"amenity\"=\"hospital\"](12.28,76.60,12.33,76.68); node[\"amenity\"=\"clinic\"](12.28,76.60,12.33,76.68); ); out body;",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{overpass_api_url}}",
+              "host": [
+                "{{overpass_api_url}}"
+              ]
+            },
+            "description": "### OSM Emergency Facilities: Healthcare\n- **Endpoint**: `https://overpass-api.de/api/interpreter`\n- **Bounding Box**: Mysuru Urban (`[12.28, 76.60, 12.33, 76.68]`)\n- **Headers**: Custom User-Agent mandatory (returns 406 without it)\n- **License**: ODbL\n- **Target Entity**: `EmergencyFacility` (`facility_type=\"hospital\"`)\n- **Actual Tested Status**: HTTP 200 OK\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test(\"Returns OSM hospital elements\", function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.elements.length).to.be.above(0);",
+                  "    pm.expect(jsonData.elements[0]).to.have.property(\"lat\");",
+                  "    pm.expect(jsonData.elements[0]).to.have.property(\"lon\");",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Overpass QL - Belagavi Fire Stations",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "User-Agent",
+                "value": "{{user_agent_floodpulse}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "data",
+                  "value": "[out:json][timeout:20]; ( node[\"amenity\"=\"fire_station\"](15.80,74.45,15.92,74.55); ); out body;",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{overpass_api_url}}",
+              "host": [
+                "{{overpass_api_url}}"
+              ]
+            },
+            "description": "### OSM Emergency Facilities: Fire Stations\n- **Endpoint**: `https://overpass-api.de/api/interpreter`\n- **Target Area**: Belagavi Urban\n- **Target Entity**: `EmergencyFacility` (`facility_type=\"fire_station\"`)\n- **Actual Tested Status**: HTTP 200 OK\n- **Status**: VERIFIED"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

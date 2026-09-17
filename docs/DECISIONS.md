@@ -189,6 +189,37 @@
 
 ---
 
+**D-023 — Official API validation lab verification findings**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Base all Phase 2 data acquisition strictly on empirical API testing results rather than speculative documentation assumptions:
+1. IMD API Gateway (`api.imd.gov.in`) is functional but credential-gated (`HTTP 401 Unauthorized`, `{"error":"API key missing"}`) with onboarding restricted to `@gov.in` institutional domains. It is classified as `CREDENTIAL_BLOCKED` and excluded from Phase 2 blocking path.
+2. NWIC National Water Data Portal (`nwdp.nwic.gov.in`) CKAN REST API is completely open (`HTTP 200 OK`) and provides 45 verified Karnataka datasets including multi-decade daily reservoir telemetry and hourly river stage telemetry.
+3. NRSC NDEM portal is institutional only (requiring disaster officer login & OTP); no public REST/WFS API exists. Screen scraping is strictly prohibited.
+4. Bhuvan OGC vector WMS endpoints time out from non-institutional networks; Bhuvan is restricted to human portal visualization.
+5. Open-Meteo Weather, Archive, and Flood (GloFAS) REST APIs are verified (`HTTP 200 OK`) with native SI units matching `DATA_CONTRACT.md`.
+**Context:** Empirical probing during Phase 2.3 provided concrete evidence of access methods, error behaviors, and real response schemas.
+**Affected components:** Data acquisition adapters, `DATA_SOURCES.md`, `API_VALIDATION_LAB.md`.
+**Reversal conditions:** None.
+
+---
+
+**D-024 — Verified ingestion source selection for Phase 2.4**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Authorize specific verified sources for Phase 2.4 adapter development:
+1. `OpenMeteoAdapter`: Operational weather observations, hourly precipitation, and 7-day weather forecasts (`source="open_meteo"`, `quality="MODEL_OUTPUT"`).
+2. `NwicReservoirAdapter`: Karnataka reservoir telemetry with mandatory imperial-to-metric conversions (`Level * 0.3048`, `TMC * 28.3168`, `cusecs * 0.0283168`).
+3. `NwicRiverLevelAdapter`: CWC river gauge hourly water level telemetry with strict `NULL` for missing discharge (`missing ≠ zero`).
+4. `IfiFloodEventLoader`: India Flood Inventory v3.0 batch loader for District × Day ground-truth flood occurrence targets ($y \in \{0, 1\}$).
+5. `OsmEmergencyFacilityLoader`: OpenStreetMap Overpass QL loader strictly for hospitals and fire stations (generic `amenity=shelter` prohibited).
+6. `CuratedShelterLoader`: Manual curation of designated evacuation shelters from published District Disaster Management Plan (DDMP) PDF annexures with occupancy set to `NULL`.
+**Context:** Ensures 100% real, attributable data ingestion without a single synthetic or fabricated value.
+**Affected components:** Phase 2.4 ingestion adapters, test suite.
+**Reversal conditions:** None.
+
+---
+
 ## Open decisions
 
 ---

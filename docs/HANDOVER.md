@@ -10,10 +10,11 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.2 — Database + Internal Data Contract (COMPLETE)
+Phase:                  Phase 2.3 — Real Source / API Validation Lab (COMPLETE)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
+                        Phase 2.2 — Database + Internal Data Contract (34 tables deployed)
 ```
 
 ## Repository
@@ -132,7 +133,19 @@ cd backend && PYTHONPATH=. alembic check
 ## Next phase
 
 ```
-Phase 2.3 — Source Adapters & Data Ingestion (as scheduled by project plan)
+Phase 2.4 — Source Adapters & Ingestion Pipelines (OpenMeteo, NWIC, IFI, OSM)
+```
+
+## Phase 2.3 Artifacts Created
+
+```
+docs/API_VALIDATION_LAB.md
+postman/FloodPulse_API_Validation_Lab.postman_collection.json
+postman/FloodPulse_Lab.postman_environment.json
+docs/DATA_PIPELINE.md
+Updated docs/DATA_SOURCES.md (25-column matrix, decision table, quality tiers)
+Updated docs/DATA_CONTRACT.md (field conversion contracts)
+Updated docs/DECISIONS.md (D-023, D-024)
 ```
 
 Wait for project owner review before proceeding.

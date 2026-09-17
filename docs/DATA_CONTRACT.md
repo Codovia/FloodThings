@@ -166,3 +166,71 @@ The data contract is physically enforced in the PostgreSQL/PostGIS database via 
 - **Referential Integrity:** Foreign keys use `ON DELETE NO ACTION` / `RESTRICT` to prevent accidental cascading data loss.
 - **Nullability / `missing ≠ 0`:** Measurement columns (`water_level`, `discharge`, `rainfall_mm`, `flood_depth`, `storage_percentage`) are nullable and never default to zero or imputed values.
 - **Check Constraints (51 active):** Enforce geographic coordinates (`[-90, 90]` latitude, `[-180, 180]` longitude), probability ranges (`[0.0, 1.0]`), percentage ranges (`[0.0, 100.0]`), and controlled vocabularies.
+
+---
+
+## Verified Source Field-to-Contract Translation Matrix
+
+Established during Phase 2.3 empirical testing. Adapters must strictly adhere to these field translations and unit conversions.
+
+### 1. NWIC / CWC Reservoir Telemetry (`karnataka_man_reservoir_data.csv`)
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `Reservoir Name` | string | `reservoirs.name` | string | Trim whitespace; map known aliases (e.g. `KRS` → `Krishnarajasagara`) |
+| `Basin` | string | `reservoirs.basin_name` | string | Direct string assignment |
+| `Monitoring Date` | string (`DD-MM-YYYY HH:mm:ss`) | `reservoir_observations.observed_at` | `TIMESTAMPTZ` (UTC) | Parse IST (`Asia/Kolkata`) string to UTC timestamp |
+| `Reservoir Level (ft)` | feet | `reservoir_observations.water_level_m` | metres (`_m`) | $\text{Level}_{\text{m}} = \text{Level}_{\text{ft}} \times 0.3048$ |
+| `Gross Capacity (TMC)` | TMC | `reservoir_observations.storage_mcm` | MCM (`_mcm`) | $\text{Storage}_{\text{MCM}} = \text{Storage}_{\text{TMC}} \times 28.3168$ |
+| `Percentage Full` | percentage | `reservoir_observations.storage_percentage` | percentage (`_pct`) | Direct float assignment ($[0.0, 100.0]$) |
+| `Inflow (Cusecs)` | cusecs (ft³/s) | `reservoir_observations.inflow_m3s` | m³/s (`_m3s`) | $\text{Inflow}_{\text{m}^3/\text{s}} = \text{Inflow}_{\text{cusecs}} \times 0.0283168$ |
+| `Outflow to River (Cusecs)` | cusecs (ft³/s) | `reservoir_observations.outflow_m3s` | m³/s (`_m3s`) | $\text{Outflow}_{\text{m}^3/\text{s}} = \text{Outflow}_{\text{cusecs}} \times 0.0283168$ |
+
+### 2. NWIC / CWC River Water Level (`rwl_manual_hr_cwc_*.csv`)
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `Station` | string | `river_stations.name` | string | Direct string assignment |
+| `River` | string | `rivers.name` | string | Direct string assignment |
+| `Basin` | string | `river_basins.name` | string | Direct string assignment |
+| `Latitude` | decimal degrees | `river_stations.latitude` | degrees | Validate in $[11.5, 18.5]$; construct PostGIS `geom` (EPSG:4326) |
+| `Longitude` | decimal degrees | `river_stations.longitude` | degrees | Validate in $[74.0, 78.6]$; construct PostGIS `geom` (EPSG:4326) |
+| `State LGD Code` | integer (`29`) | `river_stations.state_lgd_code` | integer | Reference validation against Karnataka (`29`) |
+| `District LGD Code` | integer | `river_stations.district_lgd_code` | integer | Foreign key / lookup link to `districts.lgd_code` |
+| `Data Acquisition Time` | string (`DD-MM-YYYY HH:mm`) | `river_observations.observed_at` | `TIMESTAMPTZ` (UTC) | Parse IST string to UTC timestamp |
+| `River Water Level Manual Hourly (meter)` | metres | `river_observations.water_level_m` | metres (`_m`) | Direct float assignment |
+| `Is_DischargeDataAvailable` | "Yes" / "No" | `river_observations.discharge_m3s` | m³/s (`_m3s`) | If "No" or missing, set explicitly to `NULL` (`missing ≠ 0`) |
+
+### 3. Open-Meteo Weather API (`v1/forecast` & `v1/archive`)
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `current.time` | ISO 8601 string | `weather_observations.observed_at` | `TIMESTAMPTZ` (UTC) | Parse ISO 8601 UTC timestamp |
+| `current.temperature_2m` | °C | `weather_observations.temperature_c` | °C (`_c`) | Direct float assignment |
+| `current.relative_humidity_2m` | % | `weather_observations.humidity_pct` | % (`_pct`) | Direct float assignment |
+| `current.precipitation` | mm | `rainfall_observations.rainfall_mm` | mm (`_mm`) | Direct float assignment ($\ge 0.0$) |
+| `current.wind_speed_10m` | m/s | `weather_observations.wind_speed_mps` | m/s (`_mps`) | Direct float assignment (enforce `wind_speed_unit=ms` in query) |
+| `hourly.surface_pressure` | hPa | `weather_observations.pressure_hpa` | hPa (`_hpa`) | Direct float assignment |
+| `hourly.time` | ISO 8601 array | `weather_forecasts.forecast_for` | `TIMESTAMPTZ` (UTC) | Parse ISO 8601 UTC timestamp |
+| `hourly.precipitation` | mm array | `weather_forecasts.rainfall_forecast_mm` | mm (`_mm`) | Direct float assignment ($\ge 0.0$) |
+
+### 4. India Flood Inventory v3.0 (`India_Flood_Inventory_v3.csv`)
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `UEI` | string | `flood_observations.source_record_id` | string | Unique event identifier (e.g. `UEI-IMD-FL-2023-0347`) |
+| `Start Date` | string (`DD-MM-YYYY HH:mm`) | `flood_events.start_date` | `TIMESTAMPTZ` (UTC) | Parse IST string to UTC timestamp |
+| `End Date` | string (`DD-MM-YYYY HH:mm`) | `flood_events.end_date` | `TIMESTAMPTZ` (UTC) | Parse IST string to UTC timestamp |
+| `Duration(Days)` | integer / float | `flood_events.duration_days` | integer | Cast to integer days |
+| `State_Codes` | string / int (`29`) | Reference validation | int | Must equal `29` (Karnataka) |
+| `District_LGD_Codes` | comma-separated ints | `flood_observations.district_id` | UUID | Join via `districts.lgd_code` |
+| `Main Cause` | string | `flood_events.description` | string | Retain text |
+| `Human fatality` | integer | `flood_observations.fatalities` | integer | Cast to integer ($\ge 0$) |
+| Derived target | boolean | `flood_observations.flooded` | boolean | Set to `TRUE` for documented event records |
+
+### 5. OpenStreetMap Overpass QL
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `node.id` | integer | `emergency_facilities.source_record_id` | string | Store as string identifier |
+| `tags.name` | string | `emergency_facilities.name` | string | Direct string assignment (fallback to `"Unnamed Facility"`) |
+| `tags.amenity` | "hospital" / "clinic" | `emergency_facilities.facility_type` | string | Map to `"hospital"` |
+| `tags.amenity` | "fire_station" | `emergency_facilities.facility_type` | string | Map to `"fire_station"` |
+| `lat`, `lon` | decimal degrees | `emergency_facilities.latitude`, `longitude`, `geom` | EPSG:4326 | Construct PostGIS Point `ST_SetSRID(ST_MakePoint(lon, lat), 4326)` |
+| `occupancy` | N/A | `emergency_facilities.current_occupancy` | integer | Set explicitly to `NULL` (unknown) |
+

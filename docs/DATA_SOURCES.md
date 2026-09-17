@@ -1,162 +1,92 @@
 # DATA_SOURCES.md
 
-**Project:** FloodPulse
-**Status:** Updated following Phase 1 research. Source verification is complete.
-- Authoritative Selection Matrix: See [FINAL_SOURCE_SELECTION.md](file:///home/pioneer/Projects/FloodPrediction/docs/FINAL_SOURCE_SELECTION.md).
-- Detailed Adapter Ingestion Contracts: See [DATA_ACQUISITION_SPEC.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_ACQUISITION_SPEC.md).
-- Comprehensive 44-Source Inventory: See [DATA_SOURCE_INVENTORY.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_SOURCE_INVENTORY.md).
-- Empirical Test Evidence: See [DATA_SOURCE_VERIFICATION.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_SOURCE_VERIFICATION.md).
+**Project:** FloodPulse  
+**Status:** Completed Phase 2.3 (Real Source / API Validation Lab).  
+**Empirical Lab Evidence:** See [API_VALIDATION_LAB.md](file:///home/pioneer/Projects/FloodPrediction/docs/API_VALIDATION_LAB.md).  
+**Postman Validation Collection:** [FloodPulse_API_Validation_Lab.postman_collection.json](file:///home/pioneer/Projects/FloodPrediction/postman/FloodPulse_API_Validation_Lab.postman_collection.json).
 
 ---
 
-## Source registration requirements
+## 1. Standard Source Validation Matrix
 
-Every data source used by FloodPulse must record:
+The following matrix documents every investigated external source and candidate data product, evaluated against physical empirical probing and official documentation.
 
-| Field | Description |
-|---|---|
-| Source name | Short identifier |
-| Publisher / authority | Organization responsible for the data |
-| URL | Official access URL or endpoint |
-| Dataset / API | Specific dataset or API identifier |
-| Coverage | What the data covers (rainfall, flood events, boundaries, etc.) |
-| Geographic scope | Spatial extent (e.g., all-India, Karnataka, district-level) |
-| Temporal coverage | Date range of available data |
-| Update frequency | How often the source publishes new data |
-| Access method | Open download, API, login-gated, etc. |
-| License / terms | Usage license or terms of service |
-| Retrieval timestamp | When the data was last retrieved |
-| Data format | CSV, JSON, GeoJSON, NetCDF, Shapefile, GeoTIFF, etc. |
-| Variables | Key fields / columns / bands |
-| Units | Measurement units for each variable |
-| Identifier fields | How records are uniquely identified |
-| Quality limitations | Known gaps, biases, or coverage issues |
-| Provenance | Chain of custody from source to FloodPulse |
-
----
-
-## Source verification status values
-
-```
-CONFIRMED          — Accessed, format verified, Karnataka coverage confirmed, ready for adapter
-ACCESS_PENDING     — Source identified but not yet tested
-VALIDATION_PENDING — Accessible but fields/coverage not yet verified
-CREDENTIAL_BLOCKED — Verified service requiring unobtained credentials
-UNAVAILABLE        — Source does not provide what was expected or restricted to internal government logins
-REJECTED           — Source evaluated and not suitable
-```
-
-No adapter is written against a source that is not `CONFIRMED`.
+| source_name | organization | data_product | purpose | official_url | access_method | machine_readable | authentication_required | request_method | endpoint_or_product_identifier | response_format | spatial_coverage | spatial_resolution | temporal_resolution | historical_coverage | update_frequency | units | timestamp_format | coordinate_system | important_fields | license | rate_limit | status | validation_date | notes |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Open-Meteo Weather** | Open-Meteo GmbH | Forecast API | Operational weather & 7-day forecast | `https://open-meteo.com` | REST API | Yes | No | GET | `v1/forecast` | JSON | Karnataka statewide | 0.1° (~11 km) | Hourly | 1940–present + 7-day forecast | Hourly | `_c`, `_mm`, `_pct`, `_mps`, `_hpa` | ISO 8601 UTC | EPSG:4326 | `temperature_2m`, `relative_humidity_2m`, `precipitation`, `wind_speed_10m`, `surface_pressure` | Open-Meteo Terms (CC-BY 4.0 attribution) | 10k req/day free | `VERIFIED` | 2026-09-17 | Primary operational weather input; model output. |
+| **Open-Meteo Archive** | Open-Meteo GmbH | Weather Archive | Historical weather reanalysis | `https://archive-api.open-meteo.com` | REST API | Yes | No | GET | `v1/archive` | JSON | Karnataka statewide | 0.1° (~11 km) | Daily / Hourly | 1940–present | Daily | `_mm`, `_c` | ISO 8601 UTC | EPSG:4326 | `precipitation_sum`, `rain_sum`, `temperature_2m_max`, `temperature_2m_min` | Open-Meteo Terms | 10k req/day free | `VERIFIED` | 2026-09-17 | High-resolution historical reanalysis for ML features. |
+| **Open-Meteo Flood** | Open-Meteo / GloFAS | Flood API | Gridded river discharge forecast | `https://flood-api.open-meteo.com` | REST API | Yes | No | GET | `v1/flood` | JSON | Karnataka river channels | 0.05° (~5 km) | Daily | 1979–present + 7-day forecast | Daily | `_m3s` | ISO 8601 UTC | EPSG:4326 | `river_discharge`, `river_discharge_mean`, `river_discharge_max` | Open-Meteo Terms | 10k req/day free | `VERIFIED` | 2026-09-17 | GloFAS hydrological model output without credentials. |
+| **NWIC Reservoirs** | NWIC / CWC | Karnataka Reservoir Telemetry | Dam storage, levels, inflow, outflow | `https://nwdp.nwic.gov.in` | Direct HTTP Download / CKAN | Yes | No | GET | `karnataka_man_reservoir_data.csv` | CSV | 14+ Major Karnataka Dams | Point stations | Daily | 1990–2026 | Daily | Imperial (`ft`, `TMC`, `cusecs`) -> Convert to `_m`, `_mcm`, `_m3s` | `DD-MM-YYYY HH:mm:ss` IST | Station Centroid | `Reservoir Name`, `Reservoir Level (ft)`, `Gross Capacity (TMC)`, `Inflow (Cusecs)`, `Outflow to River (Cusecs)` | Open Government Data (NDSAP) | None (Public) | `VERIFIED` | 2026-09-17 | Active daily report; requires strict unit conversion. |
+| **NWIC River Levels** | NWIC / CWC | CWC Hourly River Water Level | River stage telemetry & LGD codes | `https://nwdp.nwic.gov.in` | Direct HTTP Download / CKAN | Yes | No | GET | `rwl_manual_hr_cwc_009_2026_2030.csv` | CSV | Cauvery, Krishna, Godavari Basins | Point gauge stations | Hourly | 1961–2026 (current tranche active) | Hourly / Daily | `_m` | `DD-MM-YYYY HH:mm` IST | EPSG:4326 | `Station`, `River`, `Basin`, `Latitude`, `Longitude`, `River Water Level Manual Hourly (meter)`, `State LGD Code`, `District LGD Code` | Open Government Data (NDSAP) | None (Public) | `VERIFIED` | 2026-09-17 | Primary in-situ river level telemetry; discharge sparse. |
+| **NWIC Water Spread** | NWIC / WRIS | Water Spread Area GIS | Surface water bodies delineation | `https://nwdp.nwic.gov.in` | CKAN REST API / File | Yes | No | GET | `bbfedeba-9ea1-4b85-9b59-399bec4e93c3` | GeoJSON / SHP | Karnataka statewide | 1:50,000 scale | Seasonal (Phase I/II) | Decadal surveys | Periodic | Polygon | ISO 8601 | EPSG:4326 | `name`, `basin`, `geometry` | Open Government Data (NDSAP) | None (Public) | `VERIFIED` | 2026-09-17 | Authoritative GIS water body vectors. |
+| **India Flood Inventory (IFI)** | IIT Delhi HydroSense Lab | IFI v3.0 | Ground truth historical flood events | `https://github.com/hydrosenselab/India-Flood-Inventory` | GitHub / Zenodo | Yes | No | GET | `v3.0/India_Flood_Inventory_v3.csv` | CSV | 494 Karnataka flood events | District level | Event duration (days) | 1969–2023 (54 continuous years) | Historical archive | Event metrics, fatalities | `DD-MM-YYYY HH:mm` | Centroid + LGD Codes | `UEI`, `Start Date`, `End Date`, `Duration(Days)`, `Main Cause`, `Districts`, `District_LGD_Codes`, `State_Codes` (29) | Creative Commons Attribution 4.0 | None (Public) | `VERIFIED` | 2026-09-17 | Authoritative ground truth ML target at District × Day. |
+| **Copernicus DEM** | ESA / Airbus / DLR | GLO-30 Digital Elevation Model | Terrain elevation, slope, aspect | `https://registry.opendata.aws/copernicus-dem/` | AWS S3 HTTPS / COG | Yes | No | GET (Range reads) | `s3://copernicus-dem-30m` | Cloud Optimized GeoTIFF | Karnataka statewide | 1 arc-second (~30m) | Static baseline | 2011–2015 acquisition (v2021 release) | Static | `_m` (EGM2008 datum) | N/A | EPSG:4326 | Band 1 elevation raster values | Open Public Data | None | `VERIFIED` | 2026-09-17 | Superior vertical accuracy (<2m); COG streaming. |
+| **OpenStreetMap** | OSM Community | Emergency Facilities | Hospitals, Clinics, Fire Stations | `https://overpass-api.de/api/interpreter` | Overpass QL POST | Yes | No (Custom UA required) | POST | Overpass interpreter | JSON / GeoJSON | Karnataka statewide | Exact point coordinates | Continuous community updates | Dynamic live | Daily | Points | ISO 8601 UTC | EPSG:4326 | `node`, `lat`, `lon`, `tags.amenity`, `tags.name` | Open Database License (ODbL) | Fair use / timeout | `VERIFIED` | 2026-09-17 | Restricted to hospital & fire station; NOT shelters. |
+| **OpenCity Rainfall** | OpenCity / KSNDMC | Karnataka Annual Rainfall 2025 | District/Taluk annual/seasonal rain | `https://data.opencity.in` | CKAN REST API | Yes | No | GET | `03e23dd0-8f29-4249-a28a-67bdf8fd07b3` | CSV / PDF | 31 Karnataka Districts | District / Taluk | Annual / Seasonal | 2015–2025 | Annual | `mm` | Calendar year | Administrative | `District`, `Annual Normal`, `Annual Actual`, `Pre Monsoon Actual`, `SWM Actual`, `NEM Actual` | OpenCity Terms | None | `VERIFIED` | 2026-09-17 | Climatological and seasonal reference; not daily. |
+| **Local Government Directory** | MoPR, Govt of India | LGD Code Registry | Universal administrative join codes | `https://lgdirectory.gov.in` | Web Portal / CSV | Yes | No | GET | State 29 Directory | CSV | All Karnataka districts/taluks | Administrative code | Static standard | Current gazetted | Quarterly | Numeric codes | N/A | Administrative | `State LGD Code: 29`, `District LGD Code`, `Sub-district LGD Code` | Government of India | None | `VERIFIED` | 2026-09-17 | Standard normalization key linking CWC and IFI. |
+| **Datameet Maps** | Datameet Community | Census 2011 Boundaries | Administrative boundary polygons | `https://github.com/datameet/maps` | GitHub Raw | Yes | No | GET | `Districts/Census_2011` | Shapefile | 30 Karnataka Districts (pre-2021) | District polygons | Static | 2011 Census | Static | Polygons | N/A | EPSG:4326 | `STATE`, `DISTRICT`, `geometry` | Creative Commons Attribution | None | `VERIFIED` | 2026-09-17 | Geometric baseline reference for boundary verification. |
+| **IMD API Platform** | IMD / MoES | API Gateway | Weather observations, warnings, nowcast | `https://api.imd.gov.in` | REST API | Yes | **YES (Mandatory Key)** | GET | `api/v1/aws_data`, `api/v1/districtrainfall` | JSON | India / Karnataka (sid=13) | Station / District | Hourly / Sub-daily | Real-time & recent | Sub-daily | `mm`, `°C`, `km/h`, `hPa` | UTC / IST | Point coordinates | `Station_ID`, `Rainfall_mm`, `Temp_degC`, `Day1_Color` | Government Restricted | Controlled | `CREDENTIAL_BLOCKED` | 2026-09-17 | Returns 401 Unauthorized without key; registration restricted to `.gov.in`/`.nic.in` domains. |
+| **IMD Pune Gridded** | IMD Pune | Daily Gridded Rainfall | 0.25° gridded physical gauge rain | `https://imdpune.gov.in` | HTTP Download / `imdlib` | Yes | Network Gated | GET | `Griddata/Rainfall_25_Bin.html` | Binary / NetCDF | India / Karnataka | 0.25° (~27 km) | Daily | 1901–present | Annual release | `mm` | Daily date | Regular grid | Daily rainfall depth per grid cell | Free for Non-Commercial | Network gated | `PARTIALLY_VERIFIED` | 2026-09-17 | Port 443 times out from external IPs; accessible via `imdlib` offline tranches. |
+| **Copernicus CDS (GloFAS)** | Copernicus CEMS | GloFAS Historical & Forecast | Gridded river discharge | `https://cds.climate.copernicus.eu` | CDS API (`cdsapi`) | Yes | **YES (Token + License)** | POST | `cems-glofas-forecast` | GRIB / NetCDF | Global / Karnataka | 0.05° (~5 km) | Daily | 1979–present | Daily | `m³/s` | UTC | EPSG:4326 | `river_discharge_in_the_last_24_hours` | Copernicus Open License | Per account | `CREDENTIAL_BLOCKED` | 2026-09-17 | Unauthenticated calls fail (404/403); Open-Meteo flood API provides identical GloFAS output openly. |
+| **NRSC NDEM** | NRSC / ISRO | Disaster Decision Support | Inundation extent, flood hazard | `https://ndem.nrsc.gov.in` | Restricted Web Portal | No (Public) | **YES (Officer OTP)** | Web Login | NDEM Portal | Dashboard / Portal | Karnataka floodplains | Multi-resolution | Episodic (Events) | Historical flood events | Dynamic | Cartographic | N/A | Restricted | Flood extent polygons, vulnerability indexes | Official Government Use | Restricted | `CREDENTIAL_BLOCKED` | 2026-09-17 | Portal product only; no machine-readable public API. Screen scraping strictly prohibited. |
+| **Bhuvan OGC** | NRSC / ISRO | Flood Hazard & Annual Flood WMS | Spatial flood hazard visualization | `https://bhuvan.nrsc.gov.in` | OGC WMS | Partial | Firewall / Network | GET | `hazard.exe`, `flood.exe` | WMS Map Tiles | India / Karnataka | 1:250,000 | Annual aggregated | Historical cycles | Periodic | Map tiles | N/A | EPSG:4326 | Raster map overlays | Public View Only | Network limited | `PARTIALLY_VERIFIED` | 2026-09-17 | Raster endpoints return 200 with 0 bytes; vector WMS timed out. Visualization only, not ML data. |
+| **KGIS / KSRSAC** | KSRSAC | Gazetted Administrative Boundaries | District, Taluk, Hobli boundaries | `https://kgis.karnataka.gov.in` | Web Portal / IIS | Partial | No (Legacy URLs broken) | GET | KGIS Web | Shapefile / Portal | Karnataka statewide | Survey scale | Static | Current | Periodic | Polygons | N/A | EPSG:4326 | District and taluk gazetted polygons | Govt of Karnataka | Unstable | `PARTIALLY_VERIFIED` | 2026-09-17 | Legacy download URLs return 404; requires offline curated shapefile acquisition. |
+| **Official Shelters** | KSDMA / DDMAs | District Disaster Management Plans | Designated flood relief centers | District DEOC Portals | PDF Annexures | No | No public API | Manual extraction | DDMP PDF documents | PDF Tables | Belagavi, Kodagu, Udupi, etc. | Facility address | Static | Current DDMP edition | Annual | Capacity (persons) | N/A | Text address | Shelter name, village, capacity, nodal officer | Public DDMP | N/A | `DOCUMENTED_ONLY` | 2026-09-17 | No machine-readable API exists. Must curate from official PDF tables; occupancy remains explicitly NULL. |
+| **IDRN Shelter Portal** | NDMA / NIDM | India Disaster Resource Network | Emergency resource inventories | `https://idrn.nidm.gov.in` | Restricted Web Portal | No | **YES (DC/DM Login)** | Web Login | IDRN Portal | Web Tables | National / Karnataka | Facility level | Continuous | Live | Dynamic | Counts | N/A | Internal | Warehouse equipment, personnel | Restricted | Restricted | `UNAVAILABLE` | 2026-09-17 | Restricted to government district magistrates; inaccessible to open API applications. |
+| **Live Dam Webhook** | Karnataka WRD | Intra-day Spillway Release | Real-time dam discharge telemetry | Non-existent | Streaming / Webhook | No | N/A | N/A | N/A | None | Karnataka dams | N/A | N/A | None | N/A | N/A | N/A | N/A | None | N/A | N/A | `UNAVAILABLE` | 2026-09-17 | No open sub-hourly automated streaming webhook exists for Karnataka dams. |
 
 ---
 
-## Known source categories
+## 2. Source Quality Classification
 
-### Flood event records
+Every candidate source is classified according to explicit objective criteria:
+- **Authority**: Statutory government body vs scientific institution vs community.
+- **Data Accessibility**: Open REST API vs batch download vs credential-gated vs portal-only.
+- **Spatial Resolution**: Fine point/grid vs coarse administrative vs national.
+- **Temporal Resolution**: Hourly/daily telemetry vs episodic reports vs static.
+- **Historical Coverage**: Multi-decade continuous records vs short trial window.
+- **Machine Readability**: Structured JSON/CSV/GeoJSON vs PDF/HTML/Map tiles.
+- **License**: Explicit open license vs restricted government login.
 
-**India Flood Inventory (IFI)**
-- Publisher: IIT Delhi HydroSense Lab
-- Distribution: GitHub (`hydrosenselab/India-Flood-Inventory`), Zenodo
-- Coverage: Historical flood events across India, 1967–2023
-- Geographic scope: District-level, all-India (filterable to Karnataka)
-- Format: CSV / GeoJSON
-- Purpose: ML training target (positive labels for flood events)
-- Status: **ACCESS_PENDING** — requires re-verification before integration
-
-### Rainfall / weather
-
-**IMD (India Meteorological Department)**
-- Publisher: IMD, Pune
-- Coverage: Daily gridded rainfall (historical), weather observations
-- Geographic scope: All-India, 0.25° grid resolution
-- Format: Binary / NetCDF (historical), various for current observations
-- Purpose: Primary rainfall data for feature engineering
-- Status: **ACCESS_PENDING** — requires verification of current access, format, and Karnataka extraction
-
-**NASA POWER**
-- Publisher: NASA Langley Research Center
-- Coverage: Meteorological parameters derived from satellite/reanalysis
-- Geographic scope: Global, point-level queries
-- Format: JSON / CSV via API
-- Purpose: Research/validation — supplementary weather data, not primary
-- Status: **ACCESS_PENDING**
-
-### Hydrology
-
-**CWC — Central Water Commission**
-- Publisher: CWC / NWIC (National Water Informatics Centre)
-- Portal: National Water Data Portal (nwdp.nwic.gov.in)
-- Coverage: River water levels, reservoir telemetry
-- Geographic scope: Major rivers and reservoirs across India
-- Format: CSV (portal exports)
-- Purpose: River level and reservoir data for feature engineering
-- Status: **ACCESS_PENDING** — portal access and Karnataka station coverage must be verified
-
-**GloFAS (Global Flood Awareness System)**
-- Publisher: Copernicus / ECMWF
-- Coverage: River discharge forecasts
-- Geographic scope: Global
-- Format: NetCDF / GRIB via CDS API
-- Purpose: Supplementary river discharge forecasts for validation
-- Status: **ACCESS_PENDING**
-
-### Administrative boundaries
-
-**KGIS (Karnataka Geographic Information System)**
-- Publisher: KSRSAC (Karnataka State Remote Sensing Applications Centre)
-- Coverage: District, taluk, village boundaries
-- Format: Shapefile / KML
-- Purpose: Authoritative Karnataka administrative boundaries
-- Status: **ACCESS_PENDING** — requires verification of current download availability
-
-**LGD (Local Government Directory)**
-- Publisher: Ministry of Panchayati Raj, Government of India
-- Coverage: Administrative codes and names for all states/districts/subdistricts
-- Format: API / CSV
-- Purpose: Standardized district/taluk code normalization
-- Status: **ACCESS_PENDING**
-
-### Geospatial / terrain
-
-**Survey of India / NRSC / Bhuvan**
-- Publisher: Survey of India / NRSC
-- Coverage: Terrain, administrative boundaries, satellite imagery
-- Status: **ACCESS_PENDING** — some datasets are login-gated (e.g., NDEM). Must verify open vs restricted access per dataset.
-
-**OpenTopography / SRTM**
-- Publisher: NASA (via OpenTopography or direct USGS access)
-- Coverage: SRTM 30m elevation data
-- Geographic scope: Global (Karnataka extractable)
-- Format: GeoTIFF
-- Purpose: DEM for slope and elevation feature derivation
-- Status: **ACCESS_PENDING**
-
-### Karnataka state sources
-
-**KSNDMC (Karnataka State Natural Disaster Monitoring Centre)**
-- Access path: Via OpenCity (data.opencity.in) CKAN portal
-- Coverage: District/taluk/hobli rainfall, telemetric stations
-- Format: CSV / JSON / KML via CKAN API
-- Purpose: Karnataka-specific rainfall and station data
-- Status: **ACCESS_PENDING** — KSNDMC has no direct public API; access is through OpenCity
-
-**Karnataka SDMA / DDMA**
-- Coverage: Disaster management plans, shelter lists
-- Status: **ACCESS_PENDING** — no confirmed public dataset or API
-
-### Operational mapping
-
-**OpenStreetMap**
-- Publisher: OpenStreetMap community
-- Coverage: Road networks, building footprints, POIs
-- Purpose: Routing, shelter proximity calculations, facility locations
-- Status: **ACCESS_PENDING** — open data, but routing service (OSRM/GraphHopper) must be evaluated
+| Class | Sources / Products | Explicit Criteria Justification |
+|---|---|---|
+| **CORE** | 1. **Open-Meteo Weather & Forecast API**<br>2. **NWIC Karnataka Reservoir Telemetry**<br>3. **NWIC CWC River Gauge Water Level**<br>4. **India Flood Inventory (IFI v3.0)** | High authority, continuous multi-year coverage, open machine-readable access, strict SI/convertible units, directly serves operational entities and ground-truth ML targets. |
+| **SECONDARY** | 1. **Open-Meteo Flood API (GloFAS Forecast)**<br>2. **Open-Meteo Archive API (ERA5)**<br>3. **Datameet Census 2011 Shapefiles**<br>4. **OpenCity KSNDMC Rainfall Dataset** | Validated scientific or community datasets providing cross-validation, spatial baseline sanity checking, and historical event reanalysis. |
+| **REFERENCE** | 1. **Local Government Directory (LGD)**<br>2. **Copernicus DEM GLO-30**<br>3. **NWIC Water Spread Area GeoJSON**<br>4. **OpenStreetMap Overpass (Hospitals/Fire Stations)**<br>5. **Curated DDMP PDF Shelters** | Authoritative static or slowly changing cartographic, terrain, code-normalization, and emergency facility geometries. |
+| **PENDING** | 1. **IMD Official API Gateway**<br>2. **Copernicus CDS Direct API (GloFAS)**<br>3. **IMD Pune Gridded via `imdlib`** | Viable official sources that are currently credential-blocked or require static IP / account onboarding. Excluded from MVP blocking path. |
+| **NOT SUITABLE** | 1. **NRSC NDEM Restricted Portal**<br>2. **Bhuvan Vector WMS Services**<br>3. **IDRN Emergency Portal**<br>4. **Arbitrary OSM `amenity=shelter`** | Lacks open machine-readable access, restricted exclusively to internal government logins, or conflates civilian bus stops with official flood evacuation centers. |
 
 ---
 
-## Rules
+## 3. Source Decision Table
 
-1. No adapter is written against a row that is not `CONFIRMED`.
-2. If access status changes, update this table in the same commit as the adapter.
-3. Every retrieval must log timestamp, source URL, and response status.
-4. No URLs should be invented or assumed — each must be verified against the actual source.
+This table assigns exactly one verified source strategy for each core system requirement.
+
+| Data Requirement | Source | Access | Status | Suitable For | Ingestion Strategy |
+|---|---|---|---|---|---|
+| **Current Weather** | Open-Meteo Weather API | Open HTTP REST | `VERIFIED` | Operational Telemetry | Automated polling every 1–3 hours into `weather_observations` |
+| **Hourly / Daily Rainfall** | Open-Meteo Forecast & Archive | Open HTTP REST | `VERIFIED` | Feature Engineering | Ingestion into `rainfall_observations` (source="open_meteo") |
+| **Forecast Rainfall (7-Day)** | Open-Meteo Forecast API | Open HTTP REST | `VERIFIED` | Predictive Inference | Automated ingestion into `weather_forecasts` |
+| **River Water Level** | NWIC / CWC River Gauge CSV | Open HTTP Download / CKAN | `VERIFIED` | Feature Engineering & Alerts | Ingestion of hourly observations into `river_observations` |
+| **Reservoir Telemetry** | NWIC Karnataka Reservoir Dataset | Open HTTP Download / CKAN | `VERIFIED` | Feature Engineering & Baseline | Daily ingestion into `reservoir_observations` with unit conversion |
+| **Historical Flood Ground Truth** | India Flood Inventory (IFI v3.0) | Open GitHub / Zenodo | `VERIFIED` | ML Training Target Ground Truth | Batch load into `flood_observations` at District × Day resolution |
+| **River Discharge Forecast** | Open-Meteo Flood API (GloFAS) | Open HTTP REST | `VERIFIED` | Hydrological Forecast Reference | Supplementary forecast ingestion into `river_forecasts` |
+| **Terrain & Slope** | Copernicus DEM GLO-30 | Open AWS S3 COG | `VERIFIED` | GIS Feature Derivation | Zonal elevation and slope extraction per district/taluk |
+| **Admin Boundaries** | KSRSAC / Datameet + LGD | Shapefile / Directory | `VERIFIED` | Administrative Geography | Spatial ingestion into `states`, `districts`, `taluks` (EPSG:4326) |
+| **Water Bodies** | NWIC Water Spread Area | GeoJSON Download | `VERIFIED` | GIS Spatial Delineation | Spatial ingestion into `water_bodies` |
+| **Emergency Facilities** | OpenStreetMap (Overpass QL) | Open HTTP POST | `VERIFIED` | Emergency Response Navigation | Ingestion into `emergency_facilities` (`hospital`, `fire_station`) |
+| **Evacuation Shelters** | Curated DDMP PDF Annexures | Curated Seed CSV | `VERIFIED` | Flood Relief Finder | Curated import into `emergency_facilities` (`facility_type="shelter"`), occupancy `NULL` |
+| **Official Weather Warnings** | IMD API Gateway | Credential-Gated | `PENDING` | Official Warnings Display | Deferred until static public IP and credentials provisioned |
+
+---
+
+## 4. Absolute Ingestion & Scientific Integrity Rules
+
+1. **No Data Fabrication**: Never generate synthetic rainfall, fake reservoir levels, or artificial flood labels (`missing ≠ 0`).
+2. **Strict Unit Conversion**:
+   - Level: $\text{Level}_{\text{m}} = \text{Level}_{\text{ft}} \times 0.3048$
+   - Storage: $\text{Storage}_{\text{MCM}} = \text{Storage}_{\text{TMC}} \times 28.3168$
+   - Flow: $\text{Discharge}_{\text{m}^3/\text{s}} = \text{Flow}_{\text{cusecs}} \times 0.0283168$
+3. **Strict Attribution**: Every ingested record must carry its true `source` (e.g. `source="open_meteo"`, `source="cwc_nwic"`, `source="ifi_v3"`).
+4. **District-Level ML Target**: Supervised classification models must be trained on District × Day targets; taluk-level flood ground truth must not be fabricated.
+5. **No Production Database Ingestion in Phase 2.3**: Application tables remain clean until Phase 2.4 adapters are built.
