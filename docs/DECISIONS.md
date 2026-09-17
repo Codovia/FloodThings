@@ -266,3 +266,27 @@
 **Affected components:** Backend startup command, Vite proxy config, CORS origin.
 **Reversal conditions:** If the chatbot container is permanently removed, port 8000 can be reclaimed.
 
+---
+
+**D-025 — Real Data Ingestion Foundation Architecture (CLI-First, Adapters, Raw Preservation)**
+**Date:** 2026-09-17
+**Status:** IMPLEMENTED (Phase 2.4)
+**Decision:** Implement data ingestion using provider-independent source adapters (`BaseAdapter`), raw payload preservation under `data/raw/<source>/`, strict referential tracking in `DataSource` and `DataIngestionRun`, and manually executable CLI commands via `python -m app.ingestion.cli`.
+**Context:** Phase 2.3 validated external endpoints. Phase 2.4 establishes real data ingestion. To avoid opaque black-box background tasks or tight coupling to API routes, CLI-first manual execution provides immediate debuggability, deterministic idempotency, and clean provenance.
+**Affected components:** `backend/app/ingestion/`, `docs/INGESTION_RUNBOOK.md`, `data/raw/`.
+
+---
+
+**D-026 — Strict Unit Normalization and Separation of Forecast from Observation**
+**Date:** 2026-09-17
+**Status:** IMPLEMENTED (Phase 2.4)
+**Decision:**
+1. Forecasts and observations are stored in separate tables (`WeatherForecast` vs `WeatherObservation` / `RainfallObservation`). Under no circumstances is a forecast stored as an observation.
+2. All non-SI source units are converted strictly according to verified scientific formulas:
+   - Level: $\text{Level}_{\text{m}} = \text{Level}_{\text{ft}} \times 0.3048$
+   - Storage/Capacity: $\text{Storage}_{\text{MCM}} = \text{Storage}_{\text{TMC}} \times 28.3168$
+   - Discharge/Flow: $\text{Discharge}_{\text{m}^3/\text{s}} = \text{Flow}_{\text{cusecs}} \times 0.0283168$
+3. Missing readings remain strictly `NULL`. No zero-filling or synthetic guesses are allowed (`missing ≠ 0`).
+**Affected components:** `backend/app/ingestion/sources/`, database observation tables.
+
+

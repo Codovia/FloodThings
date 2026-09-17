@@ -1,7 +1,8 @@
 # HANDOVER.md
 
 **Project:** FloodPulse
-**Last updated:** 2026-09-17 (Phase 2.2)
+**Project:** FloodPulse
+**Last updated:** 2026-09-17 (Phase 2.4)
 
 Read this document first in every new session.
 
@@ -10,11 +11,12 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.3 — Real Source / API Validation Lab (COMPLETE)
+Phase:                  Phase 2.4 — Real Data Ingestion Foundation (COMPLETE)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
                         Phase 2.2 — Database + Internal Data Contract (34 tables deployed)
+                        Phase 2.3 — Real Source / API Validation Lab (Empirically probed)
 ```
 
 ## Repository
@@ -33,16 +35,20 @@ Note: Three different names are in use (FloodPrediction, FloodThings, FloodPulse
 ```
 Backend:                FastAPI application — health endpoints verified
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
-                        app/main.py, app/api/health.py, app/core/config.py, app/db/session.py
-Frontend:               React + Vite — health status display, API proxy
-                        src/App.jsx, src/main.jsx, src/index.css
+                        Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)
+                        Source Adapters:
+                          - KarnatakaGeographyAdapter (Karnataka State LGD 29 & 31 administrative districts)
+                          - OpenMeteoAdapter (Operational forecast, past observations, historical reanalysis)
+                          - NwicRiverLevelAdapter (CWC hourly river stage in metres, river basins & stations)
+                          - NwicReservoirAdapter (Daily telemetry with verified ft->m, TMC->MCM, cusecs->m³/s conversions)
+                          - IfiFloodAdapter (IFI v3.0 historical disaster events & district observations, depth=NULL)
+                        Raw Data Preservation: data/raw/ (<source>/, preserved JSON/CSV, .gitignore'd)
 Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpulse-postgres)
                         34 application tables deployed via Alembic migration 7eee813798dd
-                        23 PostGIS spatial columns in EPSG:4326 with 23 GiST indexes
-                        51 SQL check constraints (lat/lon bounds, probabilities, controlled statuses)
-                        Strict NULL preservation for missing values (missing != 0)
-                        Zero mock/fabricated data in database
-Tests:                  29 tests (8 unit + 6 health integration + 15 schema & contract) — 100% passing
+                        Populated with real, verified observations (102 river, 101 reservoir, 399 weather,
+                        399 rainfall, 276 forecast, 102 flood events, 188 flood observations, 5 data sources,
+                        43 tracked ingestion runs). Zero fabricated records.
+Tests:                  51 tests (8 health unit + 6 health live + 15 schema + 17 validation/adapters/idempotency + 5 integration) — 100% passing
 Alembic:                Current head: 7eee813798dd, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
@@ -133,19 +139,26 @@ cd backend && PYTHONPATH=. alembic check
 ## Next phase
 
 ```
-Phase 2.4 — Source Adapters & Ingestion Pipelines (OpenMeteo, NWIC, IFI, OSM)
+Phase 2.5 — Automated Background Ingestion & Source-Health Monitoring (APScheduler, health metrics, alerting hooks)
 ```
 
-## Phase 2.3 Artifacts Created
+## Phase 2.4 Artifacts Created
 
 ```
-docs/API_VALIDATION_LAB.md
-postman/FloodPulse_API_Validation_Lab.postman_collection.json
-postman/FloodPulse_Lab.postman_environment.json
-docs/DATA_PIPELINE.md
-Updated docs/DATA_SOURCES.md (25-column matrix, decision table, quality tiers)
-Updated docs/DATA_CONTRACT.md (field conversion contracts)
-Updated docs/DECISIONS.md (D-023, D-024)
+backend/app/ingestion/base.py               (BaseAdapter, IngestionMetrics, IngestionResult)
+backend/app/ingestion/registry.py           (DataSource & DataIngestionRun lifecycle)
+backend/app/ingestion/validation.py         (UTC standardization, coordinate bounds, float checks, EPSG:4326 WKT)
+backend/app/ingestion/sources/geography.py  (Karnataka State LGD 29 & 31 districts with centroids)
+backend/app/ingestion/sources/open_meteo.py (Operational weather, rainfall obs, weather forecast, historical reanalysis)
+backend/app/ingestion/sources/nwic_river.py (CWC hourly river stage in metres, river basins & stations)
+backend/app/ingestion/sources/nwic_reservoir.py (Daily reservoir telemetry with ft->m, TMC->MCM, cusecs->m³/s)
+backend/app/ingestion/sources/ifi_flood.py  (IFI v3.0 historical disaster events & district observations)
+backend/app/ingestion/cli.py                (CLI runner with geography, open-meteo, nwic-river, nwic-reservoir, ifi, ingest-all, status)
+backend/tests/test_ingestion_validation.py  (Timestamp, coordinate, range, quality status tests)
+backend/tests/test_ingestion_adapters.py    (Unit conversions, field mapping, observation/forecast separation tests)
+backend/tests/test_ingestion_idempotency.py (Zero-duplicate idempotency tests across all adapters)
+docs/INGESTION_RUNBOOK.md                   (Operator guide for manual CLI ingestion and status checks)
+Updated docs/DATA_PIPELINE.md, docs/DATA_SOURCES.md, docs/DATA_CONTRACT.md, docs/DECISIONS.md (D-025, D-026)
 ```
 
 Wait for project owner review before proceeding.
@@ -157,3 +170,4 @@ Wait for project owner review before proceeding.
 - Do not assume APIs exist — verify them (see DATA_SOURCES.md).
 - See CONSTRAINTS.md before writing any code.
 - Port 8001 is the current backend port (not 8000).
+

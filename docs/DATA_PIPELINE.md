@@ -1,8 +1,9 @@
 # DATA_PIPELINE.md
 
 **Project:** FloodPulse  
-**Status:** Architecture Specification following Phase 2.3 Validation Lab.  
-**Implementation Phase:** Phase 2.4 (Source Adapters & Ingestion Pipelines).
+**Status:** Implemented & Verified in Phase 2.4 (Real Data Ingestion Foundation).  
+**Execution Interface:** CLI via `python -m app.ingestion.cli`.
+
 
 ---
 

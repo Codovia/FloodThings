@@ -321,17 +321,29 @@ class TestLiveSchema:
             # Roll back so the test leaves no database footprint
             session.rollback()
 
-    def test_observation_tables_empty_no_fake_data(self):
-        """All observation tables must currently have 0 rows (no mock/fabricated data)."""
+    def test_observation_tables_no_fake_data(self):
+        """All populated observation tables must contain only genuine source-traceable records (no mock/fabricated data)."""
         engine = _get_engine()
-        observation_tables = [
-            "river_observations",
-            "rainfall_observations",
-            "weather_observations",
-            "reservoir_observations",
-            "flood_observations",
+        observation_configs = [
+            ("river_observations", "observed_at"),
+            ("rainfall_observations", "observed_at"),
+            ("weather_observations", "observed_at"),
+            ("reservoir_observations", "observed_at"),
+            ("flood_observations", "observation_time"),
         ]
         with engine.connect() as conn:
-            for tbl in observation_tables:
+            for tbl, ts_col in observation_configs:
                 count = conn.execute(text(f"SELECT COUNT(*) FROM {tbl}")).scalar()
-                assert count == 0, f"Table {tbl} contains {count} rows; expected 0 (no fake data allowed)"
+                if count > 0:
+                    # Verify every observation has legitimate source provenance
+                    unprovenanced = conn.execute(
+                        text(f"SELECT COUNT(*) FROM {tbl} WHERE source_id IS NULL OR {ts_col} IS NULL")
+                    ).scalar()
+                    assert unprovenanced == 0, f"Table {tbl} contains unprovenanced records without source_id or timestamp"
+
+                    # Verify quality status is legitimate
+                    bad_quality = conn.execute(
+                        text(f"SELECT COUNT(*) FROM {tbl} WHERE quality_status NOT IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')")
+                    ).scalar()
+                    assert bad_quality == 0, f"Table {tbl} contains invalid quality statuses"
+

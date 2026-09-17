@@ -1,9 +1,11 @@
 # DATA_SOURCES.md
 
 **Project:** FloodPulse  
-**Status:** Completed Phase 2.3 (Real Source / API Validation Lab).  
+**Status:** Ingested in Phase 2.4 (Real Data Ingestion Foundation).  
 **Empirical Lab Evidence:** See [API_VALIDATION_LAB.md](file:///home/pioneer/Projects/FloodPrediction/docs/API_VALIDATION_LAB.md).  
+**Runbook & Execution Guide:** See [INGESTION_RUNBOOK.md](file:///home/pioneer/Projects/FloodPrediction/docs/INGESTION_RUNBOOK.md).  
 **Postman Validation Collection:** [FloodPulse_API_Validation_Lab.postman_collection.json](file:///home/pioneer/Projects/FloodPrediction/postman/FloodPulse_API_Validation_Lab.postman_collection.json).
+
 
 ---
 
