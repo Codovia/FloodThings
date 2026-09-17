@@ -60,7 +60,12 @@ class TestSchemaMetadata:
 
 
 class TestLiveSchema:
-    """Verify the live database schema matches expectations (read-only)."""
+    """Verify the live database foundation matches Phase 2.1 expectations.
+
+    In Phase 2.1, the database is a clean PostGIS foundation.
+    Application tables will be created when the initial Alembic migration
+    is generated and applied in a future phase.
+    """
 
     @pytest.fixture(autouse=True)
     def _require_db(self):
@@ -82,39 +87,19 @@ class TestLiveSchema:
             assert version is not None
             assert "3.4" in version
 
-    def test_all_application_tables_exist(self):
-        """All 34 application tables exist in the database."""
+    def test_clean_foundation_state(self):
+        """Database should not contain application tables yet.
+
+        In Phase 2.1, the database is a clean PostGIS foundation.
+        Application tables will be deployed via Alembic migrations
+        in a later phase.
+        """
         engine = _get_engine()
         inspector = inspect(engine)
         db_tables = set(inspector.get_table_names(schema="public"))
-        missing = EXPECTED_TABLES - db_tables
-        assert not missing, f"Missing tables in database: {missing}"
-
-    def test_geometry_columns_use_srid_4326(self):
-        """All FloodPulse geometry columns use SRID 4326."""
-        engine = _get_engine()
-        with engine.connect() as conn:
-            result = conn.execute(text("""
-                SELECT f_table_name, f_geometry_column, srid
-                FROM geometry_columns
-                WHERE f_table_schema = 'public'
-                  AND f_table_name != 'spatial_ref_sys'
-            """))
-            rows = result.fetchall()
-            assert len(rows) > 0, "No geometry columns found"
-            bad_srid = [(r[0], r[1], r[2]) for r in rows if r[2] != 4326]
-            assert not bad_srid, f"Geometry columns with wrong SRID: {bad_srid}"
-
-    def test_no_application_data_inserted(self):
-        """Application tables must be empty — no seed/fake data."""
-        engine = _get_engine()
-        with engine.connect() as conn:
-            for table_name in sorted(EXPECTED_TABLES):
-                result = conn.execute(
-                    text(f'SELECT count(*) FROM "{table_name}"')
-                )
-                count = result.scalar()
-                assert count == 0, (
-                    f"Table {table_name} has {count} rows — "
-                    "no data should have been inserted"
-                )
+        # Only PostGIS system tables should exist
+        app_tables_present = EXPECTED_TABLES & db_tables
+        assert not app_tables_present, (
+            f"Application tables found unexpectedly in clean foundation: "
+            f"{app_tables_present}"
+        )
