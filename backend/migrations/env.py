@@ -19,9 +19,7 @@ from sqlalchemy import engine_from_config, pool
 from app.core.config import get_settings
 from app.db.session import Base
 
-# When domain models are added in later phases, import them here
-# so that Base.metadata contains the complete schema for autogenerate.
-# Example: import app.db.models  # noqa: F401
+import app.db.models  # noqa: F401
 
 # Alembic Config object — provides access to alembic.ini values.
 config = context.config

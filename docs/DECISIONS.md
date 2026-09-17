@@ -139,6 +139,56 @@
 
 ---
 
+**D-018 — Primary key strategy: UUIDv4**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Use UUIDv4 (`gen_random_uuid()`) for primary keys across all 34 application tables.
+**Context:** Distributes key generation safely across distributed clients, workers, and offline sync nodes (community reports, telemetry collectors) without sequential integer ID collision risks.
+**Affected components:** All SQLAlchemy models, Alembic migrations, database schema.
+**Reversal conditions:** None.
+
+---
+
+**D-019 — Spatial representation and indexing: PostGIS EPSG:4326 + GiST**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Standardize all spatial representations as PostGIS `GEOMETRY(..., 4326)` with explicit GiST spatial indexes.
+**Context:** EPSG:4326 (WGS84 lat/lon) is the native coordinate system for GPS, GeoJSON, and open environmental telemetry. Explicit GiST indexing ensures high-speed bounding-box and distance queries across Karnataka polygons, stream lines, and sensor points.
+**Affected components:** All spatial tables (23 geometry columns), GIS queries, Alembic migrations.
+**Reversal conditions:** None.
+
+---
+
+**D-020 — Controlled vocabularies via String and SQL Check Constraints**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Implement enumeration and status fields using `String(VARCHAR)` columns backed by explicit SQL `CheckConstraint`s rather than native PostgreSQL ENUM types.
+**Context:** Native PostgreSQL ENUM types introduce substantial migration friction in Alembic (e.g., modifying enum values requires non-transactional `ALTER TYPE`). SQL check constraints allow transactional modifications, straightforward testing, and clear error messages while guaranteeing strict data contract enforcement.
+**Affected components:** All status, severity, and quality columns across models.
+**Reversal conditions:** None.
+
+---
+
+**D-021 — Semi-structured metadata via PostgreSQL JSONB**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Use PostgreSQL `JSONB` for auxiliary, extensible, or source-specific metadata fields (e.g., `TerrainDataset.metadata_json`, `MLModel.hyperparameters`, `MLModel.metrics`).
+**Context:** Core relational attributes and physical measurements remain strictly typed in structured columns. Dynamic source attributes and ML run configs are indexed and queried via JSONB without altering schema tables.
+**Affected components:** `terrain_datasets`, `ml_models`, `ml_dataset_versions`.
+**Reversal conditions:** None.
+
+---
+
+**D-022 — Foreign key referential integrity: ON DELETE NO ACTION**
+**Date:** 2026-09-17
+**Status:** CONFIRMED
+**Decision:** Enforce `ON DELETE NO ACTION` / `RESTRICT` on all foreign key constraints.
+**Context:** Strictly prohibits cascading deletes that could unintentionally erase historical hydrologic observations, sensor telemetry, or citizen reports when a parent reference or geography is modified or decommissioned.
+**Affected components:** All foreign key constraints across the schema.
+**Reversal conditions:** None.
+
+---
+
 ## Open decisions
 
 ---

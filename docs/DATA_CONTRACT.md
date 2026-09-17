@@ -1,7 +1,8 @@
 # DATA_CONTRACT.md
 
 **Project:** FloodPulse
-**Status:** Planning document. These contracts will be enforced when data ingestion and storage are implemented.
+**Status:** Implemented in PostgreSQL/PostGIS foundation (Phase 2.2).
+34 application tables, 23 spatial columns (EPSG:4326), 23 GiST indexes, 51 check constraints enforcing coordinates, probabilities, and vocabularies, full UTC TIMESTAMPTZ timestamps, explicit provenance metadata, and strict NULL preservation (`missing ≠ 0`).
 
 ---
 
@@ -139,3 +140,29 @@ Every data value entering the system must pass validation:
 - CRS validation for spatial data.
 
 Invalid data is rejected or flagged — never silently accepted.
+
+---
+
+## Phase 2.2 Database Schema Enforcement
+
+The data contract is physically enforced in the PostgreSQL/PostGIS database via Alembic migration `7eee813798dd`.
+
+### 1. Persistence Matrix (34 Tables)
+- **Geography (4):** `states`, `districts`, `taluks`, `localities`
+- **Hydrology (8):** `river_basins`, `sub_basins`, `rivers`, `river_stations`, `river_observations`, `river_forecasts`, `reservoirs`, `reservoir_observations`
+- **Weather & Rainfall (3):** `weather_observations`, `rainfall_observations`, `weather_forecasts`
+- **Flood Intelligence (3):** `flood_observations`, `flood_events`, `flood_hazard_zones`
+- **Terrain & Land Cover (3):** `land_covers`, `water_bodies`, `terrain_datasets`
+- **Prediction & ML (5):** `prediction_grid_cells`, `feature_snapshots`, `ml_dataset_versions`, `ml_models`, `flood_predictions`
+- **Emergency Management (2):** `emergency_facilities`, `community_reports`
+- **Alerts & Messaging (2):** `alerts`, `telegram_subscriptions`
+- **System & Auditing (4):** `data_sources`, `data_ingestion_runs`, `users`, `audit_logs`
+
+### 2. Physical Schema Rules
+- **Primary Keys:** UUIDv4 generated via `gen_random_uuid()` on every table.
+- **Timestamps:** `TIMESTAMP WITH TIME ZONE` (UTC) on all datetime fields.
+- **Spatial Features:** PostGIS `GEOMETRY` in `EPSG:4326`, with GiST spatial indexes active on all 23 geometry columns.
+- **Provenance:** `source_id`, `source_record_id`, `retrieved_at`, and `quality_status` recorded on all observation tables.
+- **Referential Integrity:** Foreign keys use `ON DELETE NO ACTION` / `RESTRICT` to prevent accidental cascading data loss.
+- **Nullability / `missing ≠ 0`:** Measurement columns (`water_level`, `discharge`, `rainfall_mm`, `flood_depth`, `storage_percentage`) are nullable and never default to zero or imputed values.
+- **Check Constraints (51 active):** Enforce geographic coordinates (`[-90, 90]` latitude, `[-180, 180]` longitude), probability ranges (`[0.0, 1.0]`), percentage ranges (`[0.0, 100.0]`), and controlled vocabularies.

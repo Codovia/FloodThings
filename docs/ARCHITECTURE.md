@@ -66,8 +66,8 @@ Users
 |---|---|---|
 | Frontend | React + Vite | Implemented — Phase 2.1 |
 | Backend | FastAPI | Implemented — Phase 2.1 |
-| Database | PostgreSQL 16 | Implemented — Docker container |
-| Spatial DB | PostGIS 3.4.3 | Implemented — Docker container |
+| Database | PostgreSQL 16 | Implemented — Docker container + 34 application tables (Phase 2.2) |
+| Spatial DB | PostGIS 3.4.3 | Implemented — 23 spatial columns (EPSG:4326) + 23 GiST indexes (Phase 2.2) |
 | GIS processing | GeoPandas, Shapely, PostGIS | Planned |
 | Maps | Leaflet / React-Leaflet | Planned |
 | Charts | Recharts | Planned |
@@ -106,13 +106,16 @@ Responsibilities:
 - Alert decision engine.
 - Authentication and authorization.
 
-### Database (PARTIAL — container exists, no application schema)
+### Database (IMPLEMENTED — Phase 2.2 Foundation & Data Contract)
 
 PostgreSQL 16 + PostGIS 3.4.3 via Docker.
+Schema deployed and version-controlled via Alembic migration `7eee813798dd`.
 
 Responsibilities:
-- Relational storage for all structured data.
-- Spatial storage and queries via PostGIS.
+- Relational storage for all 34 structured application entities.
+- Spatial storage and queries via PostGIS in EPSG:4326 with 23 GiST indexes.
+- 51 check constraints enforcing coordinates ([-90, 90], [-180, 180]), probabilities, and controlled statuses.
+- Enforces data contract rules: zero mock data, missing values preserved as NULL (`missing ≠ 0`), full UTC TIMESTAMPTZ timestamps, provenance metadata tracking.
 - Single database for the application — no separate document store.
 
 ### GIS (PLANNED)

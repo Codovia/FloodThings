@@ -1,9 +1,9 @@
 # DATA_DICTIONARY.md
 
 **Project:** FloodPulse
-**Status:** Conceptual planning document. No database schema or application models have been implemented.
+**Status:** Implemented (Phase 2.2). The database schema comprises 34 tables deployed via Alembic migration `7eee813798dd` in PostgreSQL 16 + PostGIS 3.4.
 
-This document defines the planned data concepts for FloodPulse. Final SQL schemas, column types, and constraints will be designed during database implementation phases.
+This document defines the data models and physical schema implemented for FloodPulse. All primary keys are UUIDv4. All timestamps are UTC `TIMESTAMPTZ`. All spatial features are in `EPSG:4326`. Missing values in observation tables are strictly preserved as NULL (`missing ≠ 0`).
 
 ---
 
