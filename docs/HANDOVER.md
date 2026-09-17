@@ -1,8 +1,7 @@
 # HANDOVER.md
 
 **Project:** FloodPulse
-**Project:** FloodPulse
-**Last updated:** 2026-09-17 (Phase 2.4)
+**Last updated:** 2026-09-17 (Phase 2.4.1)
 
 Read this document first in every new session.
 
@@ -11,12 +10,13 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.4 — Real Data Ingestion Foundation (COMPLETE)
+Phase:                  Phase 2.4.1 — Data Semantics & Provenance Correction (COMPLETE)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
                         Phase 2.2 — Database + Internal Data Contract (34 tables deployed)
                         Phase 2.3 — Real Source / API Validation Lab (Empirically probed)
+                        Phase 2.4 — Real Data Ingestion Foundation (CLI adapters & verified ingestion)
 ```
 
 ## Repository
@@ -35,21 +35,29 @@ Note: Three different names are in use (FloodPrediction, FloodThings, FloodPulse
 ```
 Backend:                FastAPI application — health endpoints verified
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
+                        Data Category: Enforced data_category column & CHECK constraint on 5 observation tables
                         Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)
                         Source Adapters:
                           - KarnatakaGeographyAdapter (Karnataka State LGD 29 & 31 administrative districts)
-                          - OpenMeteoAdapter (Operational forecast, past observations, historical reanalysis)
-                          - NwicRiverLevelAdapter (CWC hourly river stage in metres, river basins & stations)
-                          - NwicReservoirAdapter (Daily telemetry with verified ft->m, TMC->MCM, cusecs->m³/s conversions)
-                          - IfiFloodAdapter (IFI v3.0 historical disaster events & district observations, depth=NULL)
+                          - OpenMeteoAdapter (Operational forecast, MODEL_OUTPUT past obs, REANALYSIS archive)
+                          - NwicRiverLevelAdapter (CWC hourly river stage in metres, OBSERVATION provenance)
+                          - NwicReservoirAdapter (Daily telemetry with ft->m, TMC->MCM, OBSERVATION provenance)
+                          - IfiFloodAdapter (IFI v3.0 historical disaster events & HISTORICAL_EVENT observations)
                         Raw Data Preservation: data/raw/ (<source>/, preserved JSON/CSV, .gitignore'd)
 Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpulse-postgres)
-                        34 application tables deployed via Alembic migration 7eee813798dd
-                        Populated with real, verified observations (102 river, 101 reservoir, 399 weather,
-                        399 rainfall, 276 forecast, 102 flood events, 188 flood observations, 5 data sources,
-                        43 tracked ingestion runs). Zero fabricated records.
-Tests:                  51 tests (8 health unit + 6 health live + 15 schema + 17 validation/adapters/idempotency + 5 integration) — 100% passing
-Alembic:                Current head: 7eee813798dd, alembic check clean ("No new upgrade operations detected")
+                        34 application tables deployed via Alembic migration ccfc6a6b5d06
+                        Populated with real, verified observations with 100% semantic provenance:
+                        - 397 weather_observations (325 MODEL_OUTPUT, 72 REANALYSIS)
+                        - 397 rainfall_observations (325 MODEL_OUTPUT, 72 REANALYSIS)
+                        - 275 weather_forecasts (72-hour forward predictions)
+                        - 101 river_observations (101 OBSERVATION)
+                        - 100 reservoir_observations (100 OBSERVATION)
+                        - 100 flood_events (historical catalog)
+                        - 186 flood_observations (186 HISTORICAL_EVENT ground truth)
+                        - 31 districts (LGD reference)
+                        Zero unclassified records (0 NULLs). Zero test fixture residue.
+Tests:                  52 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
+Alembic:                Current head: ccfc6a6b5d06, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
 
@@ -159,6 +167,17 @@ backend/tests/test_ingestion_adapters.py    (Unit conversions, field mapping, ob
 backend/tests/test_ingestion_idempotency.py (Zero-duplicate idempotency tests across all adapters)
 docs/INGESTION_RUNBOOK.md                   (Operator guide for manual CLI ingestion and status checks)
 Updated docs/DATA_PIPELINE.md, docs/DATA_SOURCES.md, docs/DATA_CONTRACT.md, docs/DECISIONS.md (D-025, D-026)
+```
+
+## Phase 2.4.1 Artifacts Created
+
+```
+backend/migrations/versions/ccfc6a6b5d06_add_data_category_column_for_semantic_.py (Migration, backfill, & test cleanup)
+docs/DATA_SEMANTICS_AUDIT.md                (Permanent reference for data semantics and provenance classifications)
+docs/DECISIONS.md                           (Added D-027 on semantic provenance categorization)
+Updated backend/app/db/models/              (Added data_category and CHECK constraints on 5 observation models)
+Updated backend/app/ingestion/              (Added DataCategory constants, updated adapters to assign category)
+Updated backend/tests/                      (Added data_category tests, guaranteed test teardowns)
 ```
 
 Wait for project owner review before proceeding.

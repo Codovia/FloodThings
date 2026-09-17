@@ -211,6 +211,7 @@ class RiverObservation(Base):
     source_record_id: Mapped[str | None] = mapped_column(String(100))
     retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     quality_status: Mapped[str | None] = mapped_column(String(20))
+    data_category: Mapped[str | None] = mapped_column(String(30))
 
     station: Mapped[RiverStation] = relationship(
         "RiverStation", back_populates="observations"
@@ -220,6 +221,10 @@ class RiverObservation(Base):
         CheckConstraint(
             "quality_status IS NULL OR quality_status IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')",
             name="ck_river_obs_quality_status",
+        ),
+        CheckConstraint(
+            "data_category IS NULL OR data_category IN ('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')",
+            name="ck_river_obs_data_category",
         ),
         Index("ix_river_obs_station_observed", "station_id", "observed_at"),
         Index("ix_river_obs_source_id", "source_id"),
@@ -363,6 +368,7 @@ class ReservoirObservation(Base):
     source_record_id: Mapped[str | None] = mapped_column(String(100))
     retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     quality_status: Mapped[str | None] = mapped_column(String(20))
+    data_category: Mapped[str | None] = mapped_column(String(30))
 
     reservoir: Mapped[Reservoir] = relationship(
         "Reservoir", back_populates="observations"
@@ -376,6 +382,10 @@ class ReservoirObservation(Base):
         CheckConstraint(
             "quality_status IS NULL OR quality_status IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')",
             name="ck_reservoir_obs_quality_status",
+        ),
+        CheckConstraint(
+            "data_category IS NULL OR data_category IN ('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')",
+            name="ck_reservoir_obs_data_category",
         ),
         Index("ix_reservoir_obs_reservoir_observed", "reservoir_id", "observed_at"),
         Index("ix_reservoir_obs_source_id", "source_id"),

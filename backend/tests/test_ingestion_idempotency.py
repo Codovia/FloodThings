@@ -38,13 +38,19 @@ class TestIngestionIdempotency:
 """
         factory = _get_session_factory()
         with factory() as session:
-            adapter = NwicRiverLevelAdapter(session)
-            res1 = adapter.ingest(csv_content=csv_data)
-            assert res1.status in ("SUCCESS", "PARTIAL")
+            try:
+                adapter = NwicRiverLevelAdapter(session)
+                res1 = adapter.ingest(csv_content=csv_data)
+                assert res1.status in ("SUCCESS", "PARTIAL")
 
-            res2 = adapter.ingest(csv_content=csv_data)
-            assert res2.status in ("SUCCESS", "PARTIAL")
-            assert res2.metrics.records_inserted == 0
+                res2 = adapter.ingest(csv_content=csv_data)
+                assert res2.status in ("SUCCESS", "PARTIAL")
+                assert res2.metrics.records_inserted == 0
+            finally:
+                from sqlalchemy import text
+                session.execute(text("DELETE FROM river_observations WHERE source_record_id LIKE '%IDEMP%'"))
+                session.execute(text("DELETE FROM river_stations WHERE station_code = 'IDEMP_STN'"))
+                session.commit()
 
     def test_nwic_reservoir_idempotency(self):
         csv_data = """Reservoir Name,Basin,"Sub 
@@ -55,13 +61,19 @@ IDEMP_RES,Cauvery,Cauvery,Cauvery,01-01-2026 08:00:00,75.0,1500.0,50.0,40.0,30.0
 """
         factory = _get_session_factory()
         with factory() as session:
-            adapter = NwicReservoirAdapter(session)
-            res1 = adapter.ingest(csv_content=csv_data)
-            assert res1.status in ("SUCCESS", "PARTIAL")
+            try:
+                adapter = NwicReservoirAdapter(session)
+                res1 = adapter.ingest(csv_content=csv_data)
+                assert res1.status in ("SUCCESS", "PARTIAL")
 
-            res2 = adapter.ingest(csv_content=csv_data)
-            assert res2.status in ("SUCCESS", "PARTIAL")
-            assert res2.metrics.records_inserted == 0
+                res2 = adapter.ingest(csv_content=csv_data)
+                assert res2.status in ("SUCCESS", "PARTIAL")
+                assert res2.metrics.records_inserted == 0
+            finally:
+                from sqlalchemy import text
+                session.execute(text("DELETE FROM reservoir_observations WHERE source_record_id LIKE '%IDEMP%'"))
+                session.execute(text("DELETE FROM reservoirs WHERE code = 'IDEMP_RES' OR name = 'IDEMP_RES'"))
+                session.commit()
 
     def test_ifi_flood_idempotency(self):
         csv_data = """Unnamed: 0,UEI,Start Date,End Date,Duration(Days),Main Cause,Location,Districts,State,Latitude,Longitude,Severity,Area Affected,Human fatality,Human injured,Human Displaced,Animal Fatality,Description of Casualties/injured,Extent of damage ,Event Source,Event Souce ID,District_LGD_Codes,State_Codes
@@ -69,41 +81,54 @@ IDEMP_RES,Cauvery,Cauvery,Cauvery,01-01-2026 08:00:00,75.0,1500.0,50.0,40.0,30.0
 """
         factory = _get_session_factory()
         with factory() as session:
-            adapter = IfiFloodAdapter(session)
-            res1 = adapter.ingest(csv_content=csv_data)
-            assert res1.status in ("SUCCESS", "PARTIAL")
+            try:
+                adapter = IfiFloodAdapter(session)
+                res1 = adapter.ingest(csv_content=csv_data)
+                assert res1.status in ("SUCCESS", "PARTIAL")
 
-            res2 = adapter.ingest(csv_content=csv_data)
-            assert res2.status in ("SUCCESS", "PARTIAL")
-            assert res2.metrics.records_inserted == 0
+                res2 = adapter.ingest(csv_content=csv_data)
+                assert res2.status in ("SUCCESS", "PARTIAL")
+                assert res2.metrics.records_inserted == 0
+            finally:
+                from sqlalchemy import text
+                session.execute(text("DELETE FROM flood_observations WHERE source_record_id LIKE '%UEI-IDEMP-KA-001%'"))
+                session.execute(text("DELETE FROM flood_events WHERE name LIKE '%UEI-IDEMP-KA-001%'"))
+                session.commit()
 
     def test_open_meteo_idempotency(self):
         factory = _get_session_factory()
         with factory() as session:
-            mock_client = MagicMock()
-            mock_response = MagicMock()
-            mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "latitude": 12.9716,
-                "longitude": 77.5946,
-                "hourly": {
-                    "time": ["2021-01-01T00:00"],
-                    "temperature_2m": [22.0],
-                    "relative_humidity_2m": [70.0],
-                    "surface_pressure": [1013.0],
-                    "wind_speed_10m": [2.5],
-                    "wind_direction_10m": [90.0],
-                    "precipitation": [0.0],
-                },
-            }
-            mock_client.get.return_value = mock_response
+            try:
+                mock_client = MagicMock()
+                mock_response = MagicMock()
+                mock_response.status_code = 200
+                mock_response.json.return_value = {
+                    "latitude": 12.9716,
+                    "longitude": 77.5946,
+                    "hourly": {
+                        "time": ["2021-01-01T00:00"],
+                        "temperature_2m": [22.0],
+                        "relative_humidity_2m": [70.0],
+                        "surface_pressure": [1013.0],
+                        "wind_speed_10m": [2.5],
+                        "wind_direction_10m": [90.0],
+                        "precipitation": [0.0],
+                    },
+                }
+                mock_client.get.return_value = mock_response
 
-            adapter = OpenMeteoAdapter(session)
-            loc = [{"name": "Idemp Loc", "lat": 12.9716, "lon": 77.5946, "district_code": "526"}]
+                adapter = OpenMeteoAdapter(session)
+                loc = [{"name": "Idemp Loc", "lat": 12.9716, "lon": 77.5946, "district_code": "526"}]
 
-            res1 = adapter.ingest(mode="operational", locations=loc, client=mock_client)
-            assert res1.status in ("SUCCESS", "PARTIAL")
+                res1 = adapter.ingest(mode="operational", locations=loc, client=mock_client)
+                assert res1.status in ("SUCCESS", "PARTIAL")
 
-            res2 = adapter.ingest(mode="operational", locations=loc, client=mock_client)
-            assert res2.status in ("SUCCESS", "PARTIAL")
-            assert res2.metrics.records_inserted == 0
+                res2 = adapter.ingest(mode="operational", locations=loc, client=mock_client)
+                assert res2.status in ("SUCCESS", "PARTIAL")
+                assert res2.metrics.records_inserted == 0
+            finally:
+                from sqlalchemy import text
+                session.execute(text("DELETE FROM weather_observations WHERE location_reference = 'Idemp Loc'"))
+                session.execute(text("DELETE FROM rainfall_observations WHERE station_id = 'Idemp Loc'"))
+                session.execute(text("DELETE FROM weather_forecasts WHERE location_reference = 'Idemp Loc'"))
+                session.commit()

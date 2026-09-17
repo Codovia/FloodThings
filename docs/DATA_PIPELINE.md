@@ -144,6 +144,26 @@ Official External Source (Verified API / CSV / GeoJSON / COG)
 
 ---
 
+---
+
+### 2.7 Data Semantics & Provenance Classification (`data_category`)
+
+Per Phase 2.4.1 and `docs/DATA_SEMANTICS_AUDIT.md`, all observation tables enforce a strict `data_category VARCHAR(30)` column:
+
+| Table | Category | Provenance Meaning |
+|---|---|---|
+| `weather_observations` (operational past) | `MODEL_OUTPUT` | Numerical weather prediction nowcast/hindcast (ICON/GFS 0.1° grid) |
+| `weather_observations` (historical archive) | `REANALYSIS` | ECMWF ERA5 atmospheric reanalysis reconstruction |
+| `rainfall_observations` (operational past) | `MODEL_OUTPUT` | NWP gridded precipitation nowcast/hindcast |
+| `rainfall_observations` (historical archive) | `REANALYSIS` | ECMWF ERA5-Land gridded precipitation reanalysis |
+| `river_observations` | `OBSERVATION` | In-situ physical staff gauge reading by CWC/NWIC observers |
+| `reservoir_observations` | `OBSERVATION` | In-situ physical daily dam monitoring reading by WRD Karnataka |
+| `flood_observations` | `HISTORICAL_EVENT` | Curated disaster occurrence ground truth from India Flood Inventory |
+
+Under no circumstances should `MODEL_OUTPUT` or `REANALYSIS` be confused with physical station observations in downstream feature engineering or model evaluation.
+
+---
+
 ## 3. Data Flow & Feature Store Bridge
 
 ```text
@@ -171,5 +191,6 @@ Raw Observation Tables
 - **Phase 2.1**: Project Foundation (Completed).
 - **Phase 2.2**: Database Models & Internal Data Contract (Completed).
 - **Phase 2.3**: Real Source / API Validation Lab (Completed).
-- **Phase 2.4**: Implementation of lightweight source adapters and batch ingestion scripts.
+- **Phase 2.4**: Implementation of lightweight source adapters and batch ingestion scripts (Completed).
+- **Phase 2.4.1**: Data Semantics & Provenance Correction Audit (Completed).
 - **Phase 2.5**: Automated background ingestion (APScheduler) and source-health monitoring dashboard.

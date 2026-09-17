@@ -36,6 +36,7 @@ from app.ingestion.registry import (
 )
 from app.ingestion.validation import (
     IST_TZ,
+    DataCategory,
     QualityStatus,
     parse_utc_timestamp,
     validate_float,
@@ -230,6 +231,7 @@ class IfiFloodAdapter(BaseAdapter):
                             source_record_id=source_rec_id,
                             confidence=1.0,
                             quality_status=QualityStatus.VALID,
+                            data_category=DataCategory.HISTORICAL_EVENT,
                         )
                         self.session.add(flood_obs)
                         metrics.records_inserted += 1

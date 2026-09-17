@@ -68,6 +68,7 @@ class WeatherObservation(Base):
     source_record_id: Mapped[str | None] = mapped_column(String(100))
     retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     quality_status: Mapped[str | None] = mapped_column(String(20))
+    data_category: Mapped[str | None] = mapped_column(String(30))
 
     __table_args__ = (
         CheckConstraint(
@@ -93,6 +94,10 @@ class WeatherObservation(Base):
         CheckConstraint(
             "quality_status IS NULL OR quality_status IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')",
             name="ck_weather_obs_quality_status",
+        ),
+        CheckConstraint(
+            "data_category IS NULL OR data_category IN ('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')",
+            name="ck_weather_obs_data_category",
         ),
         Index("ix_weather_obs_district_observed", "district_id", "observed_at"),
         Index("ix_weather_obs_source_id", "source_id"),
@@ -133,6 +138,7 @@ class RainfallObservation(Base):
     source_record_id: Mapped[str | None] = mapped_column(String(100))
     retrieved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     quality_status: Mapped[str | None] = mapped_column(String(20))
+    data_category: Mapped[str | None] = mapped_column(String(30))
 
     __table_args__ = (
         CheckConstraint(
@@ -154,6 +160,10 @@ class RainfallObservation(Base):
         CheckConstraint(
             "quality_status IS NULL OR quality_status IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')",
             name="ck_rainfall_obs_quality_status",
+        ),
+        CheckConstraint(
+            "data_category IS NULL OR data_category IN ('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')",
+            name="ck_rainfall_obs_data_category",
         ),
         Index("ix_rainfall_obs_district_observed", "district_id", "observed_at"),
         Index("ix_rainfall_obs_source_id", "source_id"),

@@ -72,6 +72,7 @@ class FloodObservation(Base):
     source_record_id: Mapped[str | None] = mapped_column(String(100))
     confidence: Mapped[float | None] = mapped_column(Float)
     quality_status: Mapped[str | None] = mapped_column(String(20))
+    data_category: Mapped[str | None] = mapped_column(String(30))
 
     __table_args__ = (
         CheckConstraint(
@@ -85,6 +86,10 @@ class FloodObservation(Base):
         CheckConstraint(
             "quality_status IS NULL OR quality_status IN ('VALID', 'SUSPECT', 'INVALID', 'MISSING', 'STALE')",
             name="ck_flood_obs_quality_status",
+        ),
+        CheckConstraint(
+            "data_category IS NULL OR data_category IN ('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')",
+            name="ck_flood_obs_data_category",
         ),
         Index("ix_flood_obs_observation_time", "observation_time"),
         Index("ix_flood_obs_district_id", "district_id"),

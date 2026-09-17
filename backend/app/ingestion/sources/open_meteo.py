@@ -39,6 +39,7 @@ from app.ingestion.registry import (
     start_ingestion_run,
 )
 from app.ingestion.validation import (
+    DataCategory,
     QualityStatus,
     make_point_wkt,
     parse_utc_timestamp,
@@ -280,6 +281,7 @@ class OpenMeteoAdapter(BaseAdapter):
                         source_record_id=w_rec_id,
                         retrieved_at=retrieved_at,
                         quality_status=QualityStatus.VALID,
+                        data_category=DataCategory.MODEL_OUTPUT,
                     )
                     self.session.add(w_obs)
                     metrics.records_inserted += 1
@@ -307,6 +309,7 @@ class OpenMeteoAdapter(BaseAdapter):
                         source_record_id=r_rec_id,
                         retrieved_at=retrieved_at,
                         quality_status=QualityStatus.VALID,
+                        data_category=DataCategory.MODEL_OUTPUT,
                     )
                     self.session.add(r_obs)
                     metrics.records_inserted += 1
@@ -430,6 +433,7 @@ class OpenMeteoAdapter(BaseAdapter):
                     source_record_id=w_rec_id,
                     retrieved_at=retrieved_at,
                     quality_status=QualityStatus.VALID,
+                    data_category=DataCategory.REANALYSIS,
                 )
                 self.session.add(w_obs)
                 metrics.records_inserted += 1
@@ -456,6 +460,7 @@ class OpenMeteoAdapter(BaseAdapter):
                     source_record_id=r_rec_id,
                     retrieved_at=retrieved_at,
                     quality_status=QualityStatus.VALID,
+                    data_category=DataCategory.REANALYSIS,
                 )
                 self.session.add(r_obs)
                 metrics.records_inserted += 1

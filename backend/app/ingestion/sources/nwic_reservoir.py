@@ -44,6 +44,7 @@ from app.ingestion.registry import (
 )
 from app.ingestion.validation import (
     IST_TZ,
+    DataCategory,
     QualityStatus,
     make_point_wkt,
     parse_utc_timestamp,
@@ -302,6 +303,7 @@ class NwicReservoirAdapter(BaseAdapter):
                         source_record_id=source_record_id,
                         retrieved_at=retrieved_at,
                         quality_status=quality,
+                        data_category=DataCategory.OBSERVATION,
                     )
                     self.session.add(obs)
                     metrics.records_inserted += 1

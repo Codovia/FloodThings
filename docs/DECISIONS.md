@@ -289,4 +289,20 @@
 3. Missing readings remain strictly `NULL`. No zero-filling or synthetic guesses are allowed (`missing ≠ 0`).
 **Affected components:** `backend/app/ingestion/sources/`, database observation tables.
 
+---
+
+**D-027 — Semantic Provenance Categorization (data_category) & Scientific Audit**
+**Date:** 2026-09-17
+**Status:** IMPLEMENTED (Phase 2.4.1)
+**Decision:**
+1. Explicitly classify every observation record with a mandatory semantic `data_category` column constrained to `('OBSERVATION', 'REANALYSIS', 'MODEL_OUTPUT', 'FORECAST', 'HISTORICAL_EVENT', 'REFERENCE')`.
+2. Categorize Open-Meteo operational weather and precipitation as `MODEL_OUTPUT` (gridded NWP model nowcasts/hindcasts, not physical station readings).
+3. Categorize Open-Meteo historical archive data as `REANALYSIS` (ERA5 atmospheric reanalysis).
+4. Categorize CWC river levels and WRD reservoir telemetry as `OBSERVATION` (in-situ physical gauge readings).
+5. Categorize India Flood Inventory (IFI v3.0) flood occurrences as `HISTORICAL_EVENT` (curated disaster records).
+6. Purge test fixtures from production database tables and enforce automated test teardown in pytest fixtures to prevent test contamination.
+**Context:** Downstream ML and hydrological models must never treat gridded numerical weather model outputs as physical in-situ measurements, which would corrupt model validation and introduce hidden bias.
+**Affected components:** `backend/app/db/models/`, `backend/app/ingestion/sources/`, `backend/migrations/versions/ccfc6a6b5d06_*.py`, `docs/DATA_SEMANTICS_AUDIT.md`.
+
+
 

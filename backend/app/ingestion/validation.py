@@ -36,6 +36,17 @@ class QualityStatus:
     STALE = "STALE"
 
 
+class DataCategory:
+    """Allowed semantic provenance categories per DATA_CONTRACT.md & Phase 2.4.1."""
+
+    OBSERVATION = "OBSERVATION"
+    REANALYSIS = "REANALYSIS"
+    MODEL_OUTPUT = "MODEL_OUTPUT"
+    FORECAST = "FORECAST"
+    HISTORICAL_EVENT = "HISTORICAL_EVENT"
+    REFERENCE = "REFERENCE"
+
+
 def parse_utc_timestamp(
     ts_val: Any,
     default_tz: ZoneInfo = IST_TZ,

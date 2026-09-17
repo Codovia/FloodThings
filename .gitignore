@@ -110,6 +110,7 @@ data/processed/*
 !data/processed/.gitkeep
 data/manifests/*
 !data/manifests/.gitkeep
+backend/data/
 
 # ------------------------------------------------------------------------------
 # 8. ML model artifacts
