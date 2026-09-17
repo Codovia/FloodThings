@@ -1,0 +1,6 @@
+# pytest configuration for FloodPulse backend.
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: tests requiring a live database (deselect with: -m 'not integration')",
+]

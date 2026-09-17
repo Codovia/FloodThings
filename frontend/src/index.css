@@ -1,4 +1,4 @@
-/* FloodPulse — application shell styles (Phase 0 foundation) */
+/* FloodPulse — application shell styles (Phase 2.1 foundation) */
 
 *,
 *::before,
@@ -15,6 +15,9 @@
   --color-text: #e2e8f0;
   --color-text-muted: #94a3b8;
   --color-accent: #38bdf8;
+  --color-ok: #22c55e;
+  --color-error: #ef4444;
+  --color-warn: #f59e0b;
 }
 
 body {
@@ -68,6 +71,9 @@ body {
   margin: 0 auto;
   padding: 2rem 1.5rem;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .status-section {
@@ -87,6 +93,63 @@ body {
   color: var(--color-text-muted);
   font-size: 0.9375rem;
 }
+
+/* ---- Health status grid ---- */
+
+.status-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.status-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.status-row:last-child {
+  border-bottom: none;
+}
+
+.status-label {
+  font-weight: 500;
+  min-width: 5rem;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.125rem 0.625rem;
+  border-radius: 9999px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-ok {
+  background: color-mix(in srgb, var(--color-ok) 15%, transparent);
+  color: var(--color-ok);
+}
+
+.status-error {
+  background: color-mix(in srgb, var(--color-error) 15%, transparent);
+  color: var(--color-error);
+}
+
+.status-loading {
+  background: color-mix(in srgb, var(--color-warn) 15%, transparent);
+  color: var(--color-warn);
+}
+
+.status-detail {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+/* ---- Footer ---- */
 
 .app-footer {
   text-align: center;

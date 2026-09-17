@@ -25,10 +25,21 @@ def client():
 
 @pytest.fixture(autouse=True)
 def _isolate_from_database(monkeypatch):
-    """Ensure DATABASE_URL is not set during tests and reset any cached
-    engine/session singletons so we never accidentally connect to the
-    real FloodPulse database."""
+    """Ensure DATABASE_URL is not available during tests — neither from
+    os.environ NOR from the local .env file — so we never accidentally
+    connect to the real FloodPulse database.
+
+    We override get_settings() to return a clean Settings object with
+    database_url=None, bypassing pydantic-settings .env file reading.
+    """
     monkeypatch.delenv("DATABASE_URL", raising=False)
+
+    from app.core.config import Settings
+
+    _test_settings = Settings(database_url=None, app_env="testing")
+
+    monkeypatch.setattr("app.core.config.get_settings", lambda: _test_settings)
+    monkeypatch.setattr("app.api.health.get_settings", lambda: _test_settings)
 
     # Reset the lazy engine/session singletons from db.session so that
     # each test starts clean.

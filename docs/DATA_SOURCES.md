@@ -1,7 +1,11 @@
 # DATA_SOURCES.md
 
 **Project:** FloodPulse
-**Status:** Planning document. No data sources are currently integrated. All sources require verification before an adapter is built.
+**Status:** Updated following Phase 1 research. Source verification is complete.
+- Authoritative Selection Matrix: See [FINAL_SOURCE_SELECTION.md](file:///home/pioneer/Projects/FloodPrediction/docs/FINAL_SOURCE_SELECTION.md).
+- Detailed Adapter Ingestion Contracts: See [DATA_ACQUISITION_SPEC.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_ACQUISITION_SPEC.md).
+- Comprehensive 44-Source Inventory: See [DATA_SOURCE_INVENTORY.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_SOURCE_INVENTORY.md).
+- Empirical Test Evidence: See [DATA_SOURCE_VERIFICATION.md](file:///home/pioneer/Projects/FloodPrediction/docs/DATA_SOURCE_VERIFICATION.md).
 
 ---
 
@@ -34,11 +38,12 @@ Every data source used by FloodPulse must record:
 ## Source verification status values
 
 ```
-CONFIRMED        — Accessed, format verified, Karnataka coverage confirmed
-ACCESS_PENDING   — Source identified but not yet tested
+CONFIRMED          — Accessed, format verified, Karnataka coverage confirmed, ready for adapter
+ACCESS_PENDING     — Source identified but not yet tested
 VALIDATION_PENDING — Accessible but fields/coverage not yet verified
-UNAVAILABLE      — Source does not provide what was expected
-REJECTED         — Source evaluated and not suitable
+CREDENTIAL_BLOCKED — Verified service requiring unobtained credentials
+UNAVAILABLE        — Source does not provide what was expected or restricted to internal government logins
+REJECTED           — Source evaluated and not suitable
 ```
 
 No adapter is written against a source that is not `CONFIRMED`.

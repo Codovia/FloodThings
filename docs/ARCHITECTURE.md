@@ -64,10 +64,10 @@ Users
 
 | Layer | Technology | Status |
 |---|---|---|
-| Frontend | React + Vite | Planned |
-| Backend | FastAPI | Planned |
-| Database | PostgreSQL 16 | Exists (Docker container, outside repo) |
-| Spatial DB | PostGIS 3.4.3 | Exists (Docker container, outside repo) |
+| Frontend | React + Vite | Implemented — Phase 2.1 |
+| Backend | FastAPI | Implemented — Phase 2.1 |
+| Database | PostgreSQL 16 | Implemented — Docker container |
+| Spatial DB | PostGIS 3.4.3 | Implemented — Docker container |
 | GIS processing | GeoPandas, Shapely, PostGIS | Planned |
 | Maps | Leaflet / React-Leaflet | Planned |
 | Charts | Recharts | Planned |
@@ -75,9 +75,9 @@ Users
 | ML training | Google Colab (experimentation) | Planned |
 | Background jobs | APScheduler or equivalent | Planned — to be evaluated |
 | Notifications | Telegram | Planned |
-| API style | REST / OpenAPI | Planned |
+| API style | REST / OpenAPI | Implemented — health endpoints |
 | Auth | Secure token-based | Planned |
-| Containers | Docker / Docker Compose | Partial — DB container exists |
+| Containers | Docker / Docker Compose | Implemented — postgres service |
 | Version control | Git + GitHub | Active |
 
 ---
@@ -182,10 +182,17 @@ Responsibilities:
 
 ## Current state
 
-As of Phase 0:
+As of Phase 2.1 (2026-09-17):
 
-- Repository structure exists (P0.1).
-- `.gitignore` exists (P0.2).
-- `MASTER_PROJECT_SPEC.md` exists (untracked).
-- Docker PostGIS container (`floodpulse-postgres`) is running on port 5432, healthy, but not managed by any in-repo compose file.
-- No application code, no schema, no data, no ML, no frontend, no tests exist in the repository.
+- Repository structure complete (directories, `.gitignore`, `.env.example`).
+- All 16 project-control documents tracked in `docs/`.
+- Docker Compose with PostGIS container running (PostgreSQL 16.4, PostGIS 3.4).
+- FastAPI backend with genuine health endpoints (`/health`, `/health/database`, `/health/postgis`).
+- SQLAlchemy + GeoAlchemy2 database layer with lazy engine.
+- Alembic migration foundation verified (autogenerate works, PostGIS system tables excluded).
+- React + Vite frontend with real backend health-status display.
+- Frontend→Backend connection via Vite dev proxy (`/api/*` → `localhost:8001`).
+- Unit tests (8 tests, no DB required) + integration tests (6 tests, live DB) — all passing.
+- No application domain tables — schema belongs to later phases.
+- No fabricated data anywhere in the codebase.
+

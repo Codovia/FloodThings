@@ -4,6 +4,11 @@ Alembic environment configuration for FloodPulse.
 Reads DATABASE_URL from the application configuration (environment
 variables / .env) rather than from alembic.ini, so that credentials
 are never embedded in a checked-in file.
+
+Autogenerate is configured to:
+    - Only manage the 'public' schema.
+    - Exclude PostGIS system tables (spatial_ref_sys).
+    - Ignore tiger and topology schemas entirely.
 """
 
 from logging.config import fileConfig
@@ -14,6 +19,10 @@ from sqlalchemy import engine_from_config, pool
 from app.core.config import get_settings
 from app.db.session import Base
 
+# When domain models are added in later phases, import them here
+# so that Base.metadata contains the complete schema for autogenerate.
+# Example: import app.db.models  # noqa: F401
+
 # Alembic Config object — provides access to alembic.ini values.
 config = context.config
 
@@ -23,6 +32,31 @@ if config.config_file_name is not None:
 
 # SQLAlchemy MetaData for autogenerate support.
 target_metadata = Base.metadata
+
+# Tables that exist in the database but are NOT managed by FloodPulse.
+# Alembic must never attempt to create, alter, or drop these.
+_EXCLUDE_TABLES = frozenset({"spatial_ref_sys"})
+
+
+def _include_object(object, name, type_, reflected, compare_to):
+    """Filter for Alembic autogenerate.
+
+    Excludes PostGIS system/extension tables and non-public schemas so that
+    Alembic never tries to drop tiger, topology, or PostGIS extension tables.
+    """
+    if type_ == "table":
+        # Exclude tables in non-public schemas (tiger, topology).
+        schema = getattr(object, "schema", None)
+        if schema is not None and schema != "public":
+            return False
+        # Exclude known PostGIS system tables in public schema.
+        if name in _EXCLUDE_TABLES:
+            return False
+        # Protect all unmanaged reflected tables (e.g. PostGIS/Tiger extension tables
+        # reflected via PostgreSQL search_path).
+        if reflected and name not in target_metadata.tables:
+            return False
+    return True
 
 
 def _get_url() -> str:
@@ -48,6 +82,8 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        include_schemas=False,
+        include_object=_include_object,
     )
 
     with context.begin_transaction():
@@ -72,6 +108,8 @@ def run_migrations_online() -> None:
         context.configure(
             connection=connection,
             target_metadata=target_metadata,
+            include_schemas=False,
+            include_object=_include_object,
         )
 
         with context.begin_transaction():
