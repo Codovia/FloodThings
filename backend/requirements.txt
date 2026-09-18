@@ -19,6 +19,12 @@ alembic==1.15.2
 # Scheduler
 apscheduler==3.10.4
 
+# GIS & Spatial processing
+shapely==2.1.2
+pyproj==3.8.0
+geopandas==1.1.4
+rasterio==1.5.1
+
 # Testing
 pytest==8.4.1
 httpx==0.28.1
