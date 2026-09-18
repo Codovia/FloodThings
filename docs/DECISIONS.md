@@ -347,8 +347,21 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 1. Dual-layer concurrency guard: configure APScheduler jobs with `max_instances=1` and `coalesce=True`, backed by an in-process `asyncio.Lock` inside `IngestionJobRunner`.
 2. If an ingestion execution is already in progress, suppress overlapping executions and log a clear warning; never fabricate fake success records for skipped executions.
 3. Thread offloading: synchronous blocking network and database operations in `OpenMeteoAdapter` are offloaded via `asyncio.to_thread` to prevent blocking the main FastAPI asyncio event loop.
-4. Session isolation: each scheduled run creates an isolated SQLAlchemy `SessionLocal()` closed in `finally`.
-**Affected components:** `backend/app/scheduler/runner.py`.
+
+---
+
+**D-032 — KSR-SAC Administrative GIS Normalization & Topologic Repair Protocol**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.6 Foundation)
+**Decision:**
+1. Authoritative GIS Source: Ingest official KSR-SAC / KGIS gazetted administrative boundary shapefiles (`District.shp` for 31 districts, `Taluk.shp` for 240 taluks) located at `data/raw/gis/ksrsac/`.
+2. Raw Source Preservation Policy: Source files on disk are strictly read-only and must never be modified, overwritten, or repaired in-place.
+3. Coordinate Transformation: Source horizontal CRS is validated as `EPSG:32643` (UTM Zone 43N, metres). Geometries are transformed to `EPSG:4326` (WGS 84, decimal degrees) with guaranteed `MultiPolygon` typing for PostGIS database storage.
+4. Deterministic Topology Repair: Exactly 3 taluk geometries in the source dataset contain minor ring self-intersections (Shivamogga KGIS 1506 / LGD 5520, Sringeri KGIS 1701 / LGD 5525, Hosanagar KGIS 1504 / LGD 5518). These are repaired deterministically in source metric space using `shapely.make_valid()`. `buffer(0)` is strictly prohibited. The resulting area alteration is sub-millimetric floating-point noise ($< 10^{-14}$ relative area difference).
+5. Overlap Tolerance Policy: Substantive polygon overlaps between districts or between taluks of the same district are prohibited. A relative overlap tolerance of $\text{REL\_TOL} = 10^{-10}$ ($\text{intersection\_area} / \min(\text{area}_a, \text{area}_b)$) is enforced to absorb survey digitizing edge-coincidence floating-point artifacts while guaranteeing zero substantive overlapping jurisdiction.
+6. Vijayanagara 6-Taluk Verification: District KGIS 31 (Vijayanagara, LGD code 738 in KSR-SAC `District.shp`) is verified to contain exactly 6 constituent taluks (Hadagali, Hagaribommanahalli, Harapanahalli, Hosapete, Kotturu, Kudligi).
+7. Provenance & Identifier Preservation: Both KGIS codes and official LGD codes are preserved across all 31 districts and 240 taluks.
+**Affected components:** `backend/app/gis/ksrsac.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ksrsac_gis.py`.
 
 
 

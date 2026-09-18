@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.5 — Automated Background Ingestion & Source Health (COMPLETE)
+Phase:                  Phase 2.6 — GIS Foundation (NORMALIZATION READY)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -18,6 +18,7 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 2.3 — Real Source / API Validation Lab (Empirically probed)
                         Phase 2.4 — Real Data Ingestion Foundation (CLI adapters & verified ingestion)
                         Phase 2.4.1 — Data Semantics & Provenance Correction (Backfilled provenance)
+                        Phase 2.5 — Automated Background Ingestion & Source Health (Completed)
 ```
 
 ## Repository
@@ -43,6 +44,12 @@ Backend:                FastAPI application with lifespan-integrated APScheduler
                         Scheduler Package: app/scheduler/ (manager.py, runner.py, jobs.py)
                           - In-process concurrency locking & thread offload via asyncio.to_thread
                           - Single-instance max_instances=1, coalesce=True
+                        GIS Package: app/gis/ (ksrsac.py, __init__.py)
+                          - KsrsacAdminNormalizer: In-memory normalization of KSR-SAC District.shp and Taluk.shp
+                          - Read-only raw preservation: zero file modifications on disk
+                          - Deterministic repair of 3 known invalid taluks via shapely.make_valid()
+                          - Target output in EPSG:4326 with strict MultiPolygon typing
+                          - Provenance preservation: KGIS + LGD codes for 31 districts and 240 taluks
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
                         Data Category: Enforced data_category column & CHECK constraint on 5 observation tables
                         Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)
@@ -65,7 +72,7 @@ Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpuls
                         - 186 flood_observations (186 HISTORICAL_EVENT historical evidence)
                         - 31 districts (LGD reference)
                         Zero unclassified records (0 NULLs). Zero test fixture residue.
-Tests:                  80 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
+Tests:                  95 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
 Alembic:                Current head: ccfc6a6b5d06, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
