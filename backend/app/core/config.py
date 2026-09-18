@@ -29,6 +29,15 @@ class Settings(BaseSettings):
     # NEVER supply a default that contains a password.
     database_url: str | None = None
 
+    # Background Scheduler (Phase 2.5)
+    scheduler_enabled: bool = True
+    openmeteo_ingestion_interval_minutes: int = 60
+
+    # Source Health Internal Operational Policy (Phase 2.5)
+    # NOTE: These are FloodPulse internal project policies, NOT upstream provider SLAs.
+    openmeteo_freshness_threshold_hours: int = 4
+    source_health_consecutive_failure_threshold: int = 3
+
 
 def get_settings() -> Settings:
     """Return application settings. Cached per-process by FastAPI Depends."""

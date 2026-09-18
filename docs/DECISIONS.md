@@ -304,5 +304,51 @@
 **Context:** Downstream ML and hydrological models must never treat gridded numerical weather model outputs as physical in-situ measurements, which would corrupt model validation and introduce hidden bias.
 **Affected components:** `backend/app/db/models/`, `backend/app/ingestion/sources/`, `backend/migrations/versions/ccfc6a6b5d06_*.py`, `docs/DATA_SEMANTICS_AUDIT.md`.
 
+---
+
+**D-028 — In-Process Scheduler Integration via APScheduler AsyncIOScheduler**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.5)
+**Decision:**
+Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI application lifespan (`app.main:lifespan`).
+**Context:** The application is a single-instance modular monolith for development and staging. Celery, Redis, and distributed workers are explicitly out of scope per MASTER_PROJECT_SPEC.md. AsyncIOScheduler runs in-process on the main Uvicorn event loop and shuts down gracefully with the application.
+**Affected components:** `backend/requirements.txt`, `backend/app/scheduler/`, `backend/app/main.py`.
+
+---
+
+**D-029 — Group A Automation Scope & Operational Polling Frequency**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.5)
+**Decision:**
+1. Restrict automated background scheduling strictly to Group A: `OpenMeteoAdapter` operational weather nowcasts and forecasts.
+2. Maintain the 5 verified district representative query points (Bengaluru, Belagavi, Mangaluru, Kalaburagi, Mandya) without expanding to 31 districts.
+3. Schedule operational execution at a default interval of 60 minutes (`openmeteo_ingestion_interval_minutes = 60`), generating ~120 API requests/day (well within the 10,000 req/day limit).
+4. Strictly prohibit recurring scheduling for static archives (IFI v3.0, LGD) or monolithic batch datasets (CWC river tranches, NWIC 2006–2008 reservoir data).
+**Affected components:** `backend/app/scheduler/jobs.py`, `backend/app/core/config.py`.
+
+---
+
+**D-030 — Dynamic Source Health Evaluation & FloodPulse Internal Freshness Policy**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.5)
+**Decision:**
+1. Compute source health dynamically on request via `SourceHealthService` without adding persistent `health_status` columns to `DataSource`.
+2. Derive health from `DataSource.is_active`, `DataIngestionRun` history, consecutive failure counts, and actual stored observation timestamps (`WeatherObservation.observed_at`, etc.).
+3. Supported states: `HEALTHY`, `DEGRADED`, `DOWN`.
+4. Freshness SLA Clarification: Upstream providers (Open-Meteo, NWIC, CWC) do NOT publish formal freshness SLAs. Therefore, the 4-hour freshness threshold (`openmeteo_freshness_threshold_hours = 4`) and the 3-failure threshold (`source_health_consecutive_failure_threshold = 3`) are explicitly defined and documented as **FloodPulse internal operational policies**, never as upstream provider requirements.
+**Affected components:** `backend/app/services/source_health.py`, `backend/app/api/v1/source_health.py`, `backend/app/schemas/source_health.py`.
+
+---
+
+**D-031 — Concurrency Protection and Async/Sync Safety**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.5)
+**Decision:**
+1. Dual-layer concurrency guard: configure APScheduler jobs with `max_instances=1` and `coalesce=True`, backed by an in-process `asyncio.Lock` inside `IngestionJobRunner`.
+2. If an ingestion execution is already in progress, suppress overlapping executions and log a clear warning; never fabricate fake success records for skipped executions.
+3. Thread offloading: synchronous blocking network and database operations in `OpenMeteoAdapter` are offloaded via `asyncio.to_thread` to prevent blocking the main FastAPI asyncio event loop.
+4. Session isolation: each scheduled run creates an isolated SQLAlchemy `SessionLocal()` closed in `finally`.
+**Affected components:** `backend/app/scheduler/runner.py`.
+
 
 

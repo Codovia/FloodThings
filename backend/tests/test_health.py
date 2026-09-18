@@ -36,7 +36,9 @@ def _isolate_from_database(monkeypatch):
 
     from app.core.config import Settings
 
-    _test_settings = Settings(database_url=None, app_env="testing")
+    _test_settings = Settings(
+        database_url=None, app_env="testing", scheduler_enabled=False
+    )
 
     monkeypatch.setattr("app.core.config.get_settings", lambda: _test_settings)
     monkeypatch.setattr("app.api.health.get_settings", lambda: _test_settings)

@@ -193,4 +193,50 @@ Raw Observation Tables
 - **Phase 2.3**: Real Source / API Validation Lab (Completed).
 - **Phase 2.4**: Implementation of lightweight source adapters and batch ingestion scripts (Completed).
 - **Phase 2.4.1**: Data Semantics & Provenance Correction Audit (Completed).
-- **Phase 2.5**: Automated background ingestion (APScheduler) and source-health monitoring dashboard.
+- **Phase 2.5**: Automated background ingestion (APScheduler) and source-health monitoring (Completed).
+- **Phase 3**: GIS & Administrative Boundary Ingestion / Spatial Feature Engineering.
+
+---
+
+## 5. Automated Background Ingestion & Source Health (Phase 2.5)
+
+### 5.1 In-Process Background Scheduler
+- **Technology**: `apscheduler.schedulers.asyncio.AsyncIOScheduler` (APScheduler 3.10.4).
+- **Lifecycle Integration**: Managed via FastAPI `@asynccontextmanager` application lifespan (`app.main:lifespan`).
+- **Configuration Flags**:
+  - `scheduler_enabled: bool = True` (Can be set to `False` in testing/CLI via `SCHEDULER_ENABLED=false`).
+  - `openmeteo_ingestion_interval_minutes: int = 60` (Default 60-minute polling cycle).
+
+### 5.2 Automation Scope (Group A Only)
+- **Included in Background Automation**:
+  - `OpenMeteoAdapter`: Operational weather observations nowcast (`data_category='MODEL_OUTPUT'`) and 72-hour forward forecasts (`weather_forecasts`).
+  - Query points: Fixed 5 district representative/model query points (Bengaluru, Belagavi, Mangaluru, Kalaburagi, Mandya).
+- **Excluded from Background Automation**:
+  - Static archives (`IfiFloodAdapter`, `KarnatakaGeographyAdapter`).
+  - Monolithic batch datasets (`NwicRiverLevelAdapter`, `NwicReservoirAdapter`).
+  - Community/rate-limited APIs (`OsmEmergencyFacilityLoader`).
+  - Credential-gated sources (`IMD API Gateway`, `Copernicus GloFAS`).
+
+### 5.3 Concurrency & Async/Sync Safety
+- **Dual-Layer Concurrency Guard**:
+  1. APScheduler: `max_instances=1`, `coalesce=True` on job registration.
+  2. Application Layer: In-process `asyncio.Lock` in `IngestionJobRunner`. Overlapping trigger attempts are safely skipped and logged without fabricating fake success runs.
+- **Thread Offloading**: Synchronous database and HTTP calls in `OpenMeteoAdapter` are executed in a worker thread via `asyncio.to_thread` to ensure zero blocking of the FastAPI asyncio event loop.
+- **Session Isolation**: Each execution generates an isolated SQLAlchemy session from `_get_session_factory()`, guaranteed closed in `finally`.
+
+### 5.4 Dynamic Source Health & Internal Operational Policy
+- **No Schema Columns Added**: Health is dynamically computed by `SourceHealthService` without adding persistent `health_status` columns to `DataSource`.
+- **Governing States**: `HEALTHY`, `DEGRADED`, `DOWN`.
+- **Deterministic Evaluation Criteria**:
+  - `is_active = False` → `DOWN`
+  - Zero ingestion history → `DOWN`
+  - Consecutive failures $\ge 3$ → `DOWN`
+  - Latest run `FAILED` (< 3 failures) → `DEGRADED`
+  - Latest run `PARTIAL` → `DEGRADED`
+  - Latest run `SUCCESS`: evaluated against freshness policy.
+- **Freshness SLA Policy Clarification**:
+  Upstream providers (Open-Meteo, CWC, NWIC) do **not** define FloodPulse's freshness SLA. All freshness thresholds (e.g. 4-hour staleness window for operational weather) are strictly **FloodPulse internal operational policies** configured in `Settings` (`openmeteo_freshness_threshold_hours`), never external provider requirements.
+
+### 5.5 Source Health API Endpoints
+- `GET /api/v1/health/sources`: Evaluates runtime health across all registered data providers.
+- `GET /api/v1/health/sources/{source_id}/runs`: Paginated ingestion run history ordered by `started_at DESC`.

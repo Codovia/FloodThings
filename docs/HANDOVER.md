@@ -10,13 +10,14 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.4.1 — Data Semantics & Provenance Correction (COMPLETE)
+Phase:                  Phase 2.5 — Automated Background Ingestion & Source Health (COMPLETE)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
                         Phase 2.2 — Database + Internal Data Contract (34 tables deployed)
                         Phase 2.3 — Real Source / API Validation Lab (Empirically probed)
                         Phase 2.4 — Real Data Ingestion Foundation (CLI adapters & verified ingestion)
+                        Phase 2.4.1 — Data Semantics & Provenance Correction (Backfilled provenance)
 ```
 
 ## Repository
@@ -33,7 +34,15 @@ Note: Three different names are in use (FloodPrediction, FloodThings, FloodPulse
 ## Current implementation
 
 ```
-Backend:                FastAPI application — health endpoints verified
+Backend:                FastAPI application with lifespan-integrated APScheduler (AsyncIOScheduler)
+                        Dynamic Source Health: SourceHealthService (HEALTHY, DEGRADED, DOWN)
+                        API v1 Health Endpoints:
+                          - GET /api/v1/health/sources (runtime health evaluation)
+                          - GET /api/v1/health/sources/{source_id}/runs (paginated run audit history)
+                        Legacy Health Endpoints: /health, /health/database, /health/postgis
+                        Scheduler Package: app/scheduler/ (manager.py, runner.py, jobs.py)
+                          - In-process concurrency locking & thread offload via asyncio.to_thread
+                          - Single-instance max_instances=1, coalesce=True
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
                         Data Category: Enforced data_category column & CHECK constraint on 5 observation tables
                         Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)
@@ -53,10 +62,10 @@ Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpuls
                         - 101 river_observations (101 OBSERVATION)
                         - 100 reservoir_observations (100 OBSERVATION)
                         - 100 flood_events (historical catalog)
-                        - 186 flood_observations (186 HISTORICAL_EVENT ground truth)
+                        - 186 flood_observations (186 HISTORICAL_EVENT historical evidence)
                         - 31 districts (LGD reference)
                         Zero unclassified records (0 NULLs). Zero test fixture residue.
-Tests:                  52 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
+Tests:                  80 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
 Alembic:                Current head: ccfc6a6b5d06, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
@@ -147,26 +156,28 @@ cd backend && PYTHONPATH=. alembic check
 ## Next phase
 
 ```
-Phase 2.5 — Automated Background Ingestion & Source-Health Monitoring (APScheduler, health metrics, alerting hooks)
+Phase 3 — GIS & Administrative Geography Ingestion / Spatial Feature Engineering
 ```
 
-## Phase 2.4 Artifacts Created
+## Phase 2.5 Artifacts Created
 
 ```
-backend/app/ingestion/base.py               (BaseAdapter, IngestionMetrics, IngestionResult)
-backend/app/ingestion/registry.py           (DataSource & DataIngestionRun lifecycle)
-backend/app/ingestion/validation.py         (UTC standardization, coordinate bounds, float checks, EPSG:4326 WKT)
-backend/app/ingestion/sources/geography.py  (Karnataka State LGD 29 & 31 districts with centroids)
-backend/app/ingestion/sources/open_meteo.py (Operational weather, rainfall obs, weather forecast, historical reanalysis)
-backend/app/ingestion/sources/nwic_river.py (CWC hourly river stage in metres, river basins & stations)
-backend/app/ingestion/sources/nwic_reservoir.py (Daily reservoir telemetry with ft->m, TMC->MCM, cusecs->m³/s)
-backend/app/ingestion/sources/ifi_flood.py  (IFI v3.0 historical disaster events & district observations)
-backend/app/ingestion/cli.py                (CLI runner with geography, open-meteo, nwic-river, nwic-reservoir, ifi, ingest-all, status)
-backend/tests/test_ingestion_validation.py  (Timestamp, coordinate, range, quality status tests)
-backend/tests/test_ingestion_adapters.py    (Unit conversions, field mapping, observation/forecast separation tests)
-backend/tests/test_ingestion_idempotency.py (Zero-duplicate idempotency tests across all adapters)
-docs/INGESTION_RUNBOOK.md                   (Operator guide for manual CLI ingestion and status checks)
-Updated docs/DATA_PIPELINE.md, docs/DATA_SOURCES.md, docs/DATA_CONTRACT.md, docs/DECISIONS.md (D-025, D-026)
+backend/app/scheduler/manager.py            (SchedulerManager: AsyncIOScheduler lifecycle & job registration)
+backend/app/scheduler/runner.py             (IngestionJobRunner: in-process concurrency locking & thread offload)
+backend/app/scheduler/jobs.py               (Operational Open-Meteo ingestion job definition)
+backend/app/services/source_health.py       (SourceHealthService: runtime dynamic health computation)
+backend/app/schemas/source_health.py        (Pydantic schemas: SourceHealthItem, SourceRunsResponse, etc.)
+backend/app/api/v1/source_health.py         (API endpoints: GET /api/v1/health/sources, GET /api/v1/health/sources/{source_id}/runs)
+backend/tests/test_scheduler.py             (Tests: scheduler lifecycle, disabled config, concurrency lock, runner safety)
+backend/tests/test_source_health.py         (Tests: dynamic health states, stale policy, failure escalation)
+backend/tests/test_source_health_api.py     (Tests: /api/v1/health endpoints, 404, 422, pagination, legacy preserved)
+backend/requirements.txt                    (Added apscheduler==3.10.4)
+Updated backend/app/core/config.py          (Added scheduler_enabled, intervals, and internal freshness thresholds)
+Updated backend/app/main.py                 (FastAPI lifespan context manager & /api/v1 router mount)
+Updated backend/tests/conftest.py           (Added default scheduler isolation SCHEDULER_ENABLED=false)
+Updated docs/DECISIONS.md                   (Recorded D-028, D-029, D-030, D-031)
+Updated docs/DATA_PIPELINE.md               (Documented background automation, concurrency, and dynamic health)
+Updated docs/HANDOVER.md                    (Recorded Phase 2.5 completion & handover)
 ```
 
 ## Phase 2.4.1 Artifacts Created
