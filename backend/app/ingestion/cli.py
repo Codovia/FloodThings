@@ -21,6 +21,7 @@ from typing import Any
 from sqlalchemy import func, select, text
 from sqlalchemy.orm import Session
 
+from app.db.session import _get_session_factory
 from app.db.models.flood import FloodEvent, FloodObservation
 from app.db.models.geography import District, State
 from app.db.models.hydrology import (
@@ -37,9 +38,9 @@ from app.db.models.weather import (
     WeatherForecast,
     WeatherObservation,
 )
-from app.db.session import _get_session_factory
 from app.gis.controlled_correction import ControlledDistrictCorrector
 from app.gis.district_code_audit import DistrictCodeAuditor
+from app.gis.environmental_audit import EnvironmentalDataAuditor
 from app.gis.spatial_audit import SpatialAssociationAuditor
 from app.ingestion.sources.geography import KarnatakaGeographyAdapter
 from app.ingestion.sources.ifi_flood import IfiFloodAdapter
@@ -213,6 +214,24 @@ def cmd_district_code_correct(session: Session, args: argparse.Namespace) -> int
     return 0
 
 
+def cmd_environmental_audit(session: Session, args: argparse.Namespace) -> int:
+    auditor = EnvironmentalDataAuditor(session)
+    report = auditor.audit()
+
+    if args.format == "json":
+        print(report.to_json())
+    else:
+        print(report.summary_text())
+
+    if args.export_path:
+        p = Path(args.export_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(report.to_json(), encoding="utf-8")
+        print(f"\n  Exported environmental data audit report to: {p.resolve()}")
+
+    return 0
+
+
 def print_status(session: Session) -> None:
     print_header("FloodPulse Database Observation & Provenance Status")
 
@@ -329,6 +348,14 @@ def build_parser() -> argparse.ArgumentParser:
         help="Execute in transaction and rollback without committing",
     )
 
+    # environmental-audit
+    p_env_audit = subparsers.add_parser(
+        "environmental-audit",
+        help="Run read-only environmental data spatial association & source coverage audit (Phase 3.5)",
+    )
+    p_env_audit.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
+    p_env_audit.add_argument("--export-path", help="Optional path to export audit report as JSON")
+
     return parser
 
 
@@ -350,6 +377,7 @@ def main() -> None:
             "spatial-audit": cmd_spatial_audit,
             "district-code-audit": cmd_district_code_audit,
             "district-code-correct": cmd_district_code_correct,
+            "environmental-audit": cmd_environmental_audit,
         }
         handler = cmd_map.get(args.command)
         if handler is None:
