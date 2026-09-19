@@ -63,10 +63,10 @@ class TestAkkihebbalInvestigation:
         assert r.sample_records_count > 0
 
     def test_current_database_state(self, investigation_report: AkkihebbalInvestigationReport):
-        """Verify current database state of AKKIHEBBAL before any correction."""
+        """Verify current database state of AKKIHEBBAL after Phase 3.4B correction."""
         c = investigation_report.current_database_state
         assert c.station_code == "AKKIHEBBAL"
-        assert c.assigned_district_name == "Koppal"
+        assert c.assigned_district_name == "Mandya"
         assert c.assigned_district_code == "544"
         assert c.river_name == "Cauvery"
         assert c.basin_name == "Cauvery"
@@ -83,10 +83,10 @@ class TestAkkihebbalInvestigation:
         s = investigation_report.spatial_containment
         assert s.is_inside_karnataka is True
         assert s.spatial_district_name == "Mandya"
-        assert s.spatial_district_code == "545"
+        assert s.spatial_district_code == "544"
         assert s.spatial_taluk_name == "Krishnarajpet"
         assert s.spatial_taluk_code == "5546"
-        assert s.distance_to_assigned_district_m > 250_000  # ~284 km from Koppal
+        assert s.distance_to_assigned_district_m == 0.0  # Station is inside assigned district (Mandya)
         assert s.distance_to_spatial_district_boundary_m < 10_000  # ~2.9 km from Mandya boundary
         assert s.distance_to_spatial_taluk_boundary_m < 10_000
 

@@ -94,36 +94,27 @@ class TestSpatialAssociationAudit:
         assert m.missing_or_invalid_geometry == 0
         assert m.requires_manual_review == 0
 
-    def test_river_station_akkihebbal_discrepancy(
+    def test_river_station_akkihebbal_spatial_match(
         self, audit_report: SpatialAssociationAuditReport
     ):
         """
-        Verify river station Akkihebbal spatial mismatch is detected without mutation:
-        - Stored assigned district: Koppal
+        Verify river station Akkihebbal is spatially matched to Mandya after Phase 3.4B correction:
+        - Stored assigned district: Mandya
         - Actual spatial district: Mandya
+        - Discrepancies: 0
         """
         m = audit_report.river_station_metrics
         assert m.entity_type == "river_stations"
         assert m.total_examined == 1
-        assert m.spatially_matched == 0
+        assert m.spatially_matched == 1
         assert m.outside_karnataka == 0
-        assert m.outside_assigned_district == 1
-        assert m.requires_manual_review == 1
+        assert m.outside_assigned_district == 0
+        assert m.requires_manual_review == 0
 
         river_discrepancies = [
             d for d in audit_report.discrepancies if d.entity_type == "river_stations"
         ]
-        assert len(river_discrepancies) == 1
-        disc = river_discrepancies[0]
-        assert disc.identifier == "AKKIHEBBAL"
-        assert disc.assigned_district_name == "Koppal"
-        assert disc.spatial_district_name == "Mandya"
-        assert disc.is_in_karnataka is True
-        assert disc.discrepancy_type == "OUTSIDE_ASSIGNED_DISTRICT"
-        assert disc.distance_to_assigned_district_m is not None
-        assert disc.distance_to_assigned_district_m > 250_000  # ~284 km away
-        assert disc.distance_to_spatial_boundary_m is not None
-        assert disc.distance_to_spatial_boundary_m < 10_000  # ~2.9 km from Mandya boundary
+        assert len(river_discrepancies) == 0
 
     def test_taluk_containment_and_boundary_precision(
         self, audit_report: SpatialAssociationAuditReport
@@ -236,19 +227,17 @@ class TestSpatialAssociationAudit:
         assert "discrepancies" in d
         assert "summary" in d
         assert d["summary"]["total_records_examined"] == 397 + 397 + 1 + 240 + 186
-        assert d["summary"]["total_discrepancies"] == 1
-        assert d["summary"]["total_requiring_manual_review"] == 1
+        assert d["summary"]["total_discrepancies"] == 0
+        assert d["summary"]["total_requiring_manual_review"] == 0
 
         # JSON
         json_str = audit_report.to_json()
         parsed = json.loads(json_str)
-        assert parsed["summary"]["total_discrepancies"] == 1
+        assert parsed["summary"]["total_discrepancies"] == 0
 
         # Summary text
         summary = audit_report.summary_text()
         assert "ADMINISTRATIVE GIS <-> ENVIRONMENTAL SPATIAL ASSOCIATION AUDIT" in summary
-        assert "AKKIHEBBAL" in summary
-        assert "Koppal" in summary
-        assert "Mandya" in summary
+        assert "No point-based spatial discrepancies found." in summary
         assert "TALUK BOUNDARY CASES (196)" in summary
         assert "IFI HISTORICAL FLOOD EVIDENCE ALIGNMENT" in summary

@@ -440,3 +440,24 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 5. Historical IFI Flood Observations (Admin Evidence): 186 `flood_observations` evaluated. 100% (186/186) reference valid KSR-SAC districts across 23 distinct districts. 100% (186/186) have `geometry IS NULL`, preserving the strict zero-fabrication invariant (IFI is historical disaster damage evidence, not coordinate/satellite ground truth).
 6. Reproducible CLI Integration: Accessible via `python -m app.ingestion.cli spatial-audit [--format text|json] [--export-path PATH]`.
 **Affected components:** `backend/app/gis/spatial_audit.py`, `backend/app/ingestion/cli.py`, `backend/tests/test_spatial_audit.py`, `docs/DATA_PIPELINE.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-039 — Karnataka District Code Integrity Audit, Controlled River Station Correction & Ingestion Hardening**
+**Date:** 2026-09-19
+**Status:** IMPLEMENTED (Phase 3.4B)
+**Decision:**
+1. Authoritative 31-District Code Alignment: A deterministic audit comparing database `districts.code` values against the authoritative KSR-SAC / Government of India Local Government Directory (LGD) catalog identified 25 code mismatches resulting from sequential numbering in the Phase 2.4 geography seeder. All 31 `districts.code` values were corrected to their official LGD codes (`524`–`738`), exactly matching KSR-SAC `District.shp` attributes (`LGD_Distri`).
+2. District UUID & Foreign Key Preservation: 100% of district primary keys (`districts.id` UUIDs) were strictly preserved without modification. Because all active environmental and administrative foreign keys (`weather_observations.district_id`, `rainfall_observations.district_id`, `weather_forecasts.district_id`, `taluks.district_id`, `flood_observations.district_id`) reference `districts.id` (UUID), zero foreign keys were broken or altered during the code update.
+3. Controlled AKKIHEBBAL River Station Correction: Based on authoritative CWC source evidence (`District: Mandya`, `District LGD Code: 544`) and PostGIS spatial containment, station `AKKIHEBBAL` (`station_code = 'AKKIHEBBAL'`) had its `district_id` updated from Koppal UUID (`d1aeeddc-141b-4ab0-8899-ab9844e29b8d`) to Mandya UUID (`c9065c38-f2c3-4b56-8209-1009e4faa6f7`).
+4. River Observations Preservation: All 101 `river_observations` rows for `AKKIHEBBAL` remain intact and untouched. `river_observations` references `station_id` (which was preserved); no river observation FK was modified or severed.
+5. Ingestion Adapter Hardening (`nwic_river.py`): The NWIC/CWC river level adapter was hardened to cross-validate source district code against the authoritative Karnataka LGD catalog and cross-check against source district name (including canonical aliases). Conflicting code/name combinations are rejected and logged rather than silently misassigned.
+6. Atomic Transaction Safety: Database updates were executed in a single atomic transaction with intermediate temporary code flushes to respect the `districts_code_key` unique constraint. Dry-run rollback capability was validated in automated testing.
+7. Post-Correction Spatial Association Audit: Re-running `SpatialAssociationAuditor` confirms 100.0% spatial alignment across all 1,221 audited records:
+   - River stations: 1/1 matched (0 outside, 0 manual review)
+   - Weather observations: 397/397 matched
+   - Rainfall observations: 397/397 matched
+   - Taluks: 240/240 matched
+   - IFI flood observations: 186/186 valid
+   - Total discrepancies: 0.
+**Affected components:** `backend/app/gis/district_code_audit.py`, `backend/app/gis/controlled_correction.py`, `backend/app/ingestion/sources/nwic_river.py`, `backend/app/ingestion/sources/geography.py`, `backend/app/ingestion/cli.py`, `backend/tests/test_district_code_integrity.py`, `docs/DISTRICT_CODE_AUDIT_REPORT.md`, `docs/DATA_PIPELINE.md`, `docs/HANDOVER.md`.

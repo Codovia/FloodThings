@@ -17,6 +17,7 @@ import csv
 from datetime import datetime, timezone
 import io
 from pathlib import Path
+import re
 from typing import Any
 import uuid
 
@@ -32,6 +33,7 @@ from app.ingestion.registry import (
     get_or_create_data_source,
     start_ingestion_run,
 )
+from app.ingestion.sources.geography import KARNATAKA_DISTRICTS_LGD
 from app.ingestion.validation import (
     IST_TZ,
     DataCategory,
@@ -48,6 +50,64 @@ DEFAULT_CWC_RIVER_URL = (
     "resource/37cba82e-f745-4004-80d2-b05cad65b8e4/download/rwl_manual_hr_cwc_009_2026_2030.csv"
 )
 
+AUTH_LGD_TO_DISTRICT_NAME: dict[str, str] = {
+    d["code"]: d["name"] for d in KARNATAKA_DISTRICTS_LGD
+}
+
+DISTRICT_NAME_ALIASES: dict[str, str] = {
+    "bengaluruurban": "Bangalore Urban",
+    "bangaloreurban": "Bangalore Urban",
+    "bengaluru": "Bangalore Urban",
+    "bangalore": "Bangalore Urban",
+    "bengalururural": "Bangalore Rural",
+    "bangalorerural": "Bangalore Rural",
+    "ramanagara": "Ramanagara",
+    "ramanagar": "Ramanagara",
+    "bengalurusouth": "Ramanagara",
+    "kalaburagi": "Kalaburagi",
+    "kalaburgi": "Kalaburagi",
+    "gulbarga": "Kalaburagi",
+    "kolar": "Kolar",
+    "kolara": "Kolar",
+    "chamarajanagar": "Chamarajanagara",
+    "chamarajanagara": "Chamarajanagara",
+    "chamarajnagar": "Chamarajanagara",
+    "chikkamagaluru": "Chikkamagaluru",
+    "chikmagalur": "Chikkamagaluru",
+    "chikkamagalur": "Chikkamagaluru",
+    "chikkaballapur": "Chikkaballapura",
+    "chikkaballapura": "Chikkaballapura",
+    "chikballapur": "Chikkaballapura",
+    "shivamogga": "Shivamogga",
+    "shimoga": "Shivamogga",
+    "ballari": "Ballari",
+    "bellary": "Ballari",
+    "belagavi": "Belagavi",
+    "belgaum": "Belagavi",
+    "vijayapura": "Vijayapura",
+    "bijapur": "Vijayapura",
+    "uttarakannada": "Uttara Kannada",
+    "northcanara": "Uttara Kannada",
+    "dakshinakannada": "Dakshina Kannada",
+    "southcanara": "Dakshina Kannada",
+    "tumakuru": "Tumakuru",
+    "tumkur": "Tumakuru",
+    "mysuru": "Mysuru",
+    "mysore": "Mysuru",
+    "davanagere": "Davanagere",
+    "davangere": "Davanagere",
+    "dharwad": "Dharwad",
+    "dharwar": "Dharwad",
+    "vijayanagara": "Vijayanagara",
+    "vijayanagar": "Vijayanagara",
+    "yadgir": "Yadgir",
+    "yadgiri": "Yadgir",
+}
+
+
+def _normalize_name(name: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", name.lower())
+
 
 class NwicRiverLevelAdapter(BaseAdapter):
     """Adapter for Central Water Commission (CWC) river level observations via NWIC."""
@@ -59,43 +119,114 @@ class NwicRiverLevelAdapter(BaseAdapter):
     data_type = "HYDROLOGICAL"
     update_frequency = "HOURLY"
 
-    def __init__(self, session: Session, raw_dir: Path = RAW_CWC_DIR):
+    def __init__(self, session: Session, raw_dir: Path | None = None):
         super().__init__(session)
-        self.raw_dir = raw_dir
+        self.raw_dir = raw_dir or RAW_CWC_DIR
         self.raw_dir.mkdir(parents=True, exist_ok=True)
+
+    def _resolve_district(
+        self,
+        *,
+        dist_lgd: str | None,
+        dist_name_raw: str | None,
+        station_name: str,
+        districts_by_name: dict[str, District],
+        districts_by_code: dict[str, District],
+        metrics: IngestionMetrics,
+    ) -> District | None:
+        """
+        Safely resolve a station's administrative district without blindly trusting
+        the source code or database code.
+
+        Validates source district code against the authoritative Karnataka LGD catalog,
+        cross-checks source district name when provided, and rejects/logs conflicting
+        code/name combinations to prevent silent misassignment.
+        """
+        auth_name_from_code: str | None = None
+        if dist_lgd:
+            auth_name_from_code = AUTH_LGD_TO_DISTRICT_NAME.get(dist_lgd)
+            if not auth_name_from_code:
+                metrics.errors.append(
+                    f"Station '{station_name}': source district LGD code '{dist_lgd}' "
+                    "not recognized in authoritative Karnataka LGD catalog."
+                )
+
+        canonical_name_from_name: str | None = None
+        if dist_name_raw:
+            norm_name = _normalize_name(dist_name_raw)
+            canonical_name_from_name = DISTRICT_NAME_ALIASES.get(norm_name)
+            if not canonical_name_from_name:
+                for db_name in districts_by_name:
+                    if _normalize_name(db_name) == norm_name:
+                        canonical_name_from_name = db_name
+                        break
+
+        # Cross-validation
+        if dist_lgd and dist_name_raw:
+            if auth_name_from_code and canonical_name_from_name:
+                if auth_name_from_code != canonical_name_from_name:
+                    # Conflicting code and name: REJECT to prevent silent misassignment
+                    metrics.errors.append(
+                        f"Station '{station_name}': CONFLICT between source district code '{dist_lgd}' "
+                        f"({auth_name_from_code}) and source district name '{dist_name_raw}' "
+                        f"({canonical_name_from_name}). District assignment rejected."
+                    )
+                    return None
+                # Both agree
+                return districts_by_name.get(canonical_name_from_name)
+
+            if canonical_name_from_name:
+                return districts_by_name.get(canonical_name_from_name)
+
+            if auth_name_from_code:
+                return districts_by_name.get(auth_name_from_code)
+
+            return None
+
+        if dist_name_raw:
+            if canonical_name_from_name:
+                return districts_by_name.get(canonical_name_from_name)
+            metrics.errors.append(
+                f"Station '{station_name}': unresolvable district name '{dist_name_raw}'."
+            )
+            return None
+
+        if dist_lgd:
+            if auth_name_from_code:
+                return districts_by_name.get(auth_name_from_code)
+            return districts_by_code.get(dist_lgd)
+
+        return None
 
     def ingest(
         self,
         csv_url: str = DEFAULT_CWC_RIVER_URL,
         csv_content: str | None = None,
-        max_records: int | None = None,
-        karnataka_only: bool = True,
         client: httpx.Client | None = None,
-        **kwargs: Any,
+        karnataka_only: bool = True,
+        max_records: int | None = None,
     ) -> IngestionResult:
-        """Ingest CWC river stage observations.
+        """
+        Download and ingest CWC manual hourly river stage data.
 
         Args:
-            csv_url: source URL to download if csv_content not provided.
-            csv_content: raw CSV text string (useful for offline testing).
-            max_records: optional maximum number of observations to process.
-            karnataka_only: if True, filters for State LGD Code == '29' or State == 'Karnataka'.
-            client: optional custom httpx.Client.
+            csv_url: Target URL for CWC hourly stage CSV.
+            csv_content: Optional in-memory CSV string (bypasses network fetch).
+            client: Optional httpx.Client for dependency injection in tests.
+            karnataka_only: Filter records by State LGD Code 29 (Karnataka).
+            max_records: Maximum rows to process (useful for smoke tests).
         """
-        metrics = IngestionMetrics()
         started_at = datetime.now(timezone.utc)
+        metrics = IngestionMetrics()
 
         data_source = get_or_create_data_source(
-            self.session,
+            session=self.session,
             name=self.source_name,
             organization=self.organization,
-            description="Hourly manual river water levels from CWC stations via NWIC Open Data portal",
-            source_url=csv_url,
+            source_url=self.source_url,
             access_method=self.access_method,
             data_type=self.data_type,
-            geographic_coverage="Karnataka / India River Basins",
             update_frequency=self.update_frequency,
-            license_type="Government Open Data License - India (GODL)",
         )
 
         run = start_ingestion_run(self.session, data_source.id)
@@ -124,7 +255,9 @@ class NwicRiverLevelAdapter(BaseAdapter):
 
             # 3. Cache administrative districts and hydrological entities
             dist_stmt = select(District)
-            districts = {d.code: d for d in self.session.execute(dist_stmt).scalars() if d.code}
+            all_districts = list(self.session.execute(dist_stmt).scalars().all())
+            districts_by_name = {d.name: d for d in all_districts}
+            districts_by_code = {d.code: d for d in all_districts if d.code}
 
             basin_cache: dict[str, RiverBasin] = {}
             for b in self.session.execute(select(RiverBasin)).scalars():
@@ -160,7 +293,15 @@ class NwicRiverLevelAdapter(BaseAdapter):
                 basin_name = row.get("Basin") or "Unspecified Basin"
                 river_name = row.get("River") or "Unspecified River"
                 dist_lgd = row.get("District LGD Code")
-                district = districts.get(dist_lgd) if dist_lgd else None
+                dist_name = row.get("District")
+                district = self._resolve_district(
+                    dist_lgd=dist_lgd,
+                    dist_name_raw=dist_name,
+                    station_name=station_name,
+                    districts_by_name=districts_by_name,
+                    districts_by_code=districts_by_code,
+                    metrics=metrics,
+                )
 
                 # Coordinates
                 coords = validate_coordinates(

@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 3.3 — Administrative GIS ↔ Environmental Spatial Association Audit
+Phase:                  Phase 3.4B — Karnataka District Code Integrity Audit + Controlled River Station Correction
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -24,6 +24,8 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 2.8 — ML Target Readiness Definition
                         Phase 3.1 — KSR-SAC Administrative GIS PostGIS Ingestion Design (Completed)
                         Phase 3.2 — KSR-SAC Administrative GIS PostGIS Ingestion (1 State, 31 Districts, 240 Taluks)
+                        Phase 3.3 — Administrative GIS ↔ Environmental Spatial Association Audit (Completed)
+                        Phase 3.4A — AKKIHEBBAL River Station Provenance Investigation (Completed)
 ```
 
 ## Repository

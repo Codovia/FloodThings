@@ -256,6 +256,32 @@ Under no circumstances should `MODEL_OUTPUT` or `REANALYSIS` be confused with ph
   ```
 - **Invariants**: Strictly read-only; zero synthetic coordinates; zero centroid inference; preserves source provenance.
 
+### 2.10 District Code Integrity Audit & Controlled Station Correction (Phase 3.4B)
+- **District Code Integrity Audit**:
+  - Compares database `districts.code` against authoritative KSR-SAC / Government of India Local Government Directory (LGD) catalog.
+  - Identified 25 code mismatches resulting from sequential numbering in the Phase 2.4 geography seeder.
+  - Updated all 31 `districts.code` values to official LGD codes (`524`–`738`), exactly matching KSR-SAC `District.shp` (`LGD_Distri`).
+  - 100% of district UUIDs preserved; 0 foreign keys broken.
+- **Controlled AKKIHEBBAL River Station Correction**:
+  - Station `AKKIHEBBAL` (`station_code = 'AKKIHEBBAL'`) updated from Koppal UUID (`d1aeeddc-141b-4ab0-8899-ab9844e29b8d`) to Mandya UUID (`c9065c38-f2c3-4b56-8209-1009e4faa6f7`).
+  - 101 river observations remain intact and untouched with valid `station_id` FK.
+- **Ingestion Adapter Hardening (`nwic_river.py`)**:
+  - Cross-validates source district code against authoritative Karnataka LGD catalog.
+  - Cross-checks source district name (including canonical aliases).
+  - Conflicting code/name combinations are rejected and logged rather than silently misassigned.
+- **Post-Correction Spatial Alignment**:
+  - Re-audit confirms 1,221 / 1,221 records (100.0%) spatially matched with 0 discrepancies:
+    - River stations: 1/1 matched (0 outside, 0 manual review)
+    - Weather observations: 397/397 matched
+    - Rainfall observations: 397/397 matched
+    - Taluks: 240/240 matched
+    - IFI flood observations: 186/186 valid
+- **Execution**:
+  ```bash
+  python -m app.ingestion.cli district-code-audit [--format text|json] [--export-path PATH]
+  python -m app.ingestion.cli district-code-correct [--dry-run]
+  ```
+
 ---
 
 ## 3. Data Flow & Feature Store Bridge

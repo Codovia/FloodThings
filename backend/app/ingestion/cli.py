@@ -38,6 +38,8 @@ from app.db.models.weather import (
     WeatherObservation,
 )
 from app.db.session import _get_session_factory
+from app.gis.controlled_correction import ControlledDistrictCorrector
+from app.gis.district_code_audit import DistrictCodeAuditor
 from app.gis.spatial_audit import SpatialAssociationAuditor
 from app.ingestion.sources.geography import KarnatakaGeographyAdapter
 from app.ingestion.sources.ifi_flood import IfiFloodAdapter
@@ -173,8 +175,41 @@ def cmd_spatial_audit(session: Session, args: argparse.Namespace) -> int:
         p = Path(args.export_path)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(report.to_json(), encoding="utf-8")
-        print(f"\n  Exported spatial audit report to: {p.resolve()}")
+    return 0
 
+
+def cmd_district_code_audit(session: Session, args: argparse.Namespace) -> int:
+    auditor = DistrictCodeAuditor(session)
+    report = auditor.audit()
+
+    if args.format == "json":
+        print(report.to_json())
+    else:
+        print(report.summary_text())
+
+    if args.export_path:
+        p = Path(args.export_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(report.to_json(), encoding="utf-8")
+        print(f"\n  Exported district code audit report to: {p.resolve()}")
+
+    return 0
+
+
+def cmd_district_code_correct(session: Session, args: argparse.Namespace) -> int:
+    print_header("Executing Controlled District Code & AKKIHEBBAL Station Correction (Phase 3.4B)")
+    corrector = ControlledDistrictCorrector(session)
+    res = corrector.execute_correction(dry_run=args.dry_run)
+
+    print(f"  Executed At:                  {res.executed_at}")
+    print(f"  Districts Updated:            {res.districts_updated_count}")
+    print(f"  River Stations Updated:       {res.river_stations_updated_count}")
+    print(f"  District UUIDs Preserved:     {res.district_uuids_preserved}")
+    print(f"  AKKIHEBBAL New District Name: {res.akkihebbal_new_district_name}")
+    print(f"  AKKIHEBBAL New District Code: {res.akkihebbal_new_district_code}")
+    print(f"  River Observations Intact:    {res.river_observations_count_intact}")
+    print(f"  Transaction Committed:        {res.transaction_committed}")
+    print("-" * 70)
     return 0
 
 
@@ -275,6 +310,25 @@ def build_parser() -> argparse.ArgumentParser:
     p_audit.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
     p_audit.add_argument("--export-path", help="Optional path to export audit report as JSON")
 
+    # district-code-audit
+    p_d_audit = subparsers.add_parser(
+        "district-code-audit",
+        help="Run read-only district code integrity audit against KSR-SAC / LGD",
+    )
+    p_d_audit.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
+    p_d_audit.add_argument("--export-path", help="Optional path to export audit report as JSON")
+
+    # district-code-correct
+    p_d_correct = subparsers.add_parser(
+        "district-code-correct",
+        help="Execute controlled correction of district codes and AKKIHEBBAL station",
+    )
+    p_d_correct.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Execute in transaction and rollback without committing",
+    )
+
     return parser
 
 
@@ -294,6 +348,8 @@ def main() -> None:
             "ingest-all": cmd_ingest_all,
             "status": cmd_status,
             "spatial-audit": cmd_spatial_audit,
+            "district-code-audit": cmd_district_code_audit,
+            "district-code-correct": cmd_district_code_correct,
         }
         handler = cmd_map.get(args.command)
         if handler is None:
