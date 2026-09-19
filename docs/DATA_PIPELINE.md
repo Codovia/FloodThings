@@ -101,18 +101,31 @@ Official External Source (Verified API / CSV / GeoJSON / COG)
 
 ---
 
-### 2.4 Historical Flood Ground Truth Pipeline (`IfiFloodEventLoader`)
+### 2.4 Historical Flood Event Normalization Pipeline (`IfiEventNormalizer`)
 
-- **Source**: India Flood Inventory (IFI v3.0, IIT Delhi)
-- **Execution**: Batch execution during dataset creation.
-- **Target Tables**:
-  - `flood_observations` (`district_id`, `observation_date`, `flooded`, `source="ifi_v3"`, `severity`, `fatalities`)
-  - `flood_events` (`start_date`, `end_date`, `duration_days`, `affected_districts`, `damage_description`)
-- **Target Formulation**:
-  - Spatial resolution: **District level** (using LGD District Codes).
-  - Formulation: Binary classification target per District × Day:
-    $$y_{d, t} = \begin{cases} 1 & \text{if documented flood event in district } d \text{ on date } t \\ 0 & \text{otherwise} \end{cases}$$
-  - Negative Sampling ($y=0$): Days without recorded flood damage/events in district $d$ during the active evaluation period.
+- **Source**: India Flood Inventory (IFI v3.0, HydroSenseLab / India Meteorological Department), local raw archive `data/raw/ifi/ifi_v3_karnataka_20260917_164914.csv`.
+- **Raw-Source Preservation Policy**: Raw IFI CSV archive on disk is strictly read-only and must never be modified or overwritten.
+- **Normalization Layer**: In-memory deterministic normalizer (`app.gis.ifi.IfiEventNormalizer`) aligned directly with the authoritative KSR-SAC administrative GIS foundation (`KsrsacAdminNormalizer`).
+- **Target Schema Entities**:
+  - `flood_events` (Disaster event catalog: `name`, `start_time` [UTC derived], `end_time` [UTC derived], `start_date_raw`, `end_date_raw`, `duration_days`, `main_cause`, `severity`, `affected_area`, `description`, `geometry=NULL`, `source_id`, `confidence=NULL`).
+  - `flood_observations` (District-level historical evidence: `observation_time`, `district_id`, `source_record_id=f"ifi_{uei}_{lgd_code}"`, `flooded=True`, `flood_depth=NULL`, `geometry=NULL`, `confidence=NULL`, `mapping_status="DETERMINISTIC"`, `quality_status="VALID"`, `data_category="HISTORICAL_EVENT"`).
+- **Zero-Fabrication & Semantics Constraints**:
+  - **No Manufactured Polygons or Points**: Raw IFI records have no coordinate geometry. Geometries must remain strictly `NULL` (`None`).
+  - **Centroid Inference Strictly Prohibited**: Flood geometry must never be inferred or synthesized from district centroids or bounding boxes.
+  - **Depth Nullability**: Missing flood depth remains strictly `NULL` (never 0.0 or estimated).
+  - **Confidence Semantics**: The IFI source does not publish a confidence or probability score. Source `confidence` must remain `NULL` (`None`) per CONSTRAINTS.md; assigning `1.0` as source confidence is unjustified. Administrative resolution certainty is tracked as `mapping_status="DETERMINISTIC"`.
+  - **Timezone Assumption**: Raw IFI records report timestamps without timezone offsets (predominantly `00:00` nominal midnight, representing calendar day events). Conversion to UTC assuming Indian Standard Time (IST = UTC+05:30) is an **operational assumption** based on reporting agencies (IMD/CWC), not an explicit source metadata declaration. Both `start_date_raw` and derived UTC datetimes are preserved.
+  - **Historical Disaster Evidence**: IFI events represent documented disaster damage reports, NOT satellite inundation ground truth.
+- **Deterministic Administrative Mapping Protocol**:
+  - **KSR-SAC Alignment**: Deterministically resolves raw district tokens to verified KSR-SAC `NormalizedDistrict` entities (preserving KGIS codes 01–31, official LGD codes 524–738, and canonical names).
+  - **Spelling & Geocoding Repairs**:
+    - Raw tokens with `District_LGD_Codes == 'None'`: 173 total. Of these, exactly 142 are recovered via verified spelling/headquarters aliases (`Uttar Kashia Kannada` 71 $\to$ Uttara Kannada, `Beedar` 36 $\to$ Bidar, `Bagalkotee` 20 $\to$ Bagalkote, `Chamarajanagaraa` 9 $\to$ Chamarajanagara, `Mangalore` 6 $\to$ Dakshina Kannada). The remaining 31 are unresolved tokens.
+    - Upstream LGD misattribution: Exactly 32 occurrences of `Bijapur` (assigned LGD 636 [Chhattisgarh] in upstream IFI) are recovered and mapped to Vijayapura (KGIS 03, LGD 530).
+    - Other verified canonical aliases: `ramanagara` $\to$ Bengaluru South (KGIS 29, LGD 631), `bellary` $\to$ Ballari, `mysore` $\to$ Mysuru, `coorg` $\to$ Kodagu, `shimoga` $\to$ Shivamogga, `gulbarga` $\to$ Kalaburagi.
+  - **Out-of-State Non-Karnataka Filtering**: 35 non-Karnataka district tokens in multi-state events (Kerala, Gujarat, AP/Telangana, Uttarakhand) are deterministically identified and excluded without error.
+  - **Unresolved Token Auditing**: Exactly 31 token occurrences across 18 distinct strings cannot be deterministically mapped without guessing (13 OCR concatenations like `Bagalkotee Belagavi`, 2 taluks like `Mudigere`, 1 locality `Rugi`, 2 regional descriptors `Parts of Karnataka`). The normalizer **never guesses**; these are recorded in `UnresolvedDistrictTokenRecord` and reported in the audit log.
+
+- **Idempotency**: Events deduplicated by `UEI`; district observations deduplicated by `(UEI, kgis_district_code)`.
 
 ---
 

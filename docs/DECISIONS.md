@@ -378,5 +378,21 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 7. Extension of KsrsacAdminNormalizer: Implemented `NormalizedState` dataclass, `normalize_state()`, and `validate_state_containment()` in `backend/app/gis/ksrsac.py`.
 **Affected components:** `backend/app/gis/ksrsac.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ksrsac_gis.py`.
 
+---
 
+**D-034 — Deterministic IFI Historical Flood Event Normalization & KSR-SAC GIS Alignment**
+**Date:** 2026-09-19
+**Status:** IMPLEMENTED (Phase 2.7A Foundation)
+**Decision:**
+1. In-Memory Normalization Foundation: Implement `IfiEventNormalizer` in `backend/app/gis/ifi.py` to deterministically normalize India Flood Inventory (IFI v3.0) disaster records for Karnataka (State Code 29).
+2. Authoritative Administrative Alignment: Every deterministic district match links directly to a verified KSR-SAC `NormalizedDistrict` entity, preserving KGIS codes (`01`–`31`), official LGD codes (`524`–`738`), and canonical district names.
+3. Strict Zero-Fabrication Geometry Rule: Raw IFI events contain no coordinate geometry. Geometries must remain strictly `NULL` (`None`). Inferring flood polygons or points from district centroids or synthetic coordinates is strictly prohibited. IFI events are historical disaster evidence, not satellite inundation ground truth.
+4. Strict Depth Nullability: `flood_depth` must remain strictly `NULL` (`None`), never filled with 0.0 or estimated values.
+5. Semantic Provenance & Confidence Semantics: Enforces `data_category = "HISTORICAL_EVENT"`, `quality_status = "VALID"`, `source_name = "India Flood Inventory (IFI v3.0)"`, and deterministic `source_record_id = f"ifi_{uei}_{lgd_district_code}"`. Because IFI v3 publishes no confidence score, source `confidence` must remain `NULL` (`None`) per CONSTRAINTS.md (correcting an ungrounded Phase 2.4 assumption that assigned 1.0). Administrative mapping certainty is recorded as `mapping_status = "DETERMINISTIC"`.
+6. Deterministic Alias Resolution & Recovery Counts: Exactly 173 raw tokens had `District_LGD_Codes == 'None'`. Of these, exactly 142 are recovered via verified spelling/headquarters aliases (`Uttar Kashia Kannada` 71 $\to$ Uttara Kannada, `Beedar` 36 $\to$ Bidar, `Bagalkotee` 20 $\to$ Bagalkote, `Chamarajanagaraa` 9 $\to$ Chamarajanagara, `Mangalore` 6 $\to$ Dakshina Kannada). In addition, exactly 32 occurrences of `Bijapur` (misattributed as LGD 636 [Chhattisgarh] in upstream IFI) are recovered and mapped to Vijayapura (KGIS 03, LGD 530).
+7. Out-of-State Non-Karnataka Filtering: Exactly 35 non-Karnataka district tokens in multi-state events (Kerala, Gujarat, AP/Telangana, Uttarakhand) are deterministically identified and excluded without raising errors.
+8. Unresolved Token Containment: Exactly 31 token occurrences across 18 distinct strings cannot be deterministically mapped (OCR concatenations, sub-district taluks, regional descriptors). The normalizer never guesses; unmapped tokens are recorded in `UnresolvedDistrictTokenRecord` and reported in the audit trail.
+9. Database Migration Status: Inspection of PostgreSQL 16 schema and Alembic confirms zero migrations are required. The existing 34-table schema and check constraints (`ck_flood_obs_quality_status`, `ck_flood_obs_data_category`) already fully support normalized records.
+10. Timezone Semantics: Raw IFI dates lack explicit timezone offsets and mostly use nominal midnight (`00:00`), indicating calendar day resolution. Conversion to UTC assuming IST (UTC+05:30) is documented as an **operational assumption** based on reporting agencies (IMD/CWC), not an explicit source metadata fact. Both raw date strings and derived UTC datetimes are preserved.
+**Affected components:** `backend/app/gis/ifi.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ifi_normalization.py`, `docs/DATA_PIPELINE.md`.
 

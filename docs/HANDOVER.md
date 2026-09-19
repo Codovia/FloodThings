@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.6 — GIS Foundation (NORMALIZATION READY)
+Phase:                  Phase 2.7A — Historical Flood Event Normalization Foundation
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -19,6 +19,7 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 2.4 — Real Data Ingestion Foundation (CLI adapters & verified ingestion)
                         Phase 2.4.1 — Data Semantics & Provenance Correction (Backfilled provenance)
                         Phase 2.5 — Automated Background Ingestion & Source Health (Completed)
+                        Phase 2.6 — GIS Foundation (KSR-SAC Admin & State Normalization Ready)
 ```
 
 ## Repository
@@ -44,7 +45,7 @@ Backend:                FastAPI application with lifespan-integrated APScheduler
                         Scheduler Package: app/scheduler/ (manager.py, runner.py, jobs.py)
                           - In-process concurrency locking & thread offload via asyncio.to_thread
                           - Single-instance max_instances=1, coalesce=True
-                        GIS Package: app/gis/ (ksrsac.py, __init__.py)
+                        GIS Package: app/gis/ (ksrsac.py, ifi.py, __init__.py)
                           - KsrsacAdminNormalizer: In-memory normalization of KSR-SAC State.shp, District.shp, and Taluk.shp
                           - Read-only raw preservation: zero file modifications on disk
                           - Validated single-feature State boundary (KGISStateC=29, KGISStateN=Karnataka)
@@ -52,6 +53,15 @@ Backend:                FastAPI application with lifespan-integrated APScheduler
                           - Deterministic repair of 3 known invalid taluks via shapely.make_valid()
                           - Target output in EPSG:4326 with strict MultiPolygon typing
                           - Provenance preservation: KGIS + LGD codes for State, 31 districts, and 240 taluks
+                          - IfiEventNormalizer: In-memory deterministic normalization of IFI v3.0 historical events
+                          - Grounded to KSR-SAC NormalizedDistrict foundation (31 districts)
+                          - Strict zero-fabrication geometry constraint (geometry = NULL, no centroid inference)
+                          - Strict depth nullability (flood_depth = NULL, never 0.0 or estimated)
+                          - Preserves semantic provenance (data_category = HISTORICAL_EVENT, quality_status = VALID)
+                          - Confidence semantics: source confidence is NULL (unprovided by IFI); mapping_status = DETERMINISTIC
+                          - Timezone semantics: raw dates preserved; UTC timestamps derived under documented IST assumption
+                          - Deterministic alias resolution (142 recovered from 173 'None' tokens, 32 from Bijapur LGD 636)
+                          - Unresolved token containment (31 unmapped tokens across 18 distinct strings audited without guessing)
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
                         Data Category: Enforced data_category column & CHECK constraint on 5 observation tables
                         Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)
@@ -74,7 +84,7 @@ Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpuls
                         - 186 flood_observations (186 HISTORICAL_EVENT historical evidence)
                         - 31 districts (LGD reference)
                         Zero unclassified records (0 NULLs). Zero test fixture residue.
-Tests:                  95 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
+Tests:                  115 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
 Alembic:                Current head: ccfc6a6b5d06, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
