@@ -45,11 +45,13 @@ Backend:                FastAPI application with lifespan-integrated APScheduler
                           - In-process concurrency locking & thread offload via asyncio.to_thread
                           - Single-instance max_instances=1, coalesce=True
                         GIS Package: app/gis/ (ksrsac.py, __init__.py)
-                          - KsrsacAdminNormalizer: In-memory normalization of KSR-SAC District.shp and Taluk.shp
+                          - KsrsacAdminNormalizer: In-memory normalization of KSR-SAC State.shp, District.shp, and Taluk.shp
                           - Read-only raw preservation: zero file modifications on disk
+                          - Validated single-feature State boundary (KGISStateC=29, KGISStateN=Karnataka)
+                          - State containment verified across all 31 districts and 240 taluks
                           - Deterministic repair of 3 known invalid taluks via shapely.make_valid()
                           - Target output in EPSG:4326 with strict MultiPolygon typing
-                          - Provenance preservation: KGIS + LGD codes for 31 districts and 240 taluks
+                          - Provenance preservation: KGIS + LGD codes for State, 31 districts, and 240 taluks
                         SQLAlchemy models: 34 application tables across 9 domains (app/db/models/)
                         Data Category: Enforced data_category column & CHECK constraint on 5 observation tables
                         Ingestion Framework: app/ingestion/ (base.py, registry.py, validation.py, cli.py)

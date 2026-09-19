@@ -28,18 +28,23 @@ from shapely.geometry import MultiPolygon, Point, Polygon
 from app.gis.ksrsac import (
     DEFAULT_RELATIVE_OVERLAP_TOLERANCE,
     EXPECTED_DISTRICT_COUNT,
+    EXPECTED_STATE_COUNT,
     EXPECTED_TALUK_COUNT,
     EXPECTED_VIJAYANAGARA_TALUK_COUNT,
     REQUIRED_DISTRICT_COLUMNS,
+    REQUIRED_STATE_COLUMNS,
     REQUIRED_TALUK_COLUMNS,
     VIJAYANAGARA_KGIS_CODE,
     VIJAYANAGARA_LGD_CODE,
     KsrsacAdminNormalizer,
     KsrsacCrsError,
     KsrsacFileNotFoundError,
+    KsrsacNormalizationResult,
     KsrsacSchemaError,
     KsrsacTopologyError,
     KsrsacValidationError,
+    NormalizedDistrict,
+    NormalizedState,
     to_multipolygon,
 )
 
@@ -287,3 +292,166 @@ class TestKsrsacValidationErrors:
 
         with pytest.raises(KsrsacValidationError, match="Cannot coerce geometry"):
             to_multipolygon(Point(0, 0))
+
+    def test_state_missing_file_raises_error(self, tmp_path):
+        """Missing State shapefile raises KsrsacFileNotFoundError."""
+        normalizer = KsrsacAdminNormalizer(state_path=tmp_path / "NonexistentState.shp")
+        with pytest.raises(KsrsacFileNotFoundError):
+            normalizer.normalize_state()
+
+    def test_state_missing_columns_raises_schema_error(self):
+        """Missing required state columns raises KsrsacSchemaError."""
+        p = Polygon([(0, 0), (1, 0), (1, 1), (0, 1), (0, 0)])
+        gdf_missing = gpd.GeoDataFrame({"KGISStateI": [1], "geometry": [p]}, crs="EPSG:32643")
+        with pytest.raises(KsrsacSchemaError, match="missing required attribute columns"):
+            KsrsacAdminNormalizer._validate_columns(gdf_missing, REQUIRED_STATE_COLUMNS, "State.shp")
+
+    def test_state_invalid_feature_count(self, tmp_path):
+        """State shapefile with other than 1 feature raises KsrsacSchemaError."""
+        p1 = Polygon([(0, 0), (1, 0), (1, 1), (0, 1), (0, 0)])
+        p2 = Polygon([(2, 2), (3, 2), (3, 3), (2, 3), (2, 2)])
+        gdf_multi = gpd.GeoDataFrame(
+            {
+                "KGISStateI": [1, 2],
+                "KGISStateC": ["29", "29"],
+                "KGISStateN": ["Karnataka", "Karnataka2"],
+                "geometry": [p1, p2],
+            },
+            crs="EPSG:32643",
+        )
+        shp_path = tmp_path / "MultiState.shp"
+        gdf_multi.to_file(shp_path)
+
+        normalizer = KsrsacAdminNormalizer(state_path=shp_path)
+        with pytest.raises(KsrsacSchemaError, match="exactly 1 feature"):
+            normalizer.normalize_state()
+
+    def test_state_invalid_geometry_deterministic_repair(self, tmp_path):
+        """State shapefile with self-intersecting polygon is repaired deterministically."""
+        # Bowtie self-intersecting polygon
+        bowtie = Polygon([(0, 0), (2, 2), (2, 0), (0, 2), (0, 0)])
+        assert not bowtie.is_valid
+
+        gdf_invalid = gpd.GeoDataFrame(
+            {
+                "KGISStateI": [1],
+                "KGISStateC": ["29"],
+                "KGISStateN": ["Karnataka"],
+                "geometry": [bowtie],
+            },
+            crs="EPSG:32643",
+        )
+        shp_path = tmp_path / "InvalidState.shp"
+        gdf_invalid.to_file(shp_path)
+
+        normalizer = KsrsacAdminNormalizer(state_path=shp_path)
+        normalized = normalizer.normalize_state()
+
+        assert normalized.was_repaired is True
+        assert normalized.repair_record is not None
+        assert normalized.repair_record.repair_operation == "shapely.make_valid()"
+        assert normalized.repair_record.valid_before is False
+        assert normalized.repair_record.valid_after is True
+        assert normalized.geometry.is_valid
+        assert isinstance(normalized.geometry, MultiPolygon)
+
+
+class TestKsrsacStateNormalization:
+    """Test suite for KSR-SAC State boundary normalization and topology."""
+
+    @pytest.fixture(scope="class")
+    def normalizer(self):
+        return KsrsacAdminNormalizer()
+
+    @pytest.fixture(scope="class")
+    def normalized_state(self, normalizer):
+        return normalizer.normalize_state()
+
+    @pytest.fixture(scope="class")
+    def normalized_admin(self, normalizer):
+        return normalizer.normalize()
+
+    def test_state_source_loading_and_attributes(self, normalized_state):
+        """State normalizer correctly extracts and preserves source attributes."""
+        assert isinstance(normalized_state, NormalizedState)
+        assert normalized_state.kgis_state_id == 1
+        assert normalized_state.state_code == "29"
+        assert normalized_state.state_name == "Karnataka"
+        assert normalized_state.area_sq_m > 0
+        assert normalized_state.perimeter_m > 0
+        assert normalized_state.was_repaired is False
+        assert normalized_state.repair_record is None
+
+    def test_state_geometry_types_and_crs(self, normalized_state):
+        """State geometry is valid MultiPolygon in EPSG:4326 with EWKT formatting."""
+        assert isinstance(normalized_state.geometry, MultiPolygon)
+        assert normalized_state.geometry.is_valid
+        assert not normalized_state.geometry.is_empty
+        assert isinstance(normalized_state.centroid, Point)
+        assert normalized_state.wkt.startswith("SRID=4326;MULTIPOLYGON")
+        assert normalized_state.centroid_wkt.startswith("SRID=4326;POINT")
+        assert normalized_state.raw_wkt.startswith("MULTIPOLYGON")
+
+    def test_state_districts_and_taluks_containment(self, normalizer, normalized_state, normalized_admin):
+        """State boundary topologically intersects all 31 districts and 240 taluks."""
+        # Test containment validator executes without exception
+        normalizer.validate_state_containment(
+            normalized_state, normalized_admin.districts, normalized_admin.taluks
+        )
+
+        # Explicitly verify each district
+        assert len(normalized_admin.districts) == EXPECTED_DISTRICT_COUNT
+        for district in normalized_admin.districts:
+            assert normalized_state.geometry.intersects(district.geometry), (
+                f"District {district.district_name} does not intersect state"
+            )
+            assert normalized_state.geometry.contains(district.geometry.representative_point()), (
+                f"District {district.district_name} representative point not contained in state"
+            )
+
+        # Explicitly verify each taluk
+        assert len(normalized_admin.taluks) == EXPECTED_TALUK_COUNT
+        for taluk in normalized_admin.taluks:
+            assert normalized_state.geometry.intersects(taluk.geometry), (
+                f"Taluk {taluk.taluk_name} does not intersect state"
+            )
+            assert normalized_state.geometry.contains(taluk.geometry.representative_point()), (
+                f"Taluk {taluk.taluk_name} representative point not contained in state"
+            )
+
+    def test_state_containment_failure_detection(self, normalizer, normalized_state):
+        """Topology error is raised if a district lies outside the state."""
+        dummy_geom = MultiPolygon([Polygon([(0, 0), (0.1, 0), (0.1, 0.1), (0, 0.1), (0, 0)])])
+        outside_district = NormalizedDistrict(
+            kgis_district_code="99",
+            lgd_district_code="999",
+            district_name="OutsideDistrict",
+            bhu_code=None,
+            area_sq_m=1000.0,
+            perimeter_m=100.0,
+            geometry=dummy_geom,
+            centroid=dummy_geom.centroid,
+        )
+        with pytest.raises(KsrsacTopologyError, match="does not intersect"):
+            normalizer.validate_state_containment(normalized_state, [outside_district])
+
+    def test_state_deterministic_repeated_normalization(self, normalizer):
+        """Repeated normalization produces byte-for-byte identical WKT and metrics."""
+        run1 = normalizer.normalize_state()
+        run2 = normalizer.normalize_state()
+
+        assert run1.wkt == run2.wkt
+        assert run1.centroid_wkt == run2.centroid_wkt
+        assert run1.area_sq_m == run2.area_sq_m
+        assert run1.perimeter_m == run2.perimeter_m
+        assert run1.state_code == run2.state_code
+        assert run1.state_name == run2.state_name
+
+    def test_state_raw_source_checksum_preservation(self, normalizer):
+        """Normalizing state preserves raw files on disk without alteration."""
+        source_dir = normalizer.state_path.parent
+        before_checksums = _compute_dir_checksums(source_dir)
+        normalizer.normalize_state()
+        after_checksums = _compute_dir_checksums(source_dir)
+
+        assert before_checksums == after_checksums, "Raw State shapefile components were modified!"

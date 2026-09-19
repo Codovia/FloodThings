@@ -6,6 +6,10 @@ for authoritative Karnataka boundaries, hydrology, and terrain.
 """
 
 from app.gis.ksrsac import (
+    EXPECTED_DISTRICT_COUNT,
+    EXPECTED_STATE_COUNT,
+    EXPECTED_TALUK_COUNT,
+    EXPECTED_VIJAYANAGARA_TALUK_COUNT,
     GeometryRepairRecord,
     KsrsacAdminNormalizer,
     KsrsacCrsError,
@@ -15,10 +19,18 @@ from app.gis.ksrsac import (
     KsrsacTopologyError,
     KsrsacValidationError,
     NormalizedDistrict,
+    NormalizedState,
     NormalizedTaluk,
+    REQUIRED_DISTRICT_COLUMNS,
+    REQUIRED_STATE_COLUMNS,
+    REQUIRED_TALUK_COLUMNS,
 )
 
 __all__ = [
+    "EXPECTED_DISTRICT_COUNT",
+    "EXPECTED_STATE_COUNT",
+    "EXPECTED_TALUK_COUNT",
+    "EXPECTED_VIJAYANAGARA_TALUK_COUNT",
     "GeometryRepairRecord",
     "KsrsacAdminNormalizer",
     "KsrsacCrsError",
@@ -28,5 +40,9 @@ __all__ = [
     "KsrsacTopologyError",
     "KsrsacValidationError",
     "NormalizedDistrict",
+    "NormalizedState",
     "NormalizedTaluk",
+    "REQUIRED_DISTRICT_COLUMNS",
+    "REQUIRED_STATE_COLUMNS",
+    "REQUIRED_TALUK_COLUMNS",
 ]

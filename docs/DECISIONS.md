@@ -354,13 +354,28 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 **Date:** 2026-09-18
 **Status:** IMPLEMENTED (Phase 2.6 Foundation)
 **Decision:**
-1. Authoritative GIS Source: Ingest official KSR-SAC / KGIS gazetted administrative boundary shapefiles (`District.shp` for 31 districts, `Taluk.shp` for 240 taluks) located at `data/raw/gis/ksrsac/`.
+1. Authoritative GIS Source: Ingest official KSR-SAC / KGIS administrative boundary shapefiles (`District.shp` for 31 districts, `Taluk.shp` for 240 taluks) located at `data/raw/gis/ksrsac/`.
 2. Raw Source Preservation Policy: Source files on disk are strictly read-only and must never be modified, overwritten, or repaired in-place.
 3. Coordinate Transformation: Source horizontal CRS is validated as `EPSG:32643` (UTM Zone 43N, metres). Geometries are transformed to `EPSG:4326` (WGS 84, decimal degrees) with guaranteed `MultiPolygon` typing for PostGIS database storage.
 4. Deterministic Topology Repair: Exactly 3 taluk geometries in the source dataset contain minor ring self-intersections (Shivamogga KGIS 1506 / LGD 5520, Sringeri KGIS 1701 / LGD 5525, Hosanagar KGIS 1504 / LGD 5518). These are repaired deterministically in source metric space using `shapely.make_valid()`. `buffer(0)` is strictly prohibited. The resulting area alteration is sub-millimetric floating-point noise ($< 10^{-14}$ relative area difference).
 5. Overlap Tolerance Policy: Substantive polygon overlaps between districts or between taluks of the same district are prohibited. A relative overlap tolerance of $\text{REL\_TOL} = 10^{-10}$ ($\text{intersection\_area} / \min(\text{area}_a, \text{area}_b)$) is enforced to absorb survey digitizing edge-coincidence floating-point artifacts while guaranteeing zero substantive overlapping jurisdiction.
 6. Vijayanagara 6-Taluk Verification: District KGIS 31 (Vijayanagara, LGD code 738 in KSR-SAC `District.shp`) is verified to contain exactly 6 constituent taluks (Hadagali, Hagaribommanahalli, Harapanahalli, Hosapete, Kotturu, Kudligi).
 7. Provenance & Identifier Preservation: Both KGIS codes and official LGD codes are preserved across all 31 districts and 240 taluks.
+**Affected components:** `backend/app/gis/ksrsac.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ksrsac_gis.py`.
+
+---
+
+**D-033 — Karnataka State Boundary Acquisition & Hierarchical GIS Normalization**
+**Date:** 2026-09-18
+**Status:** IMPLEMENTED (Phase 2.6B)
+**Decision:**
+1. Authoritative State Source: Acquired official KSR-SAC / KGIS Karnataka State Boundary (`State.zip` -> `State.shp`) from `https://kgis.ksrsac.in/kgis/downloads.aspx`, stored under `data/raw/gis/ksrsac/`.
+2. Raw Source Preservation Policy: Downloaded archive and unpacked shapefile components remain strictly read-only and unmodified on disk.
+3. Verified Source Attributes: Source contains exactly 1 feature with `KGISStateI = 1`, `KGISStateC = '29'` (Survey of India / LGD state code 29), and `KGISStateN = 'Karnataka'`.
+4. Coordinate Transformation & MultiPolygon Normalization: Source projection validated as `EPSG:32643` (UTM Zone 43N) and reprojected to `EPSG:4326` with guaranteed `MultiPolygon` typing and computed `centroid` point.
+5. Topological Validity: State geometry is 100% topologically valid in source coordinates (no self-intersections, no repairs required).
+6. Administrative Hierarchy Containment: Verified that all 31 normalized districts and all 240 normalized taluks intersect the normalized state boundary, and all representative points fall strictly within the state polygon.
+7. Extension of KsrsacAdminNormalizer: Implemented `NormalizedState` dataclass, `normalize_state()`, and `validate_state_containment()` in `backend/app/gis/ksrsac.py`.
 **Affected components:** `backend/app/gis/ksrsac.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ksrsac_gis.py`.
 
 

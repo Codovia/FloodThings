@@ -146,25 +146,28 @@ Official External Source (Verified API / CSV / GeoJSON / COG)
 
 ### 2.7 KSR-SAC Administrative GIS Normalization Pipeline (`KsrsacAdminNormalizer`)
 
-- **Source**: KSR-SAC / KGIS official gazetted shapefiles (`data/raw/gis/ksrsac/District.shp`, `data/raw/gis/ksrsac/Taluk.shp`).
+- **Source**: KSR-SAC / KGIS official shapefiles (`data/raw/gis/ksrsac/State.shp`, `data/raw/gis/ksrsac/District.shp`, `data/raw/gis/ksrsac/Taluk.shp`).
 - **Raw-Source Preservation Policy**: Raw source files on disk are strictly read-only and must never be modified, repaired in-place, or overwritten.
 - **Source CRS**: `EPSG:32643` (UTM Zone 43N, metres).
 - **Target Storage CRS**: `EPSG:4326` (WGS 84 decimal degrees).
 - **Validation Contract**:
-  - Exactly 31 districts, 240 taluks.
-  - Unique KGIS codes (`KGISDistri`, `KGISTalukC`) and LGD codes (`LGD_Distri`, `LGD_TalukC`).
-  - Strict preservation of source codes (KGIS 31, LGD 738 for Vijayanagara).
+  - Exactly 1 state (`KGISStateC=29`, `KGISStateN=Karnataka`), 31 districts, 240 taluks.
+  - Unique KGIS codes (`KGISStateI`, `KGISDistri`, `KGISTalukC`) and LGD codes (`KGISStateC`, `LGD_Distri`, `LGD_TalukC`).
+  - Strict preservation of source codes (KGISStateC 29 for Karnataka; KGIS 31, LGD 738 for Vijayanagara).
   - No empty or null geometries.
+  - State is a single valid MultiPolygon feature.
 - **Deterministic In-Memory Geometry Repair**:
   - Detects ring self-intersections in source survey digitization.
   - Exactly 3 taluk geometries repaired in memory via `shapely.make_valid()`: Shivamogga (KGIS 1506 / LGD 5520), Sringeri (KGIS 1701 / LGD 5525), Hosanagar (KGIS 1504 / LGD 5518).
+  - State geometry is 100% topologically valid in source data and requires zero repair.
   - Area difference after repair is sub-millimetric floating-point noise ($< 10^{-14}$ relative difference).
   - `buffer(0)` is strictly prohibited.
 - **Topological Integrity**:
+  - State hierarchy containment: All 31 districts and all 240 taluks intersect the normalized state boundary; representative points for all 31 districts and 240 taluks lie strictly within the state polygon.
   - Parent-child spatial containment: All 240 taluks intersect parent district; all 240 representative points lie strictly within parent district geometry.
   - Vijayanagara 6-taluk condition: District KGIS 31 has exactly 6 constituent taluks.
   - Non-overlap: No substantive overlaps exceeding relative tolerance $\text{REL\_TOL} = 10^{-10}$.
-- **Target Dataclasses**: Produces `NormalizedDistrict` and `NormalizedTaluk` with `wkt` (`SRID=4326;MULTIPOLYGON...`) and `centroid_wkt` ready for PostGIS ingestion.
+- **Target Dataclasses**: Produces `NormalizedState`, `NormalizedDistrict`, and `NormalizedTaluk` with `wkt` (`SRID=4326;MULTIPOLYGON...`) and `centroid_wkt` ready for PostGIS ingestion.
 
 ---
 

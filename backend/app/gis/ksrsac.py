@@ -4,6 +4,7 @@ KSR-SAC Administrative GIS Normalization Foundation.
 Reads and deterministically normalizes authoritative Karnataka administrative
 boundary shapefiles from the Karnataka State Remote Sensing Applications Centre
 (KSR-SAC) / KGIS:
+- State.shp (1 state)
 - District.shp (31 districts)
 - Taluk.shp (240 taluks)
 
@@ -47,6 +48,11 @@ REQUIRED_TALUK_COLUMNS: frozenset[str] = frozenset(
     {"KGISTalukC", "LGD_TalukC", "KGISTalukN", "KGISDistri", "geometry"}
 )
 
+REQUIRED_STATE_COLUMNS: frozenset[str] = frozenset(
+    {"KGISStateI", "KGISStateC", "KGISStateN", "geometry"}
+)
+
+EXPECTED_STATE_COUNT: int = 1
 EXPECTED_DISTRICT_COUNT: int = 31
 EXPECTED_TALUK_COUNT: int = 240
 EXPECTED_VIJAYANAGARA_TALUK_COUNT: int = 6
@@ -100,6 +106,36 @@ class GeometryRepairRecord:
     area_after_m2: float
     area_diff_m2: float
     relative_area_diff: float
+
+
+@dataclass(frozen=True)
+class NormalizedState:
+    """Normalized administrative state record in EPSG:4326."""
+
+    kgis_state_id: int
+    state_code: str
+    state_name: str
+    area_sq_m: float
+    perimeter_m: float
+    geometry: MultiPolygon
+    centroid: Point
+    was_repaired: bool = False
+    repair_record: GeometryRepairRecord | None = None
+
+    @property
+    def wkt(self) -> str:
+        """EWKT string formatted for PostGIS EPSG:4326 insertion."""
+        return f"SRID=4326;{self.geometry.wkt}"
+
+    @property
+    def raw_wkt(self) -> str:
+        """Standard WKT string."""
+        return self.geometry.wkt
+
+    @property
+    def centroid_wkt(self) -> str:
+        """EWKT string for state centroid in EPSG:4326."""
+        return f"SRID=4326;{self.centroid.wkt}"
 
 
 @dataclass(frozen=True)
@@ -276,6 +312,7 @@ class KsrsacAdminNormalizer:
         self,
         district_path: str | Path | None = None,
         taluk_path: str | Path | None = None,
+        state_path: str | Path | None = None,
         relative_overlap_tolerance: float = DEFAULT_RELATIVE_OVERLAP_TOLERANCE,
     ):
         base_dir = _resolve_default_source_dir()
@@ -288,6 +325,11 @@ class KsrsacAdminNormalizer:
             Path(taluk_path).resolve()
             if taluk_path
             else (base_dir / "Taluk.shp")
+        )
+        self.state_path = (
+            Path(state_path).resolve()
+            if state_path
+            else (base_dir / "State.shp")
         )
         self.relative_overlap_tolerance = relative_overlap_tolerance
 
@@ -372,6 +414,126 @@ class KsrsacAdminNormalizer:
             target_crs=TARGET_STORAGE_CRS,
             relative_overlap_tolerance=self.relative_overlap_tolerance,
         )
+
+    def normalize_state(self) -> NormalizedState:
+        """
+        Execute normalization and validation for State.shp.
+
+        Returns:
+            NormalizedState in EPSG:4326.
+        """
+        # 1. Source existence check
+        self._check_file_exists(self.state_path, "State shapefile")
+
+        # 2. Ingest into GeoDataFrame (in-memory read-only)
+        state_gdf = gpd.read_file(self.state_path)
+
+        # 3. Validate CRS
+        self._validate_crs(state_gdf, "State.shp")
+
+        # 4. Validate schema / required columns
+        self._validate_columns(state_gdf, REQUIRED_STATE_COLUMNS, "State.shp")
+
+        # 5. Validate exactly one feature
+        if len(state_gdf) != EXPECTED_STATE_COUNT:
+            raise KsrsacSchemaError(
+                f"State shapefile must contain exactly {EXPECTED_STATE_COUNT} feature, found {len(state_gdf)}"
+            )
+
+        # 6. Check for empty or null geometries
+        self._validate_non_empty_geometries(state_gdf, "State")
+
+        # 7. Check / repair geometry in source CRS (EPSG:32643)
+        row = state_gdf.iloc[0]
+        geom = row.geometry
+        area_m2 = float(geom.area)
+        perimeter_m = float(geom.length)
+
+        was_repaired = False
+        repair_record = None
+
+        if not geom.is_valid:
+            issue = explain_validity(geom)
+            repaired_geom = shapely.make_valid(geom)
+            if not repaired_geom.is_valid:
+                raise KsrsacTopologyError(
+                    f"State geometry could not be repaired: {issue}"
+                )
+            repaired_area = float(repaired_geom.area)
+            diff_m2 = abs(repaired_area - area_m2)
+            rel_diff = diff_m2 / area_m2 if area_m2 > 0 else 0.0
+            was_repaired = True
+            repair_record = GeometryRepairRecord(
+                feature_type="state",
+                kgis_code=str(row["KGISStateI"]),
+                lgd_code=str(row["KGISStateC"]).strip(),
+                name=str(row["KGISStateN"]).strip(),
+                issue_description=issue,
+                repair_operation="shapely.make_valid()",
+                valid_before=False,
+                valid_after=True,
+                area_before_m2=area_m2,
+                area_after_m2=repaired_area,
+                area_diff_m2=diff_m2,
+                relative_area_diff=rel_diff,
+            )
+            state_gdf.at[0, "geometry"] = repaired_geom
+
+        # 8. Transform to EPSG:4326 for storage
+        state_4326 = state_gdf.to_crs(TARGET_STORAGE_CRS)
+        geom_4326 = state_4326.geometry.iloc[0]
+
+        if not geom_4326.is_valid:
+            raise KsrsacTopologyError("State geometry failed validity check after EPSG:4326 reprojection")
+
+        mp_4326 = to_multipolygon(geom_4326)
+        centroid_4326 = mp_4326.centroid
+
+        kgis_state_id = int(row["KGISStateI"])
+        state_code = str(row["KGISStateC"]).strip()
+        state_name = str(row["KGISStateN"]).strip()
+
+        return NormalizedState(
+            kgis_state_id=kgis_state_id,
+            state_code=state_code,
+            state_name=state_name,
+            area_sq_m=area_m2,
+            perimeter_m=perimeter_m,
+            geometry=mp_4326,
+            centroid=centroid_4326,
+            was_repaired=was_repaired,
+            repair_record=repair_record,
+        )
+
+    def validate_state_containment(
+        self,
+        state: NormalizedState,
+        districts: list[NormalizedDistrict],
+        taluks: list[NormalizedTaluk] | None = None,
+    ) -> None:
+        """
+        Validate that all districts and taluks topologically intersect the state
+        and that their representative points fall within the state boundary.
+        """
+        for d in districts:
+            if not state.geometry.intersects(d.geometry):
+                raise KsrsacTopologyError(
+                    f"District {d.district_name} (KGIS {d.kgis_district_code}) does not intersect State {state.state_name}"
+                )
+            if not state.geometry.contains(d.geometry.representative_point()):
+                raise KsrsacTopologyError(
+                    f"District {d.district_name} representative point not contained in State {state.state_name}"
+                )
+        if taluks:
+            for t in taluks:
+                if not state.geometry.intersects(t.geometry):
+                    raise KsrsacTopologyError(
+                        f"Taluk {t.taluk_name} (KGIS {t.kgis_taluk_code}) does not intersect State {state.state_name}"
+                    )
+                if not state.geometry.contains(t.geometry.representative_point()):
+                    raise KsrsacTopologyError(
+                        f"Taluk {t.taluk_name} representative point not contained in State {state.state_name}"
+                    )
 
     # -------------------------------------------------------------------------
     # Internal Validation Steps
