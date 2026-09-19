@@ -89,15 +89,15 @@ class TestTargetReadinessInvariants:
         finally:
             db.close()
 
-    def test_database_district_geometry_is_null_before_phase_3(self) -> None:
-        """Verify district geometries in PostgreSQL are currently NULL prior to Phase 3 GIS ingestion."""
+    def test_database_district_geometry_populated_in_phase_3(self) -> None:
+        """Verify district geometries in PostgreSQL are populated in Phase 3 GIS ingestion."""
         session_factory = _get_session_factory()
         db = session_factory()
         try:
             dists = db.query(District).all()
             assert len(dists) == 31
-            # In Phase 2.4, only metadata was seeded; PostGIS polygons are ingested in Phase 3
-            assert all(d.geometry is None for d in dists)
+            # In Phase 3.2, PostGIS polygons are ingested from KSR-SAC
+            assert all(d.geometry is not None for d in dists)
         finally:
             db.close()
 

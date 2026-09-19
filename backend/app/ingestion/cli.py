@@ -39,6 +39,7 @@ from app.db.models.weather import (
 from app.db.session import _get_session_factory
 from app.ingestion.sources.geography import KarnatakaGeographyAdapter
 from app.ingestion.sources.ifi_flood import IfiFloodAdapter
+from app.ingestion.sources.ksrsac_gis import KsrsacGisAdapter
 from app.ingestion.sources.nwic_reservoir import NwicReservoirAdapter
 from app.ingestion.sources.nwic_river import NwicRiverLevelAdapter
 from app.ingestion.sources.open_meteo import OpenMeteoAdapter
@@ -64,6 +65,14 @@ def print_result(res: Any) -> None:
         for err in res.metrics.errors[:5]:
             print(f"    - {err}")
     print("-" * 70)
+
+
+def cmd_ksrsac_gis(session: Session, args: argparse.Namespace) -> int:
+    print_header("Ingesting KSR-SAC Administrative Boundaries (State, District, Taluk)")
+    adapter = KsrsacGisAdapter(session)
+    res = adapter.ingest()
+    print_result(res)
+    return 0 if res.status in ("SUCCESS", "PARTIAL") else 1
 
 
 def cmd_geography(session: Session, args: argparse.Namespace) -> int:
@@ -210,6 +219,9 @@ def build_parser() -> argparse.ArgumentParser:
     # geography
     subparsers.add_parser("geography", help="Seed Karnataka administrative geography (LGD)")
 
+    # ksrsac-gis
+    subparsers.add_parser("ksrsac-gis", help="Ingest KSR-SAC administrative geometries into PostGIS")
+
     # open-meteo
     p_meteo = subparsers.add_parser("open-meteo", help="Ingest Open-Meteo weather data")
     p_meteo.add_argument("--mode", choices=["operational", "historical"], default="operational")
@@ -246,6 +258,7 @@ def main() -> None:
     with factory() as session:
         cmd_map = {
             "geography": cmd_geography,
+            "ksrsac-gis": cmd_ksrsac_gis,
             "open-meteo": cmd_open_meteo,
             "nwic-river": cmd_nwic_river,
             "nwic-reservoir": cmd_nwic_reservoir,
