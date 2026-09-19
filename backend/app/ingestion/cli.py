@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from pathlib import Path
 from typing import Any
 
 from sqlalchemy import func, select, text
@@ -37,6 +38,7 @@ from app.db.models.weather import (
     WeatherObservation,
 )
 from app.db.session import _get_session_factory
+from app.gis.spatial_audit import SpatialAssociationAuditor
 from app.ingestion.sources.geography import KarnatakaGeographyAdapter
 from app.ingestion.sources.ifi_flood import IfiFloodAdapter
 from app.ingestion.sources.ksrsac_gis import KsrsacGisAdapter
@@ -158,6 +160,24 @@ def cmd_status(session: Session, args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_spatial_audit(session: Session, args: argparse.Namespace) -> int:
+    auditor = SpatialAssociationAuditor(session)
+    report = auditor.audit()
+
+    if args.format == "json":
+        print(report.to_json())
+    else:
+        print(report.summary_text())
+
+    if args.export_path:
+        p = Path(args.export_path)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text(report.to_json(), encoding="utf-8")
+        print(f"\n  Exported spatial audit report to: {p.resolve()}")
+
+    return 0
+
+
 def print_status(session: Session) -> None:
     print_header("FloodPulse Database Observation & Provenance Status")
 
@@ -247,6 +267,14 @@ def build_parser() -> argparse.ArgumentParser:
     # status
     subparsers.add_parser("status", help="Show database observation counts and quality metrics")
 
+    # spatial-audit
+    p_audit = subparsers.add_parser(
+        "spatial-audit",
+        help="Run read-only spatial association audit (Administrative GIS <-> Environmental Records)",
+    )
+    p_audit.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
+    p_audit.add_argument("--export-path", help="Optional path to export audit report as JSON")
+
     return parser
 
 
@@ -265,6 +293,7 @@ def main() -> None:
             "ifi": cmd_ifi,
             "ingest-all": cmd_ingest_all,
             "status": cmd_status,
+            "spatial-audit": cmd_spatial_audit,
         }
         handler = cmd_map.get(args.command)
         if handler is None:

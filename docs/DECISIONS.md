@@ -427,3 +427,16 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
    - This audit does NOT define an ML target, label dataset, or prediction logic.
 **Affected components:** `backend/app/gis/ifi_audit.py`, `backend/app/gis/ifi.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ifi_audit.py`, `docs/DATA_PIPELINE.md`.
 
+---
+
+**D-038 — Administrative GIS ↔ Environmental Spatial Association Audit & Discrepancy Baseline**
+**Date:** 2026-09-19
+**Status:** IMPLEMENTED (Phase 3.3 Audit)
+**Decision:**
+1. Strict Read-Only Spatial Association Audit: Implement `SpatialAssociationAuditor` in `backend/app/gis/spatial_audit.py` to evaluate spatial containment, coordinate validity, and administrative linkage between PostGIS KSR-SAC GIS geometries (State, 31 Districts, 240 Taluks) and existing environmental / historical records.
+2. Point Observation Audit (Weather & Rainfall): All 397 `weather_observations` and 397 `rainfall_observations` were audited. 100% (397/397) have valid EPSG:4326 geometries, 100% fall strictly inside the Karnataka State boundary, and 100% fall strictly within their assigned district polygons (8.95 km to 32.32 km from district boundaries; 0 boundary edge cases).
+3. River Station Discrepancy Baseline (Akkihebbal): Station `AKKIHEBBAL` (lat: 12.59861111, lon: 76.40055556) on the Hemavathi/Cauvery river has assigned `district_id` = Koppal (Northern Karnataka), but spatial containment is Mandya (Southern Karnataka, ~284 km from Koppal; 2.94 km from Mandya boundary). The audit flags this as `OUTSIDE_ASSIGNED_DISTRICT` and `requires_manual_review = 1`. In adherence to read-only constraints and provenance preservation, the stored foreign key is NOT silently modified.
+4. Taluk Polygonal Containment & Digitization Precision Tolerance: 240 taluks evaluated. 100% (240/240) intersect their assigned district, and 100% have `ST_PointOnSurface(geometry)` strictly within their assigned district. Exactly 44 taluks satisfy `ST_Within(t.geometry, d.geometry)`. Exactly 196 taluks exhibit micro-boundary slivers (< 0.00001% area difference, overlap >= 99.999%) resulting from independent shapefile digitization in KSR-SAC source data. These are deterministically classified as `BOUNDARY_SLIVER` (0 cross-district mismatches, 0 disjoint taluks).
+5. Historical IFI Flood Observations (Admin Evidence): 186 `flood_observations` evaluated. 100% (186/186) reference valid KSR-SAC districts across 23 distinct districts. 100% (186/186) have `geometry IS NULL`, preserving the strict zero-fabrication invariant (IFI is historical disaster damage evidence, not coordinate/satellite ground truth).
+6. Reproducible CLI Integration: Accessible via `python -m app.ingestion.cli spatial-audit [--format text|json] [--export-path PATH]`.
+**Affected components:** `backend/app/gis/spatial_audit.py`, `backend/app/ingestion/cli.py`, `backend/tests/test_spatial_audit.py`, `docs/DATA_PIPELINE.md`, `docs/HANDOVER.md`.

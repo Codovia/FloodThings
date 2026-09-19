@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 2.7A — Historical Flood Event Normalization Foundation
+Phase:                  Phase 3.3 — Administrative GIS ↔ Environmental Spatial Association Audit
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -20,6 +20,10 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 2.4.1 — Data Semantics & Provenance Correction (Backfilled provenance)
                         Phase 2.5 — Automated Background Ingestion & Source Health (Completed)
                         Phase 2.6 — GIS Foundation (KSR-SAC Admin & State Normalization Ready)
+                        Phase 2.7 — IFI Historical Flood Event Normalization & Evidence Audit (D-034, D-035)
+                        Phase 2.8 — ML Target Readiness Definition
+                        Phase 3.1 — KSR-SAC Administrative GIS PostGIS Ingestion Design (Completed)
+                        Phase 3.2 — KSR-SAC Administrative GIS PostGIS Ingestion (1 State, 31 Districts, 240 Taluks)
 ```
 
 ## Repository
@@ -188,6 +192,17 @@ Updated backend/app/gis/__init__.py          (Exported audit classes and records
 Updated docs/DATA_PIPELINE.md                (Added Section 2.4.1 for IFI historical evidence audit contract)
 Updated docs/DECISIONS.md                    (Added D-035 on historical flood evidence audit & spatial-temporal contract)
 Updated docs/HANDOVER.md                     (Documented Phase 2.7B completion)
+```
+
+## Phase 3.3 Artifacts Created (Administrative GIS ↔ Environmental Spatial Association Audit)
+
+```
+backend/app/gis/spatial_audit.py             (SpatialAssociationAuditor: deterministic read-only spatial & admin audit)
+backend/tests/test_spatial_audit.py          (Tests: spatial containment, discrepancy detection, read-only invariant)
+Updated backend/app/ingestion/cli.py         (Added spatial-audit subcommand with text and JSON formats)
+Updated docs/DECISIONS.md                    (Added D-038 on spatial association audit and discrepancy baseline)
+Updated docs/DATA_PIPELINE.md                (Added Section 2.9 on spatial association audit)
+Updated docs/HANDOVER.md                     (Updated current state, artifacts, and next steps)
 ```
 
 ## Phase 2.7A Artifacts Created (Historical Flood Normalization Foundation)

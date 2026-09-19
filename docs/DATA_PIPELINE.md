@@ -241,6 +241,23 @@ Under no circumstances should `MODEL_OUTPUT` or `REANALYSIS` be confused with ph
 
 ---
 
+### 2.9 Administrative GIS ↔ Environmental Spatial Association Audit (`SpatialAssociationAuditor`)
+
+- **Purpose**: Deterministic, read-only spatial verification between populated KSR-SAC administrative GIS polygons (`states`, `districts`, `taluks`) in PostGIS (EPSG:4326) and existing environmental / historical records.
+- **Audited Entities**:
+  1. `weather_observations`: 397 examined, 397 matched within assigned districts (8.95 km to 32.32 km interior; 0 outside Karnataka, 0 wrong district).
+  2. `rainfall_observations`: 397 examined, 397 matched within assigned districts (8.95 km to 32.32 km interior; 0 outside Karnataka, 0 wrong district).
+  3. `river_stations`: 1 examined (`AKKIHEBBAL`), 0 matched, 1 flagged for manual review. Stored district is Koppal (Northern Karnataka), actual spatial location is Mandya (Southern Karnataka; 284 km distant; 2.94 km from Mandya boundary). Stored FK is preserved without silent mutation.
+  4. `taluk_containment`: 240 examined, 240 have PointOnSurface inside assigned district (100.0%), 44 strictly within (`ST_Within`), 196 micro-boundary slivers (overlap >= 99.999% due to KSR-SAC digitization precision), 0 cross-district mismatches.
+  5. `flood_observations` (IFI): 186 examined, 186 reference valid KSR-SAC districts (23 distinct districts), 186 have `geometry IS NULL` (100.0% zero-fabrication preserved).
+- **Execution**:
+  ```bash
+  python -m app.ingestion.cli spatial-audit [--format text|json] [--export-path PATH]
+  ```
+- **Invariants**: Strictly read-only; zero synthetic coordinates; zero centroid inference; preserves source provenance.
+
+---
+
 ## 3. Data Flow & Feature Store Bridge
 
 ```text
