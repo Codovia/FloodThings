@@ -123,9 +123,48 @@ Official External Source (Verified API / CSV / GeoJSON / COG)
     - Upstream LGD misattribution: Exactly 32 occurrences of `Bijapur` (assigned LGD 636 [Chhattisgarh] in upstream IFI) are recovered and mapped to Vijayapura (KGIS 03, LGD 530).
     - Other verified canonical aliases: `ramanagara` $\to$ Bengaluru South (KGIS 29, LGD 631), `bellary` $\to$ Ballari, `mysore` $\to$ Mysuru, `coorg` $\to$ Kodagu, `shimoga` $\to$ Shivamogga, `gulbarga` $\to$ Kalaburagi.
   - **Out-of-State Non-Karnataka Filtering**: 35 non-Karnataka district tokens in multi-state events (Kerala, Gujarat, AP/Telangana, Uttarakhand) are deterministically identified and excluded without error.
-  - **Unresolved Token Auditing**: Exactly 31 token occurrences across 18 distinct strings cannot be deterministically mapped without guessing (13 OCR concatenations like `Bagalkotee Belagavi`, 2 taluks like `Mudigere`, 1 locality `Rugi`, 2 regional descriptors `Parts of Karnataka`). The normalizer **never guesses**; these are recorded in `UnresolvedDistrictTokenRecord` and reported in the audit log.
+  - **Unresolved Token Auditing**: Exactly 31 token occurrences across 18 distinct strings cannot be deterministically mapped without guessing (13 OCR concatenations like `Chamarajanagaraa Chikkaballapura` [6], `Bagalkotee Belagavi` [5], `Bagalkotee Bengaluru Urban` [3], `Chamarajanagaraa Hassan` [2], etc.; 2 taluk-level tokens `Mudigere` [1] and `Chikodi` [1]; 1 locality token `Rugi` [1]; 2 non-district descriptors `Parts of Karnataka` [2]; 1 ambiguous token `Uttar Kashia` [1]; 1 unmapped corrupted string `Davangere` [1]; and 1 composite `Bijapur Surendranagar` [1]). The normalizer **never guesses**; these are recorded in `UnresolvedDistrictTokenRecord` and reported in the audit log.
 
 - **Idempotency**: Events deduplicated by `UEI`; district observations deduplicated by `(UEI, kgis_district_code)`.
+
+---
+
+### 2.4.1 Historical Flood Evidence Audit & Spatial-Temporal Coverage Contract (`IfiEvidenceAuditor`)
+
+- **Audit Module**: In-memory, deterministic audit engine (`app.gis.ifi_audit.IfiEvidenceAuditor`).
+- **Audit Target**: Evaluates normalized IFI v3.0 historical flood records against all 31 authoritative KSR-SAC districts.
+- **Audit Findings (Real Source Archive)**:
+  - **Source Records**: 6,876 raw rows; 494 Karnataka-filtered events (`State_Codes` contains `29`); 493 valid events; 1 rejected event (`UEI-IMD-FL-2001-0043` with empty start timestamp).
+  - **Raw Token Evaluation & Resolution Reconciliation**:
+    - Exactly 1,344 raw district tokens evaluated across the 493 valid events:
+      - `DIRECT_LGD`: 1,104 raw resolutions $\to$ 5 duplicate observations skipped $\to$ **1,099** normalized observations.
+      - `VERIFIED_ALIAS`: 142 raw resolutions $\to$ 2 duplicate observations skipped (`Mangalore` when `Dakshina Kannada` already present in same event) $\to$ **140** normalized observations.
+      - `BIJAPUR_CORRECTION`: 32 raw resolutions $\to$ 0 duplicate observations skipped $\to$ **32** normalized observations.
+      - `OUT_OF_STATE`: 35 non-Karnataka tokens skipped.
+      - `UNMAPPED`: 31 unresolved token occurrences across 18 distinct strings.
+    - Total normalized district observations: $1,099 + 140 + 32 = \mathbf{1,271}$.
+  - **Normalized Historical Evidence**: 1,271 district observations; 0 duplicate events; 7 duplicate observations skipped within same events.
+  - **Unresolved Evidence**: Exactly 31 occurrences across 18 distinct strings cannot be deterministically mapped without guessing (13 OCR concatenations, 2 taluk-level tokens, 1 locality token, 2 non-district descriptors, 1 ambiguous token, 2 unmapped/corrupted tokens).
+  - **Spatial & Administrative Coverage**:
+    - Exactly 30 districts have documented historical flood evidence in IFI v3.0.
+    - Exactly 1 district has zero evidence: **Vijayanagara** (KGIS 31, LGD 738) has zero matching IFI v3 observations in the audited archive.
+    - Districts with zero evidence remain explicitly zero. Coverage is never manufactured.
+    - Absence of evidence does not constitute proof of zero flooding.
+  - **Temporal Coverage**:
+    - Earliest recorded event: `1969-07-14`.
+    - Latest recorded event: `2023-07-24`.
+    - 5 calendar years with zero documented events: `[1970, 1971, 1973, 1976, 1977]`.
+    - Coverage gaps are not interpolated or synthetically filled.
+- **Source Semantics & Limitations**:
+  - `source_name = "India Flood Inventory (IFI v3.0)"`
+  - `data_category = "HISTORICAL_EVENT"`
+  - Spatial resolution is coarse district-level damage reports.
+  - Coordinate geometry is strictly `NULL` (`None`).
+  - Flood depth is strictly `NULL` (`None`).
+  - Source confidence is strictly `NULL` (`None`) per CONSTRAINTS.md (IFI v3 publishes no confidence score; mapping status `DETERMINISTIC` is separate from source confidence).
+  - IFI is **not** satellite inundation ground truth; it represents recorded administrative damage.
+  - Absence of evidence does **not** constitute proof of no flooding.
+  - This audit does **not** define an ML target or label dataset.
 
 ---
 

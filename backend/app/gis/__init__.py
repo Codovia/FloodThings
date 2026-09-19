@@ -12,6 +12,14 @@ from app.gis.ifi import (
     NormalizedIfiObservation,
     UnresolvedDistrictTokenRecord,
 )
+from app.gis.ifi_audit import (
+    AuditQualityMetrics,
+    DistrictCoverageRecord,
+    IfiEvidenceAuditReport,
+    IfiEvidenceAuditor,
+    UnresolvedTokenSummary,
+    YearlyCoverageRecord,
+)
 from app.gis.ksrsac import (
     EXPECTED_DISTRICT_COUNT,
     EXPECTED_STATE_COUNT,
@@ -34,12 +42,16 @@ from app.gis.ksrsac import (
 )
 
 __all__ = [
+    "AuditQualityMetrics",
+    "DistrictCoverageRecord",
     "EXPECTED_DISTRICT_COUNT",
     "EXPECTED_STATE_COUNT",
     "EXPECTED_TALUK_COUNT",
     "EXPECTED_VIJAYANAGARA_TALUK_COUNT",
     "GeometryRepairRecord",
     "IfiEventNormalizer",
+    "IfiEvidenceAuditReport",
+    "IfiEvidenceAuditor",
     "IfiNormalizationResult",
     "KsrsacAdminNormalizer",
     "KsrsacCrsError",
@@ -57,4 +69,6 @@ __all__ = [
     "REQUIRED_STATE_COLUMNS",
     "REQUIRED_TALUK_COLUMNS",
     "UnresolvedDistrictTokenRecord",
+    "UnresolvedTokenSummary",
+    "YearlyCoverageRecord",
 ]

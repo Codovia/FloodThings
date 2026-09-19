@@ -178,6 +178,28 @@ cd backend && PYTHONPATH=. alembic check
 Phase 3 — GIS & Administrative Geography Ingestion / Spatial Feature Engineering
 ```
 
+## Phase 2.7B Artifacts Created (Historical Flood Evidence Audit)
+
+```
+backend/app/gis/ifi_audit.py                 (IfiEvidenceAuditor, IfiEvidenceAuditReport, coverage & quality records)
+backend/tests/test_ifi_audit.py              (Audit test suite: 31 districts, 0-evidence, yearly, metrics, zero fabrication)
+Updated backend/app/gis/ifi.py               (Added resolution_method tracking to NormalizedIfiObservation & _resolve_district)
+Updated backend/app/gis/__init__.py          (Exported audit classes and records)
+Updated docs/DATA_PIPELINE.md                (Added Section 2.4.1 for IFI historical evidence audit contract)
+Updated docs/DECISIONS.md                    (Added D-035 on historical flood evidence audit & spatial-temporal contract)
+Updated docs/HANDOVER.md                     (Documented Phase 2.7B completion)
+```
+
+## Phase 2.7A Artifacts Created (Historical Flood Normalization Foundation)
+
+```
+backend/app/gis/ifi.py                       (IfiEventNormalizer: deterministic normalization & KSR-SAC alignment)
+backend/tests/test_ifi_normalization.py      (Tests: normalization, deduplication, confidence=None, geometry=None)
+Updated backend/app/gis/__init__.py          (Exported IfiEventNormalizer and normalization result models)
+Updated docs/DATA_PIPELINE.md                (Added Section 2.4 for IFI historical flood event normalization)
+Updated docs/DECISIONS.md                    (Added D-034 on deterministic IFI normalization)
+```
+
 ## Phase 2.5 Artifacts Created
 
 ```

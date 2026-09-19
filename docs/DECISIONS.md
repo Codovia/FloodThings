@@ -396,3 +396,34 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 10. Timezone Semantics: Raw IFI dates lack explicit timezone offsets and mostly use nominal midnight (`00:00`), indicating calendar day resolution. Conversion to UTC assuming IST (UTC+05:30) is documented as an **operational assumption** based on reporting agencies (IMD/CWC), not an explicit source metadata fact. Both raw date strings and derived UTC datetimes are preserved.
 **Affected components:** `backend/app/gis/ifi.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ifi_normalization.py`, `docs/DATA_PIPELINE.md`.
 
+---
+
+**D-035 — Deterministic Historical Flood Evidence Audit & Spatial-Temporal Coverage Contract**
+**Date:** 2026-09-19
+**Status:** IMPLEMENTED (Phase 2.7B Audit)
+**Decision:**
+1. Pure In-Memory Audit Module: Implement `IfiEvidenceAuditor` in `backend/app/gis/ifi_audit.py` to deterministically audit normalized IFI historical flood evidence against the 31 authoritative KSR-SAC districts without database writes, migrations, or data mutations.
+2. Complete 31-District Spatial Audit: Audits all 31 districts deterministically sorted by KGIS district code (`01` to `31`). Exactly 30 districts have documented evidence; exactly 1 district (**Vijayanagara**, KGIS 31, LGD 738) has zero matching IFI v3 observations in the audited archive (`unique_events = 0`, `district_observations = 0`, `has_evidence = False`). Coverage is never manufactured, and absence of evidence does not constitute proof of zero flooding.
+3. True Temporal Coverage Contract: Derived directly from the real normalized records: earliest event date is `1969-07-14`, latest event date is `2023-07-24`. Exactly 5 calendar years have zero documented records: `[1970, 1971, 1973, 1976, 1977]`. Temporal gaps are never filled or interpolated.
+4. Exact Quality & Recovery Reconciliation: Derived from real source records:
+   - 6,876 raw records received
+   - 494 Karnataka-filtered events (`State_Codes` contains `29`)
+   - 493 valid events, 1 rejected event (`UEI-IMD-FL-2001-0043` with empty start timestamp)
+   - 1,344 raw district tokens evaluated across the 493 valid events:
+     - `DIRECT_LGD`: 1,104 raw resolutions $\to$ 5 duplicate observations skipped $\to$ 1,099 normalized observations
+     - `VERIFIED_ALIAS`: 142 raw resolutions $\to$ 2 duplicate observations skipped $\to$ 140 normalized observations
+     - `BIJAPUR_CORRECTION`: 32 raw resolutions $\to$ 0 duplicate observations skipped $\to$ 32 normalized observations
+     - `OUT_OF_STATE`: 35 non-Karnataka tokens skipped
+     - `UNMAPPED`: 31 unresolved token occurrences across 18 distinct strings (occurrence counts sum exactly to 31)
+   - Total normalized district observations: $1,099 + 140 + 32 = \mathbf{1,271}$
+   - 0 duplicate events, 7 duplicate observations skipped within same events
+   - 493 total unique events, 1,271 total unique district-event pairs
+5. Strict Source Semantics & Scientific Boundaries:
+   - Source is `India Flood Inventory (IFI v3.0)`, data category `HISTORICAL_EVENT`.
+   - Evidence is coarse district-level administrative disaster damage.
+   - Geometry, flood depth, and source confidence are explicitly `NULL` (`None`).
+   - IFI is NOT satellite inundation ground truth.
+   - Absence of evidence does NOT constitute proof of no flooding.
+   - This audit does NOT define an ML target, label dataset, or prediction logic.
+**Affected components:** `backend/app/gis/ifi_audit.py`, `backend/app/gis/ifi.py`, `backend/app/gis/__init__.py`, `backend/tests/test_ifi_audit.py`, `docs/DATA_PIPELINE.md`.
+

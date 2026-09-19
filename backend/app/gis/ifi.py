@@ -213,6 +213,7 @@ class NormalizedIfiObservation:
     flood_depth: float | None = None  # Never filled with 0.0 or estimate
     confidence: float | None = None  # Source does not publish confidence; remains None per CONSTRAINTS.md
     mapping_status: str = "DETERMINISTIC"  # Administrative resolution status against KSR-SAC
+    resolution_method: str = "DIRECT_LGD"  # 'DIRECT_LGD', 'VERIFIED_ALIAS', 'BIJAPUR_CORRECTION'
     quality_status: str = "VALID"
     data_category: str = "HISTORICAL_EVENT"
     geometry: None = None  # Explicitly unavailable
@@ -322,14 +323,14 @@ class IfiEventNormalizer:
 
     def _resolve_district(
         self, raw_name: str, raw_code: str
-    ) -> tuple[NormalizedDistrict | None, str | None]:
+    ) -> tuple[NormalizedDistrict | None, str | None, str | None]:
         """
         Deterministically map a district token to a KSR-SAC NormalizedDistrict.
 
         Returns:
-            (NormalizedDistrict, None) if resolved deterministically.
-            (None, 'OUT_OF_STATE') if token belongs to another state.
-            (None, reason_code) if unmapped/ambiguous/taluk/concatenated.
+            (NormalizedDistrict, None, resolution_method) if resolved deterministically.
+            (None, 'OUT_OF_STATE', None) if token belongs to another state.
+            (None, reason_code, None) if unmapped/ambiguous/taluk/concatenated.
         """
         code_clean = raw_code.strip()
         name_clean = raw_name.strip()
@@ -337,28 +338,28 @@ class IfiEventNormalizer:
 
         # 1. Out of state detection
         if code_clean in KNOWN_OUT_OF_STATE_LGD_CODES:
-            return None, "OUT_OF_STATE"
+            return None, "OUT_OF_STATE", None
 
         # 2. Known geocoding error in IFI: 'Bijapur' assigned 636 (Chhattisgarh) instead of 530 (Karnataka)
         if name_lower == "bijapur" and (code_clean in ("636", "none", "", "530")):
             dist = self._by_kgis.get("03")
             if dist:
-                return dist, None
+                return dist, None, "BIJAPUR_CORRECTION"
 
         # 3. Direct match by LGD code against KSR-SAC
         if code_clean.isdigit() and code_clean in self._by_lgd:
-            return self._by_lgd[code_clean], None
+            return self._by_lgd[code_clean], None, "DIRECT_LGD"
 
         # 4. Match by canonical name or verified alias
         if name_lower in DISTRICT_NAME_ALIASES:
             kgis_code = DISTRICT_NAME_ALIASES[name_lower]
             dist = self._by_kgis.get(kgis_code)
             if dist:
-                return dist, None
+                return dist, None, "VERIFIED_ALIAS"
 
         # 5. Direct match by canonical KSR-SAC name
         if name_lower in self._by_canonical_name:
-            return self._by_canonical_name[name_lower], None
+            return self._by_canonical_name[name_lower], None, "VERIFIED_ALIAS"
 
         # 6. Categorize unresolved reasons without guessing
         # Check if composite / concatenated tokens
@@ -370,21 +371,21 @@ class IfiEventNormalizer:
         matches = [w for w in common_words if w in name_lower]
         if len(matches) >= 2 or " " in name_clean and any(w in name_lower for w in common_words):
             if any(name_lower.startswith(w) for w in ["chamarajanagaraa", "bagalkotee"]):
-                return None, "CONCATENATED_TOKENS"
+                return None, "CONCATENATED_TOKENS", None
 
         if name_lower in ("mudigere", "chikodi"):
-            return None, "TALUK_LEVEL_TOKEN"
+            return None, "TALUK_LEVEL_TOKEN", None
 
         if name_lower == "rugi":
-            return None, "LOCALITY_LEVEL_TOKEN"
+            return None, "LOCALITY_LEVEL_TOKEN", None
 
         if "parts of karnataka" in name_lower:
-            return None, "NON_DISTRICT_DESCRIPTOR"
+            return None, "NON_DISTRICT_DESCRIPTOR", None
 
         if name_lower == "uttar kashia":
-            return None, "AMBIGUOUS_TOKEN"
+            return None, "AMBIGUOUS_TOKEN", None
 
-        return None, "UNMAPPED_TOKEN"
+        return None, "UNMAPPED_TOKEN", None
 
     def normalize(
         self,
@@ -530,7 +531,7 @@ class IfiEventNormalizer:
                     pairs.append((extra_name, "None"))
 
             for raw_name, raw_code in pairs:
-                norm_dist, unmapped_reason = self._resolve_district(raw_name, raw_code)
+                norm_dist, unmapped_reason, res_method = self._resolve_district(raw_name, raw_code)
 
                 if unmapped_reason == "OUT_OF_STATE":
                     out_of_state_tokens_skipped += 1
@@ -566,6 +567,7 @@ class IfiEventNormalizer:
                     flood_depth=None,  # Never filled with 0.0 or estimate
                     confidence=None,  # Source does not publish confidence
                     mapping_status="DETERMINISTIC",
+                    resolution_method=res_method or "DIRECT_LGD",
                     quality_status="VALID",
                     data_category="HISTORICAL_EVENT",
                     geometry=None,  # Explicitly unavailable
