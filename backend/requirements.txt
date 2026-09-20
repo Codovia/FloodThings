@@ -28,3 +28,6 @@ rasterio==1.5.1
 # Testing
 pytest==8.4.1
 httpx==0.28.1
+
+# Data serialization & Parquet
+pyarrow==25.0.1
