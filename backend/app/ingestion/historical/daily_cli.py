@@ -115,6 +115,10 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     )
 
     processor = DailyProcessor(config=config)
+    processor.manifest.recover_stale_running_chunks(
+        processed_base_dir=config.processed_base_dir,
+        raw_base_dir=config.raw_base_dir,
+    )
 
     # Generate candidate chunks to process
     candidate_chunks = generate_chunks(start_year=start_year, end_year=end_year, batch_size=10)

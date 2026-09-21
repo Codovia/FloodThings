@@ -4,6 +4,8 @@ HTTP client for Open-Meteo Historical Weather API (ERA5 Reanalysis).
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+from email.utils import parsedate_to_datetime
 import json
 import random
 import time
@@ -57,7 +59,7 @@ class HistoricalOpenMeteoClient:
     - Explicit `models=era5`
     - Explicit `timezone=UTC`
     - Explicit `precipitation_unit=mm` and `temperature_unit=celsius`
-    - Strict timeouts, retry backoff with jitter, and 429 cooldown.
+    - Strict timeouts, sequential request pacing, retry backoff with jitter, and 429 cooldown.
     """
 
     BASE_URL = "https://archive-api.open-meteo.com/v1/archive"
@@ -69,6 +71,7 @@ class HistoricalOpenMeteoClient:
     ):
         self.config = config or ExtractionConfig()
         self._client = client
+        self._last_request_time: float = 0.0
 
     def _get_client(self) -> httpx.Client:
         if self._client is not None:
@@ -83,6 +86,52 @@ class HistoricalOpenMeteoClient:
             timeout=timeout,
             headers={"User-Agent": "FloodPulse-HistoricalExtractor/1.0"},
         )
+
+    def _apply_request_pacing(self) -> float:
+        """
+        Enforce sequential HTTP request pacing at client level.
+        Ensures that at least config.min_request_interval_seconds has elapsed
+        since the start of the previous HTTP request.
+        Returns the duration slept in seconds.
+        """
+        slept = 0.0
+        if self.config.min_request_interval_seconds > 0 and self._last_request_time > 0:
+            elapsed = time.monotonic() - self._last_request_time
+            if elapsed < self.config.min_request_interval_seconds:
+                sleep_needed = self.config.min_request_interval_seconds - elapsed
+                time.sleep(sleep_needed)
+                slept = sleep_needed
+        self._last_request_time = time.monotonic()
+        return slept
+
+    def _parse_retry_after(self, response: httpx.Response) -> float | None:
+        """
+        Parse Retry-After header as numeric seconds or HTTP-date format (RFC 7231 / RFC 2822).
+        Returns positive duration in seconds if valid, otherwise None.
+        """
+        retry_header = response.headers.get("Retry-After")
+        if not retry_header:
+            return None
+        header_str = retry_header.strip()
+        # 1. Try parsing numeric seconds
+        try:
+            val = float(header_str)
+            if val >= 0:
+                return val
+        except (ValueError, TypeError):
+            pass
+        # 2. Try parsing HTTP-date format
+        try:
+            dt = parsedate_to_datetime(header_str)
+            now_dt = datetime.now(timezone.utc)
+            if dt.tzinfo is None:
+                dt = dt.replace(tzinfo=timezone.utc)
+            diff = (dt - now_dt).total_seconds()
+            if diff >= 0:
+                return diff
+        except Exception:
+            pass
+        return None
 
     def build_query_params(self, chunk: ExtractionChunk) -> dict[str, str]:
         """Build deterministic query parameters for a given extraction chunk."""
@@ -126,6 +175,7 @@ class HistoricalOpenMeteoClient:
 
         while attempt < self.config.max_retries:
             attempt += 1
+            self._apply_request_pacing()
             t0 = time.time()
             try:
                 response = client.get(url, params=params)
@@ -142,7 +192,15 @@ class HistoricalOpenMeteoClient:
                     return raw_bytes, parsed_json, status, latency
 
                 elif status == 429:
-                    wait_time = 60.0 + random.uniform(1.0, 5.0)
+                    retry_after = self._parse_retry_after(response)
+                    if retry_after is not None:
+                        wait_time = retry_after
+                    else:
+                        wait_time = self.config.rate_limit_cooldown_seconds
+
+                    # Do not retry faster than configured minimum request interval
+                    wait_time = max(wait_time, self.config.min_request_interval_seconds)
+
                     if attempt < self.config.max_retries:
                         time.sleep(wait_time)
                         continue

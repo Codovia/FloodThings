@@ -96,6 +96,7 @@ class ProductionHistoricalRunner:
         daily_manifest: DailyProcessingManifest | None = None,
         extractor: HistoricalExtractor | None = None,
         daily_processor: DailyProcessor | None = None,
+        auto_recover: bool = True,
     ):
         self.extraction_config = extraction_config or ExtractionConfig()
         self.daily_config = daily_config or DailyProcessingConfig()
@@ -107,12 +108,29 @@ class ProductionHistoricalRunner:
             self.daily_config.manifest_path
         )
 
+        if auto_recover:
+            self.recover_stale_chunks()
+
         self.extractor = extractor or HistoricalExtractor(
             config=self.extraction_config, manifest=self.extraction_manifest
         )
         self.daily_processor = daily_processor or DailyProcessor(
             config=self.daily_config, manifest=self.daily_manifest
         )
+
+    def recover_stale_chunks(self) -> dict[str, Any]:
+        """Safely recover stale RUNNING chunks across extraction and daily manifests."""
+        ext_res = self.extraction_manifest.recover_stale_running_chunks(
+            raw_base_dir=self.extraction_config.raw_base_dir
+        )
+        proc_res = self.daily_manifest.recover_stale_running_chunks(
+            processed_base_dir=self.daily_config.processed_base_dir,
+            raw_base_dir=self.extraction_config.raw_base_dir,
+        )
+        return {
+            "extraction": ext_res,
+            "processing": proc_res,
+        }
 
     def audit_inventory(
         self,

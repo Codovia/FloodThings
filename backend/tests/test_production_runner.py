@@ -27,7 +27,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from app.ingestion.historical.daily_manifest import DailyProcessingManifest
-from app.ingestion.historical.daily_models import DailyProcessingConfig
+from app.ingestion.historical.daily_models import DailyProcessingConfig, DailyProcessingStatus
 from app.ingestion.historical.daily_processor import DailyProcessor
 from app.ingestion.historical.extractor import HistoricalExtractor
 from app.ingestion.historical.grid import (
@@ -464,3 +464,112 @@ class TestSafetyControls:
         assert final_entry["spatial_fingerprint"] == new_chunk.spatial_fingerprint
         assert len(final_entry["cell_ids"]) == 9
 
+    def test_runner_startup_recovers_stale_running_chunk_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Production runner startup recovers stale RUNNING chunks without artifacts to PENDING."""
+        raw_dir, processed_dir = temp_dirs
+        manifest_path = raw_dir / "extraction_manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+
+        chunk = ExtractionChunk(
+            chunk_id="era5_1970_batch_030",
+            year=1970,
+            batch_id=30,
+            cells=[GridCell(lat=14.0, lon=75.0)],
+        )
+        manifest.register_chunks([chunk])
+        manifest.mark_running("era5_1970_batch_030")
+
+        assert manifest.get_chunk("era5_1970_batch_030")["status"] == ChunkStatus.RUNNING.value
+
+        # Starting runner must automatically recover the stale RUNNING chunk to PENDING
+        runner = ProductionHistoricalRunner(
+            extraction_config=ExtractionConfig(raw_base_dir=raw_dir, manifest_path=manifest_path),
+            daily_config=DailyProcessingConfig(raw_base_dir=raw_dir, processed_base_dir=processed_dir),
+            extraction_manifest=manifest,
+        )
+
+        rec = runner.extraction_manifest.get_chunk("era5_1970_batch_030")
+        assert rec["status"] == ChunkStatus.PENDING.value
+        assert rec["started_at"] is None
+
+        # Preflight audit reports it in missing_raw_chunks, ready for extraction
+        audit = runner.audit_inventory(1970, 1970)
+        assert "era5_1970_batch_030" in audit.missing_raw_chunks
+
+    def test_runner_startup_reconciles_valid_running_chunk_to_succeeded(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Production runner startup reconciles stale RUNNING chunk with valid artifact to SUCCEEDED."""
+        import gzip
+        from tests.test_historical_extraction import create_mock_payload
+
+        raw_dir, processed_dir = temp_dirs
+        manifest_path = raw_dir / "extraction_manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+
+        from app.ingestion.historical.grid import get_spatial_batches
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
+        cells = batches[29]
+        chunk = ExtractionChunk(
+            chunk_id="era5_1970_batch_030",
+            year=1970,
+            batch_id=30,
+            cells=cells,
+        )
+        manifest.register_chunks([chunk])
+        manifest.mark_running("era5_1970_batch_030")
+
+        # Write valid raw file to disk
+        year_dir = raw_dir / "year=1970"
+        year_dir.mkdir(parents=True, exist_ok=True)
+        raw_file = year_dir / "batch_030.json.gz"
+
+        payload = create_mock_payload(chunk, hours_count=8760)
+        raw_bytes = json.dumps(payload).encode("utf-8")
+        comp_bytes = gzip.compress(raw_bytes)
+        with open(raw_file, "wb") as f:
+            f.write(comp_bytes)
+
+        runner = ProductionHistoricalRunner(
+            extraction_config=ExtractionConfig(raw_base_dir=raw_dir, manifest_path=manifest_path),
+            daily_config=DailyProcessingConfig(raw_base_dir=raw_dir, processed_base_dir=processed_dir),
+            extraction_manifest=manifest,
+        )
+
+        rec = runner.extraction_manifest.get_chunk("era5_1970_batch_030")
+        assert rec["status"] == ChunkStatus.SUCCEEDED.value
+        assert rec["raw_path"] == str(raw_file)
+
+        audit = runner.audit_inventory(1970, 1970)
+        assert "era5_1970_batch_030" in audit.valid_raw_chunks
+
+    def test_runner_startup_recovers_stale_daily_running_chunk(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Production runner startup recovers stale RUNNING daily chunk to PENDING if invalid."""
+        raw_dir, processed_dir = temp_dirs
+        ext_manifest_path = raw_dir / "extraction_manifest.json"
+        daily_manifest_path = processed_dir / "processing_manifest.json"
+
+        daily_manifest = DailyProcessingManifest(daily_manifest_path)
+        daily_manifest.register_chunk(
+            chunk_id="era5_1970_batch_030",
+            year=1970,
+            batch_id=30,
+            source_raw_path=str(raw_dir / "year=1970" / "batch_030.json.gz"),
+            input_sha256="dummy_sha",
+        )
+        daily_manifest.mark_running("era5_1970_batch_030")
+        assert daily_manifest.get_chunk("era5_1970_batch_030")["status"] == DailyProcessingStatus.RUNNING.value
+
+        runner = ProductionHistoricalRunner(
+            extraction_config=ExtractionConfig(raw_base_dir=raw_dir, manifest_path=ext_manifest_path),
+            daily_config=DailyProcessingConfig(raw_base_dir=raw_dir, processed_base_dir=processed_dir, manifest_path=daily_manifest_path),
+            daily_manifest=daily_manifest,
+        )
+
+        rec = runner.daily_manifest.get_chunk("era5_1970_batch_030")
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert rec["started_at"] is None

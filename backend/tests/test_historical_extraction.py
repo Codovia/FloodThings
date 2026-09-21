@@ -287,6 +287,7 @@ class TestClientAndParameters:
 
         resp_429 = MagicMock(spec=httpx.Response)
         resp_429.status_code = 429
+        resp_429.headers = {}
 
         resp_200 = MagicMock(spec=httpx.Response)
         resp_200.status_code = 200
@@ -295,13 +296,139 @@ class TestClientAndParameters:
         mock_http = MagicMock(spec=httpx.Client)
         mock_http.get.side_effect = [resp_429, resp_200]
 
-        cfg = ExtractionConfig(max_retries=2)
+        cfg = ExtractionConfig(max_retries=2, rate_limit_cooldown_seconds=10.0, min_request_interval_seconds=1.0)
         client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
 
         with patch("time.sleep") as mock_sleep:
             raw_b, parsed_j, status, lat = client.fetch_chunk_payload(sample_chunk)
             assert status == 200
             assert mock_sleep.called
+            # Fallback cooldown of 10.0s was used
+            assert any(10.0 in call.args for call in mock_sleep.call_args_list)
+
+    def test_client_request_pacing_minimum_interval(self, sample_chunk: ExtractionChunk):
+        """Sequential requests on the same client are separated by min_request_interval_seconds."""
+        mock_data = create_mock_payload(sample_chunk)
+        mock_bytes = json.dumps(mock_data).encode("utf-8")
+
+        resp = MagicMock(spec=httpx.Response)
+        resp.status_code = 200
+        resp.content = mock_bytes
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.return_value = resp
+
+        cfg = ExtractionConfig(min_request_interval_seconds=2.0)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        # First request sets _last_request_time without sleep
+        client.fetch_chunk_payload(sample_chunk)
+
+        # Second request immediately after must sleep for remainder of 2.0s
+        with patch("time.sleep") as mock_sleep:
+            client.fetch_chunk_payload(sample_chunk)
+            assert mock_sleep.called
+            sleep_arg = mock_sleep.call_args[0][0]
+            assert 1.5 <= sleep_arg <= 2.05
+
+    def test_client_retry_after_respected(self, sample_chunk: ExtractionChunk):
+        """HTTP 429 with Retry-After header respects the header value."""
+        mock_data = create_mock_payload(sample_chunk)
+        mock_bytes = json.dumps(mock_data).encode("utf-8")
+
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": "15"}
+
+        resp_200 = MagicMock(spec=httpx.Response)
+        resp_200.status_code = 200
+        resp_200.content = mock_bytes
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.side_effect = [resp_429, resp_200]
+
+        cfg = ExtractionConfig(max_retries=2, min_request_interval_seconds=1.0)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep") as mock_sleep:
+            raw_b, parsed_j, status, lat = client.fetch_chunk_payload(sample_chunk)
+            assert status == 200
+            sleep_calls = [c[0][0] for c in mock_sleep.call_args_list]
+            assert 15.0 in sleep_calls
+
+    def test_client_429_fallback_cooldown(self, sample_chunk: ExtractionChunk):
+        """HTTP 429 without Retry-After header falls back to rate_limit_cooldown_seconds."""
+        mock_data = create_mock_payload(sample_chunk)
+        mock_bytes = json.dumps(mock_data).encode("utf-8")
+
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {}
+
+        resp_200 = MagicMock(spec=httpx.Response)
+        resp_200.status_code = 200
+        resp_200.content = mock_bytes
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.side_effect = [resp_429, resp_200]
+
+        cfg = ExtractionConfig(
+            max_retries=2,
+            min_request_interval_seconds=1.0,
+            rate_limit_cooldown_seconds=45.0,
+        )
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep") as mock_sleep:
+            raw_b, parsed_j, status, lat = client.fetch_chunk_payload(sample_chunk)
+            assert status == 200
+            sleep_calls = [c[0][0] for c in mock_sleep.call_args_list]
+            assert 45.0 in sleep_calls
+
+    def test_client_429_not_faster_than_min_interval(self, sample_chunk: ExtractionChunk):
+        """HTTP 429 with small Retry-After does not retry faster than min_request_interval_seconds."""
+        mock_data = create_mock_payload(sample_chunk)
+        mock_bytes = json.dumps(mock_data).encode("utf-8")
+
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": "0.5"}
+
+        resp_200 = MagicMock(spec=httpx.Response)
+        resp_200.status_code = 200
+        resp_200.content = mock_bytes
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.side_effect = [resp_429, resp_200]
+
+        cfg = ExtractionConfig(max_retries=2, min_request_interval_seconds=3.0)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep") as mock_sleep:
+            raw_b, parsed_j, status, lat = client.fetch_chunk_payload(sample_chunk)
+            assert status == 200
+            sleep_calls = [c[0][0] for c in mock_sleep.call_args_list]
+            # Must sleep max(0.5, 3.0) = 3.0
+            assert 3.0 in sleep_calls
+
+    def test_client_429_max_retries_exhausted_remains_retryable(self, sample_chunk: ExtractionChunk):
+        """HTTP 429 exhausting all retries raises RateLimitExceededError with retryable=True."""
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": "1.0"}
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.return_value = resp_429
+
+        cfg = ExtractionConfig(max_retries=2, min_request_interval_seconds=0.1)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep"):
+            with pytest.raises(RateLimitExceededError) as exc_info:
+                client.fetch_chunk_payload(sample_chunk)
+
+        assert exc_info.value.retryable is True
+        assert exc_info.value.http_status == 429
 
     def test_client_client_error_non_retryable(self, sample_chunk: ExtractionChunk):
         resp_400 = MagicMock(spec=httpx.Response)
@@ -509,6 +636,73 @@ class TestManifestAndIdempotency:
         )
 
         assert manifest.is_chunk_completed(sample_chunk.chunk_id) is False
+
+    def test_recover_stale_running_without_artifact_resets_to_pending(
+        self, temp_raw_dir: Path, sample_chunk: ExtractionChunk
+    ):
+        """Stale RUNNING chunk with no artifact on disk is safely reset to PENDING."""
+        manifest_path = temp_raw_dir / "manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+        manifest.register_chunks([sample_chunk])
+        manifest.mark_running(sample_chunk.chunk_id)
+
+        assert manifest.get_chunk(sample_chunk.chunk_id)["status"] == ChunkStatus.RUNNING.value
+
+        res = manifest.recover_stale_running_chunks(raw_base_dir=temp_raw_dir)
+        assert sample_chunk.chunk_id in res["reset_to_pending"]
+        assert sample_chunk.chunk_id not in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk(sample_chunk.chunk_id)
+        assert rec["status"] == ChunkStatus.PENDING.value
+        assert rec["started_at"] is None
+
+    def test_recover_stale_running_with_valid_artifact_reconciles_to_succeeded(
+        self, temp_raw_dir: Path, sample_chunk: ExtractionChunk
+    ):
+        """Stale RUNNING chunk with a valid raw artifact on disk is reconciled to SUCCEEDED."""
+        manifest_path = temp_raw_dir / "manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+        manifest.register_chunks([sample_chunk])
+        manifest.mark_running(sample_chunk.chunk_id)
+
+        # Write valid compressed payload to expected location
+        year_dir = temp_raw_dir / f"year={sample_chunk.year}"
+        year_dir.mkdir(parents=True, exist_ok=True)
+        raw_file = year_dir / f"batch_{sample_chunk.batch_id:03d}.json.gz"
+
+        payload = create_mock_payload(sample_chunk, hours_count=8760)
+        raw_bytes = json.dumps(payload).encode("utf-8")
+        comp_bytes = gzip.compress(raw_bytes)
+        with open(raw_file, "wb") as f:
+            f.write(comp_bytes)
+
+        res = manifest.recover_stale_running_chunks(raw_base_dir=temp_raw_dir)
+        assert sample_chunk.chunk_id in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk(sample_chunk.chunk_id)
+        assert rec["status"] == ChunkStatus.SUCCEEDED.value
+        assert rec["raw_path"] == str(raw_file)
+        assert rec["compressed_sha256"] == hashlib.sha256(comp_bytes).hexdigest()
+        assert rec["payload_sha256"] == hashlib.sha256(raw_bytes).hexdigest()
+
+    def test_recover_stale_running_with_corrupted_artifact_resets_to_pending(
+        self, temp_raw_dir: Path, sample_chunk: ExtractionChunk
+    ):
+        """Stale RUNNING chunk with corrupted payload on disk is safely reset to PENDING."""
+        manifest_path = temp_raw_dir / "manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+        manifest.register_chunks([sample_chunk])
+        manifest.mark_running(sample_chunk.chunk_id)
+
+        year_dir = temp_raw_dir / f"year={sample_chunk.year}"
+        year_dir.mkdir(parents=True, exist_ok=True)
+        raw_file = year_dir / f"batch_{sample_chunk.batch_id:03d}.json.gz"
+        with open(raw_file, "wb") as f:
+            f.write(b"CORRUPTED_NOT_A_GZIP_FILE")
+
+        res = manifest.recover_stale_running_chunks(raw_base_dir=temp_raw_dir)
+        assert sample_chunk.chunk_id in res["reset_to_pending"]
+        assert manifest.get_chunk(sample_chunk.chunk_id)["status"] == ChunkStatus.PENDING.value
 
 
 # =============================================================================

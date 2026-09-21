@@ -157,6 +157,127 @@ class HistoricalExtractionManifest:
         chunk["completed_at"] = now
         self.save()
 
+    def recover_stale_running_chunks(
+        self, raw_base_dir: Path | None = None
+    ) -> dict[str, list[str]]:
+        """
+        Safely recover stale RUNNING chunks at startup after an interrupted run.
+
+        For each chunk in RUNNING state:
+        - Inspect recorded artifact path, checksum, and spatial fingerprint.
+        - If a valid completed artifact exists on disk with matching checksum,
+          valid decompression, valid JSON structure, and matching spatial fingerprint,
+          reconcile the chunk to SUCCEEDED.
+        - Otherwise, transition the stale chunk to PENDING so production can resume.
+        Never blindly mark RUNNING chunks as SUCCEEDED without full validation.
+
+        Returns:
+            {"reconciled_succeeded": [...], "reset_to_pending": [...]}
+        """
+        reconciled_succeeded: list[str] = []
+        reset_to_pending: list[str] = []
+        modified = False
+
+        base_dir = Path(raw_base_dir) if raw_base_dir else self.manifest_path.parent
+
+        for chunk_id, record in self._data["chunks"].items():
+            if record.get("status") != ChunkStatus.RUNNING.value:
+                continue
+
+            raw_path_str = record.get("raw_path")
+            if raw_path_str:
+                candidate_path = Path(raw_path_str)
+            else:
+                year = record.get("year")
+                batch_id = record.get("batch_id")
+                if year is not None and batch_id is not None:
+                    candidate_path = base_dir / f"year={year}" / f"batch_{batch_id:03d}.json.gz"
+                else:
+                    candidate_path = None
+
+            is_valid_artifact = False
+            uncompressed_bytes_len = 0
+            compressed_bytes_len = 0
+            computed_payload_sha256 = None
+            computed_comp_sha256 = None
+            val_dict = None
+
+            if candidate_path and candidate_path.exists() and candidate_path.stat().st_size > 0:
+                try:
+                    import gzip
+                    from app.ingestion.historical.models import GridCell
+                    from app.ingestion.historical.validator import HistoricalChunkValidator
+
+                    compressed_bytes = candidate_path.read_bytes()
+                    compressed_bytes_len = len(compressed_bytes)
+                    computed_comp_sha256 = hashlib.sha256(compressed_bytes).hexdigest()
+
+                    # Check recorded compressed_sha256 if present
+                    rec_comp_hash = record.get("compressed_sha256")
+                    if rec_comp_hash and rec_comp_hash != computed_comp_sha256:
+                        is_valid_artifact = False
+                    else:
+                        uncompressed_bytes = gzip.decompress(compressed_bytes)
+                        uncompressed_bytes_len = len(uncompressed_bytes)
+                        computed_payload_sha256 = hashlib.sha256(uncompressed_bytes).hexdigest()
+
+                        rec_payload_hash = record.get("payload_sha256")
+                        if rec_payload_hash and rec_payload_hash != computed_payload_sha256:
+                            is_valid_artifact = False
+                        else:
+                            parsed_json = json.loads(uncompressed_bytes.decode("utf-8"))
+
+                            # Validate coordinates and fingerprint
+                            coords = record.get("coordinates", [])
+                            cells = [GridCell(lat=c[0], lon=c[1]) for c in coords]
+                            chunk_obj = ExtractionChunk(
+                                chunk_id=chunk_id,
+                                year=record.get("year", 1969),
+                                batch_id=record.get("batch_id", 1),
+                                cells=cells,
+                            )
+                            rec_fp = record.get("spatial_fingerprint")
+                            if rec_fp and chunk_obj.spatial_fingerprint != rec_fp:
+                                is_valid_artifact = False
+                            else:
+                                validator = HistoricalChunkValidator()
+                                val_result = validator.validate_chunk_response(
+                                    chunk_obj, parsed_json, http_status=200
+                                )
+                                if val_result.is_valid:
+                                    is_valid_artifact = True
+                                    val_dict = val_result.to_dict()
+                except Exception:
+                    is_valid_artifact = False
+
+            if is_valid_artifact:
+                now = datetime.now(timezone.utc).isoformat()
+                record["status"] = ChunkStatus.SUCCEEDED.value
+                record["completed_at"] = now
+                record["last_error"] = None
+                record["raw_path"] = str(candidate_path)
+                record["payload_sha256"] = computed_payload_sha256
+                record["compressed_sha256"] = computed_comp_sha256
+                record["uncompressed_bytes"] = uncompressed_bytes_len
+                record["compressed_bytes"] = compressed_bytes_len
+                record["validation_status"] = val_dict
+                reconciled_succeeded.append(chunk_id)
+                modified = True
+            else:
+                record["status"] = ChunkStatus.PENDING.value
+                record["started_at"] = None
+                record["last_error"] = "Interrupted while RUNNING; safely reset to PENDING at startup"
+                reset_to_pending.append(chunk_id)
+                modified = True
+
+        if modified:
+            self.save()
+
+        return {
+            "reconciled_succeeded": reconciled_succeeded,
+            "reset_to_pending": reset_to_pending,
+        }
+
     def is_chunk_completed(
         self, chunk_id: str, expected_fingerprint: str | None = None
     ) -> bool:

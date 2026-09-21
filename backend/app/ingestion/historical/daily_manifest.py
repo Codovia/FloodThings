@@ -5,6 +5,7 @@ Persistent checkpoint and manifest manager for daily historical meteorological p
 from __future__ import annotations
 
 from datetime import datetime, timezone
+import hashlib
 import json
 from pathlib import Path
 import tempfile
@@ -143,6 +144,277 @@ class DailyProcessingManifest:
         chunk["last_error"] = error
         chunk["completed_at"] = now
         self.save()
+
+    def recover_stale_running_chunks(
+        self,
+        processed_base_dir: Path | None = None,
+        raw_base_dir: Path | None = None,
+    ) -> dict[str, list[str]]:
+        """
+        Safely recover stale RUNNING chunks at startup after an interrupted run.
+
+        For each chunk in RUNNING state:
+        - Verify candidate output Parquet exists and is non-empty.
+        - Verify Parquet is readable by pyarrow.
+        - Verify row count matches recorded output_record_count if present.
+        - Verify output checksum matches recorded output checksum (output_sha256 or output_checksum)
+          when the manifest record has one.
+          (Note: Existing/legacy records do not track output checksums; in that case, all other
+          available validations are strictly performed, and no checksum is fabricated.)
+        - Verify cell_ids and spatial_fingerprint derived from Parquet coordinates match
+          the chunk's recorded metadata.
+        - Verify source raw payload SHA-256 matches recorded input_sha256 if the source raw
+          artifact is available on disk, and verify Parquet raw_payload_sha256 metadata/column.
+        - Only reconcile RUNNING -> SUCCEEDED if all validations pass.
+        - Otherwise reset RUNNING -> PENDING so processing can safely resume.
+
+        Returns:
+            {"reconciled_succeeded": [...], "reset_to_pending": [...]}
+        """
+        reconciled_succeeded: list[str] = []
+        reset_to_pending: list[str] = []
+        modified = False
+
+        base_dir = Path(processed_base_dir) if processed_base_dir else self.manifest_path.parent
+
+        for chunk_id, record in self._data["chunks"].items():
+            if record.get("status") != DailyProcessingStatus.RUNNING.value:
+                continue
+
+            out_path_str = record.get("output_path")
+            if out_path_str:
+                candidate_path = Path(out_path_str)
+            else:
+                year = record.get("year")
+                batch_id = record.get("batch_id")
+                if year is not None and batch_id is not None:
+                    candidate_path = base_dir / f"year={year}" / f"batch_{batch_id:03d}.parquet"
+                else:
+                    candidate_path = None
+
+            is_valid = True
+            failure_reason = ""
+            row_count = 0
+            actual_cell_ids: list[str] = []
+            actual_fingerprint: str | None = None
+
+            # 1. Output Parquet file exists and non-empty
+            if not candidate_path or not candidate_path.exists() or candidate_path.stat().st_size == 0:
+                is_valid = False
+                failure_reason = "Parquet output file does not exist or is empty"
+            else:
+                # 2. Output checksum check if manifest record tracks one
+                rec_out_checksum = record.get("output_sha256") or record.get("output_checksum")
+                if rec_out_checksum is not None:
+                    try:
+                        computed_out_sha256 = hashlib.sha256(candidate_path.read_bytes()).hexdigest()
+                        if computed_out_sha256 != rec_out_checksum:
+                            is_valid = False
+                            failure_reason = (
+                                f"Output checksum mismatch: expected {rec_out_checksum}, "
+                                f"got {computed_out_sha256}"
+                            )
+                    except Exception as e:
+                        is_valid = False
+                        failure_reason = f"Failed to compute output checksum: {e}"
+                # (Note: For legacy records without an output checksum, we do not fabricate or synthesize one.)
+
+            # 3. Parquet readability & table content inspection
+            table = None
+            if is_valid:
+                try:
+                    import pyarrow.parquet as pq
+
+                    table = pq.read_table(candidate_path)
+                    row_count = table.num_rows
+                    if row_count <= 0:
+                        is_valid = False
+                        failure_reason = "Parquet table contains 0 rows"
+                except Exception as e:
+                    is_valid = False
+                    failure_reason = f"Parquet file unreadable or corrupted: {e}"
+
+            # 4. Row count matches recorded output_record_count if present
+            if is_valid and table is not None:
+                rec_count = record.get("output_record_count")
+                if rec_count is not None and rec_count != row_count:
+                    is_valid = False
+                    failure_reason = (
+                        f"Row count mismatch: manifest recorded {rec_count}, "
+                        f"file contains {row_count}"
+                    )
+
+            # 5. Cell IDs & spatial fingerprint consistency
+            if is_valid and table is not None:
+                if "latitude" not in table.column_names or "longitude" not in table.column_names:
+                    is_valid = False
+                    failure_reason = "Parquet table missing latitude or longitude columns"
+                else:
+                    try:
+                        lats = table["latitude"].to_pylist()
+                        lons = table["longitude"].to_pylist()
+                        coords = sorted(set(zip(lats, lons)))
+                        if not coords:
+                            is_valid = False
+                            failure_reason = "No coordinates found in Parquet table"
+                        else:
+                            actual_cell_ids = sorted([
+                                f"ERA5_{int(round(lat * 100)):04d}_{int(round(lon * 100)):05d}"
+                                for lat, lon in coords
+                            ])
+                            actual_fingerprint = hashlib.sha256(
+                                ",".join(actual_cell_ids).encode("utf-8")
+                            ).hexdigest()[:8]
+
+                            # 5a. Verify against canonical batch definition if batch_id is present
+                            batch_id = record.get("batch_id")
+                            if batch_id is not None:
+                                from app.ingestion.historical.grid import get_spatial_batches
+
+                                batches = get_spatial_batches(batch_size=10, eligible_only=True)
+                                if 1 <= batch_id <= len(batches):
+                                    expected_cells = batches[batch_id - 1]
+                                    expected_ids = sorted([c.cell_id for c in expected_cells])
+                                    expected_fp = hashlib.sha256(
+                                        ",".join(expected_ids).encode("utf-8")
+                                    ).hexdigest()[:8]
+                                    if actual_cell_ids != expected_ids or actual_fingerprint != expected_fp:
+                                        is_valid = False
+                                        failure_reason = (
+                                            f"Spatial/batch mismatch with canonical batch {batch_id}: "
+                                            f"expected fingerprint {expected_fp}, got {actual_fingerprint}"
+                                        )
+
+                            # 5b. Verify against recorded cell_ids
+                            rec_cell_ids = record.get("cell_ids")
+                            if is_valid and rec_cell_ids:
+                                if sorted(rec_cell_ids) != actual_cell_ids:
+                                    is_valid = False
+                                    failure_reason = (
+                                        f"Cell IDs mismatch: manifest has {sorted(rec_cell_ids)}, "
+                                        f"Parquet has {actual_cell_ids}"
+                                    )
+
+                            # 5c. Verify against recorded spatial_fingerprint
+                            rec_fp = record.get("spatial_fingerprint")
+                            if is_valid and rec_fp:
+                                if rec_fp != actual_fingerprint:
+                                    is_valid = False
+                                    failure_reason = (
+                                        f"Spatial fingerprint mismatch: manifest has {rec_fp}, "
+                                        f"Parquet has {actual_fingerprint}"
+                                    )
+                    except Exception as e:
+                        is_valid = False
+                        failure_reason = f"Failed to validate coordinates/fingerprint: {e}"
+
+            # 6. Source raw artifact validation when available
+            if is_valid and table is not None:
+                candidate_raw_path = None
+                raw_path_str = record.get("source_raw_path")
+                if raw_path_str:
+                    candidate_raw = Path(raw_path_str)
+                    if candidate_raw.exists() and candidate_raw.stat().st_size > 0:
+                        candidate_raw_path = candidate_raw
+
+                if candidate_raw_path is None and raw_base_dir:
+                    year = record.get("year")
+                    batch_id = record.get("batch_id")
+                    if year is not None and batch_id is not None:
+                        alt_raw = Path(raw_base_dir) / f"year={year}" / f"batch_{batch_id:03d}.json.gz"
+                        if alt_raw.exists() and alt_raw.stat().st_size > 0:
+                            candidate_raw_path = alt_raw
+
+                if candidate_raw_path is not None:
+                    try:
+                        import gzip
+
+                        raw_bytes = candidate_raw_path.read_bytes()
+                        if candidate_raw_path.name.endswith(".gz"):
+                            uncomp_bytes = gzip.decompress(raw_bytes)
+                        else:
+                            uncomp_bytes = raw_bytes
+                        computed_raw_sha256 = hashlib.sha256(uncomp_bytes).hexdigest()
+
+                        rec_input_sha256 = record.get("input_sha256")
+                        if rec_input_sha256 is not None and computed_raw_sha256 != rec_input_sha256:
+                            is_valid = False
+                            failure_reason = (
+                                f"Source raw payload SHA-256 mismatch: recorded {rec_input_sha256}, "
+                                f"actual file {computed_raw_sha256}"
+                            )
+
+                        if is_valid and "raw_payload_sha256" in table.column_names:
+                            pq_hashes = set(table["raw_payload_sha256"].to_pylist())
+                            if len(pq_hashes) != 1 or next(iter(pq_hashes)) != computed_raw_sha256:
+                                is_valid = False
+                                failure_reason = (
+                                    "Parquet raw_payload_sha256 column does not match "
+                                    "source raw artifact SHA-256"
+                                )
+
+                        if is_valid and table.schema.metadata:
+                            meta_sha = table.schema.metadata.get(b"raw_payload_sha256")
+                            if meta_sha and meta_sha.decode("utf-8") != computed_raw_sha256:
+                                is_valid = False
+                                failure_reason = (
+                                    "Parquet metadata raw_payload_sha256 does not match "
+                                    "source raw artifact SHA-256"
+                                )
+                    except Exception as e:
+                        is_valid = False
+                        failure_reason = f"Failed to validate source raw artifact {candidate_raw_path}: {e}"
+                else:
+                    # When source raw file is not present on disk, check Parquet table/metadata against recorded input_sha256
+                    rec_input_sha256 = record.get("input_sha256")
+                    if rec_input_sha256 is not None:
+                        if "raw_payload_sha256" in table.column_names:
+                            pq_hashes = set(table["raw_payload_sha256"].to_pylist())
+                            if len(pq_hashes) != 1 or next(iter(pq_hashes)) != rec_input_sha256:
+                                is_valid = False
+                                failure_reason = (
+                                    "Parquet raw_payload_sha256 column does not match "
+                                    f"recorded input_sha256 {rec_input_sha256}"
+                                )
+                        if is_valid and table.schema.metadata:
+                            meta_sha = table.schema.metadata.get(b"raw_payload_sha256")
+                            if meta_sha and meta_sha.decode("utf-8") != rec_input_sha256:
+                                is_valid = False
+                                failure_reason = (
+                                    "Parquet metadata raw_payload_sha256 does not match "
+                                    f"recorded input_sha256 {rec_input_sha256}"
+                                )
+
+            # 7. Final State Transition
+            if is_valid:
+                now = datetime.now(timezone.utc).isoformat()
+                record["status"] = DailyProcessingStatus.SUCCEEDED.value
+                record["completed_at"] = now
+                record["last_error"] = None
+                record["output_path"] = str(candidate_path)
+                record["output_record_count"] = row_count
+                if actual_cell_ids and not record.get("cell_ids"):
+                    record["cell_ids"] = actual_cell_ids
+                if actual_fingerprint and not record.get("spatial_fingerprint"):
+                    record["spatial_fingerprint"] = actual_fingerprint
+                reconciled_succeeded.append(chunk_id)
+                modified = True
+            else:
+                record["status"] = DailyProcessingStatus.PENDING.value
+                record["started_at"] = None
+                record["last_error"] = (
+                    f"Interrupted while RUNNING; safely reset to PENDING at startup ({failure_reason})"
+                )
+                reset_to_pending.append(chunk_id)
+                modified = True
+
+        if modified:
+            self.save()
+
+        return {
+            "reconciled_succeeded": reconciled_succeeded,
+            "reset_to_pending": reset_to_pending,
+        }
 
     def get_chunk(self, chunk_id: str) -> dict[str, Any] | None:
         """Retrieve chunk record by ID."""

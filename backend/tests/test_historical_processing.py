@@ -457,3 +457,242 @@ class TestProcessorAndParquet:
         assert len(res2.warnings) == 0
         table2 = pq.read_table(processed_dir / "year=1994" / "batch_001.parquet")
         assert table2.column("precipitation_total_mm")[0].as_py() == pytest.approx(48.0, rel=1e-3)
+
+
+class TestDailyManifestRecovery:
+    """Focused tests for DailyProcessingManifest.recover_stale_running_chunks()."""
+
+    def _setup_processed_chunk(
+        self,
+        raw_dir: Path,
+        processed_dir: Path,
+        year: int,
+        batch_id: int,
+        cells: list[GridCell] | None = None,
+    ) -> tuple[str, DailyProcessor]:
+        """Helper to create a valid processed chunk and return chunk_id and processor."""
+        if cells is None:
+            from app.ingestion.historical.grid import get_spatial_batches
+
+            batches = get_spatial_batches(batch_size=10, eligible_only=True)
+            cells = batches[batch_id - 1]
+
+        payload = create_hourly_payload(year, cells)
+        year_dir = raw_dir / f"year={year}"
+        year_dir.mkdir(parents=True, exist_ok=True)
+        raw_file = year_dir / f"batch_{batch_id:03d}.json.gz"
+        raw_bytes = json.dumps(payload).encode("utf-8")
+        payload_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+        with open(raw_file, "wb") as f:
+            f.write(gzip.compress(raw_bytes))
+
+        config = DailyProcessingConfig(
+            raw_base_dir=raw_dir,
+            processed_base_dir=processed_dir,
+            manifest_path=processed_dir / "processing_manifest.json",
+        )
+        processor = DailyProcessor(config=config)
+        res = processor.process_chunk(year=year, batch_id=batch_id, cells=cells)
+        assert res.is_valid
+
+        chunk_id = f"era5_{year}_batch_{batch_id:03d}"
+        return chunk_id, processor
+
+    def test_recover_valid_artifact_reconciles_to_succeeded(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Valid artifact with matching output checksum and metadata reconciles to SUCCEEDED."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        # Simulate interruption while RUNNING
+        manifest.mark_running(chunk_id)
+        parquet_file = processed_dir / "year=1994" / "batch_001.parquet"
+        out_sha = hashlib.sha256(parquet_file.read_bytes()).hexdigest()
+        manifest.get_chunk(chunk_id)["output_sha256"] = out_sha
+        manifest.save()
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reconciled_succeeded"]
+        assert chunk_id not in res["reset_to_pending"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.SUCCEEDED.value
+        assert rec["last_error"] is None
+
+    def test_recover_corrupted_parquet_resets_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Corrupted/unreadable Parquet file safely resets stale RUNNING chunk to PENDING."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        manifest.mark_running(chunk_id)
+        parquet_file = processed_dir / "year=1994" / "batch_001.parquet"
+        with open(parquet_file, "wb") as f:
+            f.write(b"CORRUPTED_PARQUET_FILE_DATA")
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reset_to_pending"]
+        assert chunk_id not in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert rec["started_at"] is None
+        assert "unreadable or corrupted" in rec["last_error"]
+
+    def test_recover_row_count_mismatch_resets_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Row-count mismatch between Parquet file and manifest safely resets chunk to PENDING."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        manifest.mark_running(chunk_id)
+        rec = manifest.get_chunk(chunk_id)
+        rec["output_record_count"] = 9999  # Actual is 3650
+        manifest.save()
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reset_to_pending"]
+        assert chunk_id not in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert "Row count mismatch" in rec["last_error"]
+
+    def test_recover_source_checksum_mismatch_resets_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Mismatch between source raw artifact and recorded input_sha256 resets chunk to PENDING."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        manifest.mark_running(chunk_id)
+        rec = manifest.get_chunk(chunk_id)
+        rec["input_sha256"] = "f" * 64  # Mismatch actual raw file
+        manifest.save()
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reset_to_pending"]
+        assert chunk_id not in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert "Source raw payload SHA-256 mismatch" in rec["last_error"]
+
+    def test_recover_valid_legacy_record_without_output_checksum(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Legacy record without output checksum is safely reconciled if all other validations pass."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        manifest.mark_running(chunk_id)
+        rec = manifest.get_chunk(chunk_id)
+        # Ensure no output checksum exists (legacy format)
+        rec.pop("output_sha256", None)
+        rec.pop("output_checksum", None)
+        manifest.save()
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reconciled_succeeded"]
+        assert chunk_id not in res["reset_to_pending"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.SUCCEEDED.value
+        # Confirm no checksum was fabricated into the record
+        assert "output_sha256" not in rec
+        assert "output_checksum" not in rec
+
+    def test_recover_output_checksum_mismatch_resets_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Mismatch on recorded output checksum resets chunk to PENDING."""
+        raw_dir, processed_dir = temp_dirs
+        chunk_id, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 1)
+        manifest = processor.manifest
+
+        manifest.mark_running(chunk_id)
+        rec = manifest.get_chunk(chunk_id)
+        rec["output_sha256"] = "0" * 64
+        manifest.save()
+
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+        assert chunk_id in res["reset_to_pending"]
+
+        rec = manifest.get_chunk(chunk_id)
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert "Output checksum mismatch" in rec["last_error"]
+
+    def test_recover_cross_batch_coordinates_mismatch_resets_to_pending(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Parquet containing valid ERA5 coordinates from a different batch resets chunk to PENDING."""
+        import shutil
+        from app.ingestion.historical.grid import get_spatial_batches
+
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
+        batch_1_cells = batches[0]  # Canonical batch 1
+        batch_2_cells = batches[1]  # Canonical batch 2
+
+        raw_dir, processed_dir = temp_dirs
+
+        # Create a valid daily Parquet artifact containing Batch 2 coordinates
+        _, processor = self._setup_processed_chunk(raw_dir, processed_dir, 1994, 2, batch_2_cells)
+
+        actual_parquet = processed_dir / "year=1994" / "batch_002.parquet"
+        target_parquet_1 = processed_dir / "year=1994" / "batch_001.parquet"
+        shutil.copyfile(actual_parquet, target_parquet_1)
+
+        # Make the manifest identify it as batch 1, marked RUNNING
+        manifest = processor.manifest
+        b1_cell_ids = [c.cell_id for c in batch_1_cells]
+        b1_fp = hashlib.sha256(",".join(sorted(b1_cell_ids)).encode("utf-8")).hexdigest()[:8]
+
+        manifest.register_chunk(
+            chunk_id="era5_1994_batch_001",
+            year=1994,
+            batch_id=1,
+            source_raw_path=str(raw_dir / "year=1994" / "batch_001.json.gz"),
+            input_sha256="dummy_sha",
+            cell_ids=b1_cell_ids,
+            spatial_fingerprint=b1_fp,
+        )
+        manifest.mark_running("era5_1994_batch_001")
+        rec = manifest.get_chunk("era5_1994_batch_001")
+        rec["output_path"] = str(target_parquet_1)
+        manifest.save()
+
+        # Run recovery
+        res = manifest.recover_stale_running_chunks(
+            processed_base_dir=processed_dir, raw_base_dir=raw_dir
+        )
+
+        assert "era5_1994_batch_001" in res["reset_to_pending"]
+        assert "era5_1994_batch_001" not in res["reconciled_succeeded"]
+
+        rec = manifest.get_chunk("era5_1994_batch_001")
+        assert rec["status"] == DailyProcessingStatus.PENDING.value
+        assert rec["started_at"] is None
+
+        # Verify failure reason identifies spatial / cell / fingerprint mismatch
+        err_msg = rec["last_error"].lower()
+        assert any(term in err_msg for term in ["spatial", "cell", "fingerprint"])

@@ -124,6 +124,7 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     )
 
     manifest = HistoricalExtractionManifest(config.manifest_path)
+    manifest.recover_stale_running_chunks(raw_base_dir=config.raw_base_dir)
     extractor = HistoricalExtractor(config=config, manifest=manifest)
 
     # Generate candidate chunks
