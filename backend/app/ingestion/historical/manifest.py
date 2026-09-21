@@ -58,11 +58,12 @@ class HistoricalExtractionManifest:
         Path(temp_name).replace(self.manifest_path)
 
     def register_chunks(self, chunks: list[ExtractionChunk]) -> None:
-        """Register chunks in manifest with PENDING status if not already tracked."""
+        """Register chunks in manifest with PENDING status if not already tracked, or update pending/failed records."""
         now = datetime.now(timezone.utc).isoformat()
         modified = False
         for chunk in chunks:
-            if chunk.chunk_id not in self._data["chunks"]:
+            existing = self._data["chunks"].get(chunk.chunk_id)
+            if existing is None:
                 self._data["chunks"][chunk.chunk_id] = {
                     "chunk_id": chunk.chunk_id,
                     "year": chunk.year,
@@ -85,6 +86,17 @@ class HistoricalExtractionManifest:
                     "validation_status": None,
                 }
                 modified = True
+            elif existing.get("status") != ChunkStatus.SUCCEEDED.value:
+                # Update spatial definition if previously pending or failed under different/older grid settings
+                if (
+                    existing.get("spatial_fingerprint") != chunk.spatial_fingerprint
+                    or existing.get("locations_count") != len(chunk.cells)
+                ):
+                    existing["spatial_fingerprint"] = chunk.spatial_fingerprint
+                    existing["cell_ids"] = chunk.cell_ids
+                    existing["locations_count"] = len(chunk.cells)
+                    existing["coordinates"] = chunk.coordinates
+                    modified = True
         if modified:
             self.save()
 
@@ -110,19 +122,25 @@ class HistoricalExtractionManifest:
         uncompressed_bytes: int,
         compressed_bytes: int,
         validation: ValidationResult,
+        chunk: ExtractionChunk | None = None,
     ) -> None:
         """Transition chunk to SUCCEEDED state with complete provenance metadata."""
         now = datetime.now(timezone.utc).isoformat()
-        chunk = self._data["chunks"].setdefault(chunk_id, {"chunk_id": chunk_id})
-        chunk["status"] = ChunkStatus.SUCCEEDED.value
-        chunk["completed_at"] = now
-        chunk["last_error"] = None
-        chunk["raw_path"] = raw_path
-        chunk["payload_sha256"] = payload_sha256
-        chunk["compressed_sha256"] = compressed_sha256
-        chunk["uncompressed_bytes"] = uncompressed_bytes
-        chunk["compressed_bytes"] = compressed_bytes
-        chunk["validation_status"] = validation.to_dict()
+        rec = self._data["chunks"].setdefault(chunk_id, {"chunk_id": chunk_id})
+        rec["status"] = ChunkStatus.SUCCEEDED.value
+        rec["completed_at"] = now
+        rec["last_error"] = None
+        rec["raw_path"] = raw_path
+        rec["payload_sha256"] = payload_sha256
+        rec["compressed_sha256"] = compressed_sha256
+        rec["uncompressed_bytes"] = uncompressed_bytes
+        rec["compressed_bytes"] = compressed_bytes
+        rec["validation_status"] = validation.to_dict()
+        if chunk is not None:
+            rec["spatial_fingerprint"] = chunk.spatial_fingerprint
+            rec["cell_ids"] = chunk.cell_ids
+            rec["locations_count"] = len(chunk.cells)
+            rec["coordinates"] = chunk.coordinates
         self.save()
 
     def mark_failed(

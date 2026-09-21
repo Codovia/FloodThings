@@ -408,3 +408,59 @@ class TestSafetyControls:
         assert res["cached_process_count"] == 1
         assert res["extracted_count"] == 0
         assert res["processed_count"] == 0
+
+    def test_resume_failed_chunk_updates_spatial_metadata_and_fingerprint(
+        self, temp_dirs: tuple[Path, Path]
+    ):
+        """Verify that re-registering and extracting a previously failed chunk updates its spatial fingerprint."""
+        raw_dir, processed_dir = temp_dirs
+        manifest_path = raw_dir / "extraction_manifest.json"
+        manifest = HistoricalExtractionManifest(manifest_path)
+
+        # Chunk starts with old 10-cell failed definition
+        old_chunk = ExtractionChunk(
+            chunk_id="era5_1969_batch_004",
+            year=1969,
+            batch_id=4,
+            cells=[GridCell(lat=12.5, lon=75.75 + i * 0.25) for i in range(10)],
+        )
+        manifest.register_chunks([old_chunk])
+        manifest.mark_failed("era5_1969_batch_004", "Snapping error", ChunkStatus.VALIDATION_FAILED)
+
+        entry = manifest.get_chunk("era5_1969_batch_004")
+        assert entry["status"] == ChunkStatus.VALIDATION_FAILED.value
+        assert entry["locations_count"] == 10
+        old_fp = entry["spatial_fingerprint"]
+
+        # New chunk definition has 9 eligible cells
+        new_cells = [GridCell(lat=12.5, lon=75.75 + i * 0.25) for i in range(9)]
+        new_chunk = ExtractionChunk(
+            chunk_id="era5_1969_batch_004",
+            year=1969,
+            batch_id=4,
+            cells=new_cells,
+        )
+
+        # Re-registering updates the pending/failed record's spatial definition
+        manifest.register_chunks([new_chunk])
+        updated_entry = manifest.get_chunk("era5_1969_batch_004")
+        assert updated_entry["locations_count"] == 9
+        assert updated_entry["spatial_fingerprint"] != old_fp
+        assert updated_entry["spatial_fingerprint"] == new_chunk.spatial_fingerprint
+
+        # Marking succeeded also records the new chunk metadata
+        manifest.mark_succeeded(
+            chunk_id="era5_1969_batch_004",
+            raw_path="/fake/path",
+            payload_sha256="hash1",
+            compressed_sha256="hash2",
+            uncompressed_bytes=1000,
+            compressed_bytes=200,
+            validation=ValidationResult(is_valid=True, status=ChunkStatus.SUCCEEDED),
+            chunk=new_chunk,
+        )
+        final_entry = manifest.get_chunk("era5_1969_batch_004")
+        assert final_entry["status"] == ChunkStatus.SUCCEEDED.value
+        assert final_entry["spatial_fingerprint"] == new_chunk.spatial_fingerprint
+        assert len(final_entry["cell_ids"]) == 9
+

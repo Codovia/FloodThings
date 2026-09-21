@@ -69,7 +69,7 @@ class HistoricalExtractor:
         chunk_id = chunk.chunk_id
 
         # 1. Idempotency Check
-        if self.manifest.is_chunk_completed(chunk_id):
+        if self.manifest.is_chunk_completed(chunk_id, expected_fingerprint=chunk.spatial_fingerprint):
             return ValidationResult(
                 is_valid=True,
                 status=ChunkStatus.SUCCEEDED,
@@ -159,6 +159,7 @@ class HistoricalExtractor:
             uncompressed_bytes=uncompressed_size,
             compressed_bytes=compressed_size,
             validation=val_result,
+            chunk=chunk,
         )
 
         # Rate-limiting pacing delay

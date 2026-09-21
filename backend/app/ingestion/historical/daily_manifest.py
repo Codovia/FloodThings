@@ -63,6 +63,8 @@ class DailyProcessingManifest:
         source_raw_path: str,
         input_sha256: str,
         processing_version: str = "1.0",
+        cell_ids: list[str] | None = None,
+        spatial_fingerprint: str | None = None,
     ) -> None:
         """Register a chunk in the processing manifest if not already tracked."""
         now = datetime.now(timezone.utc).isoformat()
@@ -71,6 +73,8 @@ class DailyProcessingManifest:
                 "chunk_id": chunk_id,
                 "year": year,
                 "batch_id": batch_id,
+                "spatial_fingerprint": spatial_fingerprint,
+                "cell_ids": cell_ids or [],
                 "source_raw_path": source_raw_path,
                 "input_sha256": input_sha256,
                 "output_path": None,
@@ -101,6 +105,8 @@ class DailyProcessingManifest:
         validation: DailyValidationResult,
         input_sha256: str,
         processing_version: str = "1.0",
+        cell_ids: list[str] | None = None,
+        spatial_fingerprint: str | None = None,
     ) -> None:
         """Transition chunk to SUCCEEDED state with provenance and quality metrics."""
         now = datetime.now(timezone.utc).isoformat()
@@ -112,6 +118,10 @@ class DailyProcessingManifest:
         chunk["processing_version"] = processing_version
         chunk["completed_at"] = now
         chunk["last_error"] = None
+        if cell_ids is not None:
+            chunk["cell_ids"] = cell_ids
+        if spatial_fingerprint is not None:
+            chunk["spatial_fingerprint"] = spatial_fingerprint
         chunk["quality_summary"] = {
             "records_validated": validation.records_validated,
             "cells_validated": validation.cells_validated,

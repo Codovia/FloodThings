@@ -140,6 +140,8 @@ class DailyProcessor:
             source_raw_path=str(raw_file),
             input_sha256=payload_sha256,
             processing_version=self.config.processing_version,
+            cell_ids=chunk.cell_ids,
+            spatial_fingerprint=chunk.spatial_fingerprint,
         )
         self.manifest.mark_running(chunk_id)
 
@@ -189,6 +191,8 @@ class DailyProcessor:
             validation=val_result,
             input_sha256=payload_sha256,
             processing_version=self.config.processing_version,
+            cell_ids=chunk.cell_ids,
+            spatial_fingerprint=chunk.spatial_fingerprint,
         )
 
         return val_result
