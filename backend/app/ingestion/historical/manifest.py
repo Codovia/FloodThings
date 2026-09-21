@@ -67,6 +67,8 @@ class HistoricalExtractionManifest:
                     "chunk_id": chunk.chunk_id,
                     "year": chunk.year,
                     "batch_id": chunk.batch_id,
+                    "spatial_fingerprint": chunk.spatial_fingerprint,
+                    "cell_ids": chunk.cell_ids,
                     "locations_count": len(chunk.cells),
                     "coordinates": chunk.coordinates,
                     "status": ChunkStatus.PENDING.value,
@@ -137,18 +139,34 @@ class HistoricalExtractionManifest:
         chunk["completed_at"] = now
         self.save()
 
-    def is_chunk_completed(self, chunk_id: str) -> bool:
+    def is_chunk_completed(
+        self, chunk_id: str, expected_fingerprint: str | None = None
+    ) -> bool:
         """
         Verify whether a chunk is completely and reliably downloaded.
 
         Must satisfy:
         1. status == SUCCEEDED
-        2. raw file exists on disk
-        3. disk file SHA-256 matches manifest compressed_sha256
+        2. spatial_fingerprint matches expected_fingerprint (if specified)
+        3. raw file exists on disk and is non-empty
+        4. disk file SHA-256 matches manifest compressed_sha256
         """
         chunk = self.get_chunk(chunk_id)
         if not chunk or chunk.get("status") != ChunkStatus.SUCCEEDED.value:
             return False
+
+        if expected_fingerprint is not None:
+            actual_fp = chunk.get("spatial_fingerprint")
+            if not actual_fp:
+                # Fallback: compute from coordinates for un-migrated legacy v1.0 records
+                coords = chunk.get("coordinates", [])
+                cell_ids = [
+                    f"ERA5_{int(round(lat * 100)):04d}_{int(round(lon * 100)):05d}"
+                    for lat, lon in coords
+                ]
+                actual_fp = hashlib.sha256(",".join(sorted(cell_ids)).encode("utf-8")).hexdigest()[:8]
+            if actual_fp != expected_fingerprint:
+                return False
 
         raw_path_str = chunk.get("raw_path")
         if not raw_path_str:
@@ -176,7 +194,7 @@ class HistoricalExtractionManifest:
         """Return list of chunks that need extraction (PENDING, RETRYABLE, or invalid on disk)."""
         runnable: list[ExtractionChunk] = []
         for c in chunks:
-            if not self.is_chunk_completed(c.chunk_id):
+            if not self.is_chunk_completed(c.chunk_id, expected_fingerprint=c.spatial_fingerprint):
                 runnable.append(c)
         return runnable
 

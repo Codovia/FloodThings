@@ -7,6 +7,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from enum import Enum
 from pathlib import Path
+import hashlib
 from typing import Any
 
 
@@ -56,6 +57,12 @@ class ExtractionChunk:
     def cell_ids(self) -> list[str]:
         """List of cell IDs in the chunk."""
         return [c.cell_id for c in self.cells]
+
+    @property
+    def spatial_fingerprint(self) -> str:
+        """Deterministic 8-character hex fingerprint of the chunk's constituent cells."""
+        cell_str = ",".join(sorted(c.cell_id for c in self.cells))
+        return hashlib.sha256(cell_str.encode("utf-8")).hexdigest()[:8]
 
 
 @dataclass

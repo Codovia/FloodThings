@@ -170,6 +170,27 @@ Five representative spatial cells were probed using Open-Meteo `models=era5` for
 
 ---
 
+## Phase 3.12C Resolution: Authoritative Grid vs. ERA5 Extraction-Eligible Grid
+
+During Phase 3.12B production extraction, six coastal boundary cells were discovered where Open-Meteo ERA5 snaps requested offshore coordinates to neighboring land-side coordinates:
+- `ERA5_1275_07475` (12.75°N, 74.75°E)
+- `ERA5_1375_07450` (13.75°N, 74.50°E)
+- `ERA5_1400_07450` (14.00°N, 74.50°E)
+- `ERA5_1450_07425` (14.50°N, 74.25°E)
+- `ERA5_1475_07400` (14.75°N, 74.00°E)
+- `ERA5_1500_07400` (15.00°N, 74.00°E)
+
+### Architectural Decision (Phase 3.12D Backward-Compatible Model)
+- **Authoritative Grid (324 Cells):** Preserved in full across 33 permanent spatial batches. These 6 cells remain part of the canonical Karnataka state grid because their envelopes intersect the KSR-SAC state boundary polygon. They are never deleted from platform geometry.
+- **ERA5 Extraction-Eligible Grid (318 Cells):** The 6 cells are excluded *within* their respective batches (Batches 004, 011, 012, 015, 016, 018 query 9 cells; all others query 10; Batch 033 queries 4 cells).
+- **Documented Exclusion Reason:**
+  > "Open-Meteo ERA5 archive snaps requested offshore coordinate to a neighboring land-side ERA5 coordinate, preventing one-to-one spatial identity."
+- **Invariants Enforced:** Zero tolerance for coordinate drift, no coordinate rewriting, and no result deduplication.
+- **Production Inventory:** 33 permanent spatial batches over 26 years (1969–1994) = **858 production chunks** (3,019,728 daily records across the 318 eligible cells).
+- **Spatial Fingerprinting:** Every chunk verifies a deterministic 8-character hex cell-set fingerprint (`spatial_fingerprint`), guaranteeing that cached files match expected coordinates without batch shifting.
+
+---
+
 ## Gate 4 Prerequisites
 
 Before designing or executing production ingestion, Gate 4 must address:

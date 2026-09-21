@@ -336,32 +336,95 @@ KARNATAKA_ERA5_CELLS: tuple[GridCell, ...] = (
 )
 
 
+ERA5_EXCLUSION_REASON: str = (
+    "Open-Meteo ERA5 archive snaps requested offshore coordinate to a"
+    " neighboring land-side ERA5 coordinate, preventing one-to-one spatial"
+    " identity."
+)
+
+ERA5_EXCLUDED_CELL_IDS: frozenset[str] = frozenset(
+    {
+        "ERA5_1275_07475",
+        "ERA5_1375_07450",
+        "ERA5_1400_07450",
+        "ERA5_1450_07425",
+        "ERA5_1475_07400",
+        "ERA5_1500_07400",
+    }
+)
+
+
 def get_karnataka_grid() -> list[GridCell]:
     """Return the authoritative 324 Karnataka-intersecting ERA5 0.25° grid cells."""
     return list(KARNATAKA_ERA5_CELLS)
 
 
-def get_spatial_batches(batch_size: int = 10) -> list[list[GridCell]]:
-    """Partition the 324 Karnataka cells into deterministic batches of size batch_size."""
-    cells = get_karnataka_grid()
-    return [cells[i : i + batch_size] for i in range(0, len(cells), batch_size)]
+def get_era5_eligible_grid() -> list[GridCell]:
+    """
+    Return the 318 ERA5 extraction-eligible Karnataka grid cells.
+
+    Excludes the 6 offshore Arabian Sea boundary cells where Open-Meteo ERA5 snaps
+    requested coordinates to neighboring land-side cells.
+    """
+    return [c for c in KARNATAKA_ERA5_CELLS if c.cell_id not in ERA5_EXCLUDED_CELL_IDS]
+
+
+def get_era5_excluded_cells() -> list[GridCell]:
+    """Return the 6 offshore boundary cells excluded from ERA5 extraction."""
+    return [c for c in KARNATAKA_ERA5_CELLS if c.cell_id in ERA5_EXCLUDED_CELL_IDS]
+
+
+def compute_spatial_fingerprint(cells: list[GridCell]) -> str:
+    """Compute deterministic 8-character hex SHA-256 fingerprint for a list of grid cells."""
+    import hashlib
+    cell_str = ",".join(sorted(c.cell_id for c in cells))
+    return hashlib.sha256(cell_str.encode("utf-8")).hexdigest()[:8]
+
+
+def get_spatial_batches(batch_size: int = 10, eligible_only: bool = True) -> list[list[GridCell]]:
+    """
+    Partition authoritative Karnataka cells into deterministic batches of size batch_size.
+
+    The authoritative 324 cells define 33 permanent spatial batches (32 batches of 10
+    and 1 final batch of 4).
+
+    If eligible_only is True (default for ERA5 extraction), each batch filters its
+    constituent cells to exclude source-incompatible coordinates (ERA5_EXCLUDED_CELL_IDS),
+    maintaining fixed spatial envelopes without shifting batch boundaries across the state.
+    This yields:
+      - 26 batches with 10 eligible cells
+      - 6 batches with 9 eligible cells (batches 004, 011, 012, 015, 016, 018)
+      - 1 batch with 4 eligible cells (batch 033)
+      Total: 33 batches, 318 eligible cells.
+
+    If eligible_only is False, returns all 324 authoritative cells across the 33 batches.
+    """
+    all_cells = get_karnataka_grid()
+    batches = [all_cells[i : i + batch_size] for i in range(0, len(all_cells), batch_size)]
+    if eligible_only:
+        return [
+            [c for c in b if c.cell_id not in ERA5_EXCLUDED_CELL_IDS]
+            for b in batches
+        ]
+    return batches
 
 
 def generate_chunks(
     start_year: int,
     end_year: int,
     batch_size: int = 10,
+    eligible_only: bool = True,
 ) -> list[ExtractionChunk]:
     """
     Generate deterministic extraction chunks for a specified range of calendar years.
 
     Each chunk represents 1 spatial batch for 1 complete calendar year.
-    For the full 1969–1994 span (26 years) and batch_size=10, exactly 858 chunks are generated.
+    For the full 1969–1994 span (26 years) and 33 batches, exactly 858 chunks are generated.
     """
     if start_year > end_year:
         raise ValueError(f"start_year ({start_year}) cannot exceed end_year ({end_year})")
 
-    batches = get_spatial_batches(batch_size=batch_size)
+    batches = get_spatial_batches(batch_size=batch_size, eligible_only=eligible_only)
     chunks: list[ExtractionChunk] = []
 
     for year in range(start_year, end_year + 1):

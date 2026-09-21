@@ -4,6 +4,7 @@ Production orchestrator and preflight auditor for the full historical ERA5 extra
 
 from __future__ import annotations
 
+import calendar
 from dataclasses import dataclass, field
 import hashlib
 import json
@@ -15,7 +16,11 @@ from app.ingestion.historical.daily_models import DailyProcessingConfig
 from app.ingestion.historical.daily_processor import DailyProcessor
 from app.ingestion.historical.extractor import HistoricalExtractor
 from app.ingestion.historical.grid import (
+    ERA5_EXCLUDED_CELL_IDS,
+    ERA5_EXCLUSION_REASON,
     generate_chunks,
+    get_era5_eligible_grid,
+    get_era5_excluded_cells,
     get_karnataka_grid,
     get_spatial_batches,
 )
@@ -38,6 +43,9 @@ class PreflightAuditResult:
     total_chunks: int
     batch_sizes: list[int]
     years_range: tuple[int, int]
+    authoritative_cells_count: int = 324
+    eligible_cells_count: int = 318
+    excluded_cells_count: int = 6
 
     # Raw Extraction State
     valid_raw_chunks: list[str] = field(default_factory=list)
@@ -62,7 +70,7 @@ class PreflightAuditResult:
 
     observed_daily_parquet_bytes: int = 0
     estimated_total_daily_parquet_bytes: float = 0.0
-    estimated_total_daily_rows: int = 3076704
+    estimated_total_daily_rows: int = 3019728
 
     available_disk_bytes: int = 0
 
@@ -115,12 +123,20 @@ class ProductionHistoricalRunner:
         Perform a comprehensive preflight audit of the inventory, disk space, and existing state.
         Does not perform any network calls or database writes.
         """
-        cells = get_karnataka_grid()
-        batches = get_spatial_batches(batch_size=self.extraction_config.batch_size)
+        auth_cells = get_karnataka_grid()
+        eligible_cells = get_era5_eligible_grid()
+        excluded_cells = get_era5_excluded_cells()
+
+        batches = get_spatial_batches(batch_size=self.extraction_config.batch_size, eligible_only=True)
         batch_sizes = [len(b) for b in batches]
         years_count = end_year - start_year + 1
 
-        all_chunks = generate_chunks(start_year, end_year, batch_size=self.extraction_config.batch_size)
+        all_chunks = generate_chunks(
+            start_year,
+            end_year,
+            batch_size=self.extraction_config.batch_size,
+            eligible_only=True,
+        )
         total_chunks = len(all_chunks)
 
         # 1. Audit Raw Extraction State
@@ -136,6 +152,19 @@ class ProductionHistoricalRunner:
             manifest_entry = self.extraction_manifest.get_chunk(chunk_id)
 
             if manifest_entry and manifest_entry.get("status") == ChunkStatus.SUCCEEDED.value:
+                # Verify spatial fingerprint matches expected chunk cells
+                actual_fp = manifest_entry.get("spatial_fingerprint")
+                if not actual_fp:
+                    coords = manifest_entry.get("coordinates", [])
+                    cell_ids = [
+                        f"ERA5_{int(round(lat * 100)):04d}_{int(round(lon * 100)):05d}"
+                        for lat, lon in coords
+                    ]
+                    actual_fp = hashlib.sha256(",".join(sorted(cell_ids)).encode("utf-8")).hexdigest()[:8]
+                if actual_fp != chunk.spatial_fingerprint:
+                    invalid_raw.append(chunk_id)
+                    continue
+
                 raw_path_str = manifest_entry.get("raw_path")
                 if raw_path_str:
                     raw_path = Path(raw_path_str)
@@ -192,11 +221,15 @@ class ProductionHistoricalRunner:
         mean_u = sum(uncompressed_sizes) / len(uncompressed_sizes) if uncompressed_sizes else 0.0
         est_total_u = mean_u * total_chunks
 
+        # Compute exact daily rows across the given year range for 318 eligible cells
+        total_days = sum(366 if calendar.isleap(yr) else 365 for yr in range(start_year, end_year + 1))
+        est_daily_rows = total_days * len(eligible_cells)
+
         # Parquet metrics from existing test file
         parquet_file = self.daily_config.processed_base_dir / "year=1994" / "batch_001.parquet"
         pq_size = parquet_file.stat().st_size if parquet_file.exists() else 65372
         bytes_per_row = pq_size / 3650.0 if pq_size else 17.91
-        est_total_pq = bytes_per_row * 3076704
+        est_total_pq = bytes_per_row * est_daily_rows
 
         # Disk space
         try:
@@ -208,12 +241,15 @@ class ProductionHistoricalRunner:
             available_disk = 0
 
         return PreflightAuditResult(
-            total_cells=len(cells),
+            total_cells=len(eligible_cells),
             total_batches=len(batches),
             total_years=years_count,
             total_chunks=total_chunks,
             batch_sizes=batch_sizes,
             years_range=(start_year, end_year),
+            authoritative_cells_count=len(auth_cells),
+            eligible_cells_count=len(eligible_cells),
+            excluded_cells_count=len(excluded_cells),
             valid_raw_chunks=valid_raw,
             missing_raw_chunks=missing_raw,
             invalid_raw_chunks=invalid_raw,
@@ -230,7 +266,7 @@ class ProductionHistoricalRunner:
             estimated_total_raw_uncompressed_bytes=est_total_u,
             observed_daily_parquet_bytes=pq_size,
             estimated_total_daily_parquet_bytes=est_total_pq,
-            estimated_total_daily_rows=3076704,
+            estimated_total_daily_rows=est_daily_rows,
             available_disk_bytes=available_disk,
         )
 
@@ -248,7 +284,12 @@ class ProductionHistoricalRunner:
         """
         audit = self.audit_inventory(start_year, end_year)
 
-        all_chunks = generate_chunks(start_year, end_year, batch_size=self.extraction_config.batch_size)
+        all_chunks = generate_chunks(
+            start_year,
+            end_year,
+            batch_size=self.extraction_config.batch_size,
+            eligible_only=True,
+        )
         if batch_filter is not None:
             all_chunks = [c for c in all_chunks if c.batch_id == batch_filter]
 

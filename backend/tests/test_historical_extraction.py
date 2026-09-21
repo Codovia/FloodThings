@@ -22,7 +22,11 @@ from app.ingestion.historical.client import (
 )
 from app.ingestion.historical.extractor import HistoricalExtractor
 from app.ingestion.historical.grid import (
+    ERA5_EXCLUDED_CELL_IDS,
+    ERA5_EXCLUSION_REASON,
     generate_chunks,
+    get_era5_eligible_grid,
+    get_era5_excluded_cells,
     get_karnataka_grid,
     get_spatial_batches,
 )
@@ -132,32 +136,101 @@ def create_mock_payload(
 class TestGridAndChunkGeneration:
     """Test deterministic grid and chunk generation."""
 
-    def test_karnataka_grid_count(self):
+    def test_karnataka_authoritative_grid_count(self):
+        """Authoritative grid contains 324 cells (253 inside, 71 boundary/coastal)."""
         grid = get_karnataka_grid()
         assert len(grid) == 324
         centers_inside = sum(1 for c in grid if c.center_inside)
         assert centers_inside == 253
+        assert len(grid) - centers_inside == 71
         # Check cell ID formatting
         assert grid[0].cell_id.startswith("ERA5_")
 
-    def test_spatial_batches(self):
-        batches = get_spatial_batches(batch_size=10)
+    def test_era5_eligible_grid_count(self):
+        """Extraction-eligible grid contains 318 cells (324 - 6 offshore snapping cells)."""
+        eligible = get_era5_eligible_grid()
+        assert len(eligible) == 318
+        # Ensure no excluded cell is present in eligible grid
+        eligible_ids = {c.cell_id for c in eligible}
+        assert eligible_ids.isdisjoint(ERA5_EXCLUDED_CELL_IDS)
+
+    def test_era5_excluded_cells(self):
+        """Exactly 6 offshore boundary cells are excluded with documented reason."""
+        excluded = get_era5_excluded_cells()
+        assert len(excluded) == 6
+        excluded_ids = {c.cell_id for c in excluded}
+        assert excluded_ids == ERA5_EXCLUDED_CELL_IDS
+        # All 6 are coastal/offshore cells (center_inside is False)
+        for c in excluded:
+            assert c.center_inside is False
+        # Documented reason matches requirement
+        expected_reason = (
+            "Open-Meteo ERA5 archive snaps requested offshore coordinate to a"
+            " neighboring land-side ERA5 coordinate, preventing one-to-one spatial"
+            " identity."
+        )
+        assert ERA5_EXCLUSION_REASON == expected_reason
+
+    def test_zero_excluded_cells_in_eligible_batches(self):
+        """Zero excluded cells are partitioned into production API extraction batches."""
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
+        for b in batches:
+            batch_cell_ids = {c.cell_id for c in b}
+            assert batch_cell_ids.isdisjoint(ERA5_EXCLUDED_CELL_IDS)
+
+    def test_no_duplicate_coordinates_among_eligible_cells(self):
+        """All 318 eligible cells possess unique spatial coordinates."""
+        eligible = get_era5_eligible_grid()
+        coords = [(c.lat, c.lon) for c in eligible]
+        assert len(coords) == len(set(coords)) == 318
+
+    def test_spatial_batches_eligible(self):
+        """Authoritative grid partitioned into 33 permanent batches with in-batch exclusion."""
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
         assert len(batches) == 33
-        assert len(batches[0]) == 10
-        assert len(batches[-1]) == 4  # 32 * 10 + 4 = 324
+        # 26 batches have 10 cells, 6 have 9 cells, 1 has 4 cells
+        nine_cell_batches = [idx for idx, b in enumerate(batches, start=1) if len(b) == 9]
+        assert nine_cell_batches == [4, 11, 12, 15, 16, 18]
+        assert len(batches[32]) == 4  # final batch 33 has 4 cells
+        total_eligible = sum(len(b) for b in batches)
+        assert total_eligible == 318
+
+    def test_spatial_batches_authoritative_full(self):
+        """Full authoritative grid partitions into 33 batches: 32 of 10 and 1 of 4."""
+        batches = get_spatial_batches(batch_size=10, eligible_only=False)
+        assert len(batches) == 33
+        for i in range(32):
+            assert len(batches[i]) == 10
+        assert len(batches[32]) == 4  # 32 * 10 + 4 = 324
+        assert sum(len(b) for b in batches) == 324
 
     def test_chunk_generation_single_year(self):
-        chunks = generate_chunks(start_year=1994, end_year=1994, batch_size=10)
+        """Single year generates 33 production chunks (batches 001 to 033)."""
+        chunks = generate_chunks(start_year=1994, end_year=1994, batch_size=10, eligible_only=True)
         assert len(chunks) == 33
         assert chunks[0].chunk_id == "era5_1994_batch_001"
         assert chunks[-1].chunk_id == "era5_1994_batch_033"
+        assert chunks[0].spatial_fingerprint == "57ba28d6"
 
-    def test_chunk_generation_full_26_years(self):
-        chunks = generate_chunks(start_year=1969, end_year=1994, batch_size=10)
-        # 26 years * 33 batches = 858 chunks
+    def test_chunk_generation_full_26_years_eligible(self):
+        """Full 26 years produces exactly 858 chunks across the 33 permanent batches (26 * 33)."""
+        chunks = generate_chunks(start_year=1969, end_year=1994, batch_size=10, eligible_only=True)
         assert len(chunks) == 858
         assert chunks[0].chunk_id == "era5_1969_batch_001"
         assert chunks[-1].chunk_id == "era5_1994_batch_033"
+
+    def test_chunk_spatial_fingerprint_determinism(self):
+        """ExtractionChunk spatial_fingerprint is deterministic and detects cell alterations."""
+        chunks = generate_chunks(start_year=1969, end_year=1969, batch_size=10, eligible_only=True)
+        fp_001 = chunks[0].spatial_fingerprint
+        assert len(fp_001) == 8
+        # Deterministic across calls
+        chunks_repeat = generate_chunks(start_year=1969, end_year=1969, batch_size=10, eligible_only=True)
+        assert chunks_repeat[0].spatial_fingerprint == fp_001
+        # Distinct batches have distinct fingerprints
+        assert chunks[0].spatial_fingerprint != chunks[1].spatial_fingerprint
+        assert chunks[0].chunk_id == "era5_1969_batch_001"
+        assert chunks[-1].chunk_id == "era5_1969_batch_033"
 
     def test_chunk_generation_invalid_range(self):
         with pytest.raises(ValueError, match="cannot exceed"):

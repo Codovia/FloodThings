@@ -45,10 +45,52 @@ Design a robust, reproducible, and verifiable historical meteorological extracti
 3. **Boundary / Intersecting Cells (71 Cells):** Cells that overlap Karnataka territory but whose center lies in a neighboring state or maritime margin.
 
 ### 3.3 Boundary and Coastal Treatment
-- **324 Intersecting Cells Preserved:** All 324 intersecting cells are retained for raw historical extraction to ensure complete spatial coverage of the state territory without artificial truncation.
+- **324 Intersecting Cells Preserved in Authoritative Definition:** All 324 intersecting cells are retained in the authoritative state grid definition to ensure complete spatial coverage of the state territory without artificial truncation.
 - **No Coordinate Invention:** Extraction must query exact $0.25^\circ$ grid centers. Offshore or out-of-state points must not be artificially moved or clipped.
 - **Auditable Coordinate Logging:** Both the requested coordinate and the returned coordinate must be preserved in raw metadata to verify that no unintended snapping occurred.
 - **District Aggregation Weighting Deferred:** District aggregation weighting (e.g. area-weighting vs unweighted averaging of boundary cells) is NOT decided in this extraction phase; it is explicitly deferred to the later feature-engineering phase.
+
+### 3.4 Authoritative Grid vs. Extraction-Eligible Grid (Phase 3.12C)
+
+#### 1. Architecture Overview
+- **Authoritative Karnataka Grid (324 Cells):** The complete set of $0.25^\circ \times 0.25^\circ$ cells intersecting the KSR-SAC Karnataka state polygon. This definition remains permanent, immutable, and canonical across the FloodPulse platform.
+- **ERA5 Extraction-Eligible Grid (318 Cells):** The subset of authoritative cells that can be extracted from Open-Meteo ERA5 without spatial distortion or land-sea snapping.
+- **Excluded Source-Incompatible Cells (6 Cells):** Exactly 6 boundary cells along the western maritime margin that cannot be extracted with 1:1 spatial identity.
+
+#### 2. Source-Specific Excluded Cells
+The following 6 cells are explicitly excluded from Open-Meteo ERA5 extraction:
+1. `ERA5_1275_07475` (Latitude: $12.75^\circ\text{N}$, Longitude: $74.75^\circ\text{E}$)
+2. `ERA5_1375_07450` (Latitude: $13.75^\circ\text{N}$, Longitude: $74.50^\circ\text{E}$)
+3. `ERA5_1400_07450` (Latitude: $14.00^\circ\text{N}$, Longitude: $74.50^\circ\text{E}$)
+4. `ERA5_1450_07425` (Latitude: $14.50^\circ\text{N}$, Longitude: $74.25^\circ\text{E}$)
+5. `ERA5_1475_07400` (Latitude: $14.75^\circ\text{N}$, Longitude: $74.00^\circ\text{E}$)
+6. `ERA5_1500_07400` (Latitude: $15.00^\circ\text{N}$, Longitude: $74.00^\circ\text{E}$)
+
+#### 3. Reason for Exclusion
+> "Open-Meteo ERA5 archive snaps requested offshore coordinate to a neighboring land-side ERA5 coordinate, preventing one-to-one spatial identity."
+
+When queried, Open-Meteo's ERA5 endpoint does not return data centered at these 6 offshore cell centers. Instead, its land-sea mask snaps each requested coordinate to an adjacent land-side grid point already represented by another cell in the grid.
+
+#### 4. Distinction Between Geographic Coverage and Source Coverage
+- **Geographic Coverage (Territorial Reality):** Refers to the physical administrative extent of Karnataka. All 324 cells (including the 6 offshore boundary cells) intersect the state border polygon and remain part of the authoritative Karnataka spatial definition. They are never deleted from the platform geometry.
+- **Source Coverage (Provider-Specific Feasibility):** Refers to the actual capability of a specific data provider (Open-Meteo ECMWF ERA5) to return distinct, non-snapped, physically accurate data for each grid point.
+- **Strict Architectural Invariants Upheld:**
+  - **No Coordinate Tolerance:** FloodPulse strictly rejects introducing a 0.25° coordinate mismatch tolerance in the raw validator.
+  - **No Coordinate Rewriting:** FloodPulse refuses to rewrite requested coordinates to match returned coordinates.
+  - **No Result Deduplication:** FloodPulse refuses to deduplicate snapped API results.
+  - **Explicit Eligibility Filtering:** Instead of silent mutation or deletion, extraction eligibility is managed via an explicit filter (`eligible_only=True` in `get_spatial_batches` and `get_era5_eligible_grid()`), ensuring complete auditability and provenance.
+
+#### 5. Phase 3.12D Backward-Compatible Inventory Architecture
+- **Authoritative Partitioning:** 33 permanent spatial batches (32 batches of 10 cells + 1 final batch of 4 cells across the 324 authoritative cells).
+- **In-Batch Source Exclusion:** Rather than repackaging into 32 batches (which shifted coordinate windows starting at Batch 4), exclusions are applied *within* each permanent spatial batch:
+  - 26 batches contain 10 eligible cells
+  - 6 batches contain 9 eligible cells (Batches 004, 011, 012, 015, 016, 018)
+  - 1 batch contains 4 eligible cells (Batch 033)
+  - Total eligible cells queried: **318 cells**
+- **Deterministic Spatial Fingerprint:** Each batch computes an 8-character hex SHA-256 fingerprint from its sorted cell IDs (e.g. `57ba28d6`, `816470cd`). Dual-key manifest verification confirms both payload file hash and spatial fingerprint.
+- **Production Inventory Units:** $33\text{ batches} \times 26\text{ years} = \mathbf{858\text{ total chunks}}$.
+- **Total Daily Processed Records:** 3,019,728 records (20 non-leap years $\times 318 \times 365 = 2,321,400$; 6 leap years $\times 318 \times 366 = 698,328$).
+- **Zero Artifact Invalidation:** All 17 existing raw payloads and 13 daily Parquet files match their respective 33-batch coordinates bit-for-bit without any file movement or deletion.
 
 ---
 
@@ -126,12 +168,16 @@ Each saved raw payload must encapsulate:
 ## 7. Checkpoint and Resume Design
 
 ### 7.1 Deterministic Extraction Unit
-- **Proposed Extraction Unit:** **1 Spatial Batch $\times$ 1 Calendar Year**
-  - Spatial Batch: 10 grid cells (comma-separated query).
+- **Extraction Unit:** **1 Spatial Batch $\times$ 1 Calendar Year**
+  - Spatial Batch: 10 grid cells (comma-separated query; final batch 033 has 4 cells).
   - Time Chunk: 1 calendar year (`start_date=YYYY-01-01&end_date=YYYY-12-31`).
-  - Total Spatial Batches: 33 batches (32 batches of 10 cells + 1 batch of 4 cells for 324 total cells).
-  - Total Extraction Units: $33\text{ batches} \times 26\text{ years} = \mathbf{858\text{ total chunks}}$ (planning estimate).
-  - **Empirical Feasibility Status:** The 10 cells × 1 calendar year extraction unit is empirically validated as practical for the tested 1994 dry run. Production-scale behavior across all 858 chunks remains subject to runtime, rate-limit, and failure monitoring.
+  - Total Spatial Batches: **33 permanent batches** across the 324 authoritative Karnataka grid cells.
+  - In-Batch Eligibility: 6 coastal snapping cells are excluded within their respective batches (Batches 004, 011, 012, 015, 016, 018 query 9 cells; all others query 10 cells; Batch 033 queries 4 cells).
+  - Total Eligible Cells Queried: **318 cells**.
+  - Total Extraction Units: $33\text{ batches} \times 26\text{ years} = \mathbf{858\text{ total chunks}}$.
+  - **Dual-Key Spatial Verification (Manifest Schema v1.1):**
+    Each chunk is verified using both payload checksum (`compressed_sha256`) and deterministic 8-character hex cell-set fingerprint (`spatial_fingerprint`). This prevents silent coordinate shifting or inventory drift across runs.
+  - **100% Backward Compatibility:** All 17 raw payloads and 13 daily Parquet chunks produced in earlier phases remain 100% compatible and valid without file re-extraction or modification.
 
 ### 7.2 Chunk State Machine
 ```mermaid
