@@ -9,7 +9,6 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
-import time
 from typing import Any
 
 from app.ingestion.historical.client import (
@@ -161,11 +160,6 @@ class HistoricalExtractor:
             validation=val_result,
             chunk=chunk,
         )
-
-        # Rate-limiting pacing delay
-        if self.config.pacing_delay_seconds > 0:
-            time.sleep(self.config.pacing_delay_seconds)
-
         return val_result
 
     def extract_chunks(

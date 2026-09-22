@@ -430,6 +430,76 @@ class TestClientAndParameters:
         assert exc_info.value.retryable is True
         assert exc_info.value.http_status == 429
 
+    def test_extraction_config_default_interval_is_10_seconds(self):
+        """ExtractionConfig defaults to 10.0s request interval and 2 rate limit max retries."""
+        cfg = ExtractionConfig()
+        assert cfg.min_request_interval_seconds == 10.0
+        assert cfg.pacing_delay_seconds == 10.0
+        assert cfg.rate_limit_cooldown_seconds == 60.0
+        assert cfg.rate_limit_max_retries == 2
+
+    def test_extraction_config_pacing_delay_sync(self):
+        """ExtractionConfig synchronizes pacing_delay_seconds and min_request_interval_seconds."""
+        cfg1 = ExtractionConfig(pacing_delay_seconds=4.0)
+        assert cfg1.min_request_interval_seconds == 4.0
+        assert cfg1.pacing_delay_seconds == 4.0
+
+        cfg2 = ExtractionConfig(min_request_interval_seconds=6.0)
+        assert cfg2.min_request_interval_seconds == 6.0
+        assert cfg2.pacing_delay_seconds == 6.0
+
+    def test_client_retry_after_http_date_format(self, sample_chunk: ExtractionChunk):
+        """HTTP 429 with RFC 7231 / RFC 2822 HTTP-date Retry-After header is correctly parsed and waited."""
+        import email.utils
+        mock_data = create_mock_payload(sample_chunk)
+        mock_bytes = json.dumps(mock_data).encode("utf-8")
+
+        future_target = datetime.now(timezone.utc) + timedelta(seconds=25)
+        http_date_str = email.utils.format_datetime(future_target)
+
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": http_date_str}
+
+        resp_200 = MagicMock(spec=httpx.Response)
+        resp_200.status_code = 200
+        resp_200.content = mock_bytes
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.side_effect = [resp_429, resp_200]
+
+        cfg = ExtractionConfig(max_retries=2, min_request_interval_seconds=1.0)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep") as mock_sleep:
+            raw_b, parsed_j, status, lat = client.fetch_chunk_payload(sample_chunk)
+            assert status == 200
+            sleep_calls = [c[0][0] for c in mock_sleep.call_args_list]
+            assert any(23.0 <= s <= 27.0 for s in sleep_calls)
+
+    def test_client_rate_limit_bounded_retries(self, sample_chunk: ExtractionChunk):
+        """Client only retries 429 up to rate_limit_max_retries without blocking for full max_retries."""
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": "1.0"}
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.return_value = resp_429
+
+        # max_retries=5, but rate_limit_max_retries=2
+        cfg = ExtractionConfig(max_retries=5, rate_limit_max_retries=2, min_request_interval_seconds=0.1)
+        client = HistoricalOpenMeteoClient(config=cfg, client=mock_http)
+
+        with patch("time.sleep") as mock_sleep:
+            with pytest.raises(RateLimitExceededError):
+                client.fetch_chunk_payload(sample_chunk)
+
+        # 1 initial attempt + 1 retry = 2 total attempts made before raising
+        assert mock_http.get.call_count == 2
+        # Only 1 rate limit cooldown sleep occurred, not 4
+        cooldown_sleeps = [c[0][0] for c in mock_sleep.call_args_list if c[0][0] >= 1.0]
+        assert len(cooldown_sleeps) == 1
+
     def test_client_client_error_non_retryable(self, sample_chunk: ExtractionChunk):
         resp_400 = MagicMock(spec=httpx.Response)
         resp_400.status_code = 400
@@ -764,6 +834,57 @@ class TestExtractorMocked:
         # Call count must still be 1 (no second HTTP call)
         assert mock_http.get.call_count == 1
 
+    def test_extract_chunk_429_safely_becomes_retryable_without_manifest_corruption(
+        self, temp_raw_dir: Path, sample_chunk: ExtractionChunk
+    ):
+        """HTTP 429 exhaustion marks chunk RETRYABLE in manifest and preserves manifest validity."""
+        resp_429 = MagicMock(spec=httpx.Response)
+        resp_429.status_code = 429
+        resp_429.headers = {"Retry-After": "0.1"}
+
+        mock_http = MagicMock(spec=httpx.Client)
+        mock_http.get.return_value = resp_429
+
+        manifest_file = temp_raw_dir / "manifest.json"
+        config = ExtractionConfig(
+            raw_base_dir=temp_raw_dir,
+            manifest_path=manifest_file,
+            pacing_delay_seconds=0.0,
+            rate_limit_max_retries=2,
+        )
+        manifest = HistoricalExtractionManifest(config.manifest_path)
+        client = HistoricalOpenMeteoClient(config=config, client=mock_http)
+        validator = HistoricalChunkValidator(config)
+
+        extractor = HistoricalExtractor(
+            config=config,
+            manifest=manifest,
+            client=client,
+            validator=validator,
+        )
+
+        with patch("time.sleep"):
+            res = extractor.extract_chunk(sample_chunk)
+
+        assert res.is_valid is False
+        assert res.status == ChunkStatus.RETRYABLE
+
+        # Manifest must record chunk as RETRYABLE
+        chunk_rec = manifest.get_chunk(sample_chunk.chunk_id)
+        assert chunk_rec is not None
+        assert chunk_rec["status"] == ChunkStatus.RETRYABLE.value
+        assert "429" in chunk_rec["last_error"]
+
+        # Manifest on disk must be valid JSON
+        assert manifest_file.exists()
+        with open(manifest_file, "r", encoding="utf-8") as f:
+            disk_data = json.load(f)
+        assert disk_data["chunks"][sample_chunk.chunk_id]["status"] == ChunkStatus.RETRYABLE.value
+
+        # No raw files should have been written to disk
+        raw_file = temp_raw_dir / f"year={sample_chunk.year}" / f"batch_{sample_chunk.batch_id:03d}.json.gz"
+        assert not raw_file.exists()
+
 
 # =============================================================================
 # 6. CLI SAFETY GUARD TESTS
@@ -804,3 +925,41 @@ class TestCliSafetyGuards:
             )
             assert exit_code == 0
             assert mock_extract.called
+
+    def test_cli_pacing_wiring(self, temp_raw_dir: Path):
+        """CLI --pacing flag defaults to 10.0 and wires to ExtractionConfig.min_request_interval_seconds."""
+        from app.ingestion.historical.cli import build_parser
+
+        parser = build_parser()
+        args = parser.parse_args(["--year", "1994"])
+        # Default is 10.0
+        assert args.pacing == 10.0
+
+        args_custom = parser.parse_args(["--year", "1994", "--pacing", "15.5"])
+        assert args_custom.pacing == 15.5
+
+        with patch("app.ingestion.historical.cli.HistoricalExtractor") as mock_extractor_cls:
+            mock_inst = MagicMock()
+            mock_inst.extract_chunks.return_value = {
+                "total_processed": 0,
+                "succeeded": 0,
+                "failed": 0,
+                "skipped": 0,
+                "manifest_summary": {},
+            }
+            mock_extractor_cls.return_value = mock_inst
+
+            exit_code = run_cli(
+                [
+                    "--year", "1994",
+                    "--batch", "1",
+                    "--limit", "1",
+                    "--dry-run",
+                    "--pacing", "12.0",
+                    "--manifest-path", str(temp_raw_dir / "manifest.json"),
+                ]
+            )
+            assert exit_code == 0
+            cfg_used = mock_extractor_cls.call_args.kwargs["config"]
+            assert cfg_used.min_request_interval_seconds == 12.0
+            assert cfg_used.pacing_delay_seconds == 12.0

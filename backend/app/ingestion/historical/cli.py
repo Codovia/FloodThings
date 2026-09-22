@@ -45,7 +45,7 @@ def build_parser() -> argparse.ArgumentParser:
     filter_group.add_argument("--batch-size", type=int, default=10, help="Grid cells per batch")
     filter_group.add_argument("--limit", type=int, help="Maximum number of chunks to process in this run")
     filter_group.add_argument("--dry-run", action="store_true", help="Execute without persisting raw files to disk")
-    filter_group.add_argument("--pacing", type=float, default=0.5, help="Pacing delay between requests (seconds)")
+    filter_group.add_argument("--pacing", type=float, default=10.0, help="Minimum request interval between HTTP requests (seconds)")
     filter_group.add_argument(
         "--force-full-range",
         action="store_true",
@@ -119,6 +119,7 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
         raw_base_dir=args.output_dir,
         manifest_path=args.manifest_path,
         batch_size=args.batch_size,
+        min_request_interval_seconds=args.pacing,
         pacing_delay_seconds=args.pacing,
         dry_run=args.dry_run,
     )

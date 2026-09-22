@@ -349,6 +349,58 @@ class TestSafetyControls:
         """Test 11: CLI rejects execution without explicit scope flags."""
         assert run_cli([]) == 1
 
+    def test_production_cli_pacing_flag_wiring(self, temp_dirs: tuple[Path, Path]):
+        """Production CLI --pacing flag defaults to 10.0 and wires to ExtractionConfig."""
+        from app.ingestion.historical.production_cli import build_parser
+
+        parser = build_parser()
+        args = parser.parse_args(["--year", "1994"])
+        assert args.pacing == 10.0
+
+        args_custom = parser.parse_args(["--year", "1994", "--pacing", "14.5"])
+        assert args_custom.pacing == 14.5
+
+        raw_dir, processed_dir = temp_dirs
+        with patch("app.ingestion.historical.production_cli.ProductionHistoricalRunner") as mock_runner_cls:
+            mock_runner = MagicMock()
+            mock_runner.audit_inventory.return_value = MagicMock(
+                authoritative_cells_count=354,
+                eligible_cells_count=318,
+                excluded_cells_count=36,
+                total_batches=33,
+                total_chunks=33,
+                valid_raw_chunks=[],
+                missing_raw_chunks=[],
+                invalid_raw_chunks=[],
+                valid_processed_chunks=[],
+                missing_processed_chunks=[],
+                invalid_processed_chunks=[],
+                observed_raw_compressed_min=0,
+                observed_raw_compressed_max=0,
+                observed_raw_compressed_mean=0.0,
+                estimated_total_raw_compressed_bytes=0,
+                observed_raw_uncompressed_min=0,
+                observed_raw_uncompressed_max=0,
+                observed_raw_uncompressed_mean=0.0,
+                estimated_total_raw_uncompressed_bytes=0,
+                observed_daily_parquet_bytes=0,
+                estimated_total_daily_parquet_bytes=0,
+                estimated_total_daily_rows=0,
+                available_disk_bytes=1000000000,
+            )
+            mock_runner_cls.return_value = mock_runner
+
+            code = run_cli([
+                "--year", "1994",
+                "--raw-dir", str(raw_dir),
+                "--processed-dir", str(processed_dir),
+                "--pacing", "12.5",
+            ])
+            assert code == 0
+            cfg_used = mock_runner_cls.call_args.kwargs["extraction_config"]
+            assert cfg_used.min_request_interval_seconds == 12.5
+            assert cfg_used.pacing_delay_seconds == 12.5
+
     def test_dry_run_makes_no_http_or_db_writes(self, temp_dirs: tuple[Path, Path]):
         """Test 12 & 13: Dry-run performs zero HTTP requests and zero DB writes."""
         raw_dir, processed_dir = temp_dirs

@@ -140,7 +140,14 @@ class ExtractionConfig:
     read_timeout: float = 30.0
     max_retries: int = 4
     backoff_factor: float = 2.0
-    pacing_delay_seconds: float = 0.5
-    min_request_interval_seconds: float = 2.0
+    min_request_interval_seconds: float = 10.0
     rate_limit_cooldown_seconds: float = 60.0
+    rate_limit_max_retries: int = 2
     dry_run: bool = False
+    pacing_delay_seconds: float | None = None
+
+    def __post_init__(self) -> None:
+        if self.pacing_delay_seconds is not None:
+            self.min_request_interval_seconds = self.pacing_delay_seconds
+        else:
+            self.pacing_delay_seconds = self.min_request_interval_seconds

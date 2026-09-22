@@ -56,6 +56,12 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Explicit confirmation required to execute live production runs",
     )
+    filter_group.add_argument(
+        "--pacing",
+        type=float,
+        default=10.0,
+        help="Minimum request interval between HTTP requests (seconds)",
+    )
 
     path_group = parser.add_argument_group("Storage Configuration")
     path_group.add_argument(
@@ -119,6 +125,8 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     extraction_config = ExtractionConfig(
         raw_base_dir=args.raw_dir,
         manifest_path=args.raw_dir / "extraction_manifest.json",
+        min_request_interval_seconds=args.pacing,
+        pacing_delay_seconds=args.pacing,
     )
     daily_config = DailyProcessingConfig(
         raw_base_dir=args.raw_dir,
@@ -143,6 +151,7 @@ def run_cli(argv: Sequence[str] | None = None) -> int:
     print(f"  Source-Excluded Cells:     {audit.excluded_cells_count}")
     print(f"  Spatial Batches:           {audit.total_batches}")
     print(f"  Total Chunks:              {audit.total_chunks}")
+    print(f"  Pacing Interval:           {args.pacing}s")
     print(f"  Execution Mode:            {'DRY RUN ONLY' if is_dry_run else 'LIVE EXECUTION'}")
     print("-" * 75)
     print("  Raw Extraction State:")

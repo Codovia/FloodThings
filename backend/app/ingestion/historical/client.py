@@ -171,6 +171,7 @@ class HistoricalOpenMeteoClient:
         client = self._get_client()
 
         attempt = 0
+        rate_limit_attempts = 0
         last_exception: Exception | None = None
 
         while attempt < self.config.max_retries:
@@ -192,6 +193,7 @@ class HistoricalOpenMeteoClient:
                     return raw_bytes, parsed_json, status, latency
 
                 elif status == 429:
+                    rate_limit_attempts += 1
                     retry_after = self._parse_retry_after(response)
                     if retry_after is not None:
                         wait_time = retry_after
@@ -201,7 +203,10 @@ class HistoricalOpenMeteoClient:
                     # Do not retry faster than configured minimum request interval
                     wait_time = max(wait_time, self.config.min_request_interval_seconds)
 
-                    if attempt < self.config.max_retries:
+                    if (
+                        rate_limit_attempts < self.config.rate_limit_max_retries
+                        and attempt < self.config.max_retries
+                    ):
                         time.sleep(wait_time)
                         continue
                     raise RateLimitExceededError("HTTP 429 Rate limit exceeded after maximum retries")
