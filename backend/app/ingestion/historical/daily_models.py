@@ -51,11 +51,23 @@ class DailyRecord:
     surface_pressure_mean_hpa: float
     hour_count: int
     quality_status: str
+    cell_id: str = ""
+    chunk_id: str = ""
     source: str = "Open-Meteo Historical Weather API"
     dataset_model: str = "ERA5"
     raw_chunk_id: str = ""
     raw_payload_sha256: str = ""
     processing_version: str = "1.0"
+
+    def __post_init__(self) -> None:
+        if not self.cell_id:
+            lat_str = f"{int(round(self.latitude * 100)):04d}"
+            lon_str = f"{int(round(self.longitude * 100)):05d}"
+            object.__setattr__(self, "cell_id", f"ERA5_{lat_str}_{lon_str}")
+        if not self.chunk_id and self.raw_chunk_id:
+            object.__setattr__(self, "chunk_id", self.raw_chunk_id)
+        elif not self.raw_chunk_id and self.chunk_id:
+            object.__setattr__(self, "raw_chunk_id", self.chunk_id)
 
     def to_dict(self) -> dict[str, Any]:
         """Convert daily record to dictionary."""

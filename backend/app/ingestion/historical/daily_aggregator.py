@@ -148,16 +148,21 @@ class DailyAggregator:
             # Surface pressure: arithmetic mean
             sp_mean = round(sum(valid_pressures) / len(valid_pressures), 4)
         else:
-            # Completely missing day
-            precip_total = 0.0
-            temp_mean = 0.0
-            temp_min = 0.0
-            temp_max = 0.0
-            rh_mean = 0.0
-            sp_mean = 0.0
+            # Completely missing day: do not convert missing values to 0.0
+            precip_total = float("nan")
+            temp_mean = float("nan")
+            temp_min = float("nan")
+            temp_max = float("nan")
+            rh_mean = float("nan")
+            sp_mean = float("nan")
+
+        lat_str = f"{int(round(lat * 100)):04d}"
+        lon_str = f"{int(round(lon * 100)):05d}"
+        cell_id = f"ERA5_{lat_str}_{lon_str}"
 
         return DailyRecord(
             date=date,
+            cell_id=cell_id,
             latitude=lat,
             longitude=lon,
             precipitation_total_mm=precip_total,
@@ -170,6 +175,7 @@ class DailyAggregator:
             quality_status=quality_status,
             source="Open-Meteo Historical Weather API",
             dataset_model="ERA5",
+            chunk_id=raw_chunk_id,
             raw_chunk_id=raw_chunk_id,
             raw_payload_sha256=raw_payload_sha256,
             processing_version=self.processing_version,

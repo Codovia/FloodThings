@@ -26,6 +26,7 @@ from datetime import datetime, timedelta, timezone
 import gzip
 import hashlib
 import json
+import math
 from pathlib import Path
 import pytest
 import pyarrow.parquet as pq
@@ -40,6 +41,7 @@ from app.ingestion.historical.daily_models import (
 )
 from app.ingestion.historical.daily_processor import DailyProcessor
 from app.ingestion.historical.daily_validator import DailyDatasetValidator
+from app.ingestion.historical.grid import get_spatial_batches
 from app.ingestion.historical.models import GridCell
 
 
@@ -696,3 +698,333 @@ class TestDailyManifestRecovery:
         # Verify failure reason identifies spatial / cell / fingerprint mismatch
         err_msg = rec["last_error"].lower()
         assert any(term in err_msg for term in ["spatial", "cell", "fingerprint"])
+
+
+# =============================================================================
+# 5. REAL ON-DISK ERA5 RAW ARTIFACT PROCESSING & EDGE CASE TESTS
+# =============================================================================
+
+
+class TestRealEra5RawArtifactProcessing:
+    """Integration tests verifying daily processing using real on-disk ERA5 raw artifacts."""
+
+    REAL_RAW_BASE = Path("data/raw/era5_historical")
+
+    def test_real_raw_artifact_aggregation_and_validation(self):
+        """Aggregate real 1969 batch 001 raw artifact and validate against canonical rules."""
+        raw_file = self.REAL_RAW_BASE / "year=1969" / "batch_001.json.gz"
+        meta_file = self.REAL_RAW_BASE / "year=1969" / "batch_001.meta.json"
+
+        if not raw_file.exists() or not meta_file.exists():
+            pytest.skip("Real raw ERA5 1969 batch 001 artifact not found on disk")
+
+        with open(meta_file, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        compressed_bytes = raw_file.read_bytes()
+        raw_bytes = gzip.decompress(compressed_bytes)
+        payload_sha = hashlib.sha256(raw_bytes).hexdigest()
+        assert payload_sha == meta["payload_sha256"]
+
+        payload = json.loads(raw_bytes.decode("utf-8"))
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
+        expected_cells = batches[0]  # Batch 1 has 10 cells
+
+        aggregator = DailyAggregator(processing_version="1.0")
+        records = aggregator.aggregate_chunk_payload(
+            payload=payload,
+            raw_chunk_id="era5_1969_batch_001",
+            raw_payload_sha256=payload_sha,
+        )
+
+        # 1969 is non-leap: 10 cells * 365 days = 3,650 records
+        assert len(records) == 3650
+
+        # Verify record fields and provenance
+        for r in records:
+            assert r.date.startswith("1969-")
+            assert r.source == "Open-Meteo Historical Weather API"
+            assert r.dataset_model == "ERA5"
+            assert r.chunk_id == "era5_1969_batch_001"
+            assert r.raw_chunk_id == "era5_1969_batch_001"
+            assert r.raw_payload_sha256 == payload_sha
+            assert r.hour_count == 24
+            assert r.quality_status == DailyQualityStatus.COMPLETE.value
+
+            # Spatial identity preservation
+            expected_cid = f"ERA5_{int(round(r.latitude * 100)):04d}_{int(round(r.longitude * 100)):05d}"
+            assert r.cell_id == expected_cid
+
+            # Physical ranges
+            assert r.precipitation_total_mm >= 0.0
+            assert r.temperature_min_c <= r.temperature_mean_c <= r.temperature_max_c
+            assert 0.0 <= r.relative_humidity_mean_pct <= 100.0
+            assert r.surface_pressure_mean_hpa > 0.0
+
+        # Validate with DailyDatasetValidator
+        validator = DailyDatasetValidator()
+        val_res = validator.validate_daily_records(
+            records=records,
+            expected_year=1969,
+            expected_cells=expected_cells,
+        )
+        assert val_res.is_valid, f"Validation errors: {val_res.errors}"
+        assert val_res.complete_days == 3650
+        assert val_res.incomplete_days == 0
+
+    def test_real_raw_artifact_leap_year_aggregation(self):
+        """Aggregate real 1972 batch 018 raw artifact (leap year) with 9 cells."""
+        raw_file = self.REAL_RAW_BASE / "year=1972" / "batch_018.json.gz"
+        meta_file = self.REAL_RAW_BASE / "year=1972" / "batch_018.meta.json"
+
+        if not raw_file.exists() or not meta_file.exists():
+            pytest.skip("Real raw ERA5 1972 batch 018 artifact not found on disk")
+
+        with open(meta_file, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        raw_bytes = gzip.decompress(raw_file.read_bytes())
+        payload = json.loads(raw_bytes.decode("utf-8"))
+
+        batches = get_spatial_batches(batch_size=10, eligible_only=True)
+        expected_cells = batches[17]  # Batch 18 has 9 eligible cells
+        assert len(expected_cells) == 9
+
+        aggregator = DailyAggregator()
+        records = aggregator.aggregate_chunk_payload(
+            payload=payload,
+            raw_chunk_id="era5_1972_batch_018",
+            raw_payload_sha256=meta["payload_sha256"],
+        )
+
+        # 9 cells * 366 days = 3,294 records
+        assert len(records) == 3294
+
+        # Verify leap day exists for all 9 cells
+        leap_day_records = [r for r in records if r.date == "1972-02-29"]
+        assert len(leap_day_records) == 9
+
+        validator = DailyDatasetValidator()
+        val_res = validator.validate_daily_records(
+            records=records,
+            expected_year=1972,
+            expected_cells=expected_cells,
+        )
+        assert val_res.is_valid, f"Validation errors: {val_res.errors}"
+
+    def test_real_artifact_parquet_persistence_and_provenance(self, temp_dirs: tuple[Path, Path]):
+        """Process real artifact to Parquet and verify schema, metadata, and column preservation."""
+        _, processed_dir = temp_dirs
+        raw_file = self.REAL_RAW_BASE / "year=1969" / "batch_001.json.gz"
+        if not raw_file.exists():
+            pytest.skip("Real raw ERA5 1969 batch 001 artifact not found on disk")
+
+        config = DailyProcessingConfig(
+            raw_base_dir=self.REAL_RAW_BASE,
+            processed_base_dir=processed_dir,
+            manifest_path=processed_dir / "processing_manifest.json",
+        )
+        processor = DailyProcessor(config=config)
+        res = processor.process_chunk(year=1969, batch_id=1)
+
+        assert res.is_valid
+        parquet_file = processed_dir / "year=1969" / "batch_001.parquet"
+        assert parquet_file.exists()
+
+        table = pq.read_table(parquet_file)
+        assert table.num_rows == 3650
+
+        # Verify column preservation
+        expected_cols = [
+            "date",
+            "cell_id",
+            "latitude",
+            "longitude",
+            "precipitation_total_mm",
+            "temperature_mean_c",
+            "temperature_min_c",
+            "temperature_max_c",
+            "relative_humidity_mean_pct",
+            "surface_pressure_mean_hpa",
+            "hour_count",
+            "quality_status",
+            "source",
+            "dataset_model",
+            "chunk_id",
+            "raw_chunk_id",
+            "raw_payload_sha256",
+            "processing_version",
+        ]
+        for col in expected_cols:
+            assert col in table.column_names, f"Missing column: {col}"
+
+        # Verify schema-level metadata
+        schema_meta = table.schema.metadata
+        assert schema_meta[b"source"] == b"Open-Meteo Historical Weather API"
+        assert schema_meta[b"dataset_model"] == b"ERA5"
+        assert schema_meta[b"chunk_id"] == b"era5_1969_batch_001"
+        assert b"created_at_utc" in schema_meta
+
+        # Verify cell_id column values
+        cell_ids = table["cell_id"].to_pylist()
+        lats = table["latitude"].to_pylist()
+        lons = table["longitude"].to_pylist()
+        for cid, lat, lon in zip(cell_ids, lats, lons):
+            expected = f"ERA5_{int(round(lat * 100)):04d}_{int(round(lon * 100)):05d}"
+            assert cid == expected
+
+    def test_real_artifact_deterministic_output(self):
+        """Re-aggregating real artifact produces deterministically identical records."""
+        raw_file = self.REAL_RAW_BASE / "year=1969" / "batch_001.json.gz"
+        meta_file = self.REAL_RAW_BASE / "year=1969" / "batch_001.meta.json"
+        if not raw_file.exists():
+            pytest.skip("Real raw ERA5 1969 batch 001 artifact not found on disk")
+
+        with open(meta_file, "r", encoding="utf-8") as f:
+            meta = json.load(f)
+
+        raw_bytes = gzip.decompress(raw_file.read_bytes())
+        payload = json.loads(raw_bytes.decode("utf-8"))
+
+        aggregator = DailyAggregator()
+        recs1 = aggregator.aggregate_chunk_payload(payload, "era5_1969_batch_001", meta["payload_sha256"])
+        recs2 = aggregator.aggregate_chunk_payload(payload, "era5_1969_batch_001", meta["payload_sha256"])
+
+        assert len(recs1) == len(recs2)
+        assert recs1 == recs2
+
+
+class TestValidationAndEdgeCases:
+    """Tests for edge cases: missing hours, non-silent zero conversion, invalid values, duplicates."""
+
+    def test_incomplete_hourly_coverage(self, sample_cell: GridCell):
+        """A day with 23 valid hours is INCOMPLETE, tracks hour_count=23, sums valid precip without scaling."""
+        aggregator = DailyAggregator()
+        payload = create_hourly_payload(1994, [sample_cell], precip_val=2.0)
+        # Drop 1 hour from 1994-01-01
+        payload[0]["hourly"]["time"] = payload[0]["hourly"]["time"][:23] + payload[0]["hourly"]["time"][24:]
+        payload[0]["hourly"]["precipitation"] = payload[0]["hourly"]["precipitation"][:23] + payload[0]["hourly"]["precipitation"][24:]
+        payload[0]["hourly"]["temperature_2m"] = payload[0]["hourly"]["temperature_2m"][:23] + payload[0]["hourly"]["temperature_2m"][24:]
+        payload[0]["hourly"]["relative_humidity_2m"] = payload[0]["hourly"]["relative_humidity_2m"][:23] + payload[0]["hourly"]["relative_humidity_2m"][24:]
+        payload[0]["hourly"]["surface_pressure"] = payload[0]["hourly"]["surface_pressure"][:23] + payload[0]["hourly"]["surface_pressure"][24:]
+
+        records = aggregator.aggregate_chunk_payload(payload, "era5_1994_batch_001", "sha123")
+        jan1 = [r for r in records if r.date == "1994-01-01"][0]
+
+        assert jan1.hour_count == 23
+        assert jan1.quality_status == DailyQualityStatus.INCOMPLETE.value
+        # 23 hours * 2.0 mm = 46.0 mm (no scaling, no zero conversion)
+        assert jan1.precipitation_total_mm == pytest.approx(46.0)
+
+    def test_completely_missing_day_no_silent_zero(self, sample_cell: GridCell):
+        """Completely missing day must NOT be silently converted to 0.0 (must be NaN) and fail validation."""
+        aggregator = DailyAggregator()
+        # Single day where all hourly observations are None
+        payload = [
+            {
+                "latitude": sample_cell.lat,
+                "longitude": sample_cell.lon,
+                "hourly": {
+                    "time": [f"1994-01-01T{h:02d}:00" for h in range(24)],
+                    "precipitation": [None] * 24,
+                    "temperature_2m": [None] * 24,
+                    "relative_humidity_2m": [None] * 24,
+                    "surface_pressure": [None] * 24,
+                },
+            }
+        ]
+        records = aggregator.aggregate_chunk_payload(payload, "era5_1994_batch_001", "sha123")
+        assert len(records) == 1
+        r = records[0]
+
+        assert r.hour_count == 0
+        assert r.quality_status == DailyQualityStatus.INCOMPLETE.value
+        # Must be NaN, not silently converted to 0.0
+        assert math.isnan(r.precipitation_total_mm)
+        assert math.isnan(r.temperature_mean_c)
+        assert math.isnan(r.temperature_min_c)
+        assert math.isnan(r.temperature_max_c)
+        assert math.isnan(r.relative_humidity_mean_pct)
+        assert math.isnan(r.surface_pressure_mean_hpa)
+
+        validator = DailyDatasetValidator()
+        val_res = validator.validate_daily_records([r], expected_year=1994)
+        assert not val_res.is_valid
+        assert any("0 valid hourly observations" in e for e in val_res.errors)
+
+    def test_duplicate_hourly_timestamps_rejection(self, temp_dirs: tuple[Path, Path], sample_cell: GridCell):
+        """Raw hourly payload with duplicate timestamps fails hourly validation in DailyProcessor."""
+        raw_dir, processed_dir = temp_dirs
+        payload = create_hourly_payload(1994, [sample_cell])
+        # Inject duplicate timestamp
+        payload[0]["hourly"]["time"][1] = payload[0]["hourly"]["time"][0]
+
+        year_dir = raw_dir / "year=1994"
+        year_dir.mkdir(parents=True, exist_ok=True)
+        raw_file = year_dir / "batch_001.json.gz"
+        raw_bytes = json.dumps(payload).encode("utf-8")
+        with open(raw_file, "wb") as f:
+            f.write(gzip.compress(raw_bytes))
+
+        config = DailyProcessingConfig(
+            raw_base_dir=raw_dir,
+            processed_base_dir=processed_dir,
+            manifest_path=processed_dir / "processing_manifest.json",
+        )
+        processor = DailyProcessor(config=config)
+        res = processor.process_chunk(year=1994, batch_id=1, cells=[sample_cell])
+
+        assert not res.is_valid
+        assert res.status == DailyProcessingStatus.VALIDATION_FAILED
+        assert any("validation failed" in e.lower() for e in res.errors)
+
+    def test_date_continuity_break_rejection(self, sample_cell: GridCell):
+        """Skipping a calendar day violates continuity and is rejected by DailyDatasetValidator."""
+        aggregator = DailyAggregator()
+        payload = create_hourly_payload(1994, [sample_cell])
+        records = aggregator.aggregate_chunk_payload(payload, "era5_1994_batch_001", "sha123")
+
+        # Drop day 15 (1994-01-16) and duplicate day 0 to keep count 365
+        modified_records = [r for r in records if r.date != "1994-01-16"]
+        # Add duplicate with a modified invalid date to preserve count
+        invalid_day = DailyRecord(
+            date="1994-01-15",  # duplicate date
+            latitude=sample_cell.lat,
+            longitude=sample_cell.lon,
+            precipitation_total_mm=0.0,
+            temperature_mean_c=25.0,
+            temperature_min_c=20.0,
+            temperature_max_c=30.0,
+            relative_humidity_mean_pct=50.0,
+            surface_pressure_mean_hpa=950.0,
+            hour_count=24,
+            quality_status=DailyQualityStatus.COMPLETE.value,
+        )
+        modified_records.append(invalid_day)
+
+        validator = DailyDatasetValidator()
+        val_res = validator.validate_daily_records(modified_records, expected_year=1994)
+        assert not val_res.is_valid
+        assert any("Missing contiguous calendar dates" in e for e in val_res.errors)
+
+    def test_spatial_identity_mismatch_rejection(self, sample_cell: GridCell):
+        """Mismatched cell_id violates spatial identity and is rejected by DailyDatasetValidator."""
+        bad_record = DailyRecord(
+            date="1994-01-01",
+            cell_id="ERA5_9999_99999",  # Does not match coords (14.25, 76.50)
+            latitude=sample_cell.lat,
+            longitude=sample_cell.lon,
+            precipitation_total_mm=5.0,
+            temperature_mean_c=25.0,
+            temperature_min_c=20.0,
+            temperature_max_c=30.0,
+            relative_humidity_mean_pct=50.0,
+            surface_pressure_mean_hpa=950.0,
+            hour_count=24,
+            quality_status=DailyQualityStatus.COMPLETE.value,
+        )
+
+        validator = DailyDatasetValidator()
+        val_res = validator.validate_daily_records([bad_record], expected_year=1994)
+        assert not val_res.is_valid
+        assert any("Mismatched cell_id" in e for e in val_res.errors)

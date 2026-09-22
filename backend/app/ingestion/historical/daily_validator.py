@@ -66,6 +66,13 @@ class DailyDatasetValidator:
         end_date = f"{expected_year}-12-31"
         leap_day = f"{expected_year}-02-29"
 
+        # Continuous expected date sequence for the year
+        start_dt = datetime(expected_year, 1, 1).date()
+        expected_dates = {
+            (start_dt + timedelta(days=d)).isoformat()
+            for d in range(expected_days_per_cell)
+        }
+
         # Group records by (lat, lon)
         cell_records: dict[tuple[float, float], list[DailyRecord]] = defaultdict(list)
         for r in records:
@@ -74,10 +81,19 @@ class DailyDatasetValidator:
         # 1. Grid cell coverage and coordinate matching
         if expected_cells is not None:
             expected_cell_coords = [(round(c.lat, 4), round(c.lon, 4)) for c in expected_cells]
+            expected_cell_ids = {c.cell_id for c in expected_cells}
+            found_cell_ids = {
+                f"ERA5_{int(round(lat * 100)):04d}_{int(round(lon * 100)):05d}"
+                for (lat, lon) in cell_records.keys()
+            }
             if len(cell_records) != len(expected_cells):
                 errors.append(
                     f"Cell count ({len(cell_records)}) does not match expected ({len(expected_cells)})"
                 )
+
+            missing_cell_ids = expected_cell_ids - found_cell_ids
+            if missing_cell_ids:
+                errors.append(f"Expected grid cells missing: {sorted(missing_cell_ids)}")
 
             for c_lat, c_lon in expected_cell_coords:
                 # Check for matching cell within tolerance
@@ -103,6 +119,15 @@ class DailyDatasetValidator:
                 )
 
             for r in recs:
+                # Spatial identity and cell_id preservation
+                expected_cell_id = f"ERA5_{int(round(r.latitude * 100)):04d}_{int(round(r.longitude * 100)):05d}"
+                if not r.cell_id:
+                    errors.append(f"{cell_tag} on {r.date}: Missing cell_id")
+                elif r.cell_id != expected_cell_id:
+                    errors.append(
+                        f"{cell_tag} on {r.date}: Mismatched cell_id '{r.cell_id}', expected '{expected_cell_id}'"
+                    )
+
                 # Duplicate date check
                 if r.date in dates_seen:
                     errors.append(f"{cell_tag}: Duplicate record for date {r.date}")
@@ -111,6 +136,12 @@ class DailyDatasetValidator:
                 # Year match
                 if not r.date.startswith(f"{expected_year}-"):
                     errors.append(f"{cell_tag}: Date {r.date} does not belong to expected year {expected_year}")
+
+                # Zero valid hours check (missing observation day)
+                if r.hour_count == 0:
+                    errors.append(
+                        f"{cell_tag} on {r.date}: 0 valid hourly observations (completely missing day)"
+                    )
 
                 # Completeness rules
                 if r.quality_status == DailyQualityStatus.COMPLETE.value:
@@ -164,6 +195,18 @@ class DailyDatasetValidator:
                     errors.append(f"{cell_tag} on {r.date}: Non-finite surface pressure: {r.surface_pressure_mean_hpa}")
                 elif r.hour_count > 0 and r.surface_pressure_mean_hpa <= 0.0:
                     errors.append(f"{cell_tag} on {r.date}: Non-positive surface pressure: {r.surface_pressure_mean_hpa}")
+
+            # Calendar sequence continuity check
+            missing_dates = expected_dates - dates_seen
+            if missing_dates:
+                errors.append(
+                    f"{cell_tag}: Missing contiguous calendar dates: {sorted(missing_dates)[:5]}"
+                )
+            extra_dates = dates_seen - expected_dates
+            if extra_dates:
+                errors.append(
+                    f"{cell_tag}: Unexpected dates found: {sorted(extra_dates)[:5]}"
+                )
 
             # Leap day verification
             if is_leap:

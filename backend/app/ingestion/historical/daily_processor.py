@@ -209,6 +209,7 @@ class DailyProcessor:
         schema = pa.schema(
             [
                 ("date", pa.string()),
+                ("cell_id", pa.string()),
                 ("latitude", pa.float64()),
                 ("longitude", pa.float64()),
                 ("precipitation_total_mm", pa.float64()),
@@ -221,6 +222,7 @@ class DailyProcessor:
                 ("quality_status", pa.string()),
                 ("source", pa.string()),
                 ("dataset_model", pa.string()),
+                ("chunk_id", pa.string()),
                 ("raw_chunk_id", pa.string()),
                 ("raw_payload_sha256", pa.string()),
                 ("processing_version", pa.string()),
@@ -228,6 +230,7 @@ class DailyProcessor:
             metadata={
                 b"source": b"Open-Meteo Historical Weather API",
                 b"dataset_model": b"ERA5",
+                b"chunk_id": chunk_id.encode("utf-8"),
                 b"raw_chunk_id": chunk_id.encode("utf-8"),
                 b"raw_payload_sha256": payload_sha256.encode("utf-8"),
                 b"processing_version": self.config.processing_version.encode("utf-8"),
@@ -238,6 +241,7 @@ class DailyProcessor:
         # Build column arrays
         arrays = [
             pa.array([r.date for r in records], type=pa.string()),
+            pa.array([r.cell_id for r in records], type=pa.string()),
             pa.array([r.latitude for r in records], type=pa.float64()),
             pa.array([r.longitude for r in records], type=pa.float64()),
             pa.array([r.precipitation_total_mm for r in records], type=pa.float64()),
@@ -250,6 +254,7 @@ class DailyProcessor:
             pa.array([r.quality_status for r in records], type=pa.string()),
             pa.array([r.source for r in records], type=pa.string()),
             pa.array([r.dataset_model for r in records], type=pa.string()),
+            pa.array([r.chunk_id for r in records], type=pa.string()),
             pa.array([r.raw_chunk_id for r in records], type=pa.string()),
             pa.array([r.raw_payload_sha256 for r in records], type=pa.string()),
             pa.array([r.processing_version for r in records], type=pa.string()),
