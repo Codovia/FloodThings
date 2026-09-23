@@ -48,6 +48,7 @@ from app.ingestion.sources.ksrsac_gis import KsrsacGisAdapter
 from app.ingestion.sources.nwic_reservoir import NwicReservoirAdapter
 from app.ingestion.sources.nwic_river import NwicRiverLevelAdapter
 from app.ingestion.sources.open_meteo import OpenMeteoAdapter
+from app.ingestion.sources.hydrosheds_gis import HydrologicalGisAdapter
 
 
 def print_header(title: str) -> None:
@@ -75,6 +76,14 @@ def print_result(res: Any) -> None:
 def cmd_ksrsac_gis(session: Session, args: argparse.Namespace) -> int:
     print_header("Ingesting KSR-SAC Administrative Boundaries (State, District, Taluk)")
     adapter = KsrsacGisAdapter(session)
+    res = adapter.ingest()
+    print_result(res)
+    return 0 if res.status in ("SUCCESS", "PARTIAL") else 1
+
+
+def cmd_hydro_gis(session: Session, args: argparse.Namespace) -> int:
+    print_header("Ingesting Hydrological GIS (CWC, HydroBASINS, HydroRIVERS)")
+    adapter = HydrologicalGisAdapter(session)
     res = adapter.ingest()
     print_result(res)
     return 0 if res.status in ("SUCCESS", "PARTIAL") else 1
@@ -356,6 +365,12 @@ def build_parser() -> argparse.ArgumentParser:
     p_env_audit.add_argument("--format", choices=["text", "json"], default="text", help="Output format")
     p_env_audit.add_argument("--export-path", help="Optional path to export audit report as JSON")
 
+    # hydro-gis
+    subparsers.add_parser(
+        "hydro-gis",
+        help="Ingest hydrological GIS data (CWC basins, HydroBASINS L7, HydroRIVERS, crosswalks)",
+    )
+
     return parser
 
 
@@ -368,6 +383,7 @@ def main() -> None:
         cmd_map = {
             "geography": cmd_geography,
             "ksrsac-gis": cmd_ksrsac_gis,
+            "hydro-gis": cmd_hydro_gis,
             "open-meteo": cmd_open_meteo,
             "nwic-river": cmd_nwic_river,
             "nwic-reservoir": cmd_nwic_reservoir,

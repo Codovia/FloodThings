@@ -12,6 +12,8 @@ from app.db.models.geography import (  # noqa: F401
     Taluk,
 )
 from app.db.models.hydrology import (  # noqa: F401
+    DistrictRiverBasin,
+    DistrictSubBasin,
     Reservoir,
     ReservoirObservation,
     River,

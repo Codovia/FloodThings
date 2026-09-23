@@ -29,10 +29,11 @@ from app.db.models.system import DataSource
 from app.db.models.hydrology import RiverBasin, River, RiverStation, RiverObservation
 
 
-# Expected application tables (34 total).
+# Expected application tables (36 total).
 EXPECTED_TABLES = frozenset({
     "alerts", "audit_logs", "community_reports", "data_ingestion_runs",
-    "data_sources", "districts", "emergency_facilities", "feature_snapshots",
+    "data_sources", "district_river_basins", "district_sub_basins", "districts",
+    "emergency_facilities", "feature_snapshots",
     "flood_events", "flood_hazard_zones", "flood_observations",
     "flood_predictions", "land_covers", "localities", "ml_dataset_versions",
     "ml_models", "prediction_grid_cells", "rainfall_observations",
@@ -42,10 +43,12 @@ EXPECTED_TABLES = frozenset({
     "water_bodies", "weather_forecasts", "weather_observations",
 })
 
-# Expected 23 spatial columns across application tables in PostGIS.
+# Expected 25 spatial columns across application tables in PostGIS.
 EXPECTED_SPATIAL_COLUMNS = frozenset({
     ("alerts", "geometry"),
     ("community_reports", "geometry"),
+    ("district_river_basins", "intersection_geometry"),
+    ("district_sub_basins", "intersection_geometry"),
     ("districts", "centroid"),
     ("districts", "geometry"),
     ("emergency_facilities", "geometry"),
@@ -82,14 +85,14 @@ class TestSchemaMetadata:
     """Verify SQLAlchemy model metadata is complete and structurally sound."""
 
     def test_all_expected_tables_registered(self):
-        """All 34 documented entities are registered in Base.metadata."""
+        """All 36 documented entities are registered in Base.metadata."""
         registered = set(Base.metadata.tables.keys())
         missing = EXPECTED_TABLES - registered
         assert not missing, f"Missing tables in metadata: {missing}"
 
     def test_table_count(self):
-        """Exactly 34 application tables are registered in metadata."""
-        assert len(Base.metadata.tables) == 34
+        """Exactly 36 application tables are registered in metadata."""
+        assert len(Base.metadata.tables) == 36
 
     def test_all_tables_have_uuid_primary_key(self):
         """Every table must have a primary key named 'id'."""
@@ -141,8 +144,8 @@ class TestLiveSchema:
             assert version is not None
             assert "3.4" in version
 
-    def test_all_34_tables_exist_in_live_db(self):
-        """All 34 application tables are present in the public schema."""
+    def test_all_36_tables_exist_in_live_db(self):
+        """All 36 application tables are present in the public schema."""
         engine = _get_engine()
         inspector = inspect(engine)
         db_tables = set(inspector.get_table_names(schema="public"))
@@ -150,7 +153,7 @@ class TestLiveSchema:
         assert not missing, f"Missing tables in live database: {missing}"
 
     def test_spatial_columns_and_srid(self):
-        """All 23 geometry columns must be registered in EPSG:4326."""
+        """All 25 geometry columns must be registered in EPSG:4326."""
         engine = _get_engine()
         with engine.connect() as conn:
             rows = conn.execute(text(
@@ -163,7 +166,7 @@ class TestLiveSchema:
         registered_spatial = {(row[0], row[1]) for row in rows}
         missing_spatial = EXPECTED_SPATIAL_COLUMNS - registered_spatial
         assert not missing_spatial, f"Missing spatial columns in geometry_columns: {missing_spatial}"
-        assert len(registered_spatial) == 23, f"Expected 23 spatial columns, got {len(registered_spatial)}"
+        assert len(registered_spatial) == 25, f"Expected 25 spatial columns, got {len(registered_spatial)}"
 
         for row in rows:
             table_name, col_name, srid, geom_type = row
@@ -180,7 +183,7 @@ class TestLiveSchema:
             )).fetchall()
 
         gist_index_count = len(rows)
-        assert gist_index_count == 23, f"Expected exactly 23 GiST indexes, found {gist_index_count}"
+        assert gist_index_count == 25, f"Expected exactly 25 GiST indexes, found {gist_index_count}"
 
         # Verify each table with geometry has at least one GiST index
         indexed_tables = {row[0] for row in rows}
