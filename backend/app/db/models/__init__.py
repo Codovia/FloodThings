@@ -36,6 +36,7 @@ from app.db.models.flood import (  # noqa: F401
 from app.db.models.terrain import (  # noqa: F401
     LandCover,
     TerrainDataset,
+    TerrainStatistic,
     WaterBody,
 )
 from app.db.models.prediction import (  # noqa: F401
