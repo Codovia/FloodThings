@@ -49,6 +49,8 @@ Every candidate source is classified according to explicit objective criteria:
 - **Machine Readability**: Structured JSON/CSV/GeoJSON vs PDF/HTML/Map tiles.
 - **License**: Explicit open license vs restricted government login.
 
+These classification tiers map directly to the `data_sources.authority_level` database column and check constraint (`ck_data_source_authority_level`): `CORE`, `SECONDARY`, `REFERENCE`, `PENDING`, `CREDENTIAL_BLOCKED`, `NOT_SUITABLE`.
+
 | Class | Sources / Products | Explicit Criteria Justification |
 |---|---|---|
 | **CORE** | 1. **Open-Meteo Weather & Forecast API**<br>2. **NWIC Karnataka Reservoir Telemetry**<br>3. **NWIC CWC River Gauge Water Level**<br>4. **India Flood Inventory (IFI v3.0)** | High authority, continuous multi-year coverage, open machine-readable access, strict SI/convertible units, directly serves operational entities and ground-truth ML targets. |

@@ -156,7 +156,8 @@ The data contract is physically enforced in the PostgreSQL/PostGIS database via 
 - **Prediction & ML (5):** `prediction_grid_cells`, `feature_snapshots`, `ml_dataset_versions`, `ml_models`, `flood_predictions`
 - **Emergency Management (2):** `emergency_facilities`, `community_reports`
 - **Alerts & Messaging (2):** `alerts`, `telegram_subscriptions`
-- **System & Auditing (4):** `data_sources`, `data_ingestion_runs`, `users`, `audit_logs`
+- **System & Auditing (4):** `data_sources` (tracks provider provenance and `authority_level`), `data_ingestion_runs` (records pipeline metrics and `http_status_code`), `users`, `audit_logs`
+- **Terrain Derived (1):** `terrain_statistics` (zonal elevation and slope features per district/sub-basin)
 
 ### 2. Physical Schema Rules
 - **Primary Keys:** UUIDv4 generated via `gen_random_uuid()` on every table.

@@ -45,8 +45,8 @@ Note: Three different names are in use (FloodPrediction, FloodThings, FloodPulse
 Backend:                FastAPI application with lifespan-integrated APScheduler (AsyncIOScheduler)
                         Dynamic Source Health: SourceHealthService (HEALTHY, DEGRADED, DOWN)
                         API v1 Health Endpoints:
-                          - GET /api/v1/health/sources (runtime health evaluation)
-                          - GET /api/v1/health/sources/{source_id}/runs (paginated run audit history)
+                          - GET /api/v1/health/sources (runtime health evaluation, authority_level, last_http_status_code)
+                          - GET /api/v1/health/sources/{source_id}/runs (paginated run audit history, http_status_code)
                         Legacy Health Endpoints: /health, /health/database, /health/postgis
                         Scheduler Package: app/scheduler/ (manager.py, runner.py, jobs.py)
                           - In-process concurrency locking & thread offload via asyncio.to_thread
