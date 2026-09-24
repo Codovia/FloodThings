@@ -135,7 +135,7 @@ class TerrainStatistic(Base):
     )
     terrain_dataset_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("terrain_datasets.id", ondelete="CASCADE"),
+        ForeignKey("terrain_datasets.id", ondelete="NO ACTION"),
         nullable=False,
     )
     target_type: Mapped[str] = mapped_column(
@@ -143,12 +143,12 @@ class TerrainStatistic(Base):
     )  # 'DISTRICT' or 'SUB_BASIN'
     district_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("districts.id", ondelete="CASCADE"),
+        ForeignKey("districts.id", ondelete="NO ACTION"),
         nullable=True,
     )
     sub_basin_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True),
-        ForeignKey("sub_basins.id", ondelete="CASCADE"),
+        ForeignKey("sub_basins.id", ondelete="NO ACTION"),
         nullable=True,
     )
 

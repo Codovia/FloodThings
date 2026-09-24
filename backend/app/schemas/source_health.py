@@ -20,6 +20,10 @@ class SourceHealthItem(BaseModel):
     organization: str | None = None
     data_type: str | None = None
     update_frequency: str | None = None
+    authority_level: str | None = Field(
+        None,
+        description="Authority/access tier: CORE, SECONDARY, REFERENCE, PENDING, CREDENTIAL_BLOCKED, NOT_SUITABLE",
+    )
     is_active: bool
     health_status: str = Field(..., description="HEALTHY, DEGRADED, or DOWN")
     health_reason: str = Field(..., description="Deterministic explanation of assigned health state")
@@ -33,6 +37,9 @@ class SourceHealthItem(BaseModel):
     )
     consecutive_failures: int = 0
     recent_error_message: str | None = None
+    last_http_status_code: int | None = Field(
+        None, description="HTTP response status code from the most recent ingestion run that recorded one (100-599)"
+    )
 
 
 class SourceHealthResponse(BaseModel):
@@ -57,6 +64,9 @@ class DataIngestionRunItem(BaseModel):
     records_updated: int | None = 0
     records_rejected: int | None = 0
     error_message: str | None = None
+    http_status_code: int | None = Field(
+        None, description="HTTP response status code from the upstream source (100-599), or NULL if not HTTP-based"
+    )
 
 
 class SourceRunsResponse(BaseModel):

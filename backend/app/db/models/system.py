@@ -46,6 +46,14 @@ class DataSource(Base):
     geographic_coverage: Mapped[str | None] = mapped_column(String(100))
     update_frequency: Mapped[str | None] = mapped_column(String(50))
     license: Mapped[str | None] = mapped_column(String(100))
+    authority_level: Mapped[str | None] = mapped_column(
+        String(30),
+        nullable=True,
+        comment=(
+            "Authority/access tier per DATA_SOURCES.md §2: "
+            "CORE, SECONDARY, REFERENCE, PENDING, CREDENTIAL_BLOCKED, NOT_SUITABLE"
+        ),
+    )
     is_active: Mapped[bool] = mapped_column(
         Boolean, nullable=False, server_default=text("true")
     )
@@ -61,6 +69,14 @@ class DataSource(Base):
 
     ingestion_runs: Mapped[list[DataIngestionRun]] = relationship(
         "DataIngestionRun", back_populates="source"
+    )
+
+    __table_args__ = (
+        CheckConstraint(
+            "authority_level IS NULL OR authority_level IN "
+            "('CORE', 'SECONDARY', 'REFERENCE', 'PENDING', 'CREDENTIAL_BLOCKED', 'NOT_SUITABLE')",
+            name="ck_data_source_authority_level",
+        ),
     )
 
 
@@ -87,6 +103,11 @@ class DataIngestionRun(Base):
     records_updated: Mapped[int | None] = mapped_column(Integer)
     records_rejected: Mapped[int | None] = mapped_column(Integer)
     error_message: Mapped[str | None] = mapped_column(Text)
+    http_status_code: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        comment="HTTP response status code from the upstream source request (100-599), or NULL if not HTTP-based.",
+    )
 
     source: Mapped[DataSource] = relationship("DataSource", back_populates="ingestion_runs")
 
@@ -94,6 +115,10 @@ class DataIngestionRun(Base):
         CheckConstraint(
             "status IN ('RUNNING', 'SUCCESS', 'PARTIAL', 'FAILED')",
             name="ck_ingestion_run_status",
+        ),
+        CheckConstraint(
+            "http_status_code IS NULL OR (http_status_code >= 100 AND http_status_code <= 599)",
+            name="ck_ingestion_run_http_status_code",
         ),
         Index("ix_ingestion_runs_source_id", "source_id"),
         Index("ix_ingestion_runs_started_at", "started_at"),

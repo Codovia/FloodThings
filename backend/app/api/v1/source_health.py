@@ -51,6 +51,7 @@ def get_all_sources_health(
                 organization=item.organization,
                 data_type=item.data_type,
                 update_frequency=item.update_frequency,
+                authority_level=item.authority_level,
                 is_active=item.is_active,
                 health_status=item.health_status,
                 health_reason=item.health_reason,
@@ -60,6 +61,7 @@ def get_all_sources_health(
                 latest_run_status=item.latest_run_status,
                 consecutive_failures=item.consecutive_failures,
                 recent_error_message=item.recent_error_message,
+                last_http_status_code=item.last_http_status_code,
             )
             for item in health_items
         ],
@@ -104,6 +106,7 @@ def get_source_ingestion_runs(
                 records_updated=r.records_updated,
                 records_rejected=r.records_rejected,
                 error_message=r.error_message,
+                http_status_code=r.http_status_code,
             )
             for r in runs
         ],

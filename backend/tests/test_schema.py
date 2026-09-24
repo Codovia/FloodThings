@@ -29,7 +29,7 @@ from app.db.models.system import DataSource
 from app.db.models.hydrology import RiverBasin, River, RiverStation, RiverObservation
 
 
-# Expected application tables (36 total).
+# Expected application tables (37 total).
 EXPECTED_TABLES = frozenset({
     "alerts", "audit_logs", "community_reports", "data_ingestion_runs",
     "data_sources", "district_river_basins", "district_sub_basins", "districts",
@@ -39,8 +39,8 @@ EXPECTED_TABLES = frozenset({
     "ml_models", "prediction_grid_cells", "rainfall_observations",
     "reservoir_observations", "reservoirs", "river_basins", "river_forecasts",
     "river_observations", "river_stations", "rivers", "states", "sub_basins",
-    "taluks", "telegram_subscriptions", "terrain_datasets", "users",
-    "water_bodies", "weather_forecasts", "weather_observations",
+    "taluks", "telegram_subscriptions", "terrain_datasets", "terrain_statistics",
+    "users", "water_bodies", "weather_forecasts", "weather_observations",
 })
 
 # Expected 25 spatial columns across application tables in PostGIS.
@@ -85,14 +85,14 @@ class TestSchemaMetadata:
     """Verify SQLAlchemy model metadata is complete and structurally sound."""
 
     def test_all_expected_tables_registered(self):
-        """All 36 documented entities are registered in Base.metadata."""
+        """All 37 documented entities are registered in Base.metadata."""
         registered = set(Base.metadata.tables.keys())
         missing = EXPECTED_TABLES - registered
         assert not missing, f"Missing tables in metadata: {missing}"
 
     def test_table_count(self):
-        """Exactly 36 application tables are registered in metadata."""
-        assert len(Base.metadata.tables) == 36
+        """Exactly 37 application tables are registered in metadata."""
+        assert len(Base.metadata.tables) == 37
 
     def test_all_tables_have_uuid_primary_key(self):
         """Every table must have a primary key named 'id'."""
@@ -144,8 +144,8 @@ class TestLiveSchema:
             assert version is not None
             assert "3.4" in version
 
-    def test_all_36_tables_exist_in_live_db(self):
-        """All 36 application tables are present in the public schema."""
+    def test_all_37_tables_exist_in_live_db(self):
+        """All 37 application tables are present in the public schema."""
         engine = _get_engine()
         inspector = inspect(engine)
         db_tables = set(inspector.get_table_names(schema="public"))

@@ -77,14 +77,28 @@ def complete_ingestion_run(
     status: str,
     metrics: IngestionMetrics,
     error_message: str | None = None,
+    http_status_code: int | None = None,
 ) -> None:
-    """Mark a DataIngestionRun as completed and record metrics."""
+    """Mark a DataIngestionRun as completed and record metrics.
+
+    Args:
+        session: Active SQLAlchemy session.
+        run: The DataIngestionRun to finalise.
+        status: Terminal status: 'SUCCESS', 'PARTIAL', or 'FAILED'.
+        metrics: Record counts collected during the run.
+        error_message: Human-readable error summary, if any.
+        http_status_code: HTTP response status code received from the upstream
+            source (100–599). Pass None when the ingestion is not HTTP-based
+            (e.g. file-based, in-memory normalisation).
+    """
     run.completed_at = datetime.now(timezone.utc)
     run.status = status
     run.records_received = metrics.records_received
     run.records_inserted = metrics.records_inserted
     run.records_updated = metrics.records_updated
     run.records_rejected = metrics.records_rejected
+    if http_status_code is not None:
+        run.http_status_code = http_status_code
     if error_message:
         run.error_message = error_message
     elif metrics.errors:

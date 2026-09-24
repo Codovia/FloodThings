@@ -51,6 +51,7 @@ class SourceHealthData:
     organization: str | None
     data_type: str | None
     update_frequency: str | None
+    authority_level: str | None
     is_active: bool
     health_status: str
     health_reason: str
@@ -60,6 +61,7 @@ class SourceHealthData:
     latest_run_status: str | None
     consecutive_failures: int
     recent_error_message: str | None
+    last_http_status_code: int | None = None
 
 
 class SourceHealthService:
@@ -152,6 +154,7 @@ class SourceHealthService:
                 organization=source.organization,
                 data_type=source.data_type,
                 update_frequency=source.update_frequency,
+                authority_level=source.authority_level,
                 is_active=False,
                 health_status=HealthStatus.DOWN,
                 health_reason="Source is deactivated (is_active=False)",
@@ -161,6 +164,7 @@ class SourceHealthService:
                 latest_run_status=None,
                 consecutive_failures=0,
                 recent_error_message=None,
+                last_http_status_code=None,
             )
 
         # 2. Retrieve recent ingestion runs (most recent first)
@@ -178,6 +182,7 @@ class SourceHealthService:
                 organization=source.organization,
                 data_type=source.data_type,
                 update_frequency=source.update_frequency,
+                authority_level=source.authority_level,
                 is_active=True,
                 health_status=HealthStatus.DOWN,
                 health_reason="No ingestion runs recorded in system history",
@@ -187,12 +192,19 @@ class SourceHealthService:
                 latest_run_status=None,
                 consecutive_failures=0,
                 recent_error_message=None,
+                last_http_status_code=None,
             )
 
         latest_run = recent_runs[0]
         last_attempted_at = latest_run.started_at
         latest_run_status = latest_run.status
         recent_error_message = latest_run.error_message
+
+        # Derive the most recently recorded HTTP status from runs that have one
+        last_http_status_code: int | None = next(
+            (r.http_status_code for r in recent_runs if r.http_status_code is not None),
+            None,
+        )
 
         # Count consecutive failures starting from latest completed run backwards
         consecutive_failures = 0
@@ -358,6 +370,7 @@ class SourceHealthService:
             organization=source.organization,
             data_type=source.data_type,
             update_frequency=source.update_frequency,
+            authority_level=source.authority_level,
             is_active=source.is_active,
             health_status=health_status,
             health_reason=health_reason,
@@ -367,6 +380,7 @@ class SourceHealthService:
             latest_run_status=latest_run_status,
             consecutive_failures=consecutive_failures,
             recent_error_message=recent_error_message,
+            last_http_status_code=last_http_status_code,
         )
 
     def _get_latest_data_timestamp(
