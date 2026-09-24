@@ -238,7 +238,8 @@ class TestIfiNormalization:
 
     def test_real_raw_ifi_archive_normalization(self, normalizer: IfiEventNormalizer):
         """Verify end-to-end normalization against the preserved real raw IFI v3 archive."""
-        raw_csv_path = Path("data/raw/ifi/ifi_v3_karnataka_20260917_164914.csv")
+        repo_root = Path(__file__).resolve().parents[2]
+        raw_csv_path = repo_root / "data" / "raw" / "ifi" / "ifi_v3_karnataka_20260917_164914.csv"
         if not raw_csv_path.exists():
             pytest.skip("Real raw IFI v3 CSV file not available")
 

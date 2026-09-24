@@ -317,7 +317,8 @@ class TestIfiEvidenceAuditor:
 class TestIfiRealArchiveAuditIntegration:
     """Integration test auditing the real, authoritative IFI historical archive."""
 
-    REAL_IFI_CSV = Path("data/raw/ifi/ifi_v3_karnataka_20260917_164914.csv")
+    _REPO_ROOT = Path(__file__).resolve().parents[2]
+    REAL_IFI_CSV = _REPO_ROOT / "data" / "raw" / "ifi" / "ifi_v3_karnataka_20260917_164914.csv"
 
     @pytest.mark.skipif(not REAL_IFI_CSV.exists(), reason="Real IFI archive not present")
     def test_real_ifi_archive_audit_metrics(

@@ -29,6 +29,7 @@ from app.db.models.weather import (  # noqa: F401
     WeatherObservation,
 )
 from app.db.models.flood import (  # noqa: F401
+    DistrictDayFloodLabel,
     FloodEvent,
     FloodHazardZone,
     FloodObservation,

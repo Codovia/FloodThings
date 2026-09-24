@@ -235,3 +235,26 @@ Established during Phase 2.3 empirical testing. Adapters must strictly adhere to
 | `lat`, `lon` | decimal degrees | `emergency_facilities.latitude`, `longitude`, `geom` | EPSG:4326 | Construct PostGIS Point `ST_SetSRID(ST_MakePoint(lon, lat), 4326)` |
 | `occupancy` | N/A | `emergency_facilities.current_occupancy` | integer | Set explicitly to `NULL` (unknown) |
 
+### 6. Historical District × Day Flood Labels (`district_day_flood_labels`)
+| Source Field Name | Source Unit | Target Schema Table & Column | Target Unit | Mandatory Conversion / Parsing Rule |
+|---|---|---|---|---|
+| `District_LGD_Codes` / `Districts` | string / LGD code | `district_day_flood_labels.district_id` | UUID | Resolve to canonical `districts.id` via KSR-SAC normalization |
+| Date interval | `DD-MM-YYYY` (IST) | `district_day_flood_labels.event_date` | `DATE` (UTC) | Expand inclusive daily interval, convert IST midnight to UTC date |
+| Label state | categorical | `district_day_flood_labels.label` | `VARCHAR(20)` | Strictly `'FLOOD'`, `'NO_FLOOD'`, or `'UNKNOWN'` |
+| Occurrence | discrete binary | `district_day_flood_labels.flood_occurrence` | `SMALLINT` | `1` for FLOOD, `0` for NO_FLOOD, `NULL` for UNKNOWN |
+| Event count | count | `district_day_flood_labels.event_count` | `INTEGER` | Number of distinct overlapping IFI disaster events ($\ge 0$) |
+| `UEI` | string | `district_day_flood_labels.source_event_ids` | `JSONB` | Array of sorted unique source UEIs (`['UEI-...']`) |
+| `Main Cause` | string | `district_day_flood_labels.main_causes` | `JSONB` | Sorted array of unique cause strings |
+| `Severity` | string | `district_day_flood_labels.severities` | `JSONB` | Sorted array of unique reported severity classes |
+| `Human fatality` | integer | `district_day_flood_labels.fatalities` | `INTEGER` | Cumulative sum of fatalities across consolidated events |
+| `Human Displaced`| integer | `district_day_flood_labels.displaced` | `INTEGER` | Cumulative sum of displaced persons across consolidated events |
+
+#### Downstream ML Join Interface
+* **Spatial Join Key:** `district_id` (UUID) $\leftrightarrow$ `districts.id` / `kgis_district_code` (`'01'` to `'31'`)
+* **Temporal Join Key:** `event_date` (Date, UTC) $\leftrightarrow$ `observation_date` (Date, UTC)
+* **Join Graph:**
+  * `district_day_flood_labels` (Target: `label`, `flood_occurrence`)
+  * $\bowtie_{(\text{district\_id}, \text{date})}$ `era5_daily` (Weather predictors: `precipitation_sum_mm`, `temperature_max_c`, etc.)
+  * $\bowtie_{(\text{district\_id})}$ `terrain_statistics` (Topographic predictors: `elevation_mean_m`, `slope_mean_deg`, etc.)
+  * $\bowtie_{(\text{district\_id})}$ `district_river_basins` / hydrological stations (Catchment and river network predictors)
+

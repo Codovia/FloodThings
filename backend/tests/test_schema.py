@@ -29,10 +29,11 @@ from app.db.models.system import DataSource
 from app.db.models.hydrology import RiverBasin, River, RiverStation, RiverObservation
 
 
-# Expected application tables (37 total).
+# Expected application tables (38 total).
 EXPECTED_TABLES = frozenset({
     "alerts", "audit_logs", "community_reports", "data_ingestion_runs",
-    "data_sources", "district_river_basins", "district_sub_basins", "districts",
+    "data_sources", "district_day_flood_labels", "district_river_basins",
+    "district_sub_basins", "districts",
     "emergency_facilities", "feature_snapshots",
     "flood_events", "flood_hazard_zones", "flood_observations",
     "flood_predictions", "land_covers", "localities", "ml_dataset_versions",
@@ -85,14 +86,14 @@ class TestSchemaMetadata:
     """Verify SQLAlchemy model metadata is complete and structurally sound."""
 
     def test_all_expected_tables_registered(self):
-        """All 37 documented entities are registered in Base.metadata."""
+        """All documented entities are registered in Base.metadata."""
         registered = set(Base.metadata.tables.keys())
         missing = EXPECTED_TABLES - registered
         assert not missing, f"Missing tables in metadata: {missing}"
 
     def test_table_count(self):
-        """Exactly 37 application tables are registered in metadata."""
-        assert len(Base.metadata.tables) == 37
+        """Exactly expected application tables are registered in metadata."""
+        assert len(Base.metadata.tables) == len(EXPECTED_TABLES)
 
     def test_all_tables_have_uuid_primary_key(self):
         """Every table must have a primary key named 'id'."""
