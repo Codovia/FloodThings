@@ -163,8 +163,8 @@ def main() -> None:
 
     # build
     p_build = subparsers.add_parser("build", help="Build and serialize feature matrix")
-    p_build.add_argument("--start-date", type=str, default="1969-07-14", help="Target start date (YYYY-MM-DD)")
-    p_build.add_argument("--end-date", type=str, default="1975-12-31", help="Target end date (YYYY-MM-DD)")
+    p_build.add_argument("--start-date", type=str, default="1969-01-01", help="Target start date (YYYY-MM-DD)")
+    p_build.add_argument("--end-date", type=str, default="1994-12-31", help="Target end date (YYYY-MM-DD)")
     p_build.add_argument("--lead-time", type=int, default=1, help="Lead time in days (default: 1)")
     p_build.add_argument("--obs-start", type=str, default=None, help="Observation window start date")
     p_build.add_argument("--obs-end", type=str, default=None, help="Observation window end date")

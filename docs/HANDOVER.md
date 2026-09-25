@@ -27,7 +27,8 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 3.3 — Administrative GIS ↔ Environmental Spatial Association Audit (Completed)
                         Phase 3.4A — AKKIHEBBAL River Station Provenance Investigation (Completed)
                         Phase 3.4B — Karnataka District Code Integrity Audit + Controlled River Station Correction (Completed)
-                        Phase 4 — Canonical District × Day Feature Matrix & Leakage Audit (Completed)
+                        Phase 4.1 — Canonical District × Day Feature Matrix Sample & Leakage Audit (Completed)
+                        Phase 4.2 — Full Historical ERA5 Daily Processing & Canonical Feature Matrix Construction (Completed)
 ```
 
 ## Repository
@@ -184,6 +185,17 @@ cd backend && PYTHONPATH=. alembic check
 
 ```
 Phase 6 — Shelter, Evacuation & Routing System / Prediction API Integration
+```
+
+## Phase 4.2 Artifacts Created (Full 26-Year Historical ERA5 Processing & Feature Matrix)
+
+```
+data/processed/era5_daily/                   (858/858 daily Parquet chunks for years 1969–1994; 3,019,728 cell-days)
+data/processed/era5_daily/processing_manifest.json (100% SUCCEEDED manifest across all 858 canonical chunks)
+data/processed/ml_matrix/district_day_feature_matrix.parquet (Full 26-year canonical feature matrix; 294,376 rows x 57 columns)
+backend/app/ml/matrix_cli.py                 (Updated default temporal bounds to full 1969–1994 scope)
+Updated docs/DECISIONS.md                    (Added D-042 on Phase 4.2 full historical processing & matrix expansion)
+Updated docs/HANDOVER.md                     (Updated current state, artifacts, and next steps)
 ```
 
 ## Phase 5 Artifacts Created (Baseline ML Modeling & PU Cross-Validation)

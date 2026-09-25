@@ -489,3 +489,16 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 6. Non-Accuracy Evaluation: Evaluated via PR-AUC (Average Precision), ROC-AUC, Brier score, and PU ranking score ($r^2 / P(\hat{Y}=1)$), alongside Elkan-Noto reporting frequency parameter ($c$).
 7. Model Artifact Management: Serialized model pipelines (joblib) and metadata JSON records (recording hyperparameters, target semantics, PU assumptions, and SHA-256 data hash) saved to `data/processed/ml_models/`.
 **Affected components:** `backend/app/ml/baseline_modeling.py`, `backend/app/ml/modeling_cli.py`, `backend/tests/test_baseline_models.py`, `docs/ML_BASELINE_MODELING_AUDIT.md`.
+
+---
+
+**D-042 — Full 26-Year Historical ERA5 Daily Processing & Canonical ML Feature Matrix Expansion (Phase 4.2)**
+**Date:** 2026-09-25
+**Status:** IMPLEMENTED (Phase 4.2)
+**Decision:**
+1. Complete Daily ERA5 Processing: Processed all 858 canonical raw chunks across the full 26-year historical period (1969–1994) using `DailyProcessor`. 100.0% completion (858/858 succeeded, 0 failed, 0 pending), yielding 3,019,728 daily grid cell records across 318 unique cells with full leap-year support and physical range integrity.
+2. Canonical District × Day ML Feature Matrix Expansion: Expanded the canonical matrix across all 31 Karnataka administrative districts and 9,496 calendar days (1969-01-01 through 1994-12-31), producing exactly 294,376 District × Day rows.
+3. Strict Ground Truth Label Preservation: Integrated real IFI v3.0 disaster observations yielding 1,152 documented `FLOOD` events. Maintained strict three-state semantics: 0 fabricated `NO_FLOOD` labels, 293,224 `UNKNOWN` rows preserved as `NULL`.
+4. Strict Anti-Leakage Invariants: 24-hour lead time ($t-1 \to t$) strictly enforced across all 294,376 rows. Target-day weather strictly forbidden from entering predictor features. `feature_window_end < target_date` verified for 100.0% of records.
+5. Weather and Static Completeness: 293,446 rows (99.68%) possess full 30-day antecedent weather history; exactly 930 rows with incomplete 30-day weather correspond strictly to the initialization boundary (January 1–30, 1969) before the lookback window begins. Terrain (Copernicus DEM GLO-30) and hydrological GIS (CWC Statutory + HydroBASINS Level-7) zonal statistics are 100.0% complete across all 294,376 rows.
+**Affected components:** `backend/app/ingestion/historical/daily.py`, `backend/app/ingestion/historical/daily_cli.py`, `backend/app/ml/district_feature_matrix.py`, `backend/app/ml/matrix_cli.py`, `data/processed/era5_daily/`, `data/processed/ml_matrix/district_day_feature_matrix.parquet`.
