@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 3.4B — Karnataka District Code Integrity Audit + Controlled River Station Correction
+Phase:                  Phase 5 — Baseline ML Modeling & Temporal Cross-Validation (Completed)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -26,6 +26,8 @@ Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 3.2 — KSR-SAC Administrative GIS PostGIS Ingestion (1 State, 31 Districts, 240 Taluks)
                         Phase 3.3 — Administrative GIS ↔ Environmental Spatial Association Audit (Completed)
                         Phase 3.4A — AKKIHEBBAL River Station Provenance Investigation (Completed)
+                        Phase 3.4B — Karnataka District Code Integrity Audit + Controlled River Station Correction (Completed)
+                        Phase 4 — Canonical District × Day Feature Matrix & Leakage Audit (Completed)
 ```
 
 ## Repository
@@ -181,7 +183,21 @@ cd backend && PYTHONPATH=. alembic check
 ## Next phase
 
 ```
-Phase 3 — GIS & Administrative Geography Ingestion / Spatial Feature Engineering
+Phase 6 — Shelter, Evacuation & Routing System / Prediction API Integration
+```
+
+## Phase 5 Artifacts Created (Baseline ML Modeling & PU Cross-Validation)
+
+```
+backend/app/ml/baseline_modeling.py          (DatasetAuditor, TemporalDataSplitter, PUDatasetPreparer, LogisticRegressionBaseline, LightGBMBaseline, PUEvaluator, ModelArtifactManager, ModelingOrchestrator)
+backend/app/ml/modeling_cli.py               (CLI subcommands: audit, train, compare)
+backend/tests/test_baseline_models.py        (15 focused tests covering chronological splitting, leakage prevention, PU strategies, LightGBM, serialization, Elkan-Noto calibration)
+data/processed/ml_models/                    (Serialized joblib model pipelines and companion metadata JSON records)
+data/processed/ml_models/feature_matrix_audit.json (Machine-readable canonical dataset audit)
+data/processed/ml_models/comparison_results.json   (Full 6-way PU model benchmark results)
+docs/ML_BASELINE_MODELING_AUDIT.md           (Comprehensive Phase 5 Modeling Audit and Benchmark Report)
+Updated docs/DECISIONS.md                    (Added D-040 for Phase 4 and D-041 for Phase 5)
+Updated docs/HANDOVER.md                     (Updated current state, artifacts, and next steps)
 ```
 
 ## Phase 2.7B Artifacts Created (Historical Flood Evidence Audit)

@@ -31,3 +31,9 @@ httpx==0.28.1
 
 # Data serialization & Parquet
 pyarrow==25.0.1
+
+# Machine Learning & Modeling (Phase 5)
+scikit-learn==1.9.1
+scipy==1.18.1
+lightgbm==4.7.0
+joblib==1.6.0
