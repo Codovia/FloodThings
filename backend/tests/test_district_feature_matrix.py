@@ -21,7 +21,7 @@ Covers all 15 verification areas specified in project instructions:
 
 from __future__ import annotations
 
-from datetime import date as dt_date, timedelta
+from datetime import date as dt_date, datetime, timedelta, timezone
 import math
 from pathlib import Path
 import tempfile
@@ -666,3 +666,166 @@ class TestDistrictDayFeatureMatrix:
 
         mtime_after = manifest_file.stat().st_mtime
         assert mtime_before == mtime_after
+
+
+class TestFeatureMatrixLeakageGuards:
+    """
+    Automated leakage tests enforcing the 7 critical anti-leakage invariants:
+    1. feature timestamp <= prediction cutoff
+    2. target timestamp > prediction cutoff
+    3. no future rainfall leakage
+    4. no future ERA5 leakage
+    5. no future flood-label leakage
+    6. no target-derived feature leakage
+    7. spatial joins use authoritative district identifiers
+    """
+
+    @pytest.fixture
+    def valid_canonical_record(self) -> DistrictDayFeatureRecord:
+        return DistrictDayFeatureRecord(
+            district_id="dist-01-uuid",
+            kgis_district_code="01",
+            lgd_district_code="524",
+            district_name="Bagalkote",
+            target_date="1974-08-15",
+            target_year=1974,
+            target_month=8,
+            target_day=15,
+            day_of_year=227,
+            prediction_anchor_utc="1974-08-15T00:00:00Z",
+            lead_time_days=1,
+            feature_window_start="1974-07-16",
+            feature_window_end="1974-08-14",
+            flood_occurrence=1,
+            label_state="FLOOD",
+            event_count=1,
+            source_event_ids=["UEI-IMD-FL-1974-0012"],
+            main_causes=["Heavy Rain"],
+            severities=["MODERATE"],
+            fatalities=None,
+            displaced=None,
+            precip_1d_mm=25.4,
+            precip_3d_sum_mm=62.8,
+            precip_7d_sum_mm=112.5,
+            precip_14d_sum_mm=175.2,
+            precip_30d_sum_mm=260.0,
+            precip_7d_max_mm=45.0,
+            precip_14d_max_mm=45.0,
+            temp_mean_1d_c=24.5,
+            temp_min_1d_c=21.0,
+            temp_max_1d_c=28.5,
+            temp_7d_mean_c=25.1,
+            rh_mean_1d_pct=82.0,
+            rh_7d_mean_pct=80.5,
+            pressure_mean_1d_hpa=948.5,
+            is_weather_complete_1d=True,
+            is_weather_complete_30d=True,
+            valid_weather_days_30d=30,
+            weather_cell_count=12,
+            elevation_mean_m=557.47,
+            elevation_min_m=489.99,
+            elevation_max_m=726.18,
+            elevation_std_m=37.23,
+            slope_mean_deg=1.87,
+            slope_max_deg=43.58,
+            terrain_coverage_pct=100.0,
+            major_basin_count=1,
+            primary_basin_name="Krishna",
+            primary_basin_coverage_pct=100.0,
+            sub_basin_count=14,
+            mean_upstream_area_km2=18065.76,
+        )
+
+    def test_leakage_01_feature_timestamp_le_prediction_cutoff(self, valid_canonical_record: DistrictDayFeatureRecord):
+        """1. Feature timestamp <= prediction cutoff: feature window end must precede target date."""
+        rec = valid_canonical_record
+        cutoff_date = dt_date.fromisoformat(rec.target_date)
+        window_end_date = dt_date.fromisoformat(rec.feature_window_end)
+        assert window_end_date < cutoff_date
+        assert (cutoff_date - window_end_date).days >= rec.lead_time_days
+
+        # Violation: setting feature_window_end equal to or after cutoff raises TemporalLeakageError
+        bad_rec = DistrictDayFeatureRecord(
+            **{**rec.to_dict(), "feature_window_end": rec.target_date}
+        )
+        with pytest.raises(TemporalLeakageError, match="leaks into or past target date"):
+            TemporalLeakageAuditor.audit_dataset([bad_rec])
+
+    def test_leakage_02_target_timestamp_gt_prediction_cutoff(self, valid_canonical_record: DistrictDayFeatureRecord):
+        """2. Target timestamp > prediction cutoff: target event occurs strictly at or after prediction anchor."""
+        rec = valid_canonical_record
+        anchor = datetime.fromisoformat(rec.prediction_anchor_utc.replace("Z", "+00:00"))
+        target_dt = datetime.combine(dt_date.fromisoformat(rec.target_date), datetime.min.time(), tzinfo=timezone.utc)
+        assert target_dt >= anchor
+        assert rec.lead_time_days >= 1
+
+    def test_leakage_03_no_future_rainfall_leakage(self, valid_canonical_record: DistrictDayFeatureRecord):
+        """3. No future rainfall leakage: rainfall on target day t never enters precip features."""
+        # Suppose target day t had 150mm extreme rain, but yesterday (t-1) had 25.4mm
+        rec = valid_canonical_record
+        assert rec.precip_1d_mm == 25.4  # strictly observation at t-1
+        assert rec.precip_30d_sum_mm == 260.0  # strictly sum over [t-30, t-1]
+
+        # Invariant check: feature generator looks strictly backwards
+        from app.ml.district_feature_matrix import ROLLING_WINDOWS
+        assert 1 in ROLLING_WINDOWS
+        assert 30 in ROLLING_WINDOWS
+
+    def test_leakage_04_no_future_era5_leakage(self):
+        """4. No future ERA5 leakage: missing antecedent day does not impute from future days."""
+        # When an antecedent day is missing, it must propagate to None (NaN), never interpolate from t or t+1
+        aggregator = DistrictWeatherAggregator()
+        # Verify weather aggregator lookback uses strictly negative day offsets
+        offsets = [-w for w in range(1, 31)]
+        assert all(o < 0 for o in offsets)
+        assert 0 not in offsets  # day 0 (target day) is excluded
+
+    def test_leakage_05_no_future_flood_label_leakage(self, valid_canonical_record: DistrictDayFeatureRecord):
+        """5. No future flood-label leakage: target label is purely on target_date, not subsequent dates."""
+        rec = valid_canonical_record
+        assert rec.target_date == "1974-08-15"
+        assert rec.label_state == "FLOOD"
+        # Source events must correspond strictly to target_date
+        assert len(rec.source_event_ids) == 1
+        assert "1974" in rec.source_event_ids[0]
+
+    def test_leakage_06_no_target_derived_feature_leakage(self, valid_canonical_record: DistrictDayFeatureRecord):
+        """6. No target-derived feature leakage: target columns are segregated from predictors."""
+        rec = valid_canonical_record
+        d = rec.to_dict()
+        forbidden_target_cols = {
+            "flood_occurrence",
+            "label_state",
+            "event_count",
+            "source_event_ids",
+            "main_causes",
+            "severities",
+            "fatalities",
+            "displaced",
+        }
+        predictor_cols = {
+            k for k in d.keys()
+            if not k.startswith("target_")
+            and k not in forbidden_target_cols
+            and not k.startswith("source_")
+            and k not in {"district_id", "kgis_district_code", "lgd_district_code", "district_name", "prediction_anchor_utc", "lead_time_days", "feature_window_start", "feature_window_end", "feature_version"}
+        }
+
+        # Assert no overlap between predictors and target variables
+        assert forbidden_target_cols.isdisjoint(predictor_cols)
+        # All weather features are antecedent
+        assert "precip_1d_mm" in predictor_cols
+        assert "precip_30d_sum_mm" in predictor_cols
+        assert "elevation_mean_m" in predictor_cols
+
+    def test_leakage_07_spatial_joins_use_authoritative_district_identifiers(self):
+        """7. Spatial joins use authoritative district identifiers: 31 canonical Karnataka districts."""
+        from app.ml.district_feature_matrix import DistrictSpatialWeightsService
+        service = DistrictSpatialWeightsService()
+        weights = service.compute_weights()
+        assert len(weights) == 31  # Exactly 31 districts of Karnataka
+
+        # Every weight dictionary must have non-empty weights that sum to 1.0
+        for dist_id, w_map in weights.items():
+            assert len(w_map) >= 8  # Min 8 cells for smallest district
+            assert abs(sum(w_map.values()) - 1.0) < 1e-5

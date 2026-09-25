@@ -15,6 +15,7 @@ import logging
 from pathlib import Path
 import sys
 
+import pyarrow as pa
 import pyarrow.parquet as pq
 
 from app.ml.district_feature_matrix import (
@@ -97,6 +98,65 @@ def cmd_verify_weights(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_sample(args: argparse.Namespace) -> int:
+    """Export a deterministic validation sample from real data for manual inspection."""
+    src_p = Path(args.source_parquet)
+    if not src_p.exists():
+        logger.error("Source parquet does not exist: %s", src_p)
+        return 1
+
+    table = pq.read_table(src_p)
+    df = table.to_pandas()
+
+    # Filter deterministically
+    mask = (df["target_year"] == args.year) & (df["district_name"].isin(args.districts))
+    sample_df = df[mask].sort_values(by=["district_name", "target_date"]).reset_index(drop=True)
+
+    if sample_df.empty:
+        logger.error("No records matched filter: year=%s, districts=%s", args.year, args.districts)
+        return 1
+
+    out_p = Path(args.output_parquet)
+    out_p.parent.mkdir(parents=True, exist_ok=True)
+    out_table = pa.Table.from_pandas(sample_df)
+    pq.write_table(out_table, out_p, compression="snappy")
+    logger.info("Saved %d sample rows to %s", len(sample_df), out_p)
+
+    out_json = Path(args.output_json)
+    flood_cnt = int((sample_df["label_state"] == "FLOOD").sum())
+    unknown_cnt = int((sample_df["label_state"] == "UNKNOWN").sum())
+
+    sample_summary = {
+        "sample_description": "Deterministic validation sample from real historical data for manual alignment inspection",
+        "year": args.year,
+        "districts": sorted(args.districts),
+        "total_rows": len(sample_df),
+        "flood_rows": flood_cnt,
+        "unknown_rows": unknown_cnt,
+        "columns_count": len(sample_df.columns),
+        "date_range": [str(sample_df["target_date"].min()), str(sample_df["target_date"].max())],
+        "sample_positive_events": sample_df[sample_df["label_state"] == "FLOOD"][
+            ["district_name", "target_date", "source_event_ids", "precip_1d_mm", "precip_3d_sum_mm", "precip_7d_sum_mm", "elevation_mean_m"]
+        ].to_dict(orient="records"),
+    }
+    with open(out_json, "w", encoding="utf-8") as f:
+        json.dump(sample_summary, f, indent=2, default=str)
+    logger.info("Saved validation sample summary JSON to %s", out_json)
+
+    print("\n" + "=" * 60)
+    print("REAL DATA DETERMINISTIC VALIDATION SAMPLE EXPORT")
+    print("=" * 60)
+    print(f"Sample Rows: {len(sample_df)}")
+    print(f"Districts: {sorted(args.districts)}")
+    print(f"Date Range: {sample_df['target_date'].min()} to {sample_df['target_date'].max()}")
+    print(f"FLOOD Labels: {flood_cnt}")
+    print(f"UNKNOWN Labels: {unknown_cnt}")
+    print(f"Parquet Output: {out_p}")
+    print(f"JSON Audit: {out_json}")
+    print("=" * 60)
+    return 0
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="District x Day ML Feature Matrix CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -120,6 +180,15 @@ def main() -> None:
     p_weights = subparsers.add_parser("verify-weights", help="Verify district-cell area weights")
     p_weights.add_argument("--force", action="store_true", help="Force recomputation")
     p_weights.set_defaults(func=cmd_verify_weights)
+
+    # sample
+    p_sample = subparsers.add_parser("sample", help="Export deterministic validation sample from real data")
+    p_sample.add_argument("--source-parquet", type=str, default=str(DEFAULT_PARQUET_OUTPUT_PATH), help="Source parquet")
+    p_sample.add_argument("--output-parquet", type=str, default="data/processed/ml_matrix/validation_sample_district_day.parquet", help="Output parquet")
+    p_sample.add_argument("--output-json", type=str, default="data/processed/ml_matrix/validation_sample_district_day.json", help="Output JSON")
+    p_sample.add_argument("--year", type=int, default=1974, help="Target year")
+    p_sample.add_argument("--districts", nargs="+", default=["Belagavi", "Kodagu", "Raichur"], help="Sample districts")
+    p_sample.set_defaults(func=cmd_sample)
 
     args = parser.parse_args()
     sys.exit(args.func(args))
