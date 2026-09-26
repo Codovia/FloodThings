@@ -64,6 +64,10 @@ def cmd_train(args: argparse.Namespace) -> int:
         feature_matrix_path=args.matrix_path,
         models_dir=args.models_dir,
         train_end_year=args.train_end_year,
+        val_start_year=args.val_start_year,
+        val_end_year=args.val_end_year,
+        test_start_year=args.test_start_year,
+        test_end_year=args.test_end_year,
         val_year=args.val_year,
         test_year=args.test_year,
     )
@@ -82,7 +86,7 @@ def cmd_train(args: argparse.Namespace) -> int:
     print(f"Validation Period:   {metadata.val_dates[0]} to {metadata.val_dates[1]} ({metadata.val_rows} rows, {metadata.val_positives} FLOOD)")
     print(f"Test Period:         {metadata.test_dates[0]} to {metadata.test_dates[1]} ({metadata.test_rows} rows, {metadata.test_positives} FLOOD)")
     print("-" * 65)
-    print("VALIDATION METRICS (1974):")
+    print(f"VALIDATION METRICS ({metadata.val_dates[0]} to {metadata.val_dates[1]}):")
     print(f"  PR-AUC:            {metadata.validation_metrics.pr_auc:.4f} (prevalence = {metadata.validation_metrics.positive_prevalence:.4f})")
     print(f"  ROC-AUC:           {metadata.validation_metrics.roc_auc:.4f}")
     print(f"  Decision Threshold:{metadata.validation_metrics.decision_threshold:.4f}")
@@ -92,7 +96,7 @@ def cmd_train(args: argparse.Namespace) -> int:
     print(f"  Brier Score:       {metadata.validation_metrics.brier_score:.4f}")
     print(f"  PU Ranking Score:  {metadata.validation_metrics.pu_ranking_criterion:.4f}")
     print("-" * 65)
-    print("HELD-OUT TEST METRICS (1975):")
+    print(f"HELD-OUT TEST METRICS ({metadata.test_dates[0]} to {metadata.test_dates[1]}):")
     print(f"  PR-AUC:            {metadata.test_metrics.pr_auc:.4f} (prevalence = {metadata.test_metrics.positive_prevalence:.4f})")
     print(f"  ROC-AUC:           {metadata.test_metrics.roc_auc:.4f}")
     print(f"  Precision:         {metadata.test_metrics.precision_at_threshold:.4f}")
@@ -179,9 +183,13 @@ def main() -> None:
     p_train.add_argument("--models-dir", type=str, default=str(DEFAULT_MODELS_DIR))
     p_train.add_argument("--model-type", type=str, default=ModelType.LOGISTIC_REGRESSION.value, choices=[m.value for m in ModelType])
     p_train.add_argument("--pu-strategy", type=str, default=PUStrategy.STANDARD_PU.value, choices=[s.value for s in PUStrategy])
-    p_train.add_argument("--train-end-year", type=int, default=1973)
-    p_train.add_argument("--val-year", type=int, default=1974)
-    p_train.add_argument("--test-year", type=int, default=1975)
+    p_train.add_argument("--train-end-year", type=int, default=1988)
+    p_train.add_argument("--val-start-year", type=int, default=1989)
+    p_train.add_argument("--val-end-year", type=int, default=1991)
+    p_train.add_argument("--test-start-year", type=int, default=1992)
+    p_train.add_argument("--test-end-year", type=int, default=1994)
+    p_train.add_argument("--val-year", type=int, default=None)
+    p_train.add_argument("--test-year", type=int, default=None)
     p_train.set_defaults(func=cmd_train)
 
     # compare

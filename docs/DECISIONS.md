@@ -478,16 +478,16 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 ---
 
 **D-041 — Baseline ML Modeling, Chronological Temporal Splitting & Positive-Unlabeled (PU) Evaluation**
-**Date:** 2026-09-25
+**Date:** 2026-09-25 (Updated 2026-09-26 for 26-Year Historical Matrix)
 **Status:** IMPLEMENTED (Phase 5)
 **Decision:**
-1. Zero Negative Fabrication Policy: UNKNOWN labels are strictly never converted to NO_FLOOD. The dataset is framed and treated as Positive-Unlabeled (PU) with an empirical prevalence of 0.7457%.
-2. Expanding-Window Chronological Split: Train on 1969–1973 (50,592 observations, 247 FLOOD), Validation on 1974 (11,315 observations, 203 FLOOD), and Test on 1975 (11,315 observations, 96 FLOOD). Zero temporal overlap between splits.
+1. Zero Negative Fabrication Policy: UNKNOWN labels are strictly never converted to NO_FLOOD. The dataset is framed and treated as Positive-Unlabeled (PU) with an empirical prevalence of 0.3926% across 293,446 clean historical district-days (1,152 FLOOD events, 0 NO_FLOOD, 292,294 UNKNOWN).
+2. Expanding-Window Chronological Split: Train on 1969–1988 (20 years; 225,525 observations, 847 FLOOD), Validation on 1989–1991 (3 years; 33,945 observations, 88 FLOOD), and Test on 1992–1994 (3 years; 33,976 observations, 217 FLOOD). Strict zero temporal overlap between splits. Initialization boundary rows (Jan 1–30, 1969; 930 rows) with incomplete 30-day weather lookback are strictly filtered from training and evaluation.
 3. Preprocessing Isolation: Feature scalers (`StandardScaler`) are fitted strictly on training data ($X_{\text{train}}$). Decision thresholds are calibrated out-of-sample on validation data and evaluated on held-out test data.
 4. Model Architectures: Transparent regularized Logistic Regression baseline with standardized coefficients ($\beta_j$) and LightGBM gradient-boosted decision trees for non-linear interactions.
-5. PU Formulation Comparison: Implemented and evaluated Standard PU (SCAR assumption with class weighting), High-Confidence Negatives (filtering dry-season zero-rain days; 5,153 reliable negatives), and Bagging PU (15-estimator bootstrap subsampling ensemble).
+5. PU Formulation & Threshold Dynamics: Implemented Standard PU (SCAR assumption with class weighting), High-Confidence Negatives, and Bagging PU. Established that discrete F1 thresholding under extreme class imbalance forces thresholds to near-certainty ($\approx 0.9730$), demonstrating that production early warning systems must utilize continuous risk percentiles and risk categories (LOW, MODERATE, HIGH, SEVERE) rather than rigid binary cutoffs.
 6. Non-Accuracy Evaluation: Evaluated via PR-AUC (Average Precision), ROC-AUC, Brier score, and PU ranking score ($r^2 / P(\hat{Y}=1)$), alongside Elkan-Noto reporting frequency parameter ($c$).
-7. Model Artifact Management: Serialized model pipelines (joblib) and metadata JSON records (recording hyperparameters, target semantics, PU assumptions, and SHA-256 data hash) saved to `data/processed/ml_models/`.
+7. Model Artifact Management: Serialized model pipelines (joblib) and metadata JSON records (recording hyperparameters, target semantics, PU assumptions, and SHA-256 data hash) saved to `data/processed/ml_models/`. Baseline model ID: `1df92880-687e-4609-9033-3c6977a82940`.
 **Affected components:** `backend/app/ml/baseline_modeling.py`, `backend/app/ml/modeling_cli.py`, `backend/tests/test_baseline_models.py`, `docs/ML_BASELINE_MODELING_AUDIT.md`.
 
 ---

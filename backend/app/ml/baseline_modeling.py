@@ -110,6 +110,8 @@ PROHIBITED_LEAKAGE_COLUMNS: set[str] = {
     "lgd_district_code",
     "district_name",
     "target_date",
+    "target_year",
+    "target_day",
     "prediction_anchor_utc",
     "feature_window_start",
     "feature_window_end",
@@ -126,6 +128,7 @@ PROHIBITED_LEAKAGE_COLUMNS: set[str] = {
     "is_weather_complete_30d",
     "valid_weather_days_30d",
     "terrain_coverage_pct",
+    "primary_basin_name",
     "feature_version",
     "source_era5",
     "source_ifi",
@@ -313,6 +316,9 @@ class DatasetAuditor:
                 "leakage_violations_in_feature_list": leakage_violations,
                 "total_missing_in_predictors": sum(feature_missingness.values()),
                 "total_infs_in_predictors": sum(feature_infs.values()),
+                "complete_30d_weather_rows": int(df["is_weather_complete_30d"].sum()) if "is_weather_complete_30d" in df.columns else total_rows,
+                "initialization_boundary_incomplete_rows": int((~df["is_weather_complete_30d"]).sum()) if "is_weather_complete_30d" in df.columns else 0,
+                "missing_in_complete_weather_rows": int(df[df["is_weather_complete_30d"] == True][CANONICAL_PREDICTOR_COLUMNS].isna().sum().sum()) if "is_weather_complete_30d" in df.columns else sum(feature_missingness.values()),
             },
             "feature_dtypes": feature_dtypes,
             "feature_missingness": feature_missingness,
@@ -345,25 +351,43 @@ class TemporalDataSplitter:
 
     def __init__(
         self,
-        train_end_year: int = 1973,
-        val_year: int = 1974,
-        test_year: int = 1975,
+        train_end_year: int = 1988,
+        val_start_year: int | None = None,
+        val_end_year: int | None = None,
+        test_start_year: int | None = None,
+        test_end_year: int | None = None,
+        val_year: int | None = None,
+        test_year: int | None = None,
     ):
         self.train_end_year = train_end_year
-        self.val_year = val_year
-        self.test_year = test_year
+
+        # Support single-year kwargs for backward compatibility
+        if val_year is not None:
+            self.val_start_year = val_year
+            self.val_end_year = val_year
+        else:
+            self.val_start_year = val_start_year if val_start_year is not None else 1989
+            self.val_end_year = val_end_year if val_end_year is not None else 1991
+
+        if test_year is not None:
+            self.test_start_year = test_year
+            self.test_end_year = test_year
+        else:
+            self.test_start_year = test_start_year if test_start_year is not None else 1992
+            self.test_end_year = test_end_year if test_end_year is not None else 1994
+
 
     def split(self, df: pd.DataFrame) -> TemporalSplit:
         """
         Partition dataset into strictly chronological Train, Validation, and Test splits.
-
-        Train: years <= train_end_year (e.g. 1969–1973)
-        Val: year == val_year (e.g. 1974)
-        Test: year == test_year (e.g. 1975)
         """
+        if self.val_start_year > self.val_end_year:
+            raise ValueError(f"val_start_year ({self.val_start_year}) must be <= val_end_year ({self.val_end_year})")
+        if self.test_start_year > self.test_end_year:
+            raise ValueError(f"test_start_year ({self.test_start_year}) must be <= test_end_year ({self.test_end_year})")
         train_mask = (df["target_year"] <= self.train_end_year).to_numpy()
-        val_mask = (df["target_year"] == self.val_year).to_numpy()
-        test_mask = (df["target_year"] == self.test_year).to_numpy()
+        val_mask = ((df["target_year"] >= self.val_start_year) & (df["target_year"] <= self.val_end_year)).to_numpy()
+        test_mask = ((df["target_year"] >= self.test_start_year) & (df["target_year"] <= self.test_end_year)).to_numpy()
 
         train_dates = (
             str(df.loc[train_mask, "target_date"].min()),
@@ -378,13 +402,17 @@ class TemporalDataSplitter:
             str(df.loc[test_mask, "target_date"].max()),
         )
 
+        train_years = tuple(sorted(int(y) for y in df.loc[train_mask, "target_year"].unique()))
+        val_years = tuple(sorted(int(y) for y in df.loc[val_mask, "target_year"].unique()))
+        test_years = tuple(sorted(int(y) for y in df.loc[test_mask, "target_year"].unique()))
+
         split_obj = TemporalSplit(
             train_mask=train_mask,
             val_mask=val_mask,
             test_mask=test_mask,
-            train_years=tuple(sorted(df.loc[train_mask, "target_year"].unique())),
-            val_years=(self.val_year,),
-            test_years=(self.test_year,),
+            train_years=train_years,
+            val_years=val_years,
+            test_years=test_years,
             train_dates=train_dates,
             val_dates=val_dates,
             test_dates=test_dates,
@@ -850,12 +878,24 @@ class ModelingOrchestrator:
         self,
         feature_matrix_path: Path | str | None = None,
         models_dir: Path | str | None = None,
-        train_end_year: int = 1973,
-        val_year: int = 1974,
-        test_year: int = 1975,
+        train_end_year: int = 1988,
+        val_start_year: int | None = None,
+        val_end_year: int | None = None,
+        test_start_year: int | None = None,
+        test_end_year: int | None = None,
+        val_year: int | None = None,
+        test_year: int | None = None,
     ):
         self.feature_matrix_path = Path(feature_matrix_path) if feature_matrix_path else DEFAULT_FEATURE_MATRIX_PATH
-        self.splitter = TemporalDataSplitter(train_end_year, val_year, test_year)
+        self.splitter = TemporalDataSplitter(
+            train_end_year=train_end_year,
+            val_start_year=val_start_year,
+            val_end_year=val_end_year,
+            test_start_year=test_start_year,
+            test_end_year=test_end_year,
+            val_year=val_year,
+            test_year=test_year,
+        )
         self.evaluator = PUEvaluator()
         self.artifact_mgr = ModelArtifactManager(models_dir)
 
@@ -869,6 +909,12 @@ class ModelingOrchestrator:
         # 1. Load data
         df = pq.read_table(self.feature_matrix_path).to_pandas()
         feature_cols = CANONICAL_PREDICTOR_COLUMNS
+
+        # Exclude incomplete weather initialization boundary rows (1969-01-01 to 1969-01-30)
+        # where 30-day antecedent meteorological history is incomplete per missing != 0 contract.
+        if "is_weather_complete_30d" in df.columns:
+            complete_mask = df["is_weather_complete_30d"] == True
+            df = df.loc[complete_mask].copy().reset_index(drop=True)
 
         # 2. Temporal split
         split = self.splitter.split(df)

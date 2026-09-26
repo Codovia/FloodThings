@@ -1,7 +1,7 @@
 # HANDOVER.md
 
 **Project:** FloodPulse
-**Last updated:** 2026-09-17 (Phase 2.4.1)
+**Last updated:** 2026-09-26 (Phase 5)
 
 Read this document first in every new session.
 
@@ -10,7 +10,7 @@ Read this document first in every new session.
 ## Current state
 
 ```
-Phase:                  Phase 5 — Baseline ML Modeling & Temporal Cross-Validation (Completed)
+Phase:                  Phase 5 — Baseline ML Modeling & Temporal Validation (Completed)
 Previous phases:        Phase 0 — Project control (P0.1–P0.3)
                         Phase 1 — Source verification (planning/specification level)
                         Phase 2.1 — Project Foundation (FastAPI + React + PostGIS foundation)
@@ -93,7 +93,7 @@ Database:               PostgreSQL 16 + PostGIS 3.4 (Docker container: floodpuls
                         - 186 flood_observations (186 HISTORICAL_EVENT historical evidence)
                         - 31 districts (LGD reference)
                         Zero unclassified records (0 NULLs). Zero test fixture residue.
-Tests:                  115 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
+Tests:                  416 tests — 100% passing. Guaranteed teardowns prevent test fixture leakage.
 Alembic:                Current head: ccfc6a6b5d06, alembic check clean ("No new upgrade operations detected")
 Docker:                 docker-compose.yml with postgres service (port 5432)
 ```
@@ -198,17 +198,17 @@ Updated docs/DECISIONS.md                    (Added D-042 on Phase 4.2 full hist
 Updated docs/HANDOVER.md                     (Updated current state, artifacts, and next steps)
 ```
 
-## Phase 5 Artifacts Created (Baseline ML Modeling & PU Cross-Validation)
+## Phase 5 Artifacts Created (Baseline ML Modeling & Temporal Validation)
 
 ```
 backend/app/ml/baseline_modeling.py          (DatasetAuditor, TemporalDataSplitter, PUDatasetPreparer, LogisticRegressionBaseline, LightGBMBaseline, PUEvaluator, ModelArtifactManager, ModelingOrchestrator)
-backend/app/ml/modeling_cli.py               (CLI subcommands: audit, train, compare)
-backend/tests/test_baseline_models.py        (15 focused tests covering chronological splitting, leakage prevention, PU strategies, LightGBM, serialization, Elkan-Noto calibration)
+backend/app/ml/modeling_cli.py               (CLI subcommands: audit, train, compare with multi-year temporal split arguments)
+backend/tests/test_baseline_models.py        (21 focused tests covering chronological splitting, leakage prevention, PU strategies, LightGBM, serialization, Elkan-Noto calibration, zero negative fabrication, reproducibility)
 data/processed/ml_models/                    (Serialized joblib model pipelines and companion metadata JSON records)
-data/processed/ml_models/feature_matrix_audit.json (Machine-readable canonical dataset audit)
-data/processed/ml_models/comparison_results.json   (Full 6-way PU model benchmark results)
+data/processed/ml_models/logistic_regression_standard_pu_1df92880_pipeline.joblib (Trained baseline on 26-year matrix)
+data/processed/ml_models/logistic_regression_standard_pu_1df92880_metadata.json (Auditable evaluation metrics & parameters)
 docs/ML_BASELINE_MODELING_AUDIT.md           (Comprehensive Phase 5 Modeling Audit and Benchmark Report)
-Updated docs/DECISIONS.md                    (Added D-040 for Phase 4 and D-041 for Phase 5)
+Updated docs/DECISIONS.md                    (Updated D-041 for 26-year historical matrix partitioning)
 Updated docs/HANDOVER.md                     (Updated current state, artifacts, and next steps)
 ```
 

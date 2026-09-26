@@ -27,6 +27,8 @@ import pytest
 
 from app.ml.baseline_modeling import (
     CANONICAL_PREDICTOR_COLUMNS,
+    DEFAULT_FEATURE_MATRIX_PATH,
+    PROHIBITED_LEAKAGE_COLUMNS,
     DatasetAuditor,
     EvaluationMetrics,
     LightGBMBaseline,
@@ -420,3 +422,127 @@ class TestBaselineModels:
         metrics = PUEvaluator.evaluate(y_true, y_prob, split_name="test")
         # c = mean(0.8, 0.6) = 0.7
         assert abs(metrics.elkan_noto_c - 0.7) < 1e-4
+
+    def test_16_temporal_split_correctness_full_range(self):
+        """16. Temporal split correctness across full multi-year ranges (1969–1994)."""
+        mock_years = []
+        for yr in range(1969, 1995):
+            mock_years.extend([
+                {"target_year": yr, "target_date": f"{yr}-06-15", "district_id": "d1"},
+                {"target_year": yr, "target_date": f"{yr}-08-20", "district_id": "d2"},
+            ])
+        mock_df = pd.DataFrame(mock_years)
+
+        splitter = TemporalDataSplitter(
+            train_end_year=1988,
+            val_start_year=1989,
+            val_end_year=1991,
+            test_start_year=1992,
+            test_end_year=1994,
+        )
+        split = splitter.split(mock_df)
+
+        assert split.train_years == tuple(range(1969, 1989))
+        assert split.val_years == (1989, 1990, 1991)
+        assert split.test_years == (1992, 1993, 1994)
+        assert split.train_dates[1] < split.val_dates[0]
+        assert split.val_dates[1] < split.test_dates[0]
+
+        # Zero overlap between partition boolean masks
+        assert not np.any(split.train_mask & split.val_mask)
+        assert not np.any(split.train_mask & split.test_mask)
+        assert not np.any(split.val_mask & split.test_mask)
+        assert (split.train_mask | split.val_mask | split.test_mask).all()
+
+    def test_17_no_future_information_entering_training(self, synthetic_district_df: pd.DataFrame):
+        """17. No future information: train set strictly precedes validation and test chronologically."""
+        splitter = TemporalDataSplitter(train_end_year=1972, val_year=1974, test_year=1975)
+        split = splitter.split(synthetic_district_df)
+
+        max_train_date = synthetic_district_df.loc[split.train_mask, "target_date"].max()
+        min_val_date = synthetic_district_df.loc[split.val_mask, "target_date"].min()
+        max_val_date = synthetic_district_df.loc[split.val_mask, "target_date"].max()
+        min_test_date = synthetic_district_df.loc[split.test_mask, "target_date"].min()
+
+        assert max_train_date < min_val_date
+        assert max_val_date < min_test_date
+
+        # Lookback invariant: feature_window_end < target_date across all samples
+        for _, row in synthetic_district_df.iterrows():
+            assert row["feature_window_end"] < row["target_date"]
+
+    def test_18_unknown_handling_zero_negative_fabrication(self, synthetic_district_df: pd.DataFrame):
+        """18. UNKNOWN handling: unevidenced records are never converted to NO_FLOOD."""
+        unknown_mask = synthetic_district_df["label_state"] == "UNKNOWN"
+        assert unknown_mask.sum() > 0
+
+        # UNKNOWN rows must retain None/NaN target in data contracts
+        assert synthetic_district_df.loc[unknown_mask, "flood_occurrence"].isna().all()
+
+        # In PU preparation, unlabeled instances are treated as background (0) for training,
+        # but raw label_state remains UNKNOWN (zero negative fabrication)
+        train_mask = (synthetic_district_df["target_year"] <= 1972).to_numpy()
+        X, y, _ = PUDatasetPreparer.prepare_training_data(
+            df=synthetic_district_df,
+            train_mask=train_mask,
+            feature_cols=["precip_1d_mm"],
+            strategy=PUStrategy.STANDARD_PU,
+        )
+        assert set(np.unique(y)).issubset({0, 1})
+        assert "NO_FLOOD" not in synthetic_district_df["label_state"].values
+
+    def test_19_feature_target_separation(self):
+        """19. Feature/target separation: strict zero intersection between predictors and prohibited columns."""
+        pred_set = set(CANONICAL_PREDICTOR_COLUMNS)
+        leak_set = set(PROHIBITED_LEAKAGE_COLUMNS)
+
+        intersection = pred_set.intersection(leak_set)
+        assert len(intersection) == 0, f"Found leakage overlap: {intersection}"
+
+        # Prohibited targets and metadata must be blocked
+        assert "flood_occurrence" in PROHIBITED_LEAKAGE_COLUMNS
+        assert "label_state" in PROHIBITED_LEAKAGE_COLUMNS
+        assert "target_date" in PROHIBITED_LEAKAGE_COLUMNS
+        assert "district_id" in PROHIBITED_LEAKAGE_COLUMNS
+
+    def test_20_deterministic_dataset_construction_clean_weather(self):
+        """20. Deterministic dataset construction: clean 30-day weather population has 0 NaNs."""
+        if not DEFAULT_FEATURE_MATRIX_PATH.exists():
+            pytest.skip("Feature matrix parquet artifact not present on disk.")
+
+        import pyarrow.parquet as pq
+        df = pq.read_table(DEFAULT_FEATURE_MATRIX_PATH).to_pandas()
+
+        assert len(df) == 294376
+        # Filter clean 30-day weather
+        complete_mask = df["is_weather_complete_30d"] == True
+        df_clean = df[complete_mask]
+
+        assert len(df_clean) == 293446
+        # Incomplete initialization boundary is exactly 930 rows (Jan 1–30, 1969)
+        assert (~complete_mask).sum() == 930
+        assert df_clean[CANONICAL_PREDICTOR_COLUMNS].isna().sum().sum() == 0
+
+        # All 1,152 positive flood events are fully preserved in clean weather subset
+        assert (df_clean["label_state"] == "FLOOD").sum() == 1152
+
+    def test_21_model_reproducibility(self, synthetic_district_df: pd.DataFrame):
+        """21. Reproducibility: same seed produces identical predictions and coefficients."""
+        train_mask = (synthetic_district_df["target_year"] <= 1972).to_numpy()
+        val_mask = (synthetic_district_df["target_year"] == 1974).to_numpy()
+        feature_cols = ["precip_1d_mm", "precip_3d_sum_mm", "elevation_mean_m"]
+
+        X_tr = synthetic_district_df.loc[train_mask, feature_cols].to_numpy()
+        y_tr = (synthetic_district_df.loc[train_mask, "label_state"] == "FLOOD").to_numpy().astype(int)
+        X_val = synthetic_district_df.loc[val_mask, feature_cols].to_numpy()
+
+        m1 = LogisticRegressionBaseline(feature_cols=feature_cols, random_state=42)
+        m1.fit(X_tr, y_tr)
+        p1 = m1.predict_proba(X_val)
+
+        m2 = LogisticRegressionBaseline(feature_cols=feature_cols, random_state=42)
+        m2.fit(X_tr, y_tr)
+        p2 = m2.predict_proba(X_val)
+
+        assert np.allclose(p1, p2, atol=1e-12)
+        assert m1.get_feature_importances() == m2.get_feature_importances()
