@@ -131,7 +131,32 @@ class HistoricalOpenMeteoClient:
                 return diff
         except Exception:
             pass
+
         return None
+
+    def _get_rate_limit_wait_time(self, response: httpx.Response) -> float:
+        """
+        Determine sleep duration when HTTP 429 is received.
+        Inspects Retry-After header, then response body for Open-Meteo hourly limit messaging,
+        defaulting to config.rate_limit_cooldown_seconds.
+        """
+        # 1. Header-based Retry-After
+        parsed = self._parse_retry_after(response)
+        if parsed is not None:
+            return max(parsed, self.config.min_request_interval_seconds)
+
+        # 2. Open-Meteo hourly limit in response body
+        try:
+            body = response.json()
+            reason = str(body.get("reason", ""))
+            if "Hourly API request limit exceeded" in reason or "next hour" in reason:
+                now_dt = datetime.now(timezone.utc)
+                seconds_to_next_hour = (59 - now_dt.minute) * 60 + (60 - now_dt.second) + 15
+                return float(max(seconds_to_next_hour, self.config.min_request_interval_seconds))
+        except Exception:
+            pass
+
+        return max(self.config.rate_limit_cooldown_seconds, self.config.min_request_interval_seconds)
 
     def build_query_params(self, chunk: ExtractionChunk) -> dict[str, str]:
         """Build deterministic query parameters for a given extraction chunk."""
@@ -139,11 +164,14 @@ class HistoricalOpenMeteoClient:
         lons_str = ",".join(str(c.lon) for c in chunk.cells)
         hourly_str = ",".join(self.config.hourly_variables)
 
+        start_date = chunk.start_date or f"{chunk.year}-01-01"
+        end_date = chunk.end_date or f"{chunk.year}-12-31"
+
         return {
             "latitude": lats_str,
             "longitude": lons_str,
-            "start_date": f"{chunk.year}-01-01",
-            "end_date": f"{chunk.year}-12-31",
+            "start_date": start_date,
+            "end_date": end_date,
             "hourly": hourly_str,
             "timezone": self.config.timezone,
             "precipitation_unit": self.config.precipitation_unit,
@@ -194,19 +222,17 @@ class HistoricalOpenMeteoClient:
 
                 elif status == 429:
                     rate_limit_attempts += 1
-                    retry_after = self._parse_retry_after(response)
-                    if retry_after is not None:
-                        wait_time = retry_after
-                    else:
-                        wait_time = self.config.rate_limit_cooldown_seconds
-
-                    # Do not retry faster than configured minimum request interval
-                    wait_time = max(wait_time, self.config.min_request_interval_seconds)
+                    wait_time = self._get_rate_limit_wait_time(response)
 
                     if (
                         rate_limit_attempts < self.config.rate_limit_max_retries
                         and attempt < self.config.max_retries
                     ):
+                        if wait_time > 60:
+                            print(
+                                f"  [RATE-LIMIT 429] Hourly limit reached; sleeping {wait_time:.0f}s until top of next UTC hour...",
+                                flush=True,
+                            )
                         time.sleep(wait_time)
                         continue
                     raise RateLimitExceededError("HTTP 429 Rate limit exceeded after maximum retries")

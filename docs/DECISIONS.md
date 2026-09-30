@@ -502,3 +502,124 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 4. Strict Anti-Leakage Invariants: 24-hour lead time ($t-1 \to t$) strictly enforced across all 294,376 rows. Target-day weather strictly forbidden from entering predictor features. `feature_window_end < target_date` verified for 100.0% of records.
 5. Weather and Static Completeness: 293,446 rows (99.68%) possess full 30-day antecedent weather history; exactly 930 rows with incomplete 30-day weather correspond strictly to the initialization boundary (January 1–30, 1969) before the lookback window begins. Terrain (Copernicus DEM GLO-30) and hydrological GIS (CWC Statutory + HydroBASINS Level-7) zonal statistics are 100.0% complete across all 294,376 rows.
 **Affected components:** `backend/app/ingestion/historical/daily.py`, `backend/app/ingestion/historical/daily_cli.py`, `backend/app/ml/district_feature_matrix.py`, `backend/app/ml/matrix_cli.py`, `data/processed/era5_daily/`, `data/processed/ml_matrix/district_day_feature_matrix.parquet`.
+
+---
+
+**D-043 — Recent-Period ERA5 Segregated Ingestion, Upstream Availability Baseline & Partial-Year Boundary Support (Phase 5.2)**
+**Date:** 2026-09-27
+**Status:** IMPLEMENTED (Phase 5.2)
+**Decision:**
+1. Physical Pipeline Segregation: Preserved the authoritative historical baseline (`data/raw/era5_historical/`, `data/processed/era5_daily/`, `district_day_feature_matrix.parquet`) as 100% read-only and immutable. Recent-period meteorological data is isolated under dedicated directories:
+   - Raw: `data/raw/era5_recent/` (manifest: `extraction_manifest.json`)
+   - Daily Processed: `data/processed/era5_daily/recent/` (manifest: `processing_manifest.json`)
+   - Recent Matrix: `data/processed/ml_matrix/recent/`
+2. Upstream Open-Meteo ERA5 Source Invariant: Preserved `models=era5` Open-Meteo archive as the approved reanalysis source, rejecting non-operational Copernicus CDS time-series.
+3. Empirical Live Upstream Availability Baseline: Live probing of `https://archive-api.open-meteo.com/v1/archive` established the exact non-null cutoff timestamp as `2026-09-21T23:00` (reflecting standard ECMWF 5–6 day reanalysis latency). Timestamps from `2026-09-22T00:00` onward return nulls.
+4. Partial-Year Date Boundary Parameterization: Extended `ExtractionChunk`, `HistoricalOpenMeteoClient`, `HistoricalChunkValidator`, `DailyDatasetValidator`, `DailyProcessor`, and `generate_chunks` to accept optional `start_date` and `end_date` parameters. This resolves the `HTTP 400 Bad Request` returned when requesting future dates (`2026-12-31`), enabling seamless extraction and validation of both full 8,760/8,784-hour calendar years (2011–2025) and bounded partial years (such as 2026 up to `2026-09-21`, 6,360 hours / 264 days).
+5. Automatic Date Bounds Discovery in DailyProcessor: `DailyProcessor.process_chunk` automatically inspects companion chunk metadata (`.meta.json`) for `requested_start_date` and `requested_end_date` when not explicitly supplied, ensuring automated validation consistency across all chunks.
+6. Dedicated Recent CLI: Implemented `backend/app/ingestion/historical/recent_cli.py` with `extract`, `process`, and `status` subcommands, strict safety guards preventing accidental historical targeting, default temporal scope of 2011–2026, and automatic `final_end_date="2026-09-21"`.
+7. Empirical Pilot Verification: Successfully extracted and daily-processed pilot chunks for both full recent year 2023 (`era5_2023_batch_001`, 10 cells, 8,760 hours, 3,650 daily records) and bounded partial year 2026 (`era5_2026_batch_001`, 10 cells, 6,360 hours, 2,640 daily records) with 100% SUCCEEDED status, zero nulls, and verified idempotency cache hits.
+**Affected components:** `backend/app/ingestion/historical/models.py`, `backend/app/ingestion/historical/client.py`, `backend/app/ingestion/historical/validator.py`, `backend/app/ingestion/historical/daily_validator.py`, `backend/app/ingestion/historical/daily_processor.py`, `backend/app/ingestion/historical/grid.py`, `backend/app/ingestion/historical/recent_cli.py`, `backend/tests/test_era5_recent_bounds.py`, `data/raw/era5_recent/`, `data/processed/era5_daily/recent/`.
+
+---
+
+**D-044 — Recent-Period ERA5 District-Day Analysis Dataset (Phase 5.3)**
+**Date:** 2026-09-28
+**Status:** IMPLEMENTED (Phase 5.3)
+**Decision:**
+1. Authoritative GIS & Spatial Weights Reuse: Reused the canonical KSR-SAC / KGIS 31-district administrative geometry from `public.districts` and precomputed area-weighted geometric intersection weights from `data/processed/gis_cache/district_era5_weights.json`. Centroid-only allocation was strictly rejected in favor of area-weighted polygon intersection ($\sum_{c} w_{d,c} = 1.000000$ for all 31 districts across all 318 eligible cells).
+2. Pure Meteorological Analysis Dataset Contract: Formatted the recent analysis dataset with 23 canonical columns preserving physical units, spatial metadata, and source provenance. Zero flood labels were attached, zero synthetic negative labels were generated, and zero premature feature engineering (rolling windows, lag features, scaling) was introduced in this stage.
+3. Segregated Output Location: Persisted the aggregated dataset under `data/processed/era5_district_daily/recent/`, maintaining complete separation from the immutable historical baseline (`data/processed/era5_daily/` and `data/processed/ml_matrix/district_day_feature_matrix.parquet`).
+4. Output Artifacts & Cardinality Verification: Generated 15 annual partitions (`year=2011` to `year=2025`) and a unified table (`district_daily_2011_2025.parquet`, 2.18 MB) totaling exactly 169,849 rows across 5,479 calendar days and 31 districts, with zero duplicates, zero missing days, zero nulls, and 100% complete data quality.
+**Affected components:** `backend/app/ingestion/historical/district_daily_aggregator.py`, `backend/app/gis/recent_mapping_audit.py`, `backend/tests/test_district_daily_aggregation.py`, `data/processed/era5_district_daily/recent/`.
+
+---
+
+**D-045 — Recent-Period Supervised ML Feature Matrix & Three-State Label Integration (Phase 5.3)**
+**Date:** 2026-09-28
+**Status:** IMPLEMENTED (Phase 5.3)
+**Decision:**
+1. Target Supervised Period & Isolation: Scope bounded strictly to `2011-01-01` through `2023-07-24` (4,588 calendar days $\times$ 31 districts = exactly 142,228 rows). Post-2023-07-24 data (`2023-07-25` through `2025-12-31`) is segregated into unlabelled weather-only matrix (`district_day_weather_matrix.parquet`) and strictly prohibited from receiving fabricated labels.
+2. Verified IFI v3.0 Ground Truth Integration: Joined disaster flood events from `public.district_day_flood_labels` within the target period. Mapped 13,156 verified flood events to `flood_occurrence = 1`, `label_state = "FLOOD"`.
+3. Strict Three-State Target Semantics: Unrecorded dates are preserved strictly as `flood_occurrence = None / NaN`, `label_state = "UNKNOWN"` (129,072 rows, 90.75%). Zero synthetic `NO_FLOOD` (0) labels were manufactured. Absence from IFI is never treated as proof of no flood.
+4. Non-Negotiable Temporal Anti-Leakage: Enforced 24-hour lead time ($L = 1$, prediction anchor 00:00 UTC). Feature lookback window strictly bounded to $[t-30, t-1]$. Day $t$ weather is strictly excluded. Tested and verified across all 142,228 rows with zero violations.
+5. 100% Schema Parity with Historical Baseline: Preserved identical 57-column PyArrow schema as `data/processed/ml_matrix/district_day_feature_matrix.parquet`, ensuring identical typing, feature semantics, and provenance tracking across both historical (1969–1994) and recent (2011–2023) corpora.
+6. Absolute Prohibition on Model Training: In strict compliance with Phase 5.3 requirements, zero ML models (Logistic Regression, Random Forest, XGBoost, etc.) were trained.
+**Affected components:** `backend/app/ml/recent_matrix_builder.py`, `backend/tests/test_recent_district_matrix.py`, `data/processed/ml_matrix/recent/district_day_matrix_2011_2023.parquet`, `data/processed/ml_matrix/recent/district_day_matrix_2011_2023_audit.json`.
+
+---
+
+**D-046 — Phase 5.3 ML Dataset Scientific Audit, Anti-Leakage Verification & Experiment Contract**
+**Date:** 2026-09-30
+**Status:** IMPLEMENTED (Phase 5.3 Scientific Audit)
+**Decision:**
+1. Rigorous Pre-Training Scientific Audit: Completed a comprehensive statistical, spatial, and anti-leakage audit of the recent supervised matrix (`district_day_matrix_2011_2023.parquet`, 142,228 rows x 57 columns) and weather-only matrix (`district_day_weather_matrix.parquet`, 169,849 rows x 57 columns). Re-confirmed 100% schema parity with the historical 1969–1994 baseline matrix.
+2. Canonical 27 Predictor Whitelist & Anti-Leakage Separation: Formally codified the 27 safe predictors (14 antecedent weather variables across [t-30, t-1], 6 zonal terrain statistics, 4 static hydrological metrics, and 3 spatial/calendar indices). All 30 non-predictor columns (including target variables, temporal anchors, district identifiers, quality flags, and flood event metadata: `event_count`, `source_event_ids`, `main_causes`, `severities`, `fatalities`, `displaced`) are strictly prohibited from entering feature sets to eliminate target leakage.
+3. Three-State Contract & PU-Framing Formalization: Confirmed that `district_day_matrix_2011_2023.parquet` preserves exact positive disaster evidence (13,156 FLOOD, 9.25%) and unrecorded dates as UNKNOWN / NULL (129,072, 90.75%), with zero synthetic NO_FLOOD labels. Reaffirmed that UNKNOWN cannot be converted to 0 under ordinary cross-entropy without severe label noise; framed the task under Positive-Unlabeled (PU) learning.
+4. Spatial Weights & Multi-District Event Analysis: Verified that all 31 districts have geometric area intersection weights summing to exactly 1.000000 across 318 ERA5 grid cells. Identified that 66 of 183 unique disaster event IDs (UEIs) span multiple districts simultaneously (e.g. `UEI-IMD-FL-2023-0337` spanning 30 districts), demonstrating that random row splitting causes catastrophic spatial event leakage. Mandated chronological expanding-window splitting with temporal generalization as the primary production objective.
+5. Incomplete Initialization Lookback Policy: Verified that exactly 930 rows (Jan 1–30, 2011, 30 days x 31 districts) possess incomplete 30-day weather lookback (all labeled UNKNOWN). Codified Policy A (excluding these 930 rows from model training and validation) to ensure 100% complete feature vectors without artificial imputation.
+6. Temporal Experiment Split Design: Codified the chronological experiment partition: Train (2011-01-01 to 2019-12-31, 101,897 rows, 4,628 floods, 4.54% prevalence), Validation (2020-01-01 to 2021-12-31, 22,661 rows, 8,408 floods, 37.10% prevalence), and Held-Out Test (2022-01-01 to 2023-07-24, 17,670 rows, 120 floods, 0.68% prevalence). Clarified that post-2023-07-24 data contains zero verified labels and serves strictly as an operational forward inference test-bed.
+7. Absolute Prohibition on Model Training: Zero ML models were trained during this phase.
+**Affected components:** `backend/tests/test_recent_district_matrix.py`, `data/processed/ml_matrix/recent/ml_dataset_reconciliation_audit.json`, `docs/PHASE_8_1_ML_DATASET_AUDIT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-047 — Phase 5.4 Baseline ML Modeling & Validation Contract**
+**Date:** 2026-09-30
+**Status:** IMPLEMENTED (Phase 5.4 Baseline Modeling)
+**Decision:**
+1. Dedicated Reproducible Experiment Harness: Established `backend/app/ml/experiment/` modular harness (dataset loading, chronological splitting, PU evaluation metrics, baseline models, and experiment runner).
+2. Strict PU Target Formulation & Metric Rigor: Trained models on proxy labeling indicator $s \in \{0, 1\}$ (1 = FLOOD, 0 = UNKNOWN) under the Selected At Random (SCAR) assumption. Accuracy and Specificity were marked `NOT APPLICABLE` due to zero verified negatives. Evaluated models on PR-AUC, ROC-AUC, empirical precision lower bound, positive-class recall, Brier score, Elkan-Noto label frequency $\hat{c}$, and Lee-Liu PU criterion.
+3. Cold-Start Initialization Boundary Enforcement: Automatically excluded the 930 initialization rows (Jan 1–30, 2011) where `is_weather_complete_30d == False`, maintaining 100% complete feature vectors without synthetic weather imputation.
+4. Chronological Zero-Leakage Partitions: Enforced non-overlapping chronological split: Train (2011-01-31 to 2019-12-31, 100,967 rows), Validation (2020-01-01 to 2021-12-31, 22,661 rows), and Held-Out Test (2022-01-01 to 2023-07-24, 17,670 rows). The decision threshold was discovered on Validation and applied to Test without modification.
+5. Baseline Models Established:
+   - Logistic Regression Baseline: L2-penalized, standardized on training data only. Achieved Validation PR-AUC = 0.4320, Test PR-AUC = 0.0531, Test ROC-AUC = 0.7906, achieving 100% recall on verified test flood events.
+   - Random Forest Baseline: 100 trees, max depth 10, balanced subsampling. Achieved Validation PR-AUC = 0.4513, Test PR-AUC = 0.0154, Test ROC-AUC = 0.7013, achieving 98.33% recall on verified test flood events.
+6. Absolute Exclusion of Advanced Architectures: LightGBM, XGBoost, neural networks, and deep learning architectures were strictly excluded from this phase.
+7. Model Artifact Serialization: Persisted model pipelines and machine-readable metadata JSONs under `models/experiments/phase_5_4/logistic_regression/` and `models/experiments/phase_5_4/random_forest/`.
+**Affected components:** `backend/app/ml/experiment/`, `backend/tests/test_experiment_baseline.py`, `models/experiments/phase_5_4/`, `docs/PHASE_5_4_BASELINE_MODEL_REPORT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-048 — Phase 5.5 Advanced PU Modeling & Nonlinear Benchmark Contract**
+**Date:** 2026-09-30
+**Status:** IMPLEMENTED (Phase 5.5 Advanced PU Modeling)
+**Decision:**
+1. Non-SCAR PU Bagging Implementation: Implemented `PUBaggingClassifier` (Mordelet & Vert, 2014) in `backend/app/ml/experiment/pu_bagging.py` with 15 decision tree bags, subsampling unlabeled background data at a 3:1 ratio to verified positives. This algorithm ranks positive likeness relative to the empirical covariate distribution without requiring the unvalidated Selected At Random (SCAR) assumption.
+2. Scientific Audit & Rejection of Dry-Season Negative Conditioning: Formally evaluated candidate subset `CONDITIONAL_NEGATIVE_CANDIDATE` (January–March dry season with $\le 1.0\text{ mm}$ 30-day rain and $0.0\text{ mm}$ 1-day rain; 14,681 rows). Discovered 1,193 documented IFI flood events within this subset (8.13% prevalence) caused by prolonged inundation, upstream dam discharges, and multi-month disaster declarations. Rejected converting `UNKNOWN` to `NO_FLOOD`; kept status strictly `DISABLED_FOR_TRAINING` to prevent severe label corruption.
+3. Nonlinear Tree Benchmark (LightGBM): Implemented `LightGBMExperimentModel` in `backend/app/ml/experiment/nonlinear_lgbm.py` under conservative hyperparameters (100 trees, depth 5, balanced class weighting, no AutoML).
+4. Physical Monotonic Constraints Investigation: Implemented and evaluated directional monotonic constraints ($+1$) on the 7 precipitation accumulation features (`precip_1d_mm`, `precip_3d_sum_mm`, `precip_7d_sum_mm`, `precip_14d_sum_mm`, `precip_30d_sum_mm`, `precip_7d_max_mm`, `precip_14d_max_mm`) and 0 on the remaining 20 features. Confirmed that monotonic constraints improve test generalization (Test PR-AUC increased from 0.0263 to 0.0279, Test ROC-AUC increased from 0.7359 to 0.7414) while guaranteeing physically plausible risk behavior.
+5. Disaster Event Lineage Audit: Verified across all 183 historical disaster event IDs that zero events span multiple chronological partitions (0 Train/Val overlap, 0 Val/Test overlap, 0 Train/Test overlap), establishing complete disaster independence between partitions. Highlighted that 66 events span multiple districts (e.g. `UEI-IMD-FL-2023-0337` spanning 30 districts), reaffirming that random row splitting causes catastrophic event leakage.
+6. Empirical Benchmark Evaluation: Evaluated all 5 models under identical contracts. Observed that simple regularized linear models (Logistic Regression Test PR-AUC = 0.0531, ROC-AUC = 0.7906) generalize better under severe test catalog sparsity (0.68% prevalence) than unconstrained tree models which overfit high-prevalence validation data (37.10%). Reaffirmed that no single model should be declared "best" or ranked as ground truth.
+7. Model Artifact Serialization: Serialized model pipelines and metadata JSONs under `models/experiments/phase_5_5/pu_bagging/`, `models/experiments/phase_5_5/lightgbm_unconstrained/`, `models/experiments/phase_5_5/lightgbm_monotonic/`, and `models/experiments/phase_5_5/benchmark_comparison.json`.
+**Affected components:** `backend/app/ml/experiment/`, `backend/tests/test_experiment_phase_5_5.py`, `models/experiments/phase_5_5/`, `docs/PHASE_5_5_ADVANCED_PU_MODEL_REPORT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-049 — Phase 5.6 Hydrological Feature Integration & Multi-Scale Data Gate Contract**
+**Date:** 2026-09-30
+**Status:** IMPLEMENTED (Phase 5.6 Hydrological Audit)
+**Decision:**
+1. Empirical Hydrological Data Audit: Audited Central Water Commission (CWC) / National Water Informatics Centre (NWIC) telemetry assets across database tables (`river_stations`, `river_observations`) and raw ingested files (`data/raw/cwc/*.csv`). Confirmed that exactly 1 station (`AKKIHEBBAL` in Mandya) and 101 observations exist in PostgreSQL, and 29 Karnataka stations (299,850 observations) exist in raw CSVs, all exclusively dated to calendar year 2026 (Jan 1 – Aug 31, 2026) within the Cauvery basin.
+2. Historical Coverage Gate & Feature Blocking: Calculated observation coverage across all supervised periods: Historical Baseline (1969–1994, 294,376 district-days) has 0 observations (0.000%); Recent Supervised (2011–2023, 142,228 district-days) has 0 observations (0.000%). In accordance with the non-negotiable zero-fabrication rule (`missing != 0`), all 10 candidate hydrological features (`river_level_current`, `river_level_lag_1d`, `river_level_lag_3d`, `river_level_change_1d`, `river_level_change_3d`, `river_level_rolling_max_3d`, `river_level_rolling_max_7d`, `upstream_station_count`, `upstream_max_level`, `upstream_mean_level`) are formally marked `BLOCKED_FOR_HISTORICAL_TRAINING`.
+3. Prohibition on Missing-to-Zero Conversion & Threshold Fabrication: Prohibited converting missing river stages to 0.0 or filling them with constant means. Maintained uninvented `warning_level = NULL` and `danger_level = NULL` for all stations where official CWC danger thresholds are not published in telemetry metadata.
+4. M:N Multi-Scale Spatial Crosswalk: Reused authoritative KSR-SAC districts, CWC major basins (7 intersecting Karnataka), HydroBASINS Level-7 (116 sub-basins), and HydroRIVERS (15,371 reaches). Established reproducible crosswalk preserving M:N intersections (54 district-basin links, 264 district-subbasin links) with PostGIS geometric provenance and area weights.
+5. Strict Temporal Anti-Leakage & Timezone Alignment: Enforced prediction unit anchor at 00:00 UTC date $t$ and lookback window strictly bounded to $[t-30, t-1]$. Normalized Indian Standard Time (IST, UTC+5:30) to UTC before boundary checks; flagged records older than 72 hours as stale.
+6. Controlled Feature Ablation Specification: Formally designed three ablation tiers: Group A (27 canonical baseline predictors; active and validated), Group B (27 canonical + 10 hydrological features = 37 predictors; reserved for 2026+ operational forward inference), and Group C (10 hydrological predictors; diagnostic only).
+7. Parquet Dataset & ML Baseline Preservation: Maintained source Parquet datasets (`district_day_matrix_2011_2023.parquet` SHA-256 `d459e446...`) and Phase 5.4/5.5 model artifacts as 100% immutable and read-only.
+**Affected components:** `backend/app/ml/hydrology/`, `backend/tests/test_hydrological_features.py`, `docs/PHASE_5_6_HYDROLOGICAL_FEATURE_AUDIT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-050 — Phase 5.7 Historical ERA5 Completion & Feature-Readiness Audit Contract**
+**Date:** 2026-10-01
+**Status:** IMPLEMENTED (Phase 5.7 Historical Readiness Audit)
+**Decision:**
+1. Historical ERA5 Physical Inventory & Manifest Verification: Audited `data/raw/era5_historical/extraction_manifest.json` and physical storage. Established that historical extraction and daily processing are 100% complete across all 858 canonical chunks (858 SUCCEEDED, 0 RETRYABLE, 0 PENDING, 0 RUNNING) covering 26 years (1969–1994), 318 eligible cells (6 offshore excluded), and 33 batches. Verified 858 `.json.gz` (356.1 MB compressed) and 858 `.meta.json` files on disk, 858 historical daily parquets, and verified baseline feature matrix (`district_day_feature_matrix.parquet`, 294,376 rows, SHA-256 `849f722b4f5f6a9ee85882abf787ae3d6ea5e0abdb563f499567ede738e06d55`).
+2. Authoritative Predictor Contract (27 Canonical Predictors): Formalized the complete specification table for 27 active predictors (14 antecedent weather variables across $[t-30, t-1]$, 6 zonal terrain statistics from SRTM 30m DEM, 4 static hydrological metrics from CWC/HydroBASINS/HydroRIVERS, and 3 spatial/calendar indices). All targets, event identifiers, and post-event disaster metadata are strictly excluded.
+3. Strict Anti-Leakage & Timezone Invariant: Verified line-by-line across both historical and recent matrix generators that target prediction anchor date $t$ enforces lookback strictly in $[t-30, t-1]$ (lead time $\ge 1$ day). Zero observations from day $t$ or future dates enter any predictor.
+4. Cold-Start Initialization Boundary Enforcement: Confirmed that the first 30 days of any continuous meteorological sequence (930 rows for Jan 1–30, 1969; 930 rows for Jan 1–30, 2011) have incomplete 30-day lookback windows (`is_weather_complete_30d == False`). Reaffirmed Policy A: these rows are explicitly filtered out prior to training rather than being imputed or zero-filled.
+5. Spatial Weights Invariant Audit: Audited `data/processed/gis_cache/district_era5_weights.json`. Verified that all 31 districts reference only the 318 eligible cells, the 6 offshore cells remain excluded, and spatial weights for every district sum to exactly 1.000000.
+6. Operational Hydrology Isolation: Reaffirmed that in-situ river stage telemetry (CWC/NWIC) is available only for 2026 (0.000% historical coverage) and remains strictly `BLOCKED_FOR_HISTORICAL_TRAINING`.
+7. Parquet Dataset & Model Preservation: Maintained all existing Parquet datasets and Phase 5.4/5.5 model artifacts as 100% immutable and read-only.
+**Affected components:** `backend/app/ml/historical_readiness.py`, `backend/tests/test_historical_feature_readiness.py`, `docs/PHASE_5_7_HISTORICAL_FEATURE_READINESS_AUDIT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.

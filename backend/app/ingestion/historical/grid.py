@@ -414,11 +414,12 @@ def generate_chunks(
     end_year: int,
     batch_size: int = 10,
     eligible_only: bool = True,
+    final_end_date: str | None = None,
 ) -> list[ExtractionChunk]:
     """
     Generate deterministic extraction chunks for a specified range of calendar years.
 
-    Each chunk represents 1 spatial batch for 1 complete calendar year.
+    Each chunk represents 1 spatial batch for 1 calendar year (or partial year if final_end_date is set).
     For the full 1969–1994 span (26 years) and 33 batches, exactly 858 chunks are generated.
     """
     if start_year > end_year:
@@ -428,6 +429,7 @@ def generate_chunks(
     chunks: list[ExtractionChunk] = []
 
     for year in range(start_year, end_year + 1):
+        chunk_end_date = final_end_date if (year == end_year and final_end_date is not None) else None
         for batch_idx, batch_cells in enumerate(batches, start=1):
             chunk_id = f"era5_{year}_batch_{batch_idx:03d}"
             chunks.append(
@@ -436,6 +438,8 @@ def generate_chunks(
                     year=year,
                     batch_id=batch_idx,
                     cells=batch_cells,
+                    start_date=f"{year}-01-01" if chunk_end_date else None,
+                    end_date=chunk_end_date,
                 )
             )
 

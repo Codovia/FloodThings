@@ -66,6 +66,8 @@ class DailyProcessor:
         year: int,
         batch_id: int,
         cells: list[GridCell] | None = None,
+        start_date: str | None = None,
+        end_date: str | None = None,
     ) -> DailyValidationResult:
         """
         Process a single raw extraction chunk identified by year and batch_id.
@@ -82,17 +84,33 @@ class DailyProcessor:
             else:
                 cells = []
 
+        # 1. Locate raw file and companion metadata
+        raw_dir = self.config.raw_base_dir / f"year={year}"
+        raw_file = raw_dir / f"batch_{batch_id:03d}.json.gz"
+        meta_file = raw_dir / f"batch_{batch_id:03d}.meta.json"
+
+        # Discover date bounds from meta file if not explicitly supplied
+        effective_start_date = start_date
+        effective_end_date = end_date
+        if meta_file.exists():
+            try:
+                with open(meta_file, "r", encoding="utf-8") as mf:
+                    meta_json = json.load(mf)
+                    if effective_start_date is None:
+                        effective_start_date = meta_json.get("requested_start_date")
+                    if effective_end_date is None:
+                        effective_end_date = meta_json.get("requested_end_date")
+            except Exception:
+                pass
+
         chunk = ExtractionChunk(
             chunk_id=chunk_id,
             year=year,
             batch_id=batch_id,
             cells=cells,
+            start_date=effective_start_date,
+            end_date=effective_end_date,
         )
-
-        # 1. Locate raw file and companion metadata
-        raw_dir = self.config.raw_base_dir / f"year={year}"
-        raw_file = raw_dir / f"batch_{batch_id:03d}.json.gz"
-        meta_file = raw_dir / f"batch_{batch_id:03d}.meta.json"
 
         if not raw_file.exists() or raw_file.stat().st_size == 0:
             err = f"Raw file {raw_file} does not exist or is empty"
@@ -168,6 +186,8 @@ class DailyProcessor:
             records=daily_records,
             expected_year=year,
             expected_cells=cells,
+            expected_start_date=effective_start_date,
+            expected_end_date=effective_end_date,
         )
 
         if not val_result.is_valid:

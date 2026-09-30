@@ -76,10 +76,15 @@ class HistoricalChunkValidator:
             )
 
         # 2. Expected Hourly Count
+        start_date = chunk.start_date or f"{chunk.year}-01-01"
+        end_date = chunk.end_date or f"{chunk.year}-12-31"
+        start_dt = datetime.fromisoformat(start_date)
+        end_dt = datetime.fromisoformat(end_date)
+        expected_days = (end_dt.date() - start_dt.date()).days + 1
+        expected_hours_per_loc = expected_days * 24
+        expected_first_time = f"{start_date}T00:00"
+        expected_last_time = f"{end_date}T23:00"
         is_leap = calendar.isleap(chunk.year)
-        expected_hours_per_loc = 8784 if is_leap else 8760
-        expected_first_time = f"{chunk.year}-01-01T00:00"
-        expected_last_time = f"{chunk.year}-12-31T23:00"
 
         total_records_validated = 0
         total_null_counts: dict[str, int] = {v: 0 for v in self.config.hourly_variables}

@@ -43,6 +43,8 @@ class DailyDatasetValidator:
         records: Sequence[DailyRecord],
         expected_year: int,
         expected_cells: Sequence[GridCell] | None = None,
+        expected_start_date: str | None = None,
+        expected_end_date: str | None = None,
     ) -> DailyValidationResult:
         """
         Validate a collection of DailyRecord objects for a single chunk.
@@ -60,14 +62,15 @@ class DailyDatasetValidator:
                 errors=errors,
             )
 
+        start_date = expected_start_date or f"{expected_year}-01-01"
+        end_date = expected_end_date or f"{expected_year}-12-31"
+        start_dt = datetime.fromisoformat(start_date).date()
+        end_dt = datetime.fromisoformat(end_date).date()
+        expected_days_per_cell = (end_dt - start_dt).days + 1
         is_leap = calendar.isleap(expected_year)
-        expected_days_per_cell = 366 if is_leap else 365
-        start_date = f"{expected_year}-01-01"
-        end_date = f"{expected_year}-12-31"
         leap_day = f"{expected_year}-02-29"
 
-        # Continuous expected date sequence for the year
-        start_dt = datetime(expected_year, 1, 1).date()
+        # Continuous expected date sequence for the date range
         expected_dates = {
             (start_dt + timedelta(days=d)).isoformat()
             for d in range(expected_days_per_cell)
@@ -210,7 +213,7 @@ class DailyDatasetValidator:
 
             # Leap day verification
             if is_leap:
-                if leap_day not in dates_seen:
+                if leap_day in expected_dates and leap_day not in dates_seen:
                     errors.append(f"{cell_tag}: Missing leap day {leap_day} for leap year {expected_year}")
             else:
                 if leap_day in dates_seen:

@@ -47,6 +47,8 @@ class ExtractionChunk:
     year: int
     batch_id: int
     cells: list[GridCell]
+    start_date: str | None = None
+    end_date: str | None = None
 
     @property
     def coordinates(self) -> list[tuple[float, float]]:

@@ -9,6 +9,7 @@ import gzip
 import hashlib
 import json
 from pathlib import Path
+import time
 from typing import Any
 
 from app.ingestion.historical.client import (
@@ -76,28 +77,34 @@ class HistoricalExtractor:
             )
 
         # 2. Register & Mark RUNNING
-        self.manifest.register_chunks([chunk])
-        self.manifest.mark_running(chunk_id)
+        if not self.config.dry_run:
+            self.manifest.register_chunks([chunk])
+            self.manifest.mark_running(chunk_id)
 
         # 3. Fetch from API
         try:
             raw_bytes, parsed_json, http_status, latency = self.client.fetch_chunk_payload(chunk)
         except RateLimitExceededError as rle:
-            self.manifest.mark_failed(chunk_id, str(rle), ChunkStatus.RETRYABLE)
+            if not self.config.dry_run:
+                self.manifest.mark_failed(chunk_id, str(rle), ChunkStatus.RETRYABLE)
             return ValidationResult(is_valid=False, status=ChunkStatus.RETRYABLE, errors=[str(rle)])
         except ServerError as se:
-            self.manifest.mark_failed(chunk_id, str(se), ChunkStatus.RETRYABLE)
+            if not self.config.dry_run:
+                self.manifest.mark_failed(chunk_id, str(se), ChunkStatus.RETRYABLE)
             return ValidationResult(is_valid=False, status=ChunkStatus.RETRYABLE, errors=[str(se)])
         except MalformedResponseError as mre:
-            self.manifest.mark_failed(chunk_id, str(mre), ChunkStatus.VALIDATION_FAILED)
+            if not self.config.dry_run:
+                self.manifest.mark_failed(chunk_id, str(mre), ChunkStatus.VALIDATION_FAILED)
             return ValidationResult(is_valid=False, status=ChunkStatus.VALIDATION_FAILED, errors=[str(mre)])
         except HistoricalExtractionError as hee:
             status = ChunkStatus.RETRYABLE if hee.retryable else ChunkStatus.PERMANENTLY_FAILED
-            self.manifest.mark_failed(chunk_id, str(hee), status)
+            if not self.config.dry_run:
+                self.manifest.mark_failed(chunk_id, str(hee), status)
             return ValidationResult(is_valid=False, status=status, errors=[str(hee)])
         except Exception as unk:
             err_msg = f"Unexpected extraction error: {unk}"
-            self.manifest.mark_failed(chunk_id, err_msg, ChunkStatus.PERMANENTLY_FAILED)
+            if not self.config.dry_run:
+                self.manifest.mark_failed(chunk_id, err_msg, ChunkStatus.PERMANENTLY_FAILED)
             return ValidationResult(is_valid=False, status=ChunkStatus.PERMANENTLY_FAILED, errors=[err_msg])
 
         # 4. Calculate Raw Payload SHA-256
@@ -135,8 +142,8 @@ class HistoricalExtractor:
                 requested_url=self.client.build_request_url(chunk),
                 requested_model=self.config.model,
                 requested_coordinates=[[c.lat, c.lon] for c in chunk.cells],
-                requested_start_date=f"{chunk.year}-01-01",
-                requested_end_date=f"{chunk.year}-12-31",
+                requested_start_date=chunk.start_date or f"{chunk.year}-01-01",
+                requested_end_date=chunk.end_date or f"{chunk.year}-12-31",
                 requested_timezone=self.config.timezone,
                 retrieved_at_utc=datetime.now(timezone.utc).isoformat(),
                 http_status=http_status,
@@ -150,16 +157,17 @@ class HistoricalExtractor:
                 json.dump(metadata.to_dict(), f, indent=2)
 
         # 7. Update Manifest to SUCCEEDED
-        self.manifest.mark_succeeded(
-            chunk_id=chunk_id,
-            raw_path=str(raw_file_path),
-            payload_sha256=payload_sha256,
-            compressed_sha256=compressed_sha256,
-            uncompressed_bytes=uncompressed_size,
-            compressed_bytes=compressed_size,
-            validation=val_result,
-            chunk=chunk,
-        )
+        if not self.config.dry_run:
+            self.manifest.mark_succeeded(
+                chunk_id=chunk_id,
+                raw_path=str(raw_file_path),
+                payload_sha256=payload_sha256,
+                compressed_sha256=compressed_sha256,
+                uncompressed_bytes=uncompressed_size,
+                compressed_bytes=compressed_size,
+                validation=val_result,
+                chunk=chunk,
+            )
         return val_result
 
     def extract_chunks(
@@ -179,14 +187,25 @@ class HistoricalExtractor:
         skipped = 0
 
         for idx, chunk in enumerate(target_chunks, start=1):
+            t_chunk = time.time()
             res = self.extract_chunk(chunk)
+            elapsed = time.time() - t_chunk
             if res.is_valid:
                 if res.warnings and "already completed" in res.warnings[0]:
                     skipped += 1
+                    status_str = "CACHED"
                 else:
                     succeeded += 1
+                    status_str = "SUCCEEDED"
             else:
                 failed += 1
+                status_str = f"FAILED ({'; '.join(res.errors[:1])})"
+
+            print(f"  [{idx:03d}/{total:03d}] {chunk.chunk_id} -> {status_str} ({elapsed:.2f}s)", flush=True)
+
+            if not res.is_valid and any("Rate limit" in err for err in res.errors):
+                print(f"  [RATE-LIMIT] Aborting extraction batch early after unrecoverable rate limit.", flush=True)
+                break
 
         return {
             "total_processed": total,
