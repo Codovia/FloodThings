@@ -147,3 +147,27 @@ def create_chronological_split(
         test_part.prevalence * 100,
     )
     return split
+
+
+def create_historical_chronological_split(
+    df: pd.DataFrame,
+    train_end_date: str = "1981-12-31",
+    val_start_date: str = "1982-01-01",
+    val_end_date: str = "1987-12-31",
+    test_start_date: str = "1988-01-01",
+    test_end_date: str = "1994-12-31",
+) -> ChronologicalSplit:
+    """
+    Partition historical dataset (1969-1994) into strictly chronological Train, Validation, and Test subsets:
+    - Train: 1969-01-01 to 1981-12-31
+    - Validation: 1982-01-01 to 1987-12-31
+    - Held-Out Test: 1988-01-01 to 1994-12-31
+    """
+    return create_chronological_split(
+        df=df,
+        train_end_date=train_end_date,
+        val_start_date=val_start_date,
+        val_end_date=val_end_date,
+        test_start_date=test_start_date,
+        test_end_date=test_end_date,
+    )

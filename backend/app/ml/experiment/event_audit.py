@@ -42,13 +42,21 @@ class EventLeakageAuditResult:
         return asdict(self)
 
 
-def audit_event_leakage(df: pd.DataFrame) -> EventLeakageAuditResult:
+def audit_event_leakage(
+    df: pd.DataFrame,
+    split: Any | None = None,
+) -> EventLeakageAuditResult:
     """
     Audit disaster event IDs across chronological train, validation, and test splits.
     """
-    train_mask = df["target_date"] <= "2019-12-31"
-    val_mask = (df["target_date"] >= "2020-01-01") & (df["target_date"] <= "2021-12-31")
-    test_mask = (df["target_date"] >= "2022-01-01") & (df["target_date"] <= "2023-07-24")
+    if split is not None:
+        train_mask = split.train.mask
+        val_mask = split.val.mask
+        test_mask = split.test.mask
+    else:
+        train_mask = df["target_date"] <= "2019-12-31"
+        val_mask = (df["target_date"] >= "2020-01-01") & (df["target_date"] <= "2021-12-31")
+        test_mask = (df["target_date"] >= "2022-01-01") & (df["target_date"] <= "2023-07-24")
 
     def _extract_events(sub_df: pd.DataFrame) -> set[str]:
         events = set()

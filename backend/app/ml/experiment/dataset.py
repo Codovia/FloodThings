@@ -24,9 +24,14 @@ import pyarrow.parquet as pq
 
 logger = logging.getLogger(__name__)
 
-# Expected SHA-256 digest of the audited supervised feature matrix
+# Expected SHA-256 digest of the audited supervised feature matrix (Recent 2011-2023)
 EXPECTED_SUPERVISED_SHA256 = (
     "d459e4461166842e194de8f8373f227585169f124cd620160a4aea74651e5dac"
+)
+
+# Expected SHA-256 digest of the audited historical feature matrix (1969-1994)
+EXPECTED_HISTORICAL_SHA256 = (
+    "849f722b4f5f6a9ee85882abf787ae3d6ea5e0abdb563f499567ede738e06d55"
 )
 
 # Canonical 27 predictor features (deterministic ordering)
@@ -156,13 +161,14 @@ def load_supervised_dataset(
     parquet_path: Path | str | None = None,
     verify_sha256: bool = True,
     exclude_cold_start: bool = True,
+    expected_sha256: str | None = None,
 ) -> ExperimentDataset:
     """
-    Load the supervised feature matrix, verify SHA-256 integrity, filter cold-start rows,
-    and enforce canonical predictor whitelist.
+    Load a supervised feature matrix (Recent or Historical), verify SHA-256 integrity,
+    filter cold-start rows, and enforce canonical predictor whitelist.
     """
     if parquet_path is None:
-        # Default project path
+        # Default project path (recent supervised matrix)
         curr = Path(__file__).resolve().parent
         project_root = curr.parents[3]
         parquet_path = (
@@ -179,12 +185,21 @@ def load_supervised_dataset(
     if not parquet_path.exists():
         raise FileNotFoundError(f"Supervised Parquet matrix not found: {parquet_path}")
 
+    # Determine target expected SHA-256
+    if expected_sha256 is None:
+        if "district_day_feature_matrix.parquet" in str(parquet_path):
+            target_sha = EXPECTED_HISTORICAL_SHA256
+        else:
+            target_sha = EXPECTED_SUPERVISED_SHA256
+    else:
+        target_sha = expected_sha256
+
     # 1. SHA-256 Verification
     actual_sha256 = compute_file_sha256(parquet_path)
-    if verify_sha256 and actual_sha256 != EXPECTED_SUPERVISED_SHA256:
+    if verify_sha256 and actual_sha256 != target_sha:
         raise ValueError(
             f"SHA-256 digest mismatch on {parquet_path}.\n"
-            f"Expected: {EXPECTED_SUPERVISED_SHA256}\n"
+            f"Expected: {target_sha}\n"
             f"Observed: {actual_sha256}"
         )
 
@@ -255,4 +270,31 @@ def load_supervised_dataset(
         num_positives=num_pos,
         num_unlabeled=num_unlab,
         num_negatives=num_neg,
+    )
+
+
+def load_historical_dataset(
+    parquet_path: Path | str | None = None,
+    verify_sha256: bool = True,
+    exclude_cold_start: bool = True,
+) -> ExperimentDataset:
+    """
+    Load the historical 1969-1994 baseline feature matrix, verify SHA-256 integrity,
+    filter cold-start rows, and enforce canonical predictor whitelist.
+    """
+    if parquet_path is None:
+        curr = Path(__file__).resolve().parent
+        project_root = curr.parents[3]
+        parquet_path = (
+            project_root
+            / "data"
+            / "processed"
+            / "ml_matrix"
+            / "district_day_feature_matrix.parquet"
+        )
+    return load_supervised_dataset(
+        parquet_path=parquet_path,
+        verify_sha256=verify_sha256,
+        exclude_cold_start=exclude_cold_start,
+        expected_sha256=EXPECTED_HISTORICAL_SHA256,
     )

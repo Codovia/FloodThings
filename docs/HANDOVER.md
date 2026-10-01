@@ -382,16 +382,27 @@ Updated docs/DECISIONS.md                      (Recorded Decision D-050)
 Updated docs/HANDOVER.md                       (Recorded Phase 5.7 completion & handover)
 ```
 
-Scientific Status:
-- Historical ERA5 Extraction (1969–1994): Exactly 858/858 chunks SUCCEEDED (100.0%). 0 RETRYABLE, 0 PENDING, 0 RUNNING. 858 raw `.json.gz` (356.1 MB compressed) and 858 `.meta.json` files intact on disk.
-- Historical Daily Parquets: Exactly 858 historical daily parquets on disk; `data/processed/ml_matrix/district_day_feature_matrix.parquet` (294,376 rows, SHA-256 `849f722b...`) intact.
-- Spatial Weights: Exactly 318 eligible cells across 31 districts, weights sum to 1.000000, 6 offshore cells excluded.
-- Temporal Anti-Leakage: Zero day-$t$ weather observation leakage; feature window strictly bounded to $[t-30, t-1]$.
-- Cold-Start Handling: 930 initialization rows (Jan 1–30) flagged and excluded from training without synthetic imputation.
-- Authoritative Feature Contract: 27 canonical active predictors (`READY`); 10 operational in-situ river telemetry features (`BLOCKED_FOR_HISTORICAL_TRAINING`).
-- ML Production Readiness: PU proxy baseline models only; NOT PRODUCTION READY.
+## Phase 5.8 Artifacts Created (Multi-Era Supervised Cross-Validation Benchmark)
 
-Wait for project owner review before proceeding to Phase 5.8 (Multi-Era Historical & Recent Supervised Cross-Validation / Operational Forward Architecture).
+```
+backend/app/ml/experiment/runner_phase_5_8.py  (Phase 5.8 benchmark runner: Exp A, Exp B, Exp C1, distribution shift, stability)
+backend/tests/test_multi_era_benchmark.py       (8 unit tests: parity, SHAs, splits, 0 event leak, label semantics, PU semantics, reproducibility, importances)
+data/processed/ml_experiments/phase_5_8/benchmark_summary.json (Full machine-readable multi-era benchmark summary)
+docs/PHASE_5_8_MULTI_ERA_GENERALIZATION_AUDIT.md (Authoritative scientific audit report across all 10 required sections)
+Updated docs/DECISIONS.md                      (Recorded Decision D-051)
+Updated docs/HANDOVER.md                       (Recorded Phase 5.8 completion & handover)
+```
+
+Scientific Status:
+- Cross-Era Generalization (Historical 1969–1994 -> Recent 2011–2023): Confirmed forward discriminative ranking (ROC-AUC 0.74–0.83 on recent test data, PR-AUC 0.0402 for Logistic Regression) across a 17-year observation gap.
+- Retrospective Benchmark (Recent 2011–2019 -> Historical 1969–1994): High documented-event recall (93–99% recall on historical floods). Low empirical precision lower bound (0.4–0.5%) reflects ~24-fold lower historical catalogue reporting density (0.39% vs 9.31%).
+- Domain Monotonicity Stability Boost: LightGBM Monotonic achieves highest cross-era feature importance stability (Spearman $\rho = +0.6422$, $p = 3.04 \times 10^{-4}$), outperforming unconstrained tree models ($\rho = +0.1169$).
+- Disaster Event Lineage: 96 historical event IDs, 183 recent event IDs. Cross-era overlap = 0. Within-era overlap = 0.
+- Predictor Distribution Shift: Static topography features show 0.000 drift across all 31 districts. Climate shows $+0.61^\circ\text{C}$ warming and $+15\%$ mean antecedent precipitation increase.
+- Dataset Immutability: Both historical (`849f722b...`) and recent (`d459e446...`) Parquets remain 100% read-only and unmodified.
+- Production Readiness: PU proxy baseline models only; NOT PRODUCTION READY. Zero verified negative labels exist.
+
+Wait for project owner review before proceeding to Phase 5.9 (Operational Forward Inference & Live Monitoring Architecture).
 
 ## Important warnings
 

@@ -623,3 +623,17 @@ Use APScheduler 3.10.4 `AsyncIOScheduler` integrated directly into FastAPI appli
 6. Operational Hydrology Isolation: Reaffirmed that in-situ river stage telemetry (CWC/NWIC) is available only for 2026 (0.000% historical coverage) and remains strictly `BLOCKED_FOR_HISTORICAL_TRAINING`.
 7. Parquet Dataset & Model Preservation: Maintained all existing Parquet datasets and Phase 5.4/5.5 model artifacts as 100% immutable and read-only.
 **Affected components:** `backend/app/ml/historical_readiness.py`, `backend/tests/test_historical_feature_readiness.py`, `docs/PHASE_5_7_HISTORICAL_FEATURE_READINESS_AUDIT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
+
+---
+
+**D-051 — Phase 5.8 Multi-Era Supervised Cross-Validation & Historical Generalization Benchmark Contract**
+**Date:** 2026-10-01
+**Status:** IMPLEMENTED (Phase 5.8 Multi-Era Benchmark)
+**Decision:**
+1. Cross-Era Generalization Verification: Completed full controlled cross-era benchmarks evaluating transferability between the Historical Baseline (1969–1994, 293,446 clean rows, 1,152 floods) and Recent Supervised (2011–2023, 141,298 clean rows, 13,156 floods) datasets across a 17-year observation gap. Confirmed forward discriminative ranking (ROC-AUC 0.74–0.83 on recent held-out test data) and high retrospective observed-positive recall (86–99% on historical floods from models trained on recent data).
+2. Domain Monotonicity Stability Boost: Confirmed that enforcing physical directional constraints ($+1$ on cumulative rainfall) in LightGBM yields the highest cross-era feature importance stability (Spearman rank correlation $\rho = +0.6422$, $p = 3.04 \times 10^{-4}$), outperforming unconstrained tree ensembles (Random Forest $\rho = +0.1169$). Both historical and recent models agree that antecedent rainfall accumulation (`precip_30d_sum_mm`, `precip_14d_sum_mm`) and monsoon seasonality (`day_of_year`) are primary drivers.
+3. Event Lineage & Split Isolation: Verified zero cross-era disaster event leakage between the 96 historical event IDs and 183 recent event IDs ($\mathcal{E}_H \cap \mathcal{E}_R = \emptyset$). Enforced strict chronological within-era partitions for historical data (Train 1969–1981, Val 1982–1987, Test 1988–1994) with zero cross-partition event contamination.
+4. Reporting Density Confounder Formalization: Codified that the ~24-fold difference in positive label prevalence (0.39% in 1969–1994 vs 9.31% in 2011–2023) is primarily an artifact of institutional disaster reporting, digital archiving, and satellite verification density rather than raw climatological change ($+0.61^\circ\text{C}$ warming, $+15\%$ precipitation mean).
+5. Dataset Immutability & Contract Preservation: Kept source Parquet matrices (`district_day_feature_matrix.parquet` SHA-256 `849f722b...`, `district_day_matrix_2011_2023.parquet` SHA-256 `d459e446...`) 100% read-only and unmodified. Persisted benchmark summary to `data/processed/ml_experiments/phase_5_8/benchmark_summary.json`.
+6. Negative & Operational Claims Prohibition: Reaffirmed zero verified `NO_FLOOD` labels, unvalidated SCAR, catalogue-conditioned PU proxy metric semantics, and absolute prohibition on declaring a production model.
+**Affected components:** `backend/app/ml/experiment/runner_phase_5_8.py`, `backend/tests/test_multi_era_benchmark.py`, `data/processed/ml_experiments/phase_5_8/`, `docs/PHASE_5_8_MULTI_ERA_GENERALIZATION_AUDIT.md`, `docs/DECISIONS.md`, `docs/HANDOVER.md`.
