@@ -1,3 +1,0 @@
-"""
-FloodPulse Pydantic schemas.
-"""

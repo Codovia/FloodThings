@@ -1,1 +1,0 @@
-# FloodPulse backend application package.

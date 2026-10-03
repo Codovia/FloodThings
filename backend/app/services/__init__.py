@@ -1,3 +1,0 @@
-"""
-FloodPulse backend service layer.
-"""
