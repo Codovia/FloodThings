@@ -1,0 +1,958 @@
+{
+  "version": "karnataka_nic_provisional_v1",
+  "status": "provisional_not_lgd_not_ready_for_extraction",
+  "stage_1_complete": false,
+  "state_name": "Karnataka",
+  "lgd_state_code": null,
+  "records": [
+    {
+      "district_name": "Bagalkote",
+      "district_website": "https://bagalkot.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Ballari",
+      "district_website": "https://ballari.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Belagavi",
+      "district_website": "https://belagavi.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Bengaluru Rural",
+      "district_website": "https://bangalorerural.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Bengaluru South",
+      "district_website": "https://ramanagara.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Bengaluru Urban",
+      "district_website": "https://bengaluruurban.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Bidar",
+      "district_website": "https://bidar.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B9794868259401",
+          "shapeName": "Bidar",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Chamarajanagar",
+      "district_website": "https://chamrajnagar.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B16628456658675",
+          "shapeName": "Chamarajanagar",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Chikkaballapura",
+      "district_website": "https://chikkaballapur.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B80772392204057",
+          "shapeName": "Chikkaballapura",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Chikkamagaluru",
+      "district_website": "https://chikkamagaluru.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Chitradurga",
+      "district_website": "https://chitradurga.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B47594161132413",
+          "shapeName": "Chitradurga",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Dakshina Kannada",
+      "district_website": "https://dk.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B54396396829952",
+          "shapeName": "Dakshina Kannada",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Davanagere",
+      "district_website": "https://davanagere.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B49597693387243",
+          "shapeName": "Davanagere",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Dharwad",
+      "district_website": "https://dharwad.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B75110579117636",
+          "shapeName": "Dharwad",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Gadag",
+      "district_website": "https://gadag.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B33966968116377",
+          "shapeName": "Gadag",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Hassan",
+      "district_website": "https://hassan.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B54775433755383",
+          "shapeName": "Hassan",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Haveri",
+      "district_website": "https://haveri.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B86721175299079",
+          "shapeName": "Haveri",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Kalaburagi",
+      "district_website": "https://kalaburagi.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Kodagu",
+      "district_website": "https://kodagu.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B57609583882472",
+          "shapeName": "Kodagu",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Kolar",
+      "district_website": "https://kolar.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B29292403538801",
+          "shapeName": "Kolar",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Koppal",
+      "district_website": "https://koppal.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B79601545186231",
+          "shapeName": "Koppal",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Mandya",
+      "district_website": "https://mandya.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B43335986553000",
+          "shapeName": "Mandya",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Mysuru",
+      "district_website": "https://mysore.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Raichur",
+      "district_website": "https://raichur.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B284680734793",
+          "shapeName": "Raichur",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Shivamogga",
+      "district_website": "https://shimoga.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Tumakuru",
+      "district_website": "https://tumkur.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Udupi",
+      "district_website": "https://udupi.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B4839184447445",
+          "shapeName": "Udupi",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Uttara Kannada",
+      "district_website": "https://uttarakannada.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B79180273895456",
+          "shapeName": "Uttara Kannada",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Vijayanagara",
+      "district_website": "https://vijayanagara.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Vijayapura",
+      "district_website": "https://vijayapura.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "unmatched",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [],
+      "verified_boundary_id": null
+    },
+    {
+      "district_name": "Yadgir",
+      "district_website": "https://yadgir.nic.in",
+      "lgd_district_code": null,
+      "lgd_state_code": null,
+      "identity_status": "provisional_nic_name_lgd_unresolved",
+      "boundary_match_status": "name_candidate_not_officially_reconciled",
+      "boundary_source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "boundary_source_version": "6.0.0; 2023-09-13 CGAZ composite",
+      "boundary_candidates": [
+        {
+          "centroid_within_state": true,
+          "shapeGroup": "IND",
+          "shapeID": "76128533B84927972855096",
+          "shapeName": "Yadgir",
+          "shapeType": "ADM2"
+        }
+      ],
+      "verified_boundary_id": null
+    }
+  ],
+  "boundary_inspection": {
+    "source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+    "state_source_id": "WM/geoLab/geoBoundaries/600/ADM1",
+    "version": "6.0.0; 2023-09-13 CGAZ composite",
+    "project": "floodpulse",
+    "retrieved_at": "2026-10-04T07:59:13.170336+00:00",
+    "query_parameters": {
+      "country": "IND",
+      "state_shape_id": "1811400B56841107211215",
+      "state_original_name": "Karn?taka",
+      "district_level": "ADM2",
+      "max_features": 80,
+      "geometry_error_m": 100,
+      "per_request_deadline_ms": 10000,
+      "retries": 0,
+      "wall_seconds": 90,
+      "selection": "filterBounds(actual ADM1 geometry); centroid containment metadata",
+      "polygon_export": false
+    },
+    "status": "available_metadata_only",
+    "geometry_validation": "not_run_metadata_only",
+    "access": {
+      "initialization": "succeeded",
+      "constant_probe": 1,
+      "retrieved_at": "2026-10-04T07:59:23.162967+00:00"
+    },
+    "state_properties": {
+      "shapeGroup": "IND",
+      "shapeID": "1811400B56841107211215",
+      "shapeName": "Karn?taka",
+      "shapeType": "ADM1"
+    },
+    "state_bounds": [
+      [
+        [
+          74.08568983930105,
+          11.595669356611083
+        ],
+        [
+          78.58761612906538,
+          11.595669356611083
+        ],
+        [
+          78.58761612906538,
+          18.45883678739407
+        ],
+        [
+          74.08568983930105,
+          18.45883678739407
+        ],
+        [
+          74.08568983930105,
+          11.595669356611083
+        ]
+      ]
+    ],
+    "boundary_candidates": [
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B22471914548132",
+        "shapeName": "Chittoor",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B28294794137747",
+        "shapeName": "Kurnool",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B52664671961643",
+        "shapeName": "Anantapur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B1711704044407",
+        "shapeName": "North Goa",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B63117839967753",
+        "shapeName": "South Goa",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B41976979530466",
+        "shapeName": "Kannur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B63366045987285",
+        "shapeName": "Kasaragod",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B82539771173603",
+        "shapeName": "Wayanad",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B43335986553000",
+        "shapeName": "Mandya",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B95879808095476",
+        "shapeName": "Mysore",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B80772392204057",
+        "shapeName": "Chikkaballapura",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B84927972855096",
+        "shapeName": "Yadgir",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B15550697205080",
+        "shapeName": "Chikmagalur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B47594161132413",
+        "shapeName": "Chitradurga",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B86721175299079",
+        "shapeName": "Haveri",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B54396396829952",
+        "shapeName": "Dakshina Kannada",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B284680734793",
+        "shapeName": "Raichur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B29292403538801",
+        "shapeName": "Kolar",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B40495457052818",
+        "shapeName": "Bijapur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B79180273895456",
+        "shapeName": "Uttara Kannada",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B49597693387243",
+        "shapeName": "Davanagere",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B75110579117636",
+        "shapeName": "Dharwad",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B9794868259401",
+        "shapeName": "Bidar",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B16628456658675",
+        "shapeName": "Chamarajanagar",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B1083016608278",
+        "shapeName": "Gulbarga",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B33966968116377",
+        "shapeName": "Gadag",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B4839184447445",
+        "shapeName": "Udupi",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B83278580643229",
+        "shapeName": "Bagalkot",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B54775433755383",
+        "shapeName": "Hassan",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B85389886560116",
+        "shapeName": "Shimoga",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B92621859299479",
+        "shapeName": "Bellary",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B57609583882472",
+        "shapeName": "Kodagu",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B48075109668277",
+        "shapeName": "Bangalore Rural",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B64905184636422",
+        "shapeName": "Tumkur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B74319098136622",
+        "shapeName": "Belgaum",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B79601545186231",
+        "shapeName": "Koppal",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B76927648517269",
+        "shapeName": "Bangalore",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": true,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B79600797037735",
+        "shapeName": "Ramanagara",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B98050240849249",
+        "shapeName": "Latur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B62490300334729",
+        "shapeName": "Solapur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B20474666262371",
+        "shapeName": "Osmanabad",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B39238815774480",
+        "shapeName": "Sindhudurg",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B66719908763317",
+        "shapeName": "Kolhapur",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B63783580004876",
+        "shapeName": "Nanded",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B9892158671522",
+        "shapeName": "Sangli",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B35717069663408",
+        "shapeName": "Krishnagiri",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B15337568968545",
+        "shapeName": "Erode",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B21812274124310",
+        "shapeName": "The Nilgiris",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B21068662878849",
+        "shapeName": "Kamareddy",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B40480360118262",
+        "shapeName": "Sangareddy",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B74887942950962",
+        "shapeName": "Vikarabad",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B72829420975835",
+        "shapeName": "Jogulamba",
+        "shapeType": "ADM2"
+      },
+      {
+        "centroid_within_state": false,
+        "shapeGroup": "IND",
+        "shapeID": "76128533B14968875277413",
+        "shapeName": "Narayanpet",
+        "shapeType": "ADM2"
+      }
+    ],
+    "asset_version": 1710456098096623,
+    "completed_at": "2026-10-04T07:59:28.730236+00:00"
+  },
+  "spatial_validation": "not_run_no_officially_reconciled_polygons"
+}
