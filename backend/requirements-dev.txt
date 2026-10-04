@@ -1,3 +1,4 @@
 -r requirements.txt
 pytest==9.0.2
 -r ../scripts/requirements-spatial.txt
+-r ../scripts/requirements-boundaries.txt

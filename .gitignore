@@ -13,6 +13,7 @@ data/raw/
 data/tmp/
 data/exports/
 data/recovery/
+data/working/
 tmp/
 exports/
 *.tif

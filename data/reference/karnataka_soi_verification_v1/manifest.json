@@ -1,0 +1,799 @@
+{
+  "version": "karnataka_soi_abdb2025_verification_v1",
+  "inspected_at": "2026-10-04T10:17:11.596641+00:00",
+  "stage_1_complete": false,
+  "status": "verified_soi_source_not_current_lgd_reconciled",
+  "sources": {
+    "archive": {
+      "original_name": "State_District_Subdistrict_PAN_INDIA.rar",
+      "bytes": 202524438,
+      "sha256": "b8325e5d9dd0f04a6663d775363fe38cd2f23bd9dbae3fb7118b4e6e0ce0bcb7",
+      "url": "https://surveyofindia.gov.in/documents/State_District_Subdistrict_PAN%20INDIA.rar",
+      "original_retrieved_at": null
+    },
+    "metadata_zip": {
+      "original_name": "Metadata_ABDB.zip",
+      "bytes": 38879,
+      "sha256": "1a14716b73f00fc8391f2708a7975c2f2c1ad4a4e91aafb6dce6546a039e9514",
+      "url": "https://surveyofindia.gov.in/documents/Metadata_ABDB.zip",
+      "original_retrieved_at": null
+    },
+    "district_components": [
+      {
+        "original_name": "District Boundary.shp",
+        "bytes": 136610876,
+        "sha256": "05efac0a02c113f25cd55df3f01a4aee7201bfc9b299f73bb3e273b9aa7e3740"
+      },
+      {
+        "original_name": "District Boundary.shx",
+        "bytes": 6564,
+        "sha256": "691482470b29fe9d5c6d5a7753e90823a1fbe162c603c6260fbd28b5e0a23aea"
+      },
+      {
+        "original_name": "District Boundary.dbf",
+        "bytes": 282282,
+        "sha256": "0bcc1d46dcbc403f29c47c8c47db2fe4b71e802cd3c8038fc4663765fc2c4236"
+      },
+      {
+        "original_name": "District Boundary.prj",
+        "bytes": 454,
+        "sha256": "4e0115a1711327038fc52f74a11a80ee1c399c8d84e8f0e5f54bf00b9fd20f16"
+      },
+      {
+        "original_name": "District Boundary.cpg",
+        "bytes": 5,
+        "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+      }
+    ],
+    "state_components": [
+      {
+        "original_name": "State Boundary.shp",
+        "bytes": 27497672,
+        "sha256": "602505cbaa149c3aef1701e8bc69cfbda7d8a73c2c2c4d891892bb67ba95b779"
+      },
+      {
+        "original_name": "State Boundary.shx",
+        "bytes": 420,
+        "sha256": "c1edfa5638ec217291460d871db6ef0772b249c075ef6d4b06ae35f6bac127fc"
+      },
+      {
+        "original_name": "State Boundary.dbf",
+        "bytes": 6586,
+        "sha256": "e6afe169ff7055d02471a6ddae6536bed4c1dfb02c50765c0166ca2eb9a17ea0"
+      },
+      {
+        "original_name": "State Boundary.prj",
+        "bytes": 454,
+        "sha256": "4e0115a1711327038fc52f74a11a80ee1c399c8d84e8f0e5f54bf00b9fd20f16"
+      },
+      {
+        "original_name": "State Boundary.cpg",
+        "bytes": 5,
+        "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+      }
+    ],
+    "nic_inventory": {
+      "original_name": "district_names.json",
+      "bytes": 31265,
+      "sha256": "419fad46ef9eb4369809c4d9710f417089138792e9669fb1781e41c451fafcbc"
+    }
+  },
+  "metadata": {
+    "district_workbook": {
+      "sha256": "6b05a2497fa8e6dd196c8534f75f8d8dcd76307b0132807e939adb886b72b21d",
+      "bytes": 11250,
+      "zip_entry_modification_time_not_reference_date": [
+        2026,
+        5,
+        20,
+        15,
+        56,
+        16
+      ]
+    },
+    "district_cells": {
+      "B4": "SOI/ABDB/VECTOR/50000/2025/DISTRICT/INDIA",
+      "B6": "2026-05-06",
+      "B7": "publication",
+      "B23": "50000",
+      "B26": "2022-2025",
+      "B28": "2022-2025",
+      "B29": "creation",
+      "B30": "SOI/ABDB/VECTOR/50000/2025/DISTRICT/INDIA",
+      "B31": "2025",
+      "B48": "LCC- WGS84; EPSG7755",
+      "B53": "Horizontal RMSE \u00b112.5 m",
+      "B54": "copyright",
+      "B55": "copyright"
+    },
+    "state_workbook": {
+      "sha256": "151b874a567bf485cc608a32ac58c37433deb34d9e830c190af107e1a353ae5d",
+      "bytes": 11232,
+      "zip_entry_modification_time_not_reference_date": [
+        2026,
+        5,
+        20,
+        15,
+        49,
+        8
+      ]
+    },
+    "administrative_reference": "Karnataka harmonization year 2025; exact effective day unspecified",
+    "scale": "1:50000",
+    "accuracy_status": "publisher-stated, not independently measured",
+    "publication_date": "2026-05-06",
+    "edition_year": "2025"
+  },
+  "crs": {
+    "actual_wkt": "PROJCS[\"LCC_WGS84\",GEOGCS[\"GCS_WGS_1984\",DATUM[\"D_WGS_1984\",SPHEROID[\"WGS_1984\",6378137.0,298.257223563]],PRIMEM[\"Greenwich\",0.0],UNIT[\"Degree\",0.0174532925199433]],PROJECTION[\"Lambert_Conformal_Conic\"],PARAMETER[\"False_Easting\",4000000.0],PARAMETER[\"False_Northing\",4000000.0],PARAMETER[\"Central_Meridian\",80.0],PARAMETER[\"Standard_Parallel_1\",12.472944],PARAMETER[\"Standard_Parallel_2\",35.172806],PARAMETER[\"Latitude_Of_Origin\",24.0],UNIT[\"Meter\",1.0]]",
+    "actual_authority": null,
+    "matches_metadata_epsg7755": false,
+    "actual_operation_parameters": [
+      {
+        "name": "Latitude of false origin",
+        "value": 24.0,
+        "unit": "Degree"
+      },
+      {
+        "name": "Longitude of false origin",
+        "value": 80.0,
+        "unit": "Degree"
+      },
+      {
+        "name": "Latitude of 1st standard parallel",
+        "value": 12.472944,
+        "unit": "Degree"
+      },
+      {
+        "name": "Latitude of 2nd standard parallel",
+        "value": 35.172806,
+        "unit": "Degree"
+      },
+      {
+        "name": "Easting at false origin",
+        "value": 4000000.0,
+        "unit": "metre"
+      },
+      {
+        "name": "Northing at false origin",
+        "value": 4000000.0,
+        "unit": "metre"
+      }
+    ],
+    "epsg7755_operation_parameters": [
+      {
+        "name": "Latitude of false origin",
+        "value": 24.0,
+        "unit": "degree"
+      },
+      {
+        "name": "Longitude of false origin",
+        "value": 80.0,
+        "unit": "degree"
+      },
+      {
+        "name": "Latitude of 1st standard parallel",
+        "value": 12.472955,
+        "unit": "degree"
+      },
+      {
+        "name": "Latitude of 2nd standard parallel",
+        "value": 35.172804444444445,
+        "unit": "degree"
+      },
+      {
+        "name": "Easting at false origin",
+        "value": 4000000.0,
+        "unit": "metre"
+      },
+      {
+        "name": "Northing at false origin",
+        "value": 4000000.0,
+        "unit": "metre"
+      }
+    ],
+    "output_rule": "preserve actual .prj and native coordinates, never relabel EPSG:7755"
+  },
+  "original_district_fields": [
+    [
+      "OBJECTID",
+      "N",
+      10,
+      0
+    ],
+    [
+      "STATE_UT",
+      "C",
+      50,
+      0
+    ],
+    [
+      "STATE_LGD",
+      "C",
+      50,
+      0
+    ],
+    [
+      "DISTRICT",
+      "C",
+      50,
+      0
+    ],
+    [
+      "DIST_LGD",
+      "C",
+      50,
+      0
+    ],
+    [
+      "REMARKS",
+      "C",
+      100,
+      0
+    ],
+    [
+      "Shape_Leng",
+      "N",
+      19,
+      11
+    ],
+    [
+      "Shape_Area",
+      "N",
+      19,
+      11
+    ]
+  ],
+  "original_state_fields": [
+    [
+      "OBJECTID_1",
+      "N",
+      10,
+      0
+    ],
+    [
+      "OBJECTID",
+      "N",
+      10,
+      0
+    ],
+    [
+      "STATE",
+      "C",
+      50,
+      0
+    ],
+    [
+      "Shape_Leng",
+      "N",
+      19,
+      11
+    ],
+    [
+      "Shape_Area",
+      "N",
+      19,
+      11
+    ],
+    [
+      "Country",
+      "C",
+      50,
+      0
+    ]
+  ],
+  "national_district_record_count": 808,
+  "karnataka_district_count": 31,
+  "nic_district_count": 31,
+  "district_count_agrees_with_nic": true,
+  "source_shape_type": 15,
+  "district_records": [
+    {
+      "source_record_index": 268,
+      "source_objectid": 344,
+      "district_name_original": "B<galkot",
+      "district_lgd_code_as_supplied_by_soi": "556",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 6563.00620878778,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 269,
+      "source_objectid": 345,
+      "district_name_original": "Bengal#ru (Rural)",
+      "district_lgd_code_as_supplied_by_soi": "583",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 2298.053375183859,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 270,
+      "source_objectid": 346,
+      "district_name_original": "Belag<vi",
+      "district_lgd_code_as_supplied_by_soi": "555",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 13405.07300939293,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 271,
+      "source_objectid": 347,
+      "district_name_original": "Chikkamagal#ru",
+      "district_lgd_code_as_supplied_by_soi": "570",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 7213.636981852976,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 272,
+      "source_objectid": 348,
+      "district_name_original": "Ball<ri",
+      "district_lgd_code_as_supplied_by_soi": "565",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4245.864916655512,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 273,
+      "source_objectid": 349,
+      "district_name_original": "Ch<mar<janagara",
+      "district_lgd_code_as_supplied_by_soi": "578",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 5640.669646332363,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 274,
+      "source_objectid": 350,
+      "district_name_original": "Chitradurga",
+      "district_lgd_code_as_supplied_by_soi": "566",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 8436.691346107767,
+      "nic_exact_name": "Chitradurga",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 275,
+      "source_objectid": 351,
+      "district_name_original": "Koppal",
+      "district_lgd_code_as_supplied_by_soi": "560",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 5578.633319511963,
+      "nic_exact_name": "Koppal",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 276,
+      "source_objectid": 352,
+      "district_name_original": "Vijayanagara",
+      "district_lgd_code_as_supplied_by_soi": "761",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 5647.66535617508,
+      "nic_exact_name": "Vijayanagara",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 277,
+      "source_objectid": 353,
+      "district_name_original": "Raich#r",
+      "district_lgd_code_as_supplied_by_soi": "559",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 8438.80668616617,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 278,
+      "source_objectid": 354,
+      "district_name_original": "Chikkaball<pura",
+      "district_lgd_code_as_supplied_by_soi": "582",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4244.231581448191,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 279,
+      "source_objectid": 355,
+      "district_name_original": "D<vanagere",
+      "district_lgd_code_as_supplied_by_soi": "567",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4482.6437230494885,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 280,
+      "source_objectid": 356,
+      "district_name_original": "Dh<rw<d",
+      "district_lgd_code_as_supplied_by_soi": "562",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4258.386166734271,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 281,
+      "source_objectid": 357,
+      "district_name_original": "Gadag",
+      "district_lgd_code_as_supplied_by_soi": "561",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4658.243351091693,
+      "nic_exact_name": "Gadag",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 282,
+      "source_objectid": 358,
+      "district_name_original": "H<veri",
+      "district_lgd_code_as_supplied_by_soi": "564",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4821.387879791073,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 283,
+      "source_objectid": 359,
+      "district_name_original": "H<ssan",
+      "district_lgd_code_as_supplied_by_soi": "574",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 6821.106717539691,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 284,
+      "source_objectid": 360,
+      "district_name_original": "Kalaburagi",
+      "district_lgd_code_as_supplied_by_soi": "579",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 10954.536297515162,
+      "nic_exact_name": "Kalaburagi",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 285,
+      "source_objectid": 361,
+      "district_name_original": "Bengal#ru (Urban)",
+      "district_lgd_code_as_supplied_by_soi": "572",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 2194.050134823002,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 286,
+      "source_objectid": 362,
+      "district_name_original": "Kol<ra",
+      "district_lgd_code_as_supplied_by_soi": "581",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 3979.8178081860015,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 287,
+      "source_objectid": 363,
+      "district_name_original": "Mandya",
+      "district_lgd_code_as_supplied_by_soi": "573",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4955.132933207565,
+      "nic_exact_name": "Mandya",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 288,
+      "source_objectid": 364,
+      "district_name_original": "Mys#ru",
+      "district_lgd_code_as_supplied_by_soi": "577",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 6310.0378331659,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 289,
+      "source_objectid": 365,
+      "district_name_original": "Shivamogga",
+      "district_lgd_code_as_supplied_by_soi": "568",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 8478.926129967973,
+      "nic_exact_name": "Shivamogga",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 290,
+      "source_objectid": 366,
+      "district_name_original": "Dakshina Kannada",
+      "district_lgd_code_as_supplied_by_soi": "575",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4847.364442371039,
+      "nic_exact_name": "Dakshina Kannada",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 291,
+      "source_objectid": 367,
+      "district_name_original": "Uttara Kannada",
+      "district_lgd_code_as_supplied_by_soi": "563",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 10299.013875686225,
+      "nic_exact_name": "Uttara Kannada",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 292,
+      "source_objectid": 368,
+      "district_name_original": "Vijayapura",
+      "district_lgd_code_as_supplied_by_soi": "557",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 10491.605732885402,
+      "nic_exact_name": "Vijayapura",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 293,
+      "source_objectid": 369,
+      "district_name_original": "Y<dgir",
+      "district_lgd_code_as_supplied_by_soi": "580",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 5275.218101058992,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 294,
+      "source_objectid": 370,
+      "district_name_original": "R<managara",
+      "district_lgd_code_as_supplied_by_soi": "584",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 3519.890805572589,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 295,
+      "source_objectid": 371,
+      "district_name_original": "Udupi",
+      "district_lgd_code_as_supplied_by_soi": "569",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 3579.071215901866,
+      "nic_exact_name": "Udupi",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 296,
+      "source_objectid": 372,
+      "district_name_original": "Tumak#ru",
+      "district_lgd_code_as_supplied_by_soi": "571",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 10599.894566251203,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 297,
+      "source_objectid": 373,
+      "district_name_original": "Kodagu",
+      "district_lgd_code_as_supplied_by_soi": "576",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 4100.897651217361,
+      "nic_exact_name": "Kodagu",
+      "name_status": "exact_name_candidate",
+      "current_lgd_export_verified": false
+    },
+    {
+      "source_record_index": 298,
+      "source_objectid": 374,
+      "district_name_original": "B\\dar",
+      "district_lgd_code_as_supplied_by_soi": "558",
+      "state_lgd_code_as_supplied_by_soi": "29",
+      "area_km2": 5444.231274444466,
+      "nic_exact_name": null,
+      "name_status": "unresolved_original_spelling_or_rename",
+      "current_lgd_export_verified": false
+    }
+  ],
+  "nic_exact_name_candidates": 12,
+  "nic_unmatched_names": [
+    "Bagalkote",
+    "Ballari",
+    "Belagavi",
+    "Bengaluru Rural",
+    "Bengaluru South",
+    "Bengaluru Urban",
+    "Bidar",
+    "Chamarajanagar",
+    "Chikkaballapura",
+    "Chikkamagaluru",
+    "Davanagere",
+    "Dharwad",
+    "Hassan",
+    "Haveri",
+    "Kolar",
+    "Mysuru",
+    "Raichur",
+    "Tumakuru",
+    "Yadgir"
+  ],
+  "current_lgd_verified_identities": 0,
+  "geometry_validation": {
+    "valid_polygons": 31,
+    "empty_polygons": 0,
+    "area_crs": "+proj=laea +lat_0=15 +lon_0=76 +datum=WGS84 +units=m +no_defs",
+    "district_areas_km2": [
+      6563.00620878778,
+      2298.053375183859,
+      13405.07300939293,
+      7213.636981852976,
+      4245.864916655512,
+      5640.669646332363,
+      8436.691346107767,
+      5578.633319511963,
+      5647.66535617508,
+      8438.80668616617,
+      4244.231581448191,
+      4482.6437230494885,
+      4258.386166734271,
+      4658.243351091693,
+      4821.387879791073,
+      6821.106717539691,
+      10954.536297515162,
+      2194.050134823002,
+      3979.8178081860015,
+      4955.132933207565,
+      6310.0378331659,
+      8478.926129967973,
+      4847.364442371039,
+      10299.013875686225,
+      10491.605732885402,
+      5275.218101058992,
+      3519.890805572589,
+      3579.071215901866,
+      10599.894566251203,
+      4100.897651217361,
+      5444.231274444466
+    ],
+    "union_area_km2": 191783.7890680742,
+    "state_area_km2": 191783.78906807752,
+    "positive_area_overlaps": [],
+    "pairwise_checks": 465,
+    "state_not_covered_m2": 0.0,
+    "districts_outside_state_m2": 0.0,
+    "sum_minus_union_m2_numerical_residual": 0.001373291015625,
+    "area_comparison_tolerance_m2": 1.0,
+    "coverage_reference": "same SOI release state polygon; not independent ground truth",
+    "analysis_dimensions": "2D; original PolygonZ coordinates retained in local subset"
+  },
+  "limitations": [
+    "Original retrieval dates unknown; archive/HTTP modification times are not administrative dates",
+    "LGD export absent; SOI supplied codes are not independently verified current LGD identities",
+    "Original legacy/transliterated names retained; no guessed letter replacements or aliases",
+    "R<managara source spelling retained; NIC Bengaluru South not automatically reconciled",
+    "Metadata EPSG assertion differs from actual shapefile WKT; publisher clarification needed"
+  ],
+  "reuse": {
+    "policy_url": "https://surveyofindia.gov.in/pages/copyright-policy",
+    "checked_on": "2026-10-04",
+    "status": "copyright; written SOI permission required for reproduction",
+    "geometry_publication_authorized": false,
+    "source_attribution": "Survey of India, Government of India",
+    "publication_scope": "processing code, tests, factual metadata and checksums only"
+  },
+  "official_http_verification": [
+    {
+      "url": "https://surveyofindia.gov.in/documents/Metadata_ABDB.zip",
+      "method": "GET",
+      "checked_at": "2026-10-04T10:06:11.895671+00:00",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "38879",
+        "Last-Modified": "Fri, 29 May 2026 04:41:24 GMT",
+        "Content-Type": "application/zip"
+      },
+      "sha256": "1a14716b73f00fc8391f2708a7975c2f2c1ad4a4e91aafb6dce6546a039e9514",
+      "bytes": 38879,
+      "matches_local_metadata_zip": true
+    },
+    {
+      "url": "https://surveyofindia.gov.in/documents/State_District_Subdistrict_PAN%20INDIA.rar",
+      "method": "HEAD",
+      "checked_at": "2026-10-04T10:06:14.262001+00:00",
+      "http_status": 200,
+      "headers": {
+        "Content-Length": "202524438",
+        "Last-Modified": "Tue, 12 May 2026 08:51:34 GMT",
+        "Content-Type": "application/vnd.rar"
+      }
+    }
+  ],
+  "local_only_geometry": true,
+  "files": {
+    "districts.cpg": {
+      "original_name": "districts.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+    },
+    "districts.dbf": {
+      "original_name": "districts.dbf",
+      "bytes": 11108,
+      "sha256": "702617c4f414420dfb2475d186ac1530e336a982351234e4f0bb38f624275bb3"
+    },
+    "districts.prj": {
+      "original_name": "districts.prj",
+      "bytes": 454,
+      "sha256": "4e0115a1711327038fc52f74a11a80ee1c399c8d84e8f0e5f54bf00b9fd20f16"
+    },
+    "districts.shp": {
+      "original_name": "districts.shp",
+      "bytes": 12490228,
+      "sha256": "89eb1ff0363d5bca6ccc6cbcd8ebad5b883ab64ed3d4f1bd3f485d75451d6344"
+    },
+    "districts.shx": {
+      "original_name": "districts.shx",
+      "bytes": 348,
+      "sha256": "409630653b0240cb480b5fcd16fdc8b60fca9552b456d11698171af098eb680c"
+    },
+    "state.cpg": {
+      "original_name": "state.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+    },
+    "state.dbf": {
+      "original_name": "state.dbf",
+      "bytes": 384,
+      "sha256": "177eeda761d69f367811522ac68e99f34e43af43a48143b3c6a8cdbd1ea2c454"
+    },
+    "state.prj": {
+      "original_name": "state.prj",
+      "bytes": 454,
+      "sha256": "4e0115a1711327038fc52f74a11a80ee1c399c8d84e8f0e5f54bf00b9fd20f16"
+    },
+    "state.shp": {
+      "original_name": "state.shp",
+      "bytes": 1196928,
+      "sha256": "b5096c65840bf0c27610d671a7ac3c45a1f4c8cb533aaf0ff2f6144678bccc45"
+    },
+    "state.shx": {
+      "original_name": "state.shx",
+      "bytes": 108,
+      "sha256": "4fa4aa7b359d026a669d31c0f10cf997c625c0ae61a9d89ea0bcf540f834c2c0"
+    }
+  }
+}
