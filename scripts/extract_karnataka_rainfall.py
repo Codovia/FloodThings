@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
-"""Bounded CHIRPS August 2025 pilot; SOI geometry NEVER leaves local processing.
+"""Bounded CHIRPS 2025 monthly extraction; SOI geometry NEVER leaves local processing.
 
-Only smoke (one day) and month (31 days) are supported. No backfill or EE exports.
+Only the existing August smoke and individual 2025 months are supported. No backfill.
 Tables remain local pending permission review of SOI-based aggregate publication.
 """
 import argparse
+import calendar
 import csv
 from datetime import date, datetime, timedelta, timezone
 import hashlib
@@ -59,9 +60,12 @@ def require_new_output(path):
             "Cannot write inside a completed version")
 
 
-def requested_dates(mode):
-    require(mode in {"smoke", "month"}, "Only the authorized August 2025 pilot is supported")
-    return [(date(2025, 8, 1) + timedelta(days=i)).isoformat() for i in range(1 if mode == "smoke" else 31)]
+def requested_dates(mode, month=8):
+    require(mode in {"smoke", "month"}, "Only the authorized 2025 extraction is supported")
+    require(type(month) is int and 1 <= month <= 12, "Invalid 2025 month")
+    require(mode != "smoke" or month == 8, "Smoke is the existing August pilot only")
+    return [(date(2025, month, 1) + timedelta(days=i)).isoformat()
+            for i in range(1 if mode == "smoke" else calendar.monthrange(2025, month)[1])]
 
 
 def download_parameters(grid):
@@ -101,7 +105,7 @@ def image_record(info, day):
 
 def validate_image_record(record):
     day = record["date"]
-    require(day in requested_dates("month"), "Image date outside authorized pilot")
+    require(date.fromisoformat(day).year == 2025, "Image date outside authorized 2025 extraction")
     start = int(datetime.fromisoformat(day).replace(tzinfo=timezone.utc).timestamp() * 1000)
     require(record["source_image_id"] == f"{SOURCE}/{day.replace('-', '')}"
             and record["source_time_start_ms"] == start and record["source_time_end_ms"] == start + 86400000
@@ -323,7 +327,8 @@ def validate_dataset(directory, raw_directory, boundary_directory=BOUNDARIES):
     masks, centres = district_masks(districts, crs, parameters)
     rows = read_table(directory / "daily_rainfall.csv")
     regenerated = []
-    require([i["date"] for i in manifest["images"]] == requested_dates(manifest["mode"]), "Image date coverage mismatch")
+    dates = requested_dates(manifest["mode"], manifest.get("month", 8))
+    require([i["date"] for i in manifest["images"]] == dates, "Image date coverage mismatch")
     for image in manifest["images"]:
         validate_image_record(image)
         require(image["file"] == image["date"].replace("-", "") + ".tif", "Unexpected raw raster filename")
@@ -333,7 +338,7 @@ def validate_dataset(directory, raw_directory, boundary_directory=BOUNDARIES):
         require(metadata == image["raster_metadata"], "Raw raster metadata mismatch")
         regenerated.extend(summarize(districts, masks, values, valid, image, boundary_manifest["version"]))
     require(regenerated == rows, "Recalculation differs from archived table")
-    result = validate_rows(rows, boundary_manifest["district_records"], requested_dates(manifest["mode"]))
+    result = validate_rows(rows, boundary_manifest["district_records"], dates)
     require(result == manifest["validation"], "Coverage validation mismatch")
     return result
 
@@ -373,7 +378,8 @@ def extract(args, ee, session):
     for path in (args.output, args.raw_directory, args.metadata_output):
         require_new_output(path)
     districts, crs, boundaries = load_boundaries(args.boundaries)
-    days = requested_dates(args.mode)
+    month = getattr(args, "month", 8)
+    days = requested_dates(args.mode, month)
     parameters = download_parameters({"crs": "EPSG:4326", "transform": GRID})
     masks, centres = district_masks(districts, crs, parameters)
     rows, images, checks = [], [], []
@@ -386,7 +392,8 @@ def extract(args, ee, session):
         require(cache_directory is None or args.mode == "month", "Partial cache reuse is month-only")
         cache = cached_images(cache_directory) if cache_directory else {}
         if args.reuse_smoke:
-            require(args.mode == "month" and args.reuse_raw is not None, "Reuse requires validated smoke and raw directories")
+            require(args.mode == "month" and month == 8 and args.reuse_raw is not None,
+                    "Reuse requires the August month, validated smoke and raw directories")
             validate_dataset(args.reuse_smoke, args.reuse_raw, args.boundaries)
             reused = json.loads((args.reuse_smoke / "manifest.json").read_text())
             require(reused["mode"] == "smoke", "Reuse input is not the one-day smoke version")
@@ -414,7 +421,7 @@ def extract(args, ee, session):
             validate_image_record(record)
             record["raster_metadata"] = metadata
             observations = summarize(districts, masks, values, valid, record, boundaries["version"])
-            if day in {"2025-08-01", "2025-08-15", "2025-08-31"}:
+            if day in {days[0], f"2025-{month:02d}-15", days[-1]}:
                 checks.extend(independent_checks(districts, centres, values, valid, observations))
             rows.extend(observations)
             images.append(record)
@@ -423,7 +430,8 @@ def extract(args, ee, session):
                 stream.write(json.dumps({"stage": "validated", **record}, allow_nan=False) + "\n")
             print(json.dumps({"completed_date": day, "district_records": len(observations), "raw_bytes": path.stat().st_size}), flush=True)
     validation = validate_rows(rows, boundaries["district_records"], days)
-    manifest = {"version": args.output.name, "mode": args.mode, "created_at": now(), "project": "floodpulse", "access": access,
+    manifest = {"version": args.output.name, "mode": args.mode, "month": month,
+                "created_at": now(), "project": "floodpulse", "access": access,
                 "stage_1_complete": False,
                 "source": {"collection": SOURCE, "version": "CHIRPS v2.0 Final", "band": "precipitation", "units": "mm/day",
                            "url": SOURCE_URL, "license": "Public domain", "license_checked_on": "2026-10-04",
@@ -455,16 +463,35 @@ def extract(args, ee, session):
                       "output": str(args.output), "metadata_output": str(args.metadata_output)}, indent=2), flush=True)
 
 
+def record_failure(args, exc):
+    """Retain completed dates on failure; never persist credential-bearing errors."""
+    if not args.raw_directory.is_dir() or (args.raw_directory / "failure.json").exists():
+        return
+    log = args.raw_directory / "retrieval.jsonl"
+    completed = [json.loads(line)["date"] for line in log.read_text().splitlines()
+                 if json.loads(line).get("stage") == "validated"] if log.exists() else []
+    pending = [day for day in requested_dates(args.mode, getattr(args, "month", 8)) if day not in completed]
+    result = {"recorded_at": now(), "completed_dates": completed,
+              "failed_date": pending[0] if pending else None, "unreviewed_dates": pending[1:],
+              "phase": "daily retrieval/validation" if pending else "final dataset validation/publication",
+              "error_type": type(exc).__name__,
+              "error": str(exc) if isinstance(exc, ValueError) and "http" not in str(exc).lower()
+                       else "Request or computation failed; raw retrieval provenance preserved; external error text withheld"}
+    write_json(args.raw_directory / "failure.json", result)
+    print(json.dumps(result), flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=["smoke", "month"])
+    parser.add_argument("--month", type=int, choices=range(1, 13), default=8, help="Single 2025 month; August already complete")
     parser.add_argument("--boundaries", type=Path, default=BOUNDARIES)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--raw-directory", type=Path, required=True)
     parser.add_argument("--metadata-output", type=Path)
     parser.add_argument("--reuse-smoke", type=Path)
     parser.add_argument("--reuse-raw", type=Path)
-    parser.add_argument("--reuse-partial-raw", type=Path, help="Read-only validated daily cache from interrupted August extraction")
+    parser.add_argument("--reuse-partial-raw", type=Path, help="Read-only validated daily cache from an interrupted month")
     parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args()
     if args.validate_only:
@@ -472,10 +499,18 @@ def main():
         return
     if not args.mode or not args.metadata_output:
         parser.error("Extraction requires authorized --mode and new --metadata-output")
+    if args.mode == "month" and args.month == 8:
+        parser.error("August is immutable and complete; use --validate-only, not re-extraction")
     import ee
     import requests
+    raw_was_present = args.raw_directory.exists()
     with requests.Session() as session:
-        extract(args, ee, session)
+        try:
+            extract(args, ee, session)
+        except Exception as exc:
+            if not raw_was_present:
+                record_failure(args, exc)
+            raise
 
 
 if __name__ == "__main__":

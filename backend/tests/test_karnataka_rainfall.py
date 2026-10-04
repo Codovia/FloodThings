@@ -67,7 +67,7 @@ def observations():
 def test_scope_and_original_grid_preserved_no_region_geometry_sent():
     assert len(rain.requested_dates("smoke")) == 1
     assert len(rain.requested_dates("month")) == 31
-    with pytest.raises(ValueError, match="authorized August"):
+    with pytest.raises(ValueError, match="authorized 2025"):
         rain.requested_dates("backfill")
     assert PARAMETERS["dimensions"] == [110, 160]
     assert PARAMETERS["crs_transform"] == [.05, 0, 73.5, 0, -.05, 19]
@@ -78,6 +78,41 @@ def test_scope_and_original_grid_preserved_no_region_geometry_sent():
     image.select.return_value.mask.assert_called_once()
     image.clip.assert_not_called()
     assert "ee.Geometry" not in SCRIPT.read_text()
+
+
+def test_2025_months_have_exact_calendar_and_batch_coverage():
+    dates = [rain.requested_dates("month", month) for month in range(1, 13)]
+    assert [len(d) for d in dates] == [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+    assert sum(map(len, dates)) == 365
+    assert sum(len(dates[m-1]) for m in [1, 2, 3]) == 90
+    assert sum(len(dates[m-1]) for m in [4, 5, 6]) == 91
+    assert sum(len(dates[m-1]) for m in [7, 9]) == 61
+    assert sum(len(dates[m-1]) for m in [10, 11, 12]) == 92
+    assert dates[1][-1] == "2025-02-28"
+    assert len(set(day for days in dates for day in days)) == 365
+    for month in [0, 13, True, 1.5]:
+        with pytest.raises(ValueError, match="Invalid 2025 month"):
+            rain.requested_dates("month", month)
+    with pytest.raises(ValueError, match="existing August"):
+        rain.requested_dates("smoke", 1)
+
+
+def test_failed_month_preserves_completed_dates_and_withholds_external_error():
+    with TemporaryDirectory() as directory:
+        root = Path(directory)
+        (root/"retrieval.jsonl").write_text(json.dumps({"stage": "validated", "date": "2025-01-01"})+"\n")
+        original = snapshot(root)
+        args = SimpleNamespace(raw_directory=root, mode="month", month=1)
+        rain.record_failure(args, RuntimeError("https://example.invalid/?token=private-fixture"))
+        result = json.loads((root/"failure.json").read_text())
+        assert result["completed_dates"] == ["2025-01-01"]
+        assert result["failed_date"] == "2025-01-02"
+        assert len(result["unreviewed_dates"]) == 29
+        assert "private-fixture" not in (root/"failure.json").read_text()
+        assert all(snapshot(root)[key] == value for key, value in original.items())
+        complete = snapshot(root)
+        rain.record_failure(args, ValueError("second failure"))
+        assert snapshot(root) == complete
 
 
 @pytest.mark.parametrize("transform", [[.1, 0, -180, 0, -.1, 50], [.05, 0, -179.99, 0, -.05, 50]])
