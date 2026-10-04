@@ -49,3 +49,19 @@ Verified Git history includes the application/data checkpoint `3eb084cfd95ce2e28
 **Git:** branch `feature/karnataka-data-foundation`, configured origin `git@github.com:Codovia/FloodThings.git`. Previous delivery **`745aac72141dfa1516645c8e26bd67f82f665544`** was independently confirmed on GitHub before this month began. This month's reviewed metadata/source-register/log delivery is prepared for commit and push; the new full hash and independent push confirmation will be recorded in the next chronological entry or final response, without an extra self-hash commit.
 
 **Next step:** May may begin only after this April commit is pushed and its remote hash independently confirmed.
+
+## 2026-10-04 — Stage 2C: May 2025 complete
+
+**Task/status:** collect and validate 2025-05-01–2025-05-31 across all **31** local SOI 2025 district polygons using the existing unchanged extractor. Completed immutable monthly partition: **961 rows**, **961 valid**, **961 full-coverage**, **0 partial**, **0 unavailable**. Cumulative: **5642 valid records / 6 months / 182 dates**. No annual dataset was created.
+
+**Sources/provenance:** genuine CHIRPS v2 assets `UCSB-CHG/CHIRPS/DAILY/20250501`–`/20250531`, project `floodpulse`; actual retrievals **2026-10-04T17:12:19.019626+00:00–2026-10-04T17:14:06.790171+00:00**. Native **0.05° EPSG:4326**, **mm/day**, original masks and local cell-centre means/min/max were preserved. SOI geometry stayed local. Original image IDs, versions, timestamps, raw/source/table hashes and processing parameters are in the manifests. Requests retained the **60-second** EE deadline, **three-attempt** cap, **2/4-second** backoffs, SDK retries **0** and **900-second** monthly wall limit. No failed live request attempts; every operation succeeded at its first attempt.
+
+**Created/changed files:** local `data/working/karnataka_chirps_soi2025_202505_v1/` and `data/raw/chirps/karnataka_window_202505_verified_v1/` (**1676773 bytes** combined); permitted `data/reference/karnataka_chirps_202505_v1/manifest.json` (**71512 bytes**); existing `docs/DATA_SOURCE_REGISTER.md` and this appended log. Code, tests, weather/historical/drainage application, stylesheet and `QandA.md` are unchanged. Tables, raw rasters, SOI geometry/archives and credentials are excluded from Git.
+
+**Verification:** 63 isolated extraction/recovery/annual-helper tests passed; completed-month validator reproduced every row from retained rasters and local polygons. All rows reproduced, all requested dates/source identities matched, keys were unique, original raster CRS/alignment/masks and non-negative finite values passed; nine independent scalar comparisons passed. The **305 previously protected files** retained SHA-256 and modification times, and earlier log entries remain intact. The new monthly files are added to the local preservation checkpoint before delivery.
+
+**Limitations:** unresolved current-LGD identity verification (0 current identities, 12 NIC name candidates / 19 unresolved), SOI-derived aggregate-publication permission and shelter entrance verification remain blockers for their respective features. CHIRPS district summaries are historical estimates, not locality gauges or proof of prediction-time availability. No flood-negative labels, training or drainage-risk scoring occurred.
+
+**Git:** branch `feature/karnataka-data-foundation`, configured origin `git@github.com:Codovia/FloodThings.git`. Previous delivery **`b6eeeebcac0b96e880745898ccc2afe9d1266e14`** was independently confirmed on GitHub before this month began. This month's reviewed metadata/source-register/log delivery is prepared for commit and push; the new full hash and independent push confirmation will be recorded in the next chronological entry or final response, without an extra self-hash commit.
+
+**Next step:** June may begin only after this May commit is pushed and its remote hash independently confirmed.
