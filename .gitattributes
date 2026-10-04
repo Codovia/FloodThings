@@ -1,0 +1,3 @@
+# Immutable research products must retain exact manifest-matching bytes.
+data/processed/** -text
+data/recovery/** -text
