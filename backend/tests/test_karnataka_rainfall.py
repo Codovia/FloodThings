@@ -99,6 +99,23 @@ def test_original_image_identity_precision_and_dates_required(change):
         rain.image_record(info, "2025-08-01")
 
 
+def test_integral_json_float_asset_version_is_preserved_losslessly():
+    info = image_info()
+    info["version"] = 1757796890900650.0
+    record = rain.image_record(info, "2025-08-01")
+    assert record["image_asset_version"] == 1757796890900650
+    assert record["source_asset_version_original"] == info["version"]
+    assert record["source_asset_version_json_type"] == "float"
+
+
+@pytest.mark.parametrize("version", [None, 1.5, float("nan"), float(2**53+2), True])
+def test_missing_or_inexact_versions_are_never_guessed(version):
+    info = image_info()
+    info["version"] = version
+    with pytest.raises(ValueError, match="inexact source asset version"):
+        rain.image_record(info, "2025-08-01")
+
+
 def test_centres_are_local_nonoverlapping_and_boundary_points_excluded():
     districts, masks, _, _, _ = observations()
     assert [int(m.sum()) for m in masks] == [1, 1]
@@ -231,6 +248,11 @@ def test_full_fixture_extraction_recalculates_read_only_and_keeps_tables_local(m
         rain.extract(args, ee, MagicMock())
         before = snapshot(root)
         assert rain.validate_dataset(args.output, args.raw_directory, boundary_dir)["valid_records"] == 2
+        assert snapshot(root) == before
+        before = snapshot(root)
+        cached = rain.cached_images(args.raw_directory)
+        assert set(cached) == {"2025-08-01"}
+        assert cached["2025-08-01"]["download"]["sha256"] == rain.soi.digest(args.raw_directory / "20250801.tif")
         assert snapshot(root) == before
         published = json.loads(args.metadata_output.read_text())
         assert not any("scalar_mean_mm_per_day" in c for c in published["independent_checks"])

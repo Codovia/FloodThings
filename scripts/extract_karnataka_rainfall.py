@@ -88,9 +88,14 @@ def image_record(info, day):
             "Unexpected CHIRPS daily temporal semantics")
     grid = {"crs": band["crs"], "transform": band["crs_transform"]}
     download_parameters(grid)
-    require(isinstance(info.get("version"), int), "Missing source asset version")
+    version = info.get("version")
+    # EE may encode the same integer as a JSON floating-point number. Convert only
+    # positive, exact integers within float's safe integer range; never invent a version.
+    require(type(version) is int and version > 0 or type(version) is float and math.isfinite(version)
+            and version.is_integer() and 0 < version <= 2**53, "Missing or inexact source asset version")
     return {"date": day, "source_image_id": asset, "source_time_start_ms": start,
-            "source_time_end_ms": start + 86400000, "image_asset_version": info["version"],
+            "source_time_end_ms": start + 86400000, "image_asset_version": int(version),
+            "source_asset_version_original": version, "source_asset_version_json_type": type(version).__name__,
             "native_grid": grid, "native_dimensions": band["dimensions"], "units": "mm/day"}
 
 
@@ -342,6 +347,28 @@ def public_manifest(manifest):
     return result
 
 
+def cached_images(raw_directory):
+    """Read-only reuse of completed daily downloads from an interrupted month."""
+    log = raw_directory / "retrieval.jsonl"
+    require(log.stat().st_size <= MAX_BYTES, "Partial retrieval log exceeds bounded size")
+    result = {}
+    for line in log.read_text().splitlines():
+        record = json.loads(line)
+        if record.get("stage") != "validated":
+            continue
+        validate_image_record(record)
+        day = record["date"]
+        require(day not in result and record["file"] == day.replace("-", "") + ".tif", "Duplicate or invalid cached image")
+        path = raw_directory / record["file"]
+        require(soi.digest(path) == record["download"]["sha256"] and path.stat().st_size == record["download"]["bytes"],
+                "Cached raster checksum mismatch")
+        _, _, metadata = read_raster(path, download_parameters(record["native_grid"]))
+        require(metadata == record["raster_metadata"], "Cached raster metadata mismatch")
+        result[day] = {k: v for k, v in record.items() if k != "stage"}
+    require(len(result) <= 31, "Cache exceeds authorized month")
+    return result
+
+
 def extract(args, ee, session):
     for path in (args.output, args.raw_directory, args.metadata_output):
         require_new_output(path)
@@ -355,6 +382,9 @@ def extract(args, ee, session):
     with verification.wall_limit(budget):
         access = verification.probe_access(ee, "floodpulse")
         reused = None
+        cache_directory = getattr(args, "reuse_partial_raw", None)
+        require(cache_directory is None or args.mode == "month", "Partial cache reuse is month-only")
+        cache = cached_images(cache_directory) if cache_directory else {}
         if args.reuse_smoke:
             require(args.mode == "month" and args.reuse_raw is not None, "Reuse requires validated smoke and raw directories")
             validate_dataset(args.reuse_smoke, args.reuse_raw, args.boundaries)
@@ -366,6 +396,10 @@ def extract(args, ee, session):
                 record = json.loads(json.dumps(reused["images"][0]))
                 shutil.copyfile(args.reuse_raw / record["file"], path)
                 record["reused_from_smoke_manifest_sha256"] = soi.digest(args.reuse_smoke / "manifest.json")
+            elif day in cache:
+                record = json.loads(json.dumps(cache[day]))
+                shutil.copyfile(cache_directory / record["file"], path)
+                record["reused_from_partial_retrieval_log_sha256"] = soi.digest(cache_directory / "retrieval.jsonl")
             else:
                 image = ee.Image(f"{SOURCE}/{day.replace('-', '')}")
                 record = image_record(image.getInfo(), day)
@@ -430,6 +464,7 @@ def main():
     parser.add_argument("--metadata-output", type=Path)
     parser.add_argument("--reuse-smoke", type=Path)
     parser.add_argument("--reuse-raw", type=Path)
+    parser.add_argument("--reuse-partial-raw", type=Path, help="Read-only validated daily cache from interrupted August extraction")
     parser.add_argument("--validate-only", action="store_true")
     args = parser.parse_args()
     if args.validate_only:
