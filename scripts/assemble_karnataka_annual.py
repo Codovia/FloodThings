@@ -32,11 +32,12 @@ def load_partitions(boundaries=rain.BOUNDARIES):
     for month in range(1, 13):
         suffix = f'2025{month:02d}'
         directory = ROOT / f'data/working/karnataka_chirps_soi2025_{suffix}_v1'
-        raw = ROOT / f'data/raw/chirps/karnataka_window_{suffix}_verified_v1'
         rain.require((directory / 'manifest.json').is_file(),
                      f'Required completed monthly partition unavailable: {suffix}; annual assembly blocked')
-        rain.validate_dataset(directory, raw, boundaries)
         manifest = json.loads((directory / 'manifest.json').read_text())
+        raw = ROOT / manifest.get('raw_directory', f'data/raw/chirps/karnataka_window_{suffix}_verified_v1')
+        rain.require(raw.resolve().is_relative_to((ROOT / 'data/raw/chirps').resolve()), 'Raw partition path outside local CHIRPS storage')
+        rain.validate_dataset(directory, raw, boundaries)
         rain.require(manifest['mode'] == 'month' and manifest.get('month', 8) == month,
                      'Monthly partition identity mismatch')
         if partitions:

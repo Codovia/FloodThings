@@ -271,7 +271,7 @@ def test_full_fixture_extraction_recalculates_read_only_and_keeps_tables_local(m
                     "sources": {"archive": {"sha256": "0"*64}, "district_components": [{"sha256": "1"*64}]},
                     "files": {"districts.shp": {"sha256": "2"*64}}}
         monkeypatch.setattr(rain, "load_boundaries", lambda _: (districts, "EPSG:4326", boundary))
-        monkeypatch.setattr(rain.verification, "probe_access", lambda *_: {"initialization": "controlled fixture"})
+        monkeypatch.setattr(rain, "initialize_access", lambda *_: {"initialization": "controlled fixture"})
         def fixture_download(session, url, path):
             fixture_raster(path)
             return {"retrieved_at": "2026-10-04T00:00:00+00:00", "sha256": rain.soi.digest(path), "bytes": path.stat().st_size}

@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 import importlib.util
 import io
 import json
+import shutil
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
@@ -164,3 +165,34 @@ def test_absent_month_blocks_assembly_before_any_external_or_disk_write(monkeypa
         with pytest.raises(ValueError, match='202501; annual assembly blocked'):
             annual.load_partitions()
         assert list(root.iterdir()) == []
+
+
+def test_month_manifest_selects_recovered_raw_path_with_legacy_fallback(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary)
+        monkeypatch.setattr(annual, 'ROOT', root)
+        inputs = fixtures(root)
+        calls = []
+        monkeypatch.setattr(rain, 'validate_dataset', lambda directory, raw, boundaries: calls.append(raw))
+        for partition in inputs:
+            month = partition['month']
+            directory = root/f'data/working/karnataka_chirps_soi2025_2025{month:02d}_v1'
+            directory.mkdir(parents=True)
+            manifest = deepcopy(partition['manifest'])
+            manifest['validation'] = {'records': len(partition['rows'])}
+            if month == 3:
+                manifest['raw_directory'] = 'data/raw/chirps/karnataka_window_202503_recovered_v1'
+            (directory/'manifest.json').write_text(json.dumps(manifest))
+            shutil.copyfile(partition['directory']/'daily_rainfall.csv', directory/'daily_rainfall.csv')
+        before = snapshot(root)
+        loaded = annual.load_partitions()
+        assert calls[2] == root/'data/raw/chirps/karnataka_window_202503_recovered_v1'
+        assert calls[7] == root/'data/raw/chirps/karnataka_window_202508_verified_v1'
+        assert loaded[2]['raw_directory'] == calls[2]
+        assert snapshot(root) == before
+        manifest_path = root/'data/working/karnataka_chirps_soi2025_202501_v1/manifest.json'
+        manifest = json.loads(manifest_path.read_text())
+        manifest['raw_directory'] = '../../outside-fixture'
+        manifest_path.write_text(json.dumps(manifest))
+        with pytest.raises(ValueError, match='outside local CHIRPS storage'):
+            annual.load_partitions()

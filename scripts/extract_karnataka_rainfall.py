@@ -37,6 +37,8 @@ WINDOW = [73.5, 11.0, 79.0, 19.0]
 GRID = [0.05, 0, -180, 0, -0.05, 50]
 NODATA = -9999
 MAX_BYTES = 1024 * 1024
+DEFAULT_EE_DEADLINE_SECONDS = 10
+MAX_ATTEMPTS = 3
 FIELDS = ["source_state_lgd_code", "source_district_lgd_code", "district_name_original", "nic_exact_name",
           "identity_status", "geometry_edition", "geometry_source_id", "geometry_version",
           "date", "source_collection", "source_image_id", "source_time_start_ms", "source_time_end_ms",
@@ -58,6 +60,93 @@ def require_new_output(path):
     require(not path.exists(), "Output version exists; never overwrite")
     require(all(not (parent / "manifest.json").exists() for parent in path.resolve().parents),
             "Cannot write inside a completed version")
+
+
+def failure_category(exc):
+    """Inspect types/statuses without persisting provider messages or signed URLs."""
+    # Offline validators do not require the optional live requests/EE environment.
+    try:
+        from requests.exceptions import ConnectionError as HTTPConnectionError, Timeout as HTTPTimeout
+    except ImportError:
+        HTTPConnectionError, HTTPTimeout = ConnectionError, TimeoutError
+    if isinstance(exc, BoundedRequestFailure):
+        return exc.category, exc.http_status
+    current, seen = exc, set()
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        if isinstance(current, (TimeoutError, HTTPTimeout)):
+            return "network_timeout", None
+        if isinstance(current, (ConnectionError, HTTPConnectionError)):
+            return "network_connection", None
+        response = getattr(current, "response", None)
+        status = getattr(response, "status_code", None) or getattr(getattr(current, "resp", None), "status", None)
+        if status in {429, 500, 502, 503, 504}:
+            return "transient_http", status
+        if status == 404 or "image asset" in str(current).lower() and "not found" in str(current).lower():
+            # EE's 'not found' can also mean lack of permission, not verified absence.
+            return "source_unavailable_or_access_denied", status
+        if status in {401, 403}:
+            return "authorization_error", status
+        current = current.__cause__ or current.__context__
+    return "non_retryable_error", None
+
+
+class BoundedRequestFailure(RuntimeError):
+    def __init__(self, operation, day, attempts, category, error_type, http_status=None):
+        self.operation, self.day, self.attempts = operation, day, attempts
+        self.category, self.error_type, self.http_status = category, error_type, http_status
+        super().__init__(f"{operation} failed after {attempts} attempt(s): {category} ({error_type}); signed URL withheld; provider error text withheld")
+
+
+def bounded_request(call, operation, log, day=None, attempts=MAX_ATTEMPTS, sleep=None):
+    require(type(attempts) is int and 1 <= attempts <= MAX_ATTEMPTS, "Request attempts must be 1–3")
+    sleep = sleep or time.sleep
+    for attempt in range(1, attempts + 1):
+        event = {"operation": operation, "date": day, "attempt": attempt, "started_at": now()}
+        try:
+            result = call()
+        except Exception as exc:
+            category, status = failure_category(exc)
+            error_type = exc.error_type if isinstance(exc, BoundedRequestFailure) else type(exc).__name__
+            retry = category in {"network_timeout", "network_connection", "transient_http"} and attempt < attempts
+            delay = 2**attempt if retry else 0
+            event.update(status="failed", category=category, error_type=error_type, http_status=status,
+                         retry_scheduled=retry, backoff_seconds=delay, finished_at=now())
+            with log.open("a") as stream:
+                stream.write(json.dumps(event) + "\n")
+            if not retry:
+                raise BoundedRequestFailure(operation, day, attempt, category, error_type, status) from None
+            sleep(delay)
+        else:
+            event.update(status="succeeded", finished_at=now())
+            with log.open("a") as stream:
+                stream.write(json.dumps(event) + "\n")
+            return result
+
+
+def initialize_access(ee, deadline_seconds, log):
+    require(type(deadline_seconds) is int and 1 <= deadline_seconds <= 60, "EE deadline must be 1–60 seconds")
+    # Disable client discovery and request retries BEFORE initialization; one retry owner.
+    ee.data.setMaxRetries(0)
+    bounded_request(lambda: ee.Initialize(project="floodpulse"), "initialization", log)
+    # setDeadline rebuilds the initialized transport; its discovery retries are also zero.
+    bounded_request(lambda: ee.data.setDeadline(deadline_seconds * 1000), "configure_deadline", log)
+    value = bounded_request(lambda: ee.Number(1).getInfo(), "constant_probe", log)
+    require(value == 1, "Earth Engine constant probe returned an unexpected value")
+    return {"initialization": "succeeded", "constant_probe": value, "retrieved_at": now()}
+
+
+def download_with_retries(session, url, path, log, day):
+    attempt = 0
+    def retrieve():
+        nonlocal attempt
+        attempt += 1
+        temporary = path.with_name(path.stem + f".attempt{attempt}.partial.tif")
+        result = download(session, url, temporary)
+        require(not path.exists(), "Downloaded raster already exists; never overwrite")
+        temporary.rename(path)
+        return result
+    return bounded_request(retrieve, "raster_download", log, day)
 
 
 def requested_dates(mode, month=8):
@@ -139,7 +228,8 @@ def download(session, url, path):
     except Exception as exc:
         # Request exceptions may contain signed URLs. Never expose them or their tokens.
         status = getattr(getattr(exc, "response", None), "status_code", None)
-        raise RuntimeError(f"Bounded CHIRPS download failed ({type(exc).__name__}, HTTP status {status}); signed URL withheld") from None
+        category, _ = failure_category(exc)
+        raise BoundedRequestFailure("raster_download", None, 1, category, type(exc).__name__, status) from None
     return {"retrieved_at": now(), "bytes": total, "sha256": soi.digest(path),
             "request": {"host": "earthengine.googleapis.com", "timeouts_seconds": [5, 15],
                         "elapsed_ceiling_seconds": 30, "byte_ceiling": MAX_BYTES, "retries": 0}}
@@ -320,6 +410,9 @@ def validate_dataset(directory, raw_directory, boundary_directory=BOUNDARIES):
     require(set(p.name for p in directory.iterdir()) == {"daily_rainfall.csv", "manifest.json"}, "Unexpected dataset files")
     require(soi.fingerprint(directory / "daily_rainfall.csv") == manifest["files"]["daily_rainfall.csv"], "Table checksum mismatch")
     require(soi.fingerprint(raw_directory / "retrieval.jsonl") == manifest["raw_retrieval_log"], "Retrieval provenance checksum mismatch")
+    if "request_attempt_log" in manifest:
+        require(soi.fingerprint(raw_directory / "request_attempts.jsonl") == manifest["request_attempt_log"],
+                "Request-attempt provenance checksum mismatch")
     require(manifest["geometry_provenance"]["working_manifest_sha256"] == soi.digest(boundary_directory / "manifest.json"), "Boundary manifest changed")
     districts, crs, boundary_manifest = load_boundaries(boundary_directory)
     parameters = manifest["download_parameters"]
@@ -385,12 +478,15 @@ def extract(args, ee, session):
     rows, images, checks = [], [], []
     args.raw_directory.mkdir(parents=True)
     budget = 180 if args.mode == "smoke" else 900
+    deadline_seconds = getattr(args, "ee_deadline_seconds", DEFAULT_EE_DEADLINE_SECONDS)
+    request_log = args.raw_directory / "request_attempts.jsonl"
     with verification.wall_limit(budget):
-        access = verification.probe_access(ee, "floodpulse")
+        access = initialize_access(ee, deadline_seconds, request_log)
         reused = None
         cache_directory = getattr(args, "reuse_partial_raw", None)
         require(cache_directory is None or args.mode == "month", "Partial cache reuse is month-only")
         cache = cached_images(cache_directory) if cache_directory else {}
+        require(set(cache).issubset(days), "Partial cache contains dates outside requested month")
         if args.reuse_smoke:
             require(args.mode == "month" and month == 8 and args.reuse_raw is not None,
                     "Reuse requires the August month, validated smoke and raw directories")
@@ -409,10 +505,12 @@ def extract(args, ee, session):
                 record["reused_from_partial_retrieval_log_sha256"] = soi.digest(cache_directory / "retrieval.jsonl")
             else:
                 image = ee.Image(f"{SOURCE}/{day.replace('-', '')}")
-                record = image_record(image.getInfo(), day)
+                info = bounded_request(image.getInfo, "image_metadata", request_log, day)
+                record = image_record(info, day)
                 # Export arguments have only a fixed CHIRPS grid/window, NEVER a SOI feature.
-                url = export_image(image).getDownloadURL(dict(parameters))
-                record["download"] = download(session, url, path)
+                url = bounded_request(lambda: export_image(image).getDownloadURL(dict(parameters)),
+                                      "download_url", request_log, day)
+                record["download"] = download_with_retries(session, url, path, request_log, day)
                 record["file"] = path.name
             # Preserve retrieval provenance before local validation, even if parsing later fails.
             with (args.raw_directory / "retrieval.jsonl").open("a") as stream:
@@ -431,6 +529,7 @@ def extract(args, ee, session):
             print(json.dumps({"completed_date": day, "district_records": len(observations), "raw_bytes": path.stat().st_size}), flush=True)
     validation = validate_rows(rows, boundaries["district_records"], days)
     manifest = {"version": args.output.name, "mode": args.mode, "month": month,
+                "raw_directory": str(args.raw_directory),
                 "created_at": now(), "project": "floodpulse", "access": access,
                 "stage_1_complete": False,
                 "source": {"collection": SOURCE, "version": "CHIRPS v2.0 Final", "band": "precipitation", "units": "mm/day",
@@ -449,9 +548,13 @@ def extract(args, ee, session):
                 "temporal_semantics": "daily accumulated precipitation in mm/day, UTC observation windows; historical estimates, not gauges or prediction-time availability",
                 "geometry_temporal_limit": "2025-edition geometry used; not claimed to represent each historical observation year's boundaries",
                 "identity_limit": "SOI supplied DIST_LGD identifiers pending independent current-LGD verification; NIC exact-name matches are candidates only",
-                "request_limits": {"per_request_deadline_ms": 10000, "retries": 0, "wall_seconds": budget, "max_days": len(days), "max_download_bytes": MAX_BYTES},
+                "request_limits": {"per_request_deadline_ms": deadline_seconds * 1000, "retries": 0,
+                                   "client_automatic_retries": 0, "max_attempts_per_operation": MAX_ATTEMPTS,
+                                   "backoff_seconds": [2, 4], "wall_seconds": budget,
+                                   "max_days": len(days), "max_download_bytes": MAX_BYTES},
                 "processing_code": soi.fingerprint(Path(__file__)), "csv_fields": FIELDS,
                 "raw_retrieval_log": soi.fingerprint(args.raw_directory / "retrieval.jsonl"),
+                "request_attempt_log": soi.fingerprint(request_log),
                 "validation": validation, "independent_checks": checks,
                 "reuse": {"chirps": "Public domain", "soi_policy_url": soi.POLICY_URL,
                           "district_aggregate_publication": "permission not established; local only", "geometry_publication": False}}
@@ -477,6 +580,11 @@ def record_failure(args, exc):
               "error_type": type(exc).__name__,
               "error": str(exc) if isinstance(exc, ValueError) and "http" not in str(exc).lower()
                        else "Request or computation failed; raw retrieval provenance preserved; external error text withheld"}
+    if isinstance(exc, BoundedRequestFailure):
+        result.update(operation=exc.operation, category=exc.category, attempts=exc.attempts,
+                      original_error_type=exc.error_type, http_status=exc.http_status)
+    if isinstance(exc, verification.VerificationDeadlineExceeded):
+        result.update(category="total_runtime_limit", error=str(exc))
     write_json(args.raw_directory / "failure.json", result)
     print(json.dumps(result), flush=True)
 
@@ -485,6 +593,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mode", choices=["smoke", "month"])
     parser.add_argument("--month", type=int, choices=range(1, 13), default=8, help="Single 2025 month; August already complete")
+    parser.add_argument("--ee-deadline-seconds", type=int, default=DEFAULT_EE_DEADLINE_SECONDS,
+                        help="EE request deadline, 1–60 seconds; recovery uses 60. Three attempts with 2/4s backoff; client retries disabled")
     parser.add_argument("--boundaries", type=Path, default=BOUNDARIES)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--raw-directory", type=Path, required=True)
@@ -501,13 +611,15 @@ def main():
         parser.error("Extraction requires authorized --mode and new --metadata-output")
     if args.mode == "month" and args.month == 8:
         parser.error("August is immutable and complete; use --validate-only, not re-extraction")
+    require(type(args.ee_deadline_seconds) is int and 1 <= args.ee_deadline_seconds <= 60,
+            "EE deadline must be 1–60 seconds")
     import ee
     import requests
     raw_was_present = args.raw_directory.exists()
     with requests.Session() as session:
         try:
             extract(args, ee, session)
-        except Exception as exc:
+        except (Exception, verification.VerificationDeadlineExceeded) as exc:
             if not raw_was_present:
                 record_failure(args, exc)
             raise
