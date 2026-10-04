@@ -1,0 +1,69 @@
+{
+  "version": "karnataka_nic_provisional_v1",
+  "status": "provisional_not_lgd_not_ready_for_extraction",
+  "stage_1_complete": false,
+  "created_at": "2026-10-04T08:04:43.639827+00:00",
+  "sources": {
+    "nic": {
+      "name": "nic",
+      "url": "https://igod.gov.in/sg/KA/E042/organizations",
+      "retrieved_at": "2026-10-04T07:56:05.477102+00:00",
+      "http_status": 200,
+      "bytes": 66905,
+      "sha256": "2c5e87abb7ad74818398e4760ea2442ae326b9064203764335194695a1fec2e4",
+      "tls": "Hostname and system-root verification enabled; missing issuer chain supplied from official Lets Encrypt HTTPS certificates; no system trust modifications",
+      "issuer_certificate_urls": [
+        "https://letsencrypt.org/certs/gen-y/int-yr2.pem",
+        "https://letsencrypt.org/certs/gen-y/root-yr-by-x1.pem"
+      ],
+      "pages": [
+        {
+          "url": "https://igod.gov.in/sg/KA/E042/organizations_more/25/5",
+          "retrieved_at": "2026-10-04T08:03:02.512676+00:00",
+          "http_status": 200,
+          "bytes": 3397,
+          "sha256": "9797c9223995ffb7d852f56dab4479ac6426018eef84a51f9966e4dbbacd3bb4",
+          "start": 25,
+          "limit": 5,
+          "request_headers": {
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": "https://igod.gov.in/sg/KA/E042/organizations"
+          }
+        },
+        {
+          "url": "https://igod.gov.in/sg/KA/E042/organizations_more/30/1",
+          "retrieved_at": "2026-10-04T08:03:02.909655+00:00",
+          "http_status": 200,
+          "bytes": 674,
+          "sha256": "89fee645a03d75da501e2f73a55d844a3889d147209eb5dfe3118f7bad22634b",
+          "start": 30,
+          "limit": 1,
+          "request_headers": {
+            "X-Requested-With": "XMLHttpRequest",
+            "Referer": "https://igod.gov.in/sg/KA/E042/organizations"
+          }
+        }
+      ],
+      "attribution": "National Informatics Centre, Government of India",
+      "reuse": "Small factual name/URL inventory only; source HTML not redistributed; no blanket document licence asserted"
+    },
+    "boundaries": {
+      "source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+      "state_source_id": "WM/geoLab/geoBoundaries/600/ADM1",
+      "version": "6.0.0 CGAZ; 2023-09-13 composite, not current LGD",
+      "attribution": "William & Mary geoLab / geoBoundaries",
+      "license": "CC BY 4.0",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/WM_geoLab_geoBoundaries_600_ADM2"
+    }
+  },
+  "files": {
+    "district_names.json": {
+      "sha256": "419fad46ef9eb4369809c4d9710f417089138792e9669fb1781e41c451fafcbc",
+      "bytes": 31265
+    }
+  },
+  "lgd_export": "unavailable; no original LGD file found",
+  "canonical_districts": 0,
+  "verified_polygons": 0,
+  "name_count": 31
+}

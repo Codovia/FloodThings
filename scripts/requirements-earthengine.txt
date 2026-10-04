@@ -1,0 +1,2 @@
+# Optional verification environment; keep separate from the weather backend.
+earthengine-api==1.7.46

@@ -1,2 +1,50 @@
 
 .env
+.venv/
+__pycache__/
+.pytest_cache/
+node_modules/
+dist/
+.env.*
+!.env.example
+
+# Local downloads and export jobs stay outside ordinary Git history.
+data/raw/
+data/tmp/
+data/exports/
+data/recovery/
+data/working/
+tmp/
+exports/
+*.tif
+*.tiff
+*.nc
+*.h5
+*.hdf
+*.grib
+*.grib2
+*.pbf
+*.zip
+
+# Cloud credentials and private keys must never be staged.
+.config/earthengine/
+.aws/
+.gcloud/
+credentials*.json
+*service-account*.json
+*service_account*.json
+application_default_credentials.json
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local test/build artifacts.
+.cache/
+.ruff_cache/
+.coverage
+htmlcov/
+coverage/
+playwright-report/
+test-results/
+*.log

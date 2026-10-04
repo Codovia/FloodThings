@@ -1,0 +1,462 @@
+{
+  "version": "udupi_historical_v1",
+  "schema_version": 1,
+  "started_at": "2026-10-03T13:02:15.977703+00:00",
+  "project": "floodpulse",
+  "query_parameters": {
+    "project": "floodpulse",
+    "version": "udupi_historical_v1",
+    "district": "Udupi",
+    "boundary_asset": "WM/geoLab/geoBoundaries/600/ADM2",
+    "boundary_shape_id": "76128533B4839184447445",
+    "events": [
+      {
+        "event_id": 2728,
+        "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728_From_20050914_to_20050930",
+        "start_date": "2005-09-14",
+        "end_date_inclusive": "2005-09-30",
+        "rainfall_start_inclusive": "2005-08-31",
+        "rainfall_end_exclusive": "2005-10-01",
+        "requested_daily_images": 31
+      },
+      {
+        "event_id": 3551,
+        "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_3551_From_20090925_to_20091012",
+        "start_date": "2009-09-25",
+        "end_date_inclusive": "2009-10-12",
+        "rainfall_start_inclusive": "2009-09-11",
+        "rainfall_end_exclusive": "2009-10-13",
+        "requested_daily_images": 32
+      }
+    ],
+    "rainfall_source": "UCSB-CHG/CHIRPS/DAILY",
+    "rainfall_batch_size": 7,
+    "rainfall_max_pixels": 10000,
+    "rainfall_grid": "original CHIRPS native projection/transform",
+    "rainfall_reducer": "unweighted mean/min/max/count of native pixel centres inside district",
+    "flood_scale_m": 250,
+    "flood_max_pixels_per_partition": 300000,
+    "flood_crs": "EPSG:32643",
+    "flood_transform": [
+      250,
+      0,
+      0,
+      0,
+      -250,
+      0
+    ],
+    "bestEffort": false,
+    "per_request_deadline_ms": 10000,
+    "retries": 0,
+    "wall_seconds": 120,
+    "full_flood_collection_scan": false
+  },
+  "sources": {
+    "UCSB-CHG/CHIRPS/DAILY": {
+      "producer": "UCSB Climate Hazards Center",
+      "version": "2.0 Final",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+      "license": "Public domain",
+      "citation": "Funk et al. (2015), doi:10.1038/sdata.2015.66",
+      "units": "mm/day",
+      "native_resolution_degrees": 0.05
+    },
+    "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1": {
+      "producer": "Cloud to Street / Dartmouth Flood Observatory",
+      "version": "V1",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+      "license": "CC BY-NC 4.0; attribution and non-commercial use required",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "citation": "Tellman et al. (2021), doi:10.1038/s41586-021-03695-w",
+      "native_classification_resolution_m": 250,
+      "catalogue_band_grid_m": 30,
+      "units": "binary water classes; counts are processing-grid pixels; clear_views is retained as a source-band sum"
+    },
+    "WM/geoLab/geoBoundaries/600/ADM2": {
+      "producer": "William & Mary geoLab",
+      "version": "6.0.0 (2023 composite)",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/WM_geoLab_geoBoundaries_600_ADM2",
+      "license": "CC BY 4.0",
+      "license_url": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  },
+  "rainfall_queries": [
+    {
+      "event_id": 2728,
+      "image_count": 31,
+      "native_projection": {
+        "type": "Projection",
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "nominal_scale_m": 5565.974539663679,
+      "expected_pixel_count": 118
+    },
+    {
+      "event_id": 3551,
+      "image_count": 32,
+      "native_projection": {
+        "type": "Projection",
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "nominal_scale_m": 5565.974539663679,
+      "expected_pixel_count": 118
+    }
+  ],
+  "flood_queries": [
+    {
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728_From_20050914_to_20050930",
+      "properties": {
+        "cc": "IND, BGD",
+        "composite_type": "3Day",
+        "countries": "India, Bangladesh",
+        "dfo_centroid_x": 82.538893,
+        "dfo_centroid_y": 21.113878,
+        "dfo_country": "India",
+        "dfo_dead": 89,
+        "dfo_displaced": 550000,
+        "dfo_main_cause": "Heavy rain",
+        "dfo_other_country": "NA",
+        "dfo_severity": 1,
+        "dfo_validation_type": "News",
+        "gfd_country_code": "['BG', 'IN']",
+        "gfd_country_name": "['BANGLADESH', 'INDIA']",
+        "glide_index": "NA",
+        "id": 2728,
+        "slope_threshold": 5,
+        "system:asset_size": 26373308,
+        "system:id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728_From_20050914_to_20050930",
+        "system:index": "DFO_2728_From_20050914_to_20050930",
+        "system:time_end": 1128038400000,
+        "system:time_start": 1126656000000,
+        "system:version": 1685079812079786,
+        "threshold_b1b2": 0.7,
+        "threshold_b7": 675,
+        "threshold_type": "standard"
+      },
+      "partitions": [
+        {
+          "partition": 0,
+          "half_open_window": [
+            1819,
+            1953,
+            -6185,
+            -5998
+          ],
+          "statistics": {
+            "clear_views_count": 11799,
+            "clear_views_sum": 411113,
+            "mapped_nonpermanent_flood_count": 11799,
+            "mapped_nonpermanent_flood_sum": 10,
+            "observed_nonpermanent_flood_count": 11799,
+            "observed_nonpermanent_flood_sum": 10
+          },
+          "retrieved_at": "2026-10-03T13:03:02.958509+00:00"
+        },
+        {
+          "partition": 1,
+          "half_open_window": [
+            1819,
+            1953,
+            -5998,
+            -5810
+          ],
+          "statistics": {
+            "clear_views_count": 13465,
+            "clear_views_sum": 469553,
+            "mapped_nonpermanent_flood_count": 13465,
+            "mapped_nonpermanent_flood_sum": 3,
+            "observed_nonpermanent_flood_count": 13465,
+            "observed_nonpermanent_flood_sum": 3
+          },
+          "retrieved_at": "2026-10-03T13:03:04.502165+00:00"
+        },
+        {
+          "partition": 2,
+          "half_open_window": [
+            1953,
+            2087,
+            -6185,
+            -5998
+          ],
+          "statistics": {
+            "clear_views_count": 3180,
+            "clear_views_sum": 109446,
+            "mapped_nonpermanent_flood_count": 3180,
+            "mapped_nonpermanent_flood_sum": 20,
+            "observed_nonpermanent_flood_count": 3180,
+            "observed_nonpermanent_flood_sum": 20
+          },
+          "retrieved_at": "2026-10-03T13:03:06.474005+00:00"
+        },
+        {
+          "partition": 3,
+          "half_open_window": [
+            1953,
+            2087,
+            -5998,
+            -5810
+          ],
+          "statistics": {
+            "clear_views_count": 12908,
+            "clear_views_sum": 444259,
+            "mapped_nonpermanent_flood_count": 12908,
+            "mapped_nonpermanent_flood_sum": 0,
+            "observed_nonpermanent_flood_count": 12908,
+            "observed_nonpermanent_flood_sum": 0
+          },
+          "retrieved_at": "2026-10-03T13:03:06.983356+00:00"
+        }
+      ],
+      "retrieved_at": "2026-10-03T13:03:06.983418+00:00",
+      "computation_complete": true,
+      "valid_observed_pixels": 41352,
+      "positive_observed_pixels": 33,
+      "finding": "confirmed_mapped_nonpermanent_floodwater"
+    },
+    {
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_3551_From_20090925_to_20091012",
+      "properties": {
+        "cc": "IND",
+        "composite_type": "3Day",
+        "countries": "India",
+        "dfo_centroid_x": 78.232999,
+        "dfo_centroid_y": 15.708107,
+        "dfo_country": "India",
+        "dfo_dead": 303,
+        "dfo_displaced": 0,
+        "dfo_main_cause": "Heavy Rain",
+        "dfo_other_country": "NA",
+        "dfo_severity": 2,
+        "dfo_validation_type": "0",
+        "gfd_country_code": "['IN']",
+        "gfd_country_name": "['INDIA']",
+        "glide_index": "FL-2009-000217-IND",
+        "id": 3551,
+        "slope_threshold": 5,
+        "system:asset_size": 21306386,
+        "system:id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_3551_From_20090925_to_20091012",
+        "system:index": "DFO_3551_From_20090925_to_20091012",
+        "system:time_end": 1255305600000,
+        "system:time_start": 1253836800000,
+        "system:version": 1685079931706051,
+        "threshold_b1b2": 0.7,
+        "threshold_b7": 675,
+        "threshold_type": "standard"
+      },
+      "partitions": [
+        {
+          "partition": 0,
+          "half_open_window": [
+            1819,
+            1953,
+            -6185,
+            -5998
+          ],
+          "statistics": {
+            "clear_views_count": 11799,
+            "clear_views_sum": 445195,
+            "mapped_nonpermanent_flood_count": 11799,
+            "mapped_nonpermanent_flood_sum": 6,
+            "observed_nonpermanent_flood_count": 11799,
+            "observed_nonpermanent_flood_sum": 6
+          },
+          "retrieved_at": "2026-10-03T13:03:08.369141+00:00"
+        },
+        {
+          "partition": 1,
+          "half_open_window": [
+            1819,
+            1953,
+            -5998,
+            -5810
+          ],
+          "statistics": {
+            "clear_views_count": 13465,
+            "clear_views_sum": 504985,
+            "mapped_nonpermanent_flood_count": 13465,
+            "mapped_nonpermanent_flood_sum": 1,
+            "observed_nonpermanent_flood_count": 13465,
+            "observed_nonpermanent_flood_sum": 1
+          },
+          "retrieved_at": "2026-10-03T13:03:09.001284+00:00"
+        },
+        {
+          "partition": 2,
+          "half_open_window": [
+            1953,
+            2087,
+            -6185,
+            -5998
+          ],
+          "statistics": {
+            "clear_views_count": 3180,
+            "clear_views_sum": 118559,
+            "mapped_nonpermanent_flood_count": 3180,
+            "mapped_nonpermanent_flood_sum": 16,
+            "observed_nonpermanent_flood_count": 3180,
+            "observed_nonpermanent_flood_sum": 16
+          },
+          "retrieved_at": "2026-10-03T13:03:09.694331+00:00"
+        },
+        {
+          "partition": 3,
+          "half_open_window": [
+            1953,
+            2087,
+            -5998,
+            -5810
+          ],
+          "statistics": {
+            "clear_views_count": 12908,
+            "clear_views_sum": 479167,
+            "mapped_nonpermanent_flood_count": 12908,
+            "mapped_nonpermanent_flood_sum": 0,
+            "observed_nonpermanent_flood_count": 12908,
+            "observed_nonpermanent_flood_sum": 0
+          },
+          "retrieved_at": "2026-10-03T13:03:11.663114+00:00"
+        }
+      ],
+      "retrieved_at": "2026-10-03T13:03:11.663143+00:00",
+      "computation_complete": true,
+      "valid_observed_pixels": 41352,
+      "positive_observed_pixels": 23,
+      "finding": "confirmed_mapped_nonpermanent_floodwater"
+    }
+  ],
+  "image_identifiers": "Rainfall image_id is the original collection-relative Earth Engine Image.id(); full asset is source_id/image_id. Flood image_id is the full explicitly selected asset identifier.",
+  "table_semantics": {
+    "daily_rainfall.csv": "One returned CHIRPS image per district/date/source. mean_mm/min_mm/max_mm summarize daily precipitation at native pixel centres. Preceding totals have units mm; empty cells denote unavailable values, never zero fill.",
+    "event_evidence.csv": "One event-window maximum map per original event ID; no daily flood occurrences or negative labels. Evidence counts and clear_views_sum are integer source-band/grid statistics."
+  },
+  "observation_criteria": "flooded==1 AND jrc_perm_water==0; all three band masks valid AND clear_views>0",
+  "lag_definition": "sum of complete district daily means for t-3..t-1 or t-7..t-1; null if any preceding date/image/pixel coverage is missing",
+  "limitations": [
+    "District CHIRPS summaries are gridded estimates, not locality rain-gauge measurements.",
+    "Only precipitation observation dates precede lag dates. Historical product publication times are unknown; retrospective Final values are not verified as-of predictors.",
+    "Modern geoBoundaries district geometry applied to 2005/2009; historical boundary equivalence is unverified.",
+    "Flooded is event-window maximum extent, not daily occurrence or independent ground truth.",
+    "Clouds, masks, event selection and MODIS resolution limit flood evidence; no negative or daily labels are generated.",
+    "Counts use the declared 250 m processing grid with nearest-neighbour source sampling; they are not native area measurements."
+  ],
+  "access": {
+    "initialization": "succeeded",
+    "constant_probe": 1,
+    "retrieved_at": "2026-10-03T13:02:25.172880+00:00"
+  },
+  "boundary": {
+    "source_id": "WM/geoLab/geoBoundaries/600/ADM2",
+    "area_km2": 3574.2856017722406,
+    "bounds": [
+      [
+        [
+          74.58262990665376,
+          13.13912923264342
+        ],
+        [
+          75.20067916080882,
+          13.13912923264342
+        ],
+        [
+          75.20067916080882,
+          13.985488903751628
+        ],
+        [
+          74.58262990665376,
+          13.985488903751628
+        ],
+        [
+          74.58262990665376,
+          13.13912923264342
+        ]
+      ]
+    ],
+    "properties": {
+      "shapeGroup": "IND",
+      "shapeID": "76128533B4839184447445",
+      "shapeName": "Udupi",
+      "shapeType": "ADM2"
+    },
+    "retrieved_at": "2026-10-03T13:02:29.063555+00:00"
+  },
+  "finished_at": "2026-10-03T13:03:11.663242+00:00",
+  "code_sha256": {
+    "extract_udupi_history.py": "d0a3a43b6a3fe5f58525ba363e9ce4a1f92e8bf9471bde1967cc060328a131f9",
+    "verify_earth_engine.py": "4ec9ddebfa06862d80b6dcca6b3331bc4fd488befbd81b69e5545199d56c09b9"
+  },
+  "validation": {
+    "rainfall_rows": 63,
+    "event_rows": 2,
+    "requested_dates": 63,
+    "missing_image_dates": [],
+    "unavailable_or_partial_dates": [],
+    "complete_requested_rainfall": true,
+    "preceding_3d_totals_available": 57,
+    "preceding_7d_totals_available": 49
+  },
+  "status": "complete_research_extraction",
+  "files": {
+    "daily_rainfall.csv": {
+      "sha256": "f6dd8cdd73b3f67bdba4d733f410f84527f93024d1ae8a1654b8d1030c9667a3",
+      "columns": [
+        "event_id",
+        "district",
+        "boundary_id",
+        "date",
+        "source_id",
+        "image_id",
+        "source_time_start_ms",
+        "units",
+        "mean_mm",
+        "min_mm",
+        "max_mm",
+        "valid_pixel_count",
+        "expected_pixel_count",
+        "status",
+        "preceding_3d_mm",
+        "preceding_7d_mm",
+        "retrieved_at"
+      ]
+    },
+    "event_evidence.csv": {
+      "sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6",
+      "columns": [
+        "event_id",
+        "district",
+        "boundary_id",
+        "source_id",
+        "image_id",
+        "start_date",
+        "end_date_inclusive",
+        "source_time_start_ms",
+        "source_time_end_ms",
+        "extent_semantics",
+        "processing_scale_m",
+        "partitions_completed",
+        "valid_observed_pixels",
+        "mapped_nonpermanent_pixels",
+        "positive_observed_pixels",
+        "clear_views_sum",
+        "clear_views_count",
+        "finding",
+        "retrieved_at"
+      ]
+    }
+  }
+}

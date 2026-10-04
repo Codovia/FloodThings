@@ -1,0 +1,4 @@
+# Optional local SOI verification; not an application dependency.
+shapely==2.1.2
+pyproj==3.8.0
+pyshp==3.1.6
