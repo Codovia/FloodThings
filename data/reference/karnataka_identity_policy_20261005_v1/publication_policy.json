@@ -1,0 +1,85 @@
+{
+  "scope": "2025-edition SOI ABDB products and their derivatives only; does not alter other source licences",
+  "checked_on": "2026-10-05",
+  "repository_decisions": {
+    "original_soi_geometry": "withhold",
+    "transformed_soi_geometry": "withhold",
+    "rasterised_soi_geometry": "withhold",
+    "soi_derived_rainfall_statistics": "withhold",
+    "project_authored_non_spatial_metadata_checksums_code": "allow"
+  },
+  "broader_publication_authorized": false,
+  "separate_review_required_before_publication_change": true,
+  "categories": [
+    {
+      "category": "local_internal_research",
+      "permission_status": "unresolved_for_this_ABDB_download",
+      "repository_handling": "retain locally; no public distribution; existing read-only research continues within user scope",
+      "evidence": "Pricing page describes conditional Digital Licence internal use for open-series products; no executed ABDB licence or specific unconditional research grant was established.",
+      "source_urls": [
+        "https://surveyofindia.gov.in/pages/pricing-of-digital-data",
+        "https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-"
+      ]
+    },
+    {
+      "category": "original_soi_geometry",
+      "permission_status": "unresolved_without_written_permission",
+      "repository_handling": "withhold",
+      "evidence": "Copyright policy requires written permission for reproduction; ABDB download listing and public catalogue classification supply access, not an express redistribution grant.",
+      "source_urls": [
+        "https://surveyofindia.gov.in/pages/copyright-policy",
+        "https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-"
+      ]
+    },
+    {
+      "category": "transformed_soi_geometry",
+      "permission_status": "unresolved",
+      "repository_handling": "withhold",
+      "evidence": "No inspected ABDB term expressly grants public redistribution of transformed or reprojected geometry.",
+      "source_urls": [
+        "https://surveyofindia.gov.in/pages/copyright-policy"
+      ]
+    },
+    {
+      "category": "rasterised_soi_geometry",
+      "permission_status": "unresolved",
+      "repository_handling": "withhold",
+      "evidence": "Publishing Licence template defines a limited, read-only raster publication scope (definitions and clause 3.2); signing, payment and licence issuance are conditions, not automatic permission.",
+      "source_urls": [
+        "https://surveyofindia.gov.in/documents/publishing-licence.pdf"
+      ]
+    },
+    {
+      "category": "soi_derived_rainfall_statistics",
+      "permission_status": "unresolved",
+      "repository_handling": "withhold",
+      "evidence": "No inspected official term expressly addresses district rainfall aggregates computed using ABDB polygons. This is uncertainty, not a finding that such aggregates are legally prohibited.",
+      "source_urls": [
+        "https://surveyofindia.gov.in/pages/copyright-policy",
+        "https://surveyofindia.gov.in/pages/terms-and-conditions"
+      ]
+    },
+    {
+      "category": "project_authored_non_spatial_metadata_checksums_code",
+      "permission_status": "repository_permitted_scope_not_a_soi_reproduction_licence",
+      "repository_handling": "allow only original project code, schemas, factual source references/identity metadata, checksums and redacted provenance; no source policy documents, geometry, observations or numerical rainfall statistics",
+      "evidence": "Continues the explicitly reviewed repository scope; does not assert a blanket SOI grant to reproduce its material."
+    }
+  ],
+  "source_attribution": "Survey of India, Government of India",
+  "bundled_metadata": {
+    "workbook_sha256": "6b05a2497fa8e6dd196c8534f75f8d8dcd76307b0132807e939adb886b72b21d",
+    "B54_access_constraints": "copyright",
+    "B55_use_constraints": "copyright",
+    "B56_other_constraints": "Geospatial Guidelines 2021 to be followed; violations subject to applicable laws",
+    "embedded_qgis_metadata": "empty descriptive/legal fields; no additional grant",
+    "archive_inventory": "shapefile components and QGIS/XML metadata only; no separate redistribution licence file observed"
+  },
+  "applicability_limits": [
+    "No executed publishing/digital licence or written permission is recorded.",
+    "The publishing template and pricing page do not establish an unconditional licence for the downloaded 1:50000 ABDB edition.",
+    "SOI superseded-policies page lists National Map Policy 2005 and implementation guidelines; older publication controls are not assumed to be current ABDB obligations.",
+    "Vector catalogue 2025 was inspected through the web reader (Karnataka 31 districts, ABDB classified public); full local PDF retention stopped at the 2 MiB ceiling. No complete response checksum is claimed.",
+    "Website terms advise checking ambiguities with the department; this register is evidence-based repository handling, not a legal determination."
+  ]
+}
