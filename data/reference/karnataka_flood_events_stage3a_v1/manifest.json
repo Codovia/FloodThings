@@ -1,0 +1,180 @@
+{
+  "version": "karnataka_flood_events_stage3a_v1",
+  "recorded_at": "2026-10-05T16:00:01.018757+00:00",
+  "status": "blocked_source_retrieval_no_catalogue_created",
+  "previous_verified_commit": "4f63d05fe26a0f62ec85104fe5c6ebfbdc1b5daf",
+  "ifi": {
+    "doi": "10.5281/zenodo.16994648",
+    "catalogue_url": "https://zenodo.org/records/16994648",
+    "release_version": "v4",
+    "publication_date": "2025-08-29",
+    "original_filename": "India_Flood_Inventory_v3.csv",
+    "source_url": "https://zenodo.org/records/16994648/files/India_Flood_Inventory_v3.csv?download=1",
+    "publisher_checksum": "md5:fea75a9ff9eba8fb328eaddfacd21d67",
+    "original_bytes_retained": false,
+    "original_byte_size": null,
+    "local_sha256": null,
+    "rights_metadata_status": "not_retrieved; rendered Rights/License heading supplies no readable grant",
+    "publication_decision": "Raw IFI and detailed derived tables remain local until original rights metadata is retained and reviewed",
+    "schema_status": "Publisher CSV inspected through web reader; original local byte-level schema inspection still pending"
+  },
+  "access_attempts": [
+    {
+      "source_url": "https://zenodo.org/api/records/16994648",
+      "status": "failed_bounded_elapsed_check",
+      "error": "RuntimeError: bounded retrieval limit exceeded",
+      "http_status_verified": null,
+      "complete_response_sha256": null,
+      "timeout_seconds": [
+        10,
+        25
+      ],
+      "elapsed_check_seconds": 60,
+      "retries": 0
+    },
+    {
+      "source_url": "https://zenodo.org/records/16994648/files/India_Flood_Inventory_v3.csv?download=1",
+      "status": "process_wall_timeout",
+      "exit_code": 124,
+      "wall_seconds": 60,
+      "timeout_seconds": [
+        10,
+        20
+      ],
+      "retries": 0,
+      "http_status_verified": null,
+      "complete_response_sha256": null,
+      "purpose": "direct-link diagnostic; no response returned"
+    },
+    {
+      "source_url": "https://zenodo.org/records/16994648/files/India_Flood_Inventory_v3.csv?download=1",
+      "status": "process_wall_timeout",
+      "exit_code": 124,
+      "wall_seconds": 60,
+      "timeout_seconds": [
+        10,
+        20
+      ],
+      "retries": 0,
+      "http_status_verified": null,
+      "complete_response_sha256": null,
+      "purpose": "original byte retention; no complete file received"
+    }
+  ],
+  "gfd": {
+    "collection": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1",
+    "source_url": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+    "project": "floodpulse",
+    "query_window": [
+      73.5,
+      11,
+      79,
+      19
+    ],
+    "window_semantics": "Public geographic window, not an official boundary",
+    "max_metadata_events": 128,
+    "per_query_deadline_ms": 10000,
+    "wall_seconds": 60,
+    "retries": 0,
+    "status": "initialization_timeout_before_query",
+    "error": "VerificationDeadlineExceeded: Verification exceeded 60 seconds",
+    "failure_stage": "ee.Initialize -> existing credential refresh -> socket connect",
+    "initialization_succeeded": false,
+    "live_metadata_retrieved": false,
+    "event_count": null,
+    "licence": "CC BY-NC 4.0",
+    "extent_semantics": "event-window maximum; never daily flood labels",
+    "spatial_verification_performed": false,
+    "soi_geometry_transmitted": false,
+    "attribution": "Cloud to Street / Dartmouth Flood Observatory; Tellman et al. (2021), doi:10.1038/s41586-021-03695-w"
+  },
+  "official_government": {
+    "status": "catalogue_only_no_event_corroboration_claimed",
+    "source_url": "https://ksdma.karnataka.gov.in/storage/pdf-files/ActionplanforFloodriskmanagement2021.pdf",
+    "title": "Karnataka State Action Plan for Flood Risk Management",
+    "document_year": 2021,
+    "web_reader_failure": "400: Content length is too large: 15322461",
+    "original_response_retained": false,
+    "source_sha256": null,
+    "event_links_created": 0
+  },
+  "catalogue_counts": {
+    "karnataka_source_rows": null,
+    "unique_ifi_events": null,
+    "earliest_event_year": null,
+    "latest_event_year": null,
+    "affected_karnataka_source_districts": null,
+    "usable_date_windows": null,
+    "officially_corroborated_ifi_events": null,
+    "ifi_records_in_gfd_period": null,
+    "ifi_events_with_gfd_candidates": null,
+    "satellite_confirmed_ifi_records": null,
+    "unresolved_ifi_records": null
+  },
+  "existing_independent_udupi_evidence": {
+    "not_a_match_to_unretrieved_ifi_rows": true,
+    "boundary_asset": "WM/geoLab/geoBoundaries/600/ADM2",
+    "boundary_shape_id": "76128533B4839184447445",
+    "events": [
+      {
+        "event_id": 2728,
+        "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728_From_20050914_to_20050930",
+        "start_date": "2005-09-14",
+        "end_date_inclusive": "2005-09-30",
+        "qualified_nonpermanent_pixels": 33
+      },
+      {
+        "event_id": 3551,
+        "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_3551_From_20090925_to_20091012",
+        "start_date": "2009-09-25",
+        "end_date_inclusive": "2009-10-12",
+        "qualified_nonpermanent_pixels": 23
+      }
+    ],
+    "processing_scale_m": 250,
+    "criteria": "flooded == 1; jrc_perm_water == 0; valid input masks; clear_views > 0; district-clipped pixel-centre inclusion",
+    "extent_semantics": "Event-window maximum, not daily flood occurrence",
+    "historical_boundary_limitation": "Modern geoBoundaries geometry is not verified as the historical administrative boundary",
+    "event_evidence_path": "data/processed/udupi_historical_v1/event_evidence.csv",
+    "event_evidence_sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6"
+  },
+  "geographic_status": {
+    "current_lgd_reconciliation": "incomplete",
+    "soi_current_lgd_verified": false,
+    "soi_geometry_used_for_new_event_processing": false
+  },
+  "next_task": "Recover official IFI original bytes and rights metadata; complete Stage 3A offline before Stage 3B satellite verification.",
+  "reviewed_file_checksums": {
+    "scripts/catalogue_karnataka_floods.py": {
+      "bytes": 12585,
+      "sha256": "69d3e232eeb68101cd2b890185b6d3fc77817e33722df8cc924df8bd2b5c881a"
+    },
+    "backend/tests/test_flood_catalogue.py": {
+      "bytes": 8300,
+      "sha256": "0118f1770539e7d913ad6385e9e81eaeab596bc9e4a31ee4be249b1f1e52b17a"
+    },
+    "data/processed/udupi_historical_v1/event_evidence.csv": {
+      "bytes": 970,
+      "sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6"
+    },
+    "data/processed/udupi_flood_spatial_v1/manifest.json": {
+      "bytes": 7508,
+      "sha256": "6c16b2d3731e9404adfdb56ad35b53721c18331b5a3207bac81e46974a061dca"
+    },
+    "data/working/karnataka_chirps_soi2025_2025_v1/daily_rainfall.csv": {
+      "bytes": 4142083,
+      "sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819"
+    }
+  },
+  "verification": {
+    "new_isolated_tests": 18,
+    "backend_suite_passed": 304,
+    "frontend_tests_passed": 14,
+    "browser_regressions_passed": 4,
+    "production_frontend_build": "passed",
+    "existing_dataset_validators": "passed",
+    "starting_protected_files_unchanged": 575,
+    "new_catalogue_validator": "not run on real data: verified original IFI unavailable",
+    "automated_external_requests": 0
+  }
+}
