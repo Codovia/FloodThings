@@ -52,14 +52,18 @@ def fixtures(root):
         body = stream.getvalue().encode()
         (directory/'daily_rainfall.csv').write_bytes(body)
         manifest = {'version': directory.name, 'mode': 'month', 'dates': days,
-                    'source': {'collection': rain.SOURCE, 'version': 'fixture only'},
-                    'geometry_provenance': {'identities': identities, 'current_lgd_reconciled': False},
+                    'source': {'collection': rain.SOURCE, 'version': 'fixture only', 'units': 'mm/day',
+                               'native_resolution_degrees': 0.05},
+                    'geometry_provenance': {'identities': identities, 'current_lgd_reconciled': False,
+                                            'edition': '2025', 'source_id': rain.SOURCE_GEOMETRY},
                     'method': 'fixture daily means', 'download_parameters': {}, 'csv_fields': rain.FIELDS,
                     'raw_retrieval_log': {'sha256': 'fixture only', 'bytes': 0},
                     'images': [{'source_image_id': rain.SOURCE+'/'+day.replace('-', ''),
                                 'download': {'retrieved_at': rows[0]['retrieved_at']}} for day in days],
                     'temporal_semantics': 'fixture historical estimates', 'geometry_temporal_limit': '2025 geometry only',
-                    'identity_limit': 'pending current LGD', 'reuse': {'district_aggregate_publication': 'local only'}}
+                    'identity_limit': 'pending current LGD', 'reuse': {'district_aggregate_publication': 'local only'},
+                    'files': {'daily_rainfall.csv': rain.soi.fingerprint(directory/'daily_rainfall.csv')},
+                    'validation': rain.validate_rows(rows, identities, days)}
         if month != 8:
             manifest['month'] = month  # Original August manifest has no month field.
         (directory/'manifest.json').write_text(json.dumps(manifest))
@@ -86,6 +90,12 @@ def test_annual_assembly_preserves_month_bytes_hashes_times_and_august_rows(monk
         assert raw[august['offset_bytes']:august['offset_bytes']+august['bytes']] == original
         assert b'\r\n' in original
         assert annual.validate(output, partitions) == result
+        assert len(manifest['monthly_equality_checks']) == 12
+        assert all(c['statistics_equal'] and c['logical_equality'] for c in manifest['monthly_equality_checks'])
+        assert all(c['observations'] == 365 for c in manifest['district_coverage_checks'])
+        annual_before = snapshot(output)
+        assert annual.validate(output, partitions) == result
+        assert snapshot(output) == annual_before
         assert all(snapshot(root)[key] == value for key, value in before.items())
         complete = snapshot(root)
         with pytest.raises(ValueError, match='never overwrite'):
@@ -94,7 +104,8 @@ def test_annual_assembly_preserves_month_bytes_hashes_times_and_august_rows(monk
         assert 'total_mm' not in manifest['validation']
         def assert_metadata_only(node):
             if isinstance(node, dict):
-                assert not set(node) & {'mean_mm_per_day', 'scalar_mean_mm_per_day', 'total_mm', 'coordinates'}
+                assert not set(node) & {'mean_mm_per_day', 'scalar_mean_mm_per_day', 'total_mm', 'coordinates',
+                                        'source_statistics', 'annual_statistics'}
                 for value in node.values():
                     assert_metadata_only(value)
             elif isinstance(node, list):
@@ -172,23 +183,23 @@ def test_month_manifest_selects_recovered_raw_path_with_legacy_fallback(monkeypa
         root = Path(temporary)
         monkeypatch.setattr(annual, 'ROOT', root)
         inputs = fixtures(root)
-        calls = []
-        monkeypatch.setattr(rain, 'validate_dataset', lambda directory, raw, boundaries: calls.append(raw))
+        def forbidden_raster_recalculation(*args):
+            raise AssertionError('Annual assembly must not recalculate rainfall from rasters')
+        monkeypatch.setattr(rain, 'validate_dataset', forbidden_raster_recalculation)
         for partition in inputs:
             month = partition['month']
             directory = root/f'data/working/karnataka_chirps_soi2025_2025{month:02d}_v1'
             directory.mkdir(parents=True)
             manifest = deepcopy(partition['manifest'])
-            manifest['validation'] = {'records': len(partition['rows'])}
+            manifest['version'] = directory.name
             if month == 3:
                 manifest['raw_directory'] = 'data/raw/chirps/karnataka_window_202503_recovered_v1'
             (directory/'manifest.json').write_text(json.dumps(manifest))
             shutil.copyfile(partition['directory']/'daily_rainfall.csv', directory/'daily_rainfall.csv')
         before = snapshot(root)
         loaded = annual.load_partitions()
-        assert calls[2] == root/'data/raw/chirps/karnataka_window_202503_recovered_v1'
-        assert calls[7] == root/'data/raw/chirps/karnataka_window_202508_verified_v1'
-        assert loaded[2]['raw_directory'] == calls[2]
+        assert loaded[2]['raw_directory'] == root/'data/raw/chirps/karnataka_window_202503_recovered_v1'
+        assert loaded[7]['raw_directory'] == root/'data/raw/chirps/karnataka_window_202508_verified_v1'
         assert snapshot(root) == before
         manifest_path = root/'data/working/karnataka_chirps_soi2025_202501_v1/manifest.json'
         manifest = json.loads(manifest_path.read_text())
@@ -196,3 +207,130 @@ def test_month_manifest_selects_recovered_raw_path_with_legacy_fallback(monkeypa
         manifest_path.write_text(json.dumps(manifest))
         with pytest.raises(ValueError, match='outside local CHIRPS storage'):
             annual.load_partitions()
+
+
+def save_fixture(partition, lexical_precision=False):
+    """Modify controlled inputs only; never touch project research paths."""
+    table = partition['directory']/'daily_rainfall.csv'
+    with table.open('w', newline='') as stream:
+        writer = csv.DictWriter(stream, fieldnames=rain.FIELDS)
+        writer.writeheader()
+        for row in partition['rows']:
+            writer.writerow({**row, 'mean_mm_per_day': '2.5000000000000000'} if lexical_precision else row)
+    partition['csv_bytes'] = table.read_bytes()
+    manifest = partition['manifest']
+    manifest['files'] = {'daily_rainfall.csv': rain.soi.fingerprint(table)}
+    manifest['validation'] = rain.validate_rows(partition['rows'], manifest['geometry_provenance']['identities'], manifest['dates'])
+    (partition['directory']/'manifest.json').write_text(json.dumps(manifest))
+
+
+def test_sorted_union_preserves_every_original_record_precision_and_quoted_newline(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root)
+        for p in partitions:
+            for identity in p['manifest']['geometry_provenance']['identities']:
+                identity['district_name_original'] = 'Fixture,\n'+identity['district_lgd_code_as_supplied_by_soi']
+            names = {i['district_lgd_code_as_supplied_by_soi']: i['district_name_original']
+                     for i in p['manifest']['geometry_provenance']['identities']}
+            for row in p['rows']: row['district_name_original'] = names[row['source_district_lgd_code']]
+            p['rows'].reverse()
+            save_fixture(p, lexical_precision=True)
+        before = snapshot(root)
+        output = root/'annual'
+        annual.assemble(output, root/'public.json', partitions)
+        content = (output/'daily_rainfall.csv').read_bytes()
+        assert content.count(b'2.5000000000000000') == 730
+        _, records = annual.original_records(content)
+        assert records[0][0]['date'] == '2025-01-01' and records[0][0]['source_district_lgd_code'] == '569'
+        assert all('\n' in r['district_name_original'] for r, _ in records)
+        result = annual.validate(output, partitions)
+        assert result['duplicate_keys'] == result['missing_rainfall_values'] == 0
+        manifest = json.loads((output/'manifest.json').read_text())
+        assert not manifest['august_record_preservation']['source_order_preserved']
+        assert manifest['august_record_preservation']['original_records_unchanged']
+        assert all(snapshot(root)[name] == value for name, value in before.items())
+
+
+@pytest.mark.parametrize('fault', ['source_version', 'method', 'geometry', 'schema', 'version'])
+def test_mixed_provenance_is_rejected_before_any_output(monkeypatch, fault):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root);manifest = partitions[1]['manifest']
+        if fault == 'source_version':manifest['source']['version'] = 'different controlled version'
+        if fault == 'method':manifest['method'] = 'different controlled method'
+        if fault == 'geometry':manifest['geometry_provenance']['source_id'] = 'different controlled geometry'
+        if fault == 'schema':manifest['csv_fields'] = rain.FIELDS[:-1]
+        if fault == 'version':manifest['version'] = 'ambiguous controlled version'
+        (partitions[1]['directory']/'manifest.json').write_text(json.dumps(manifest))
+        before = snapshot(root)
+        with pytest.raises(ValueError):annual.assemble(root/'annual', root/'public.json', partitions)
+        assert snapshot(root) == before
+
+
+def test_monthly_checksum_is_checked_before_parsing_observations(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root)
+        table = partitions[0]['directory']/'daily_rainfall.csv'
+        table.write_bytes(table.read_bytes()+b'corrupt controlled fixture')
+        before = snapshot(root)
+        def forbidden(*args):raise AssertionError('Corrupted table must not be parsed')
+        monkeypatch.setattr(rain, 'read_table', forbidden)
+        with pytest.raises(ValueError, match='Monthly table checksum mismatch'):
+            annual.assemble(root/'annual', root/'public.json', partitions)
+        assert snapshot(root) == before
+
+
+@pytest.mark.parametrize('state', ['no_valid_pixels', 'partial_pixel_coverage'])
+def test_incomplete_month_cannot_be_published_as_annual(monkeypatch, state):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root);row = partitions[0]['rows'][0];row['status'] = state
+        if state == 'no_valid_pixels':
+            row['valid_pixel_count'] = 0;row['valid_fraction'] = 0.0
+            row['mean_mm_per_day'] = row['min_mm_per_day'] = row['max_mm_per_day'] = None
+        else:row['expected_pixel_count'] = 2;row['valid_fraction'] = .5
+        save_fixture(partitions[0]);before = snapshot(root)
+        with pytest.raises(ValueError, match='Incomplete monthly observations'):
+            annual.assemble(root/'annual', root/'public.json', partitions)
+        assert snapshot(root) == before
+
+
+def test_failed_candidate_validation_does_not_publish_a_completed_version(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary);monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root);before = snapshot(root)
+        def fail(*args):raise ValueError('Controlled candidate failure')
+        monkeypatch.setattr(annual, 'validate', fail)
+        with pytest.raises(ValueError, match='Controlled candidate failure'):
+            annual.assemble(root/'annual', root/'public.json', partitions)
+        assert snapshot(root) == before
+        assert not list(root.glob('.annual-candidate-*'))
+
+
+def test_validator_rejects_changed_values_even_with_updated_annual_checksum(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary);monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root);output = root/'annual'
+        annual.assemble(output, root/'public.json', partitions)
+        table = output/'daily_rainfall.csv';table.write_bytes(table.read_bytes().replace(b',2.5,', b',2.4,', 1))
+        manifest = json.loads((output/'manifest.json').read_text())
+        manifest['files']['daily_rainfall.csv'] = rain.soi.fingerprint(table)
+        (output/'manifest.json').write_text(json.dumps(manifest));before = snapshot(root)
+        with pytest.raises(ValueError, match='Annual byte content/checksum mismatch'):
+            annual.validate(output, partitions)
+        assert snapshot(root) == before
+
+
+def test_validator_rejects_forged_monthly_statistics_without_writing(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary);monkeypatch.setattr(annual, 'ROOT', root)
+        partitions = fixtures(root);output = root/'annual'
+        annual.assemble(output, root/'public.json', partitions)
+        manifest = json.loads((output/'manifest.json').read_text())
+        manifest['monthly_equality_checks'][0]['annual_statistics']['mean_mm_per_day']['sum'] += 1
+        (output/'manifest.json').write_text(json.dumps(manifest));before = snapshot(root)
+        with pytest.raises(ValueError, match='Annual equality/coverage/assembly provenance mismatch'):
+            annual.validate(output, partitions)
+        assert snapshot(root) == before
