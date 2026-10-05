@@ -1,0 +1,319 @@
+{
+  "version": "karnataka_flood_events_recovery_v1",
+  "created_at": "2026-10-05T16:35:12.359280+00:00",
+  "status": "source_verified_offline_catalogue_validated",
+  "record": {
+    "id": 16994648,
+    "doi": "10.5281/zenodo.16994648",
+    "title": "India Flood Inventory-Impacts (IFI-Impacts) [1967-2023]: A multi-source national geospatial database to facilitate comprehensive flood research",
+    "release_display_version": "v4",
+    "release_display_version_source": "https://zenodo.org/records/16994648",
+    "api_version_field_present": false,
+    "api_publication_date": "2025-08-29",
+    "api_publisher_field_present": false,
+    "publisher_display": "Zenodo",
+    "publisher_display_source": "https://zenodo.org/records/16994648",
+    "api_status": "published",
+    "api_access_right": "open",
+    "license_exact": {
+      "id": "cc-by-nc-4.0"
+    },
+    "rights_field_present": false,
+    "version_relations_exact": {
+      "version": [
+        {
+          "index": 3,
+          "is_last": true,
+          "parent": {
+            "pid_type": "recid",
+            "pid_value": "4742142"
+          }
+        }
+      ]
+    },
+    "creators_exact": [
+      {
+        "name": "Manabendra Saharia",
+        "affiliation": "IIT Delhi"
+      }
+    ],
+    "source_url": "https://zenodo.org/api/records/16994648",
+    "retrieved_at": "2026-10-05T16:17:10.127610+00:00",
+    "response": {
+      "bytes": 6163,
+      "sha256": "195cd2fe6afacb329d3a361f91214ac9e3cf7359c7534664a0050d9568a3becc"
+    },
+    "file_inventory": [
+      {
+        "id": "b0b6a32b-0c62-4553-80c1-cd255a30487e",
+        "key": "India_Flood_Inventory_v3.csv",
+        "size": 1801579,
+        "checksum": "md5:fea75a9ff9eba8fb328eaddfacd21d67",
+        "links": {
+          "self": "https://zenodo.org/api/records/16994648/files/India_Flood_Inventory_v3.csv/content"
+        }
+      },
+      {
+        "id": "435a82e9-cdde-48b2-ab7c-c55608686734",
+        "key": "District_FloodImpact.csv",
+        "size": 19122,
+        "checksum": "md5:231d4157f462ea6c9bfd728c9dfbf520",
+        "links": {
+          "self": "https://zenodo.org/api/records/16994648/files/District_FloodImpact.csv/content"
+        }
+      },
+      {
+        "id": "5d0ae679-9efa-4db8-8478-526a73ab0931",
+        "key": "District_FloodedArea.csv",
+        "size": 32567,
+        "checksum": "md5:52744304c21f28b841fb3a28e510e789",
+        "links": {
+          "self": "https://zenodo.org/api/records/16994648/files/District_FloodedArea.csv/content"
+        }
+      },
+      {
+        "id": "a584d4fd-1a6f-4b91-b489-f88a54778dc4",
+        "key": "DFSI.csv",
+        "size": 29118,
+        "checksum": "md5:d15cbab2f15c3a6c393fd45220665211",
+        "links": {
+          "self": "https://zenodo.org/api/records/16994648/files/DFSI.csv/content"
+        }
+      }
+    ],
+    "original_response_local_filename": "record.json",
+    "content_type": "application/json"
+  },
+  "original_file": {
+    "filename": "India_Flood_Inventory_v3.csv",
+    "source_url_from_record": "https://zenodo.org/api/records/16994648/files/India_Flood_Inventory_v3.csv/content",
+    "http_status": 200,
+    "content_type": "text/plain; charset=utf-8",
+    "retrieved_at": "2026-10-05T16:18:50.959358+00:00",
+    "publisher_md5": "fea75a9ff9eba8fb328eaddfacd21d67",
+    "local_md5": "fea75a9ff9eba8fb328eaddfacd21d67",
+    "bytes": 1801579,
+    "sha256": "ef9ab2cd0db7bf917dcc22c7cb094ec599f5013ef1b96ba525d816f26ff1b108"
+  },
+  "requests": [
+    {
+      "attempt": 1,
+      "url": "https://zenodo.org/api/records/16994648",
+      "started_at": "2026-10-05T16:17:09.035952+00:00",
+      "finished_at": "2026-10-05T16:17:10.127610+00:00",
+      "exit_code": 0,
+      "http_status": "200",
+      "error": "",
+      "connect_timeout_seconds": 10,
+      "total_timeout_seconds": 40,
+      "max_bytes": 1048576,
+      "automatic_retries": 0,
+      "redirects_followed": true,
+      "bytes": 6163,
+      "sha256": "195cd2fe6afacb329d3a361f91214ac9e3cf7359c7534664a0050d9568a3becc"
+    },
+    {
+      "kind": "csv",
+      "attempt": 1,
+      "url": "https://zenodo.org/api/records/16994648/files/India_Flood_Inventory_v3.csv/content",
+      "started_at": "2026-10-05T16:18:43.685084+00:00",
+      "finished_at": "2026-10-05T16:18:50.959358+00:00",
+      "exit_code": 0,
+      "http_status": "200",
+      "error": "",
+      "resume_from_bytes": 0,
+      "connect_timeout_seconds": 10,
+      "total_timeout_seconds": 60,
+      "max_bytes": 5242880,
+      "automatic_retries": 0,
+      "redirects_followed": true,
+      "retained_bytes": 1801579
+    }
+  ],
+  "raw_schema": [
+    "Unnamed: 0",
+    "UEI",
+    "Start Date",
+    "End Date",
+    "Duration(Days)",
+    "Main Cause",
+    "Location",
+    "Districts",
+    "State",
+    "Latitude",
+    "Longitude",
+    "Severity",
+    "Area Affected",
+    "Human fatality",
+    "Human injured",
+    "Human Displaced",
+    "Animal Fatality",
+    "Description of Casualties/injured",
+    "Extent of damage ",
+    "Event Source",
+    "Event Souce ID",
+    "District_LGD_Codes",
+    "State_Codes"
+  ],
+  "global_source_quality_counts": {
+    "source_rows": 6876,
+    "duplicate_row_occurrences": 0,
+    "missing_event_identifiers": 0,
+    "date_fields": {
+      "usable": 13712,
+      "missing": 40
+    },
+    "reversed_date_windows": 17,
+    "missing_states": 0,
+    "missing_districts": 60,
+    "unexpected_code_tokens": [
+      "None"
+    ]
+  },
+  "karnataka_summary": {
+    "karnataka_source_rows": 494,
+    "unique_nonmissing_source_event_ids": 494,
+    "earliest_start": "1969-07-15",
+    "latest_start": "2023-07-25",
+    "latest_end": "2023-07-25",
+    "distinct_source_district_tokens_including_multistate_rows": 73,
+    "distinct_numeric_source_district_code_tokens_including_multistate_rows": 49,
+    "missing_source_district_rows": 3,
+    "complete_parsed_date_pairs": 493,
+    "partially_dated_rows": 0,
+    "both_dates_missing_or_malformed_rows": 1,
+    "reversed_date_windows": 1,
+    "usable_date_windows": 492,
+    "records_with_gfd_candidates": 0,
+    "satellite_confirmed_catalogue_records": 0,
+    "unresolved_current_geometry_mappings": 494,
+    "official_corroboration": "not_reviewed"
+  },
+  "karnataka_quality_counts": {
+    "duplicate_source_rows": 0,
+    "duplicate_source_event_ids": 0,
+    "missing_source_event_ids": 0,
+    "malformed_date_fields": 0,
+    "missing_date_fields": 2,
+    "multi_state_rows": 2,
+    "single_state_rows": 492,
+    "source_district_names_status": "73 literal comma-delimited tokens, including multi-state rows, malformed/concatenated names, localities and placeholders; not 73 verified Karnataka districts",
+    "source_district_codes_status": "49 numeric source tokens plus literal None, including multi-state rows; not current-LGD verified"
+  },
+  "evidence": {
+    "reported_flood_event": 494,
+    "satellite_not_reviewed": 494,
+    "satellite_confirmed_ifi_records": 0,
+    "official_corroboration": "not_reviewed",
+    "new_earth_engine_requests": 0,
+    "new_gfd_requests": 0,
+    "candidate_count_semantics": "No new candidates retrieved or attached, not evidence of absent flood maps",
+    "existing_independent_udupi_records": 2,
+    "existing_udupi_ifi_matches": 0,
+    "unmatched_existing_udupi_records": 2,
+    "existing_positive_cell_counts": {
+      "2728": 33,
+      "3551": 23
+    },
+    "existing_source_csv": {
+      "path": "data/processed/udupi_historical_v1/event_evidence.csv",
+      "bytes": 970,
+      "sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6"
+    },
+    "temporal_overlap_policy": "No deterministic association inferred from differing observation windows and absent shared event identifier; separate prior evidence retained in local manifest"
+  },
+  "catalogue": {
+    "path": "data/working/karnataka_flood_events_v1",
+    "files": {
+      "events.json": {
+        "bytes": 1117098,
+        "sha256": "770480e56cd36c91a8e157df0ceb0c4251e396961ad6c1146ed0f6be06a96874"
+      },
+      "manifest.json": {
+        "bytes": 10315,
+        "sha256": "eecfa782e11c6177dff94b8f9e7424ee0d4d8910d0d5f6318101e7ce8843a7ea"
+      }
+    },
+    "total_bytes": 1127413,
+    "event_schema": [
+      "project_event_id",
+      "source_row_ordinal",
+      "ifi_source_event_id",
+      "source_start_date",
+      "source_end_date",
+      "parsed_start_date",
+      "parsed_end_date_inclusive",
+      "date_status",
+      "source_duration_days",
+      "derived_event_duration_days_inclusive",
+      "source_state",
+      "source_districts",
+      "source_state_codes",
+      "source_district_lgd_codes",
+      "identifier_status",
+      "original_source_values",
+      "evidence_class",
+      "official_karnataka_corroboration_status",
+      "gfd_candidates",
+      "satellite_verification_status",
+      "current_geometry_mapping_status",
+      "provenance_reference",
+      "notes"
+    ],
+    "reproducible_from_retained_originals": true,
+    "completed_version_overwrite": "refused"
+  },
+  "publication": {
+    "ifi_license_id": "cc-by-nc-4.0",
+    "ifi_license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+    "attribution": "Manabendra Saharia, IIT Delhi / HydroSense Lab; India Flood Inventory-Impacts, Zenodo DOI 10.5281/zenodo.16994648",
+    "conditions": "Attribution, licence link, indication of changes and non-commercial use; public access is not unrestricted use",
+    "changes": "Original source bytes unchanged; Karnataka source-state filtering, separate parsed date/duration and evidence annotations",
+    "gfd_license_id": "CC BY-NC 4.0",
+    "gfd_attribution": "Cloud to Street / Dartmouth Flood Observatory; Tellman et al. (2021), doi:10.1038/s41586-021-03695-w",
+    "repository_scope": "Reviewed processing code, tests, schemas, high-level counts and provenance/checksums only; original CSV, API body and detailed catalogue kept local",
+    "soi_geometry_and_rainfall_publication_status": "Unchanged: withheld and unresolved"
+  },
+  "validation": {
+    "catalogue_tests_passed": 30,
+    "full_backend_tests_passed": 316,
+    "frontend_initial": {
+      "passed": 13,
+      "failed": 1,
+      "failure": "Unchanged DrainageResearchLayers overlay assertion ran before mocked effect call"
+    },
+    "frontend_serial_rerun": {
+      "passed": 14,
+      "failed": 0,
+      "source_or_assertion_changes": false
+    },
+    "browser_tests_passed": 4,
+    "production_build": "passed",
+    "existing_dataset_validators": "passed",
+    "current_lgd_validator": "passed with reconciliation still incomplete",
+    "real_source_catalogue_validator": "passed",
+    "starting_inventory_files": 579,
+    "unchanged_starting_protected_files": 577,
+    "authorized_code_test_changes": [
+      "scripts/catalogue_karnataka_floods.py",
+      "backend/tests/test_flood_catalogue.py"
+    ],
+    "frozen_annual": {
+      "records": 11315,
+      "dates": 365,
+      "source_district_ids": 31,
+      "sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819"
+    }
+  },
+  "processing_files": {
+    "scripts/catalogue_karnataka_floods.py": {
+      "bytes": 19159,
+      "sha256": "2ad762c99d2a15e3c811215e446368092ffd81385e96c52220deecb6c6020f35"
+    },
+    "backend/tests/test_flood_catalogue.py": {
+      "bytes": 15735,
+      "sha256": "f4595aad1baa1cbf9419635724b45414de5fcec06485875580f2fbc281be43cd"
+    }
+  },
+  "next_task": "Stage 3B — satellite verification of selected Karnataka historical flood events; no such work started."
+}

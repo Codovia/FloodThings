@@ -80,7 +80,7 @@ def test_state_name_only_is_preserved_without_invented_code():
 def test_date_parsing_retains_original_missing_or_malformed_values(raw, status):
     record = catalogue.build([row(**{"Start Date": raw})], "a" * 64)[0]
     assert record["source_start_date"] == raw and record["date_status"]["start"] == status
-    assert record["satellite_verification_status"] == "unknown"
+    assert record["satellite_verification_status"] == "not_reviewed"
 
 
 def test_reversed_dates_have_no_candidate_or_daily_label():
@@ -163,4 +163,122 @@ def test_tampered_evidence_fails_even_after_output_checksum_is_updated(monkeypat
         manifest["files"]["events.json"] = catalogue.fingerprint(output / "events.json")
         (output / "manifest.json").write_text(json.dumps(manifest))
         with pytest.raises(ValueError, match="evidence validation"):
+            catalogue.validate(output)
+
+
+def publisher_record(root, source, retrieval):
+    """Controlled record shaped like the retained API; no live source content."""
+    data = json.loads(retrieval.read_text())
+    link = "https://zenodo.org/api/records/16994648/files/India_Flood_Inventory_v3.csv/content"
+    record = {"id": 16994648, "metadata": {"doi": catalogue.DOI, "publication_date": "2025-08-29",
+                                          "access_right": "open", "license": {"id": "cc-by-nc-4.0"}},
+              "files": [{"key": source.name, "size": source.stat().st_size,
+                         "checksum": "md5:" + data["publisher_md5"], "links": {"self": link}}]}
+    path = root / "record.json"; path.write_text(json.dumps(record))
+    data.update(url=link, record_metadata_path=str(path), record_metadata_sha256=catalogue.fingerprint(path)["sha256"])
+    retrieval.write_text(json.dumps(data))
+    return path
+
+
+@pytest.mark.parametrize("status", [200, 206])
+def test_api_provided_link_and_resumed_response_use_retained_record_provenance(monkeypatch, status):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); source, retrieval = inputs(root, monkeypatch)
+        record = publisher_record(root, source, retrieval)
+        data = json.loads(retrieval.read_text()); data["http_status"] = status
+        retrieval.write_text(json.dumps(data)); frozen = signatures(root)
+        output = root / "version"; result = catalogue.create(source, retrieval, output)
+        manifest = json.loads((output / "manifest.json").read_text())
+        assert manifest["source_url"] == data["url"]
+        assert manifest["record_metadata_exact"] == json.loads(record.read_text())["metadata"]
+        assert manifest["record_metadata_exact"]["license"] == {"id": "cc-by-nc-4.0"}
+        assert not manifest["api_version_field_present"]
+        assert catalogue.validate(output) == result
+        assert {name: signatures(root)[name] for name in frozen} == frozen
+
+
+@pytest.mark.parametrize("change", ["link", "size", "record", "checksum", "metadata_hash", "mirror"])
+def test_record_conflicts_are_rejected_before_output(monkeypatch, change):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); source, retrieval = inputs(root, monkeypatch)
+        path = publisher_record(root, source, retrieval); record = json.loads(path.read_text())
+        data = json.loads(retrieval.read_text())
+        if change == "link": record["files"][0]["links"]["self"] += "?different=1"
+        if change == "size": record["files"][0]["size"] += 1
+        if change == "record": record["id"] = 1
+        if change == "checksum": record["files"][0]["checksum"] = "md5:" + "0" * 32
+        if change == "metadata_hash": record["metadata"]["publication_date"] = "2000-01-01"
+        if change == "mirror":
+            data["url"] = "https://unofficial.invalid/fixture.csv"
+            record["files"][0]["links"]["self"] = data["url"]
+        path.write_text(json.dumps(record))
+        if change != "metadata_hash": data["record_metadata_sha256"] = catalogue.fingerprint(path)["sha256"]
+        retrieval.write_text(json.dumps(data))
+        with pytest.raises(ValueError, match="record"):
+            catalogue.create(source, retrieval, root / "version")
+        assert not (root / "version").exists()
+
+
+def test_open_access_without_a_licence_never_invents_reuse_rights(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); source, retrieval = inputs(root, monkeypatch)
+        path = publisher_record(root, source, retrieval); record = json.loads(path.read_text())
+        del record["metadata"]["license"]; path.write_text(json.dumps(record))
+        data = json.loads(retrieval.read_text()); data["record_metadata_sha256"] = catalogue.fingerprint(path)["sha256"]
+        retrieval.write_text(json.dumps(data)); output = root / "version"
+        catalogue.create(source, retrieval, output)
+        assert "license" not in json.loads((output / "manifest.json").read_text())["record_metadata_exact"]
+
+
+def test_missing_reversed_and_complete_windows_keep_source_duration_separate():
+    rows = [row(**{"Duration(Days)": "99"}), row(**{"Start Date": "", "End Date": ""}),
+            row(**{"Start Date": "05-08-2005 00:00"}), row(**{"End Date": ""})]
+    records = catalogue.build(rows, "a" * 64); result = catalogue.summary(records)
+    assert records[0]["derived_event_duration_days_inclusive"] == 3
+    assert records[0]["source_duration_days"] == "99"
+    assert records[1]["derived_event_duration_days_inclusive"] is None
+    assert records[2]["derived_event_duration_days_inclusive"] is None
+    assert result["complete_parsed_date_pairs"] == 2 and result["usable_date_windows"] == 1
+    assert result["partially_dated_rows"] == 1 and result["both_dates_missing_or_malformed_rows"] == 1
+    assert result["reversed_date_windows"] == 1
+
+
+def udupi_fixture(root):
+    directory = root / "fixture_udupi"; directory.mkdir(); path = directory / "event_evidence.csv"
+    previous = []
+    for event, start, end, count in [(2728, "2005-09-14", "2005-09-30", 33), (3551, "2009-09-25", "2009-10-12", 23)]:
+        previous.append({"event_id": str(event), "image_id": catalogue.GFD + "/FIXTURE_ONLY_" + str(event),
+                         "start_date": start, "end_date_inclusive": end, "processing_scale_m": "250",
+                         "positive_observed_pixels": str(count), "finding": "confirmed_mapped_nonpermanent_floodwater",
+                         "extent_semantics": "event_window_maximum_not_daily_occurrence"})
+    with path.open("w", newline="") as handle:
+        writer = csv.DictWriter(handle, fieldnames=list(previous[0])); writer.writeheader(); writer.writerows(previous)
+    manifest = {"version": "udupi_historical_v1", "files": {path.name: catalogue.fingerprint(path)},
+                "query_parameters": {"events": previous}}
+    (directory / "manifest.json").write_text(json.dumps(manifest))
+    return path
+
+
+def test_temporal_location_overlap_keeps_prior_satellite_evidence_separate():
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); path = udupi_fixture(root); frozen = signatures(root)
+        source = row(Districts="Udupi", **{"Start Date": "01-10-2009 00:00", "End Date": "07-10-2009 00:00"})
+        records = catalogue.build([source], "a" * 64)
+        result = catalogue.existing_udupi_evidence(path, records)
+        assert [r["matched_ifi_project_ids"] for r in result] == [[], []]
+        assert result[1]["overlapping_ifi_ids_for_review_only"] == ["FIXTURE-ONLY-001"]
+        assert result[0]["overlapping_ifi_ids_for_review_only"] == []
+        assert records[0]["evidence_class"] == "reported_flood_event"
+        assert records[0]["satellite_verification_status"] == "not_reviewed"
+        assert signatures(root) == frozen
+
+
+def test_independent_evidence_is_reproducible_read_only_and_rejects_corruption(monkeypatch):
+    with TemporaryDirectory() as temporary:
+        root = Path(temporary); source, retrieval = inputs(root, monkeypatch); prior = udupi_fixture(root)
+        output = root / "version"; catalogue.create(source, retrieval, output, udupi_path=prior)
+        frozen = signatures(root); catalogue.validate(output)
+        assert signatures(root) == frozen
+        prior.write_bytes(prior.read_bytes() + b"\n")
+        with pytest.raises(ValueError, match="checksum mismatch"):
             catalogue.validate(output)
