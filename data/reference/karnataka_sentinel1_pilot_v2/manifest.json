@@ -1,0 +1,1218 @@
+{
+  "attribution": "Contains modified Copernicus Sentinel data 2018,2019; ESA/EU/Copernicus. JRC/Pekel et al.2016; NASA/USGS SRTM; William and Mary geoLab CC BY 4.0; IFI Saharia/IIT Delhi/HydroSense CC BY-NC 4.0.",
+  "binary_labels": 0,
+  "candidate_counts": {
+    "all_ifi_karnataka_records": 494,
+    "narrow_pilot_eligible": 47,
+    "partially_unresolved_location": 107,
+    "post_2014_start_records": 174,
+    "unresolved_location_no_exact_token": 61,
+    "within_live_coverage_valid": 158
+  },
+  "candidate_years": [
+    "2015",
+    "2016",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023"
+  ],
+  "collection_metadata": {
+    "asset": {
+      "id": "COPERNICUS/S1_GRD",
+      "name": "projects/earthengine-public/assets/COPERNICUS/S1_GRD",
+      "type": "IMAGE_COLLECTION",
+      "updateTime": "2026-10-06T12:23:52.494306Z"
+    },
+    "earliest_utc": "2015-02-24T00:54:46.610000+00:00",
+    "latest_utc": "2026-10-04T00:31:26+00:00",
+    "response": {
+      "count": 4706,
+      "earliest_ms": 1424739286610,
+      "latest_ms": 1791073886000,
+      "modes": {
+        "IW": 4706
+      },
+      "passes": {
+        "ASCENDING": 242,
+        "DESCENDING": 4464
+      },
+      "polarizations": [
+        "VV",
+        "VH"
+      ],
+      "resolutions_m": {
+        "10.0": 4706
+      }
+    },
+    "retrieved_at": "2026-10-06T12:39:44.568059+00:00",
+    "source": "COPERNICUS/S1_GRD",
+    "state_id": "1811400B56841107211215",
+    "state_source": "WM/geoLab/geoBoundaries/600/ADM1"
+  },
+  "created_at": "2026-10-06T12:53:16.504566+00:00",
+  "dataset_files": {
+    "candidate_inventory.json": {
+      "bytes": 420170,
+      "sha256": "0f8c4028b16401962b0d7eb939bbefedabe539fa03fe77209785cd72a4e94fe5"
+    },
+    "evidence.json": {
+      "bytes": 91111,
+      "sha256": "f0d6e859924c79b74486a5735d1cf9f085ec0bcefe6e022f67745bfe557ac6ea"
+    },
+    "scene_inventory.json": {
+      "bytes": 294817,
+      "sha256": "d6fb257d4c5cb85728571a397e7ad22aaae1f15ed9beb9327ddf0341720f5e38"
+    }
+  },
+  "independent_spatial_corroboration_count": 0,
+  "inputs": {
+    "data/raw/flood_satellite/stage3b_access_v1/public_boundary_inventory.json": {
+      "bytes": 5070,
+      "sha256": "4d58194696ca95697b874dbbc573d77ca3c844e42a47c9e9ab1efb56a6d01bca"
+    },
+    "data/working/karnataka_chirps_soi2025_2025_v1/daily_rainfall.csv": {
+      "bytes": 4142083,
+      "sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819"
+    },
+    "data/working/karnataka_event_comparison_v1/evidence.json": {
+      "bytes": 21166,
+      "sha256": "d924d7435aff3629ff19e1c3310730eebbabe94e4b351594b89a8abe8d2cc7fa"
+    },
+    "data/working/karnataka_flood_events_v1/events.json": {
+      "bytes": 1117098,
+      "sha256": "770480e56cd36c91a8e157df0ceb0c4251e396961ad6c1146ed0f6be06a96874"
+    },
+    "data/working/karnataka_positive_event_rainfall_v1/manifest.json": {
+      "bytes": 883036,
+      "sha256": "9a90be720fbde859b673261e41ffda61f2a07cbb9c45397834d5119567e7d8f7"
+    }
+  },
+  "local_dataset_version": "karnataka_sentinel1_flood_pilot_v2",
+  "local_manifest": {
+    "bytes": 15173,
+    "sha256": "33f0ea0e8412435141ad220e6deb49fdc133cfcff2ed4e0900385ab247272941"
+  },
+  "metadata_selection_extension": "Initial three extended to five after first metadata checks found unavailable pairs; same ranking, no pixel outcomes. Actual dual VV/VH required by this implemented method; missing bands never forced.",
+  "method": {
+    "baseline": "per-pixel median of up to four distinct pre-start UTC acquisitions in dB",
+    "change": "event minus baseline dB, independently for VV and VH; no dB division",
+    "change_thresholds_db": [
+      -2.0,
+      -3.0,
+      -4.0
+    ],
+    "event": "first compatible scene during event; otherwise first within 7 days after inclusive end",
+    "event_vh_threshold_db": -22.0,
+    "event_vv_thresholds_db": [
+      -14.0,
+      -16.0,
+      -18.0
+    ],
+    "future_auxiliary_data": "GSW 1984-2021 summary is retrospective; not prediction-time feature",
+    "incidence_angle_degrees": [
+      30.0,
+      45.0
+    ],
+    "interpretation": "Raw unsmoothed sigma0 change candidates; no connected-pixel filter or speckle correction. Unknown confounders preclude promotion.",
+    "max_angle_difference_degrees": 1.0,
+    "permanent_water": "GSW v1.4 seasonality >= 10 months; valid occurrence and seasonality masks required",
+    "radiometric_terrain_flattening": false,
+    "resampling": "nearest to aligned 10 m EPSG:32643 research grid; no assertion of 10 m physical resolution",
+    "scope_rule": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+    "slope_percent_limits": [
+      3.0,
+      5.0,
+      7.0
+    ],
+    "terrain": "SRTM slope in degrees converted locally to percent=100*tan(degrees); not shadow/layover model",
+    "threshold_status": "EXPERIMENTAL_PREDECLARED_NOT_VALIDATED"
+  },
+  "preserved_failed_v1": {
+    "manifest": {
+      "bytes": 11506,
+      "sha256": "9f6759de8b3c84643aaab5df66a7785327e0fe0d96696f47a55ed27885a941e8"
+    },
+    "reason": "SDK mutated getDownloadURL parameters causing JSON serialization failure after one valid tile; v2 reused it without extraction."
+  },
+  "processing_code_at_extraction": {
+    "bytes": 33759,
+    "sha256": "30c4c4040d76d26caa16812d6dd1f1ca10ea5543fe82737c8ec591660e8abd28"
+  },
+  "project": "floodpulse",
+  "publication": "Code/tests/methods/source identifiers/aggregate diagnostics/checksums only; detailed rasters/geometries/evidence remain local; SOI publication and current LGD unresolved.",
+  "raw_files": {
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2015-0043.completed.json": {
+      "bytes": 2723,
+      "sha256": "07e3417530d02fd213bb9b16650a97d5d51f515e8e38d9eada5fdfa648341ef9"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2015-0043.scene_metadata.json": {
+      "bytes": 33,
+      "sha256": "022846b636af72823bb4f72b7ca8f0261e70d42d4cdc44124a857910202252d4"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2016-0062.completed.json": {
+      "bytes": 3250,
+      "sha256": "dcd37e9edfe5bc30e23f9338b50264e6ee2b1e71cc40c9e32525711640680fbf"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2016-0062.scene_metadata.json": {
+      "bytes": 9968,
+      "sha256": "f1a8a37a31abc0c778e3d3853ff67e008760b49b260d515bec8353db041a3299"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2017-0052.completed.json": {
+      "bytes": 3664,
+      "sha256": "86537c884b2722461b0f799ce9c4f10b723c8fc1e442385d39a5b43fb29fb457"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2017-0052.scene_metadata.json": {
+      "bytes": 13026,
+      "sha256": "16814bb6614658a7ff3c040a067ca947e9294000551fc0c99dd617a1d6031c0f"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023.completed.json": {
+      "bytes": 43393,
+      "sha256": "73eb0dd4b1de83ba7c646597b7e2d55222e8ce9da0c8155507d7735c930c6eb2"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023.scene_metadata.json": {
+      "bytes": 32633,
+      "sha256": "ba608673667013db634eaf0d90816dca0e51f918964fceaffe50904fa55bb3b8"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/change_products.tif": {
+      "bytes": 883424,
+      "sha256": "938dd25112236acb5e8783f9a7f73ba359041d1c535b98e9f256709b5eafca55"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/source_projections.json": {
+      "bytes": 5162,
+      "sha256": "e6f09f7da909f2b6eff19f3f7740502ce23fc335e0a05982aa76c90a21d89d54"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile0.json": {
+      "bytes": 1124,
+      "sha256": "6a9d0fcd093efdfa5a5e8621555e3577c2e5d8cc6d1c54760811d0248b149b1b"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile0.tif": {
+      "bytes": 538251,
+      "sha256": "8b7dc52676e799123a84a35f122362f1451d0ee808c8d32204cf3a2d8a4b515c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile1.json": {
+      "bytes": 927,
+      "sha256": "f58dcddecdcc18f075d426f809ab2a19d7023a1c358672cbeacb6008117203cd"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile1.tif": {
+      "bytes": 538470,
+      "sha256": "a0f56b2df46dd19f0b9b053dea76fa06d9bf7b8eef8645ba46df43e6ed1b8436"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile2.json": {
+      "bytes": 927,
+      "sha256": "ebd196aa7456fadaab0846814c8bce5a8e9ad0940345b46034a2c075755fbe57"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile2.tif": {
+      "bytes": 537637,
+      "sha256": "139ac163febcbeb98552bdd3928ad84bc00c09f67007212028ec9790a2907f4a"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile3.json": {
+      "bytes": 927,
+      "sha256": "3f59aab217d6b31d0f1bf8579619c5bb2cc0e48efad785113172ed97db5ab9c0"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile3.tif": {
+      "bytes": 540354,
+      "sha256": "9ab3fa9d5bc6e709db2da718c809bdde35e65b16dbac6c2db3c6e423ad20a53c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/workload_plan.json": {
+      "bytes": 1836,
+      "sha256": "13cd9af3236bff514622d15be694a6d0e9b24c269363e90686d596da5f7c1281"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032.completed.json": {
+      "bytes": 31903,
+      "sha256": "245b37cfc916620a0efdc04afe288a689536a5d892a3584d01243a9129871564"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032.scene_metadata.json": {
+      "bytes": 10082,
+      "sha256": "56f9f5842dcd2fc9e5c71b60c92748a460e10c47d9bbd35c5c541bbda2fefd4e"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/change_products.tif": {
+      "bytes": 883188,
+      "sha256": "eac90f0c391567fe8b1bfc9edd52728fd8e927605b82bc93ea6156eb052dedfb"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/source_projections.json": {
+      "bytes": 3097,
+      "sha256": "5087b7949f2a42bc8b14756b796969bafcce94b2760b5f37b04205970868669c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile0.json": {
+      "bytes": 843,
+      "sha256": "90fff33232d7cd3bf21e0d73d023af8acc0868c2f1178f3100a176d7462fce6c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile0.tif": {
+      "bytes": 334452,
+      "sha256": "1e73eed2658d36133f0c71797fec49ca627093708e1db37d37da507f3735467d"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile1.json": {
+      "bytes": 843,
+      "sha256": "e8a7d187d0d5d62eef113434f34b0727a46b13b1bcba3265b9c09c5efd356831"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile1.tif": {
+      "bytes": 333946,
+      "sha256": "370ae55f296379b9fcdec2eb1fd54ea7f8b3020e562a55801ae8e43a8538391c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile2.json": {
+      "bytes": 843,
+      "sha256": "7970b3cda478132cb2c5142d9a0f92f4220e16bb9c8ad346b75b166a7194e488"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile2.tif": {
+      "bytes": 333821,
+      "sha256": "b7f48ea5d9a29ad091552eab86b6ec69564e6f2303f77dc23787f512c3fb1348"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile3.json": {
+      "bytes": 843,
+      "sha256": "05a26d338aa2f8e583822590b3510b365139c145a021a991c2d9299d53efa2e9"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile3.tif": {
+      "bytes": 333940,
+      "sha256": "59bd729aca993def2866f8aef2195216e7cfca8fe62e50550e3b718e458dcd0f"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/workload_plan.json": {
+      "bytes": 1836,
+      "sha256": "45e408433bf83dd0b1f36bd6de5e546abe4ce6aac191d5dcda5ec372d08aca04"
+    },
+    "data/raw/sentinel1/stage3e_v2/candidate_inventory.json": {
+      "bytes": 420170,
+      "sha256": "0f8c4028b16401962b0d7eb939bbefedabe539fa03fe77209785cd72a4e94fe5"
+    },
+    "data/raw/sentinel1/stage3e_v2/coverage.json": {
+      "bytes": 2891,
+      "sha256": "c9affe09519230ccdf8891ffb58e06c6c00904161956d58972d9d2abfd33f586"
+    },
+    "data/raw/sentinel1/stage3e_v2/expanded_shortlist.json": {
+      "bytes": 4065,
+      "sha256": "516bd7b2b37197703f8b27a73c8c0e4959cd0b7f8402ecb446f69577fbc24b76"
+    },
+    "data/raw/sentinel1/stage3e_v2/metadata.json": {
+      "bytes": 294817,
+      "sha256": "d6fb257d4c5cb85728571a397e7ad22aaae1f15ed9beb9327ddf0341720f5e38"
+    },
+    "data/raw/sentinel1/stage3e_v2/requests.jsonl": {
+      "bytes": 3458,
+      "sha256": "b93e0be03e95fcb0e341b92e263b73bb78fc5becf7fe4a60d4e95c63f727c256"
+    },
+    "data/raw/sentinel1/stage3e_v2/shortlist.json": {
+      "bytes": 2449,
+      "sha256": "116eaa60b425a6ee973d8d541b01b1876461402eba2bd8b41d1a7bb68f0440be"
+    },
+    "data/raw/sentinel1/stage3e_v2/timing.jsonl": {
+      "bytes": 11320,
+      "sha256": "b15fd0ba1a97a40b6b37ce6eb812af225485b5332f3366bc10510019f3f03d75"
+    }
+  },
+  "records": [
+    {
+      "evidence_source": "Sentinel-1",
+      "gfd_associations": [],
+      "groups_available": 0,
+      "identifier_status": "IFI source supplied; not independently current-LGD verified",
+      "ifi_original_end": "02-11-2015 00:00",
+      "ifi_original_start": "02-11-2015 00:00",
+      "ifi_source_event_id": "UEI-IMD-FL-2015-0043",
+      "ml_binary_label": null,
+      "parsed_end_inclusive": "2015-11-02",
+      "parsed_start": "2015-11-02",
+      "public_scope_geometry_sha256": "1c86a681e556da637cd5c697636c53140596dc56bcfc5bfcb4e2a2ab1c3d58ed",
+      "public_scope_id": "76128533B47594161132413",
+      "public_scope_source": "WM/geoLab/geoBoundaries/600/ADM2",
+      "scene_ids_considered": [],
+      "scene_inventory_count": 0,
+      "scene_rejections": [],
+      "scope_description": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+      "scope_not_verified_flood_site": true,
+      "source_district_lgd_codes": "533",
+      "source_district_name": "Chitradurga",
+      "source_state_codes": "29",
+      "status": "sentinel1_pair_unavailable",
+      "unavailable_reason": "No scenes in declared window"
+    },
+    {
+      "evidence_source": "Sentinel-1",
+      "gfd_associations": [],
+      "groups_available": 0,
+      "identifier_status": "IFI source supplied; not independently current-LGD verified",
+      "ifi_original_end": "20-06-2016 00:00",
+      "ifi_original_start": "20-06-2016 00:00",
+      "ifi_source_event_id": "UEI-IMD-FL-2016-0062",
+      "ml_binary_label": null,
+      "parsed_end_inclusive": "2016-06-20",
+      "parsed_start": "2016-06-20",
+      "public_scope_geometry_sha256": "accf3b5a8b1113cd4d573c2450b7c45a873ae30a73c05fdec3b9c343e478222a",
+      "public_scope_id": "76128533B284680734793",
+      "public_scope_source": "WM/geoLab/geoBoundaries/600/ADM2",
+      "scene_ids_considered": [
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160515T003846_20160515T003911_011262_0110CB_B9F7",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160527T003847_20160527T003912_011437_011690_FC6F",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160608T003848_20160608T003913_011612_011C10_1FE5"
+      ],
+      "scene_inventory_count": 3,
+      "scene_rejections": [
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160515T003846_20160515T003911_011262_0110CB_B9F7",
+          "reason": "incomplete_footprint_or_outside_window"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160527T003847_20160527T003912_011437_011690_FC6F",
+          "reason": "incomplete_footprint_or_outside_window"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20160608T003848_20160608T003913_011612_011C10_1FE5",
+          "reason": "incomplete_footprint_or_outside_window"
+        }
+      ],
+      "scope_description": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+      "scope_not_verified_flood_site": true,
+      "source_district_lgd_codes": "546",
+      "source_district_name": "Raichur",
+      "source_state_codes": "29",
+      "status": "sentinel1_pair_unavailable",
+      "unavailable_reason": "Only three baseline scenes, each partially covers window; no event/immediately-after scene"
+    },
+    {
+      "evidence_source": "Sentinel-1",
+      "gfd_associations": [
+        {
+          "association_status": "strong_temporal_candidate",
+          "gfd_id": 4508,
+          "interpretation": "Retained provisional documentary relationship, not spatial validation; no new GFD review",
+          "satellite_confirmation": false
+        }
+      ],
+      "groups_available": 0,
+      "identifier_status": "IFI source supplied; not independently current-LGD verified",
+      "ifi_original_end": "17-08-2017 00:00",
+      "ifi_original_start": "17-08-2017 00:00",
+      "ifi_source_event_id": "UEI-IMD-FL-2017-0052",
+      "ml_binary_label": null,
+      "parsed_end_inclusive": "2017-08-17",
+      "parsed_start": "2017-08-17",
+      "public_scope_geometry_sha256": "0ddd1765d37466cf4a020dd62ae8f67de8b4251adc410befb181910893121a62",
+      "public_scope_id": "76128533B43335986553000",
+      "public_scope_source": "WM/geoLab/geoBoundaries/600/ADM2",
+      "scene_ids_considered": [
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170709T003957_20170709T004022_017387_01D0AC_B3B6",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170721T003946_20170721T004011_017562_01D603_87B3",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170802T003959_20170802T004024_017737_01DB61_0E0E",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170814T003947_20170814T004012_017912_01E0AC_04BC"
+      ],
+      "scene_inventory_count": 4,
+      "scene_rejections": [
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170709T003957_20170709T004022_017387_01D0AC_B3B6",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170721T003946_20170721T004011_017562_01D603_87B3",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170802T003959_20170802T004024_017737_01DB61_0E0E",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20170814T003947_20170814T004012_017912_01E0AC_04BC",
+          "reason": "not_in_deterministic_selected_group"
+        }
+      ],
+      "scope_description": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+      "scope_not_verified_flood_site": true,
+      "source_district_lgd_codes": "544",
+      "source_district_name": "Mandya",
+      "source_state_codes": "29",
+      "status": "sentinel1_pair_unavailable",
+      "unavailable_reason": "Four full-window pre-event scenes; none during event or within declared +7 days"
+    },
+    {
+      "configuration": [
+        "IW",
+        "DESCENDING",
+        63,
+        10,
+        [
+          "VH",
+          "VV"
+        ],
+        "A"
+      ],
+      "derived_raster_checksum": {
+        "bytes": 883424,
+        "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/change_products.tif",
+        "sha256": "938dd25112236acb5e8783f9a7f73ba359041d1c535b98e9f256709b5eafca55"
+      },
+      "evidence_source": "Sentinel-1",
+      "gfd_associations": [],
+      "groups_available": 2,
+      "identifier_status": "IFI source supplied; not independently current-LGD verified",
+      "ifi_original_end": "29-05-2018 00:00",
+      "ifi_original_start": "29-05-2018 00:00",
+      "ifi_source_event_id": "UEI-IMD-FL-2018-0023",
+      "ml_binary_label": null,
+      "observation_statistics": {
+        "auxiliary_missing_cells": 40000,
+        "baseline_incidence_degrees_range": [
+          42.686798095703125,
+          42.814842224121094
+        ],
+        "candidate_count_interpretation": "not_assessable_no_valid_cells",
+        "candidate_range_cells": [
+          0,
+          0
+        ],
+        "event_incidence_degrees_range": [
+          42.6912956237793,
+          42.81932067871094
+        ],
+        "incidence_rejected_cells": 0,
+        "independent_spatial_corroboration": "not_available",
+        "interpretation": "Small-window experimental dual-pol darkening; no validated flood extent or true negative. Speckle, vegetation, dry surfaces and unmodelled shadow/layover remain.",
+        "ml_binary_label": null,
+        "nominal": {
+          "candidate_area_m2": 0,
+          "candidate_cells": 0,
+          "change_threshold_db": -3.0,
+          "event_vv_threshold_db": -16.0,
+          "slope_percent_limit": 5.0,
+          "valid_analysis_cells": 0
+        },
+        "permanent_water_cells": 0,
+        "promoted_beyond_candidate": false,
+        "sar_valid_cells": 40000,
+        "scope_cells": 40000,
+        "sensitivity": [
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          }
+        ],
+        "status": "sentinel1_ambiguous",
+        "steep_cells_at_5_percent": 0,
+        "vh_change_db_range": [
+          -10.91610336303711,
+          8.259357452392578
+        ],
+        "vv_change_db_range": [
+          -9.752925872802734,
+          9.38764762878418
+        ]
+      },
+      "parsed_end_inclusive": "2018-05-29",
+      "parsed_start": "2018-05-29",
+      "public_scope_geometry_sha256": "141fac4c84e32d950bd01d47f869b1b4fedc4df02caaaeccdb7766f51a4e9162",
+      "public_scope_id": "76128533B4839184447445",
+      "public_scope_source": "WM/geoLab/geoBoundaries/600/ADM2",
+      "scene_ids_considered": [
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180416T004806_20180416T004831_021485_02502C_3100",
+        "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180417T130635_20180417T130704_010524_013300_9B8A",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180428T004806_20180428T004831_021660_0255A4_70A4",
+        "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180429T130636_20180429T130705_010699_01389C_2CDB",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180510T004807_20180510T004832_021835_025B32_15AA",
+        "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180511T130637_20180511T130706_010874_013E42_D09B",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180522T004808_20180522T004833_022010_0260C7_3190",
+        "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180523T130637_20180523T130706_011049_0143F3_B7A0",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180603T004808_20180603T004833_022185_026653_E00E",
+        "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180604T130638_20180604T130707_011224_01499A_70F1"
+      ],
+      "scene_inventory_count": 10,
+      "scene_rejections": [
+        {
+          "id": "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180417T130635_20180417T130704_010524_013300_9B8A",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180429T130636_20180429T130705_010699_01389C_2CDB",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180511T130637_20180511T130706_010874_013E42_D09B",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180523T130637_20180523T130706_011049_0143F3_B7A0",
+          "reason": "not_in_deterministic_selected_group"
+        },
+        {
+          "id": "COPERNICUS/S1_GRD/S1B_IW_GRDH_1SDV_20180604T130638_20180604T130707_011224_01499A_70F1",
+          "reason": "not_in_deterministic_selected_group"
+        }
+      ],
+      "scope_description": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+      "scope_not_verified_flood_site": true,
+      "source_district_lgd_codes": "549",
+      "source_district_name": "Udupi",
+      "source_state_codes": "29",
+      "status": "sentinel1_ambiguous",
+      "tiles_checksums": [
+        {
+          "bytes": 538251,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile0.tif",
+          "retrieved_at": "2026-10-06T12:50:10.065095+00:00",
+          "sha256": "8b7dc52676e799123a84a35f122362f1451d0ee808c8d32204cf3a2d8a4b515c"
+        },
+        {
+          "bytes": 538470,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile1.tif",
+          "retrieved_at": "2026-10-06T12:52:53.552278+00:00",
+          "sha256": "a0f56b2df46dd19f0b9b053dea76fa06d9bf7b8eef8645ba46df43e6ed1b8436"
+        },
+        {
+          "bytes": 537637,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile2.tif",
+          "retrieved_at": "2026-10-06T12:52:56.972273+00:00",
+          "sha256": "139ac163febcbeb98552bdd3928ad84bc00c09f67007212028ec9790a2907f4a"
+        },
+        {
+          "bytes": 540354,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile3.tif",
+          "retrieved_at": "2026-10-06T12:53:00.821709+00:00",
+          "sha256": "9ab3fa9d5bc6e709db2da718c809bdde35e65b16dbac6c2db3c6e423ad20a53c"
+        }
+      ],
+      "used_scenes": [
+        {
+          "acquired_at": "2018-04-16T00:48:06+00:00",
+          "angle_nominal_scale_m": 16257.57469498199,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180416T004806_20180416T004831_021485_02502C_3100",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2018-04-28T00:48:06+00:00",
+          "angle_nominal_scale_m": 16257.551621871162,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180428T004806_20180428T004831_021660_0255A4_70A4",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2018-05-10T00:48:07+00:00",
+          "angle_nominal_scale_m": 16257.607958781786,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180510T004807_20180510T004832_021835_025B32_15AA",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2018-05-22T00:48:08+00:00",
+          "angle_nominal_scale_m": 16257.626899546778,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180522T004808_20180522T004833_022010_0260C7_3190",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2018-06-03T00:48:08+00:00",
+          "angle_nominal_scale_m": 16257.60357799774,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20180603T004808_20180603T004833_022185_026653_E00E",
+          "relationship": "immediately_after_event"
+        }
+      ],
+      "workload": {
+        "area_m2": 4000000,
+        "band_pixels": 760000,
+        "bands": 19,
+        "bestEffort": false,
+        "crs": "EPSG:32643",
+        "download_byte_ceiling": 1048576,
+        "maxPixels": 300000,
+        "partition_count": 4,
+        "per_partition_band_pixels": 190000,
+        "phase_total_deadline_seconds": 900,
+        "request_deadline_seconds": 60,
+        "scale_m": 10,
+        "spatial_pixels": 40000
+      }
+    },
+    {
+      "configuration": [
+        "IW",
+        "DESCENDING",
+        63,
+        10,
+        [
+          "VH",
+          "VV"
+        ],
+        "A"
+      ],
+      "derived_raster_checksum": {
+        "bytes": 883188,
+        "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/change_products.tif",
+        "sha256": "eac90f0c391567fe8b1bfc9edd52728fd8e927605b82bc93ea6156eb052dedfb"
+      },
+      "evidence_source": "Sentinel-1",
+      "gfd_associations": [],
+      "groups_available": 1,
+      "identifier_status": "IFI source supplied; not independently current-LGD verified",
+      "ifi_original_end": "04-01-2019 00:00",
+      "ifi_original_start": "04-01-2019 00:00",
+      "ifi_source_event_id": "UEI-IMD-FL-2019-0032",
+      "ml_binary_label": null,
+      "observation_statistics": {
+        "auxiliary_missing_cells": 40000,
+        "baseline_incidence_degrees_range": [
+          36.258155822753906,
+          36.40684127807617
+        ],
+        "candidate_count_interpretation": "not_assessable_no_valid_cells",
+        "candidate_range_cells": [
+          0,
+          0
+        ],
+        "event_incidence_degrees_range": [
+          36.262962341308594,
+          36.411991119384766
+        ],
+        "incidence_rejected_cells": 0,
+        "independent_spatial_corroboration": "not_available",
+        "interpretation": "Small-window experimental dual-pol darkening; no validated flood extent or true negative. Speckle, vegetation, dry surfaces and unmodelled shadow/layover remain.",
+        "ml_binary_label": null,
+        "nominal": {
+          "candidate_area_m2": 0,
+          "candidate_cells": 0,
+          "change_threshold_db": -3.0,
+          "event_vv_threshold_db": -16.0,
+          "slope_percent_limit": 5.0,
+          "valid_analysis_cells": 0
+        },
+        "permanent_water_cells": 0,
+        "promoted_beyond_candidate": false,
+        "sar_valid_cells": 40000,
+        "scope_cells": 40000,
+        "sensitivity": [
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 3.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 5.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -14.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -16.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -2.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -3.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          },
+          {
+            "candidate_area_m2": 0,
+            "candidate_cells": 0,
+            "change_threshold_db": -4.0,
+            "event_vv_threshold_db": -18.0,
+            "slope_percent_limit": 7.0,
+            "valid_analysis_cells": 0
+          }
+        ],
+        "status": "sentinel1_ambiguous",
+        "steep_cells_at_5_percent": 0,
+        "vh_change_db_range": [
+          -18.463829040527344,
+          12.155254364013672
+        ],
+        "vv_change_db_range": [
+          -11.56312370300293,
+          8.619916915893555
+        ]
+      },
+      "parsed_end_inclusive": "2019-01-04",
+      "parsed_start": "2019-01-04",
+      "public_scope_geometry_sha256": "cc48678a5a902d003a948dbdae62cfe38e845777298fd41a956ed1d7dd16ed28",
+      "public_scope_id": "76128533B57609583882472",
+      "public_scope_source": "WM/geoLab/geoBoundaries/600/ADM2",
+      "scene_ids_considered": [
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20181130T004814_20181130T004839_024810_02BB28_ADD8",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20181224T004814_20181224T004839_025160_02C77C_51C6",
+        "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20190105T004813_20190105T004838_025335_02CDCB_A2F6"
+      ],
+      "scene_inventory_count": 3,
+      "scene_rejections": [],
+      "scope_description": "2 km square around deterministic public district representative point, grid-snapped; local district cell-centre clip",
+      "scope_not_verified_flood_site": true,
+      "source_district_lgd_codes": "541",
+      "source_district_name": "Kodagu",
+      "source_state_codes": "29",
+      "status": "sentinel1_ambiguous",
+      "tiles_checksums": [
+        {
+          "bytes": 334452,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile0.tif",
+          "retrieved_at": "2026-10-06T12:53:06.035706+00:00",
+          "sha256": "1e73eed2658d36133f0c71797fec49ca627093708e1db37d37da507f3735467d"
+        },
+        {
+          "bytes": 333946,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile1.tif",
+          "retrieved_at": "2026-10-06T12:53:10.696026+00:00",
+          "sha256": "370ae55f296379b9fcdec2eb1fd54ea7f8b3020e562a55801ae8e43a8538391c"
+        },
+        {
+          "bytes": 333821,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile2.tif",
+          "retrieved_at": "2026-10-06T12:53:14.217911+00:00",
+          "sha256": "b7f48ea5d9a29ad091552eab86b6ec69564e6f2303f77dc23787f512c3fb1348"
+        },
+        {
+          "bytes": 333940,
+          "file": "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile3.tif",
+          "retrieved_at": "2026-10-06T12:53:16.352500+00:00",
+          "sha256": "59bd729aca993def2866f8aef2195216e7cfca8fe62e50550e3b718e458dcd0f"
+        }
+      ],
+      "used_scenes": [
+        {
+          "acquired_at": "2018-11-30T00:48:14+00:00",
+          "angle_nominal_scale_m": 16257.670541820275,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20181130T004814_20181130T004839_024810_02BB28_ADD8",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2018-12-24T00:48:14+00:00",
+          "angle_nominal_scale_m": 16102.286499722853,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20181224T004814_20181224T004839_025160_02C77C_51C6",
+          "relationship": "baseline"
+        },
+        {
+          "acquired_at": "2019-01-05T00:48:13+00:00",
+          "angle_nominal_scale_m": 16102.304089273335,
+          "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20190105T004813_20190105T004838_025335_02CDCB_A2F6",
+          "relationship": "immediately_after_event"
+        }
+      ],
+      "workload": {
+        "area_m2": 4000000,
+        "band_pixels": 520000,
+        "bands": 13,
+        "bestEffort": false,
+        "crs": "EPSG:32643",
+        "download_byte_ceiling": 1048576,
+        "maxPixels": 300000,
+        "partition_count": 4,
+        "per_partition_band_pixels": 130000,
+        "phase_total_deadline_seconds": 900,
+        "request_deadline_seconds": 60,
+        "scale_m": 10,
+        "spatial_pixels": 40000
+      }
+    }
+  ],
+  "selection_not_based_on_sar_pixels": true,
+  "selection_rule": "Unique exact single IFI district token in retained public inventory, Karnataka-only, usable window <=31 days, baseline search fully inside live coverage; greedily new year, new region, earlier date, stable original ID. Three scopes; no raster outcomes, no guessed aliases. Availability tested after shortlist; pair unavailable retained.",
+  "sensitivity_readiness": "Not assessable: all 27 configurations have zero usable auxiliary-qualified cells in both windows. Zero arithmetic count is not flood absence or threshold stability.",
+  "source_terms_urls": [
+    "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD",
+    "https://developers.google.com/earth-engine/guides/sentinel1",
+    "https://sentinels.copernicus.eu/documents/247904/690755/Sentinel_Data_Legal_Notice",
+    "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_GlobalSurfaceWater",
+    "https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003"
+  ],
+  "sources": {
+    "ifi_doi": "10.5281/zenodo.16994648",
+    "public_geometry": "WM/geoLab/geoBoundaries/600/ADM2",
+    "sar": "COPERNICUS/S1_GRD",
+    "terrain": "USGS/SRTMGL1_003",
+    "water": "JRC/GSW1_4/GlobalSurfaceWater"
+  },
+  "supported_flood_candidate_count": 0,
+  "task": "Stage 3E",
+  "version": "karnataka_sentinel1_pilot_v2"
+}
