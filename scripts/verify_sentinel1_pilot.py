@@ -202,6 +202,11 @@ def band_names(pair):
 
 
 def analyze(values,names,mask):
+    """Historical v1/v2 reproduction only; its JRC validity gate is superseded.
+
+    Correct independent SAR validity/JRC flags live in verify_jrc_auxiliary.
+    Keeping this evaluator exact protects archived failed/completed evidence.
+    """
     require(values.shape==(len(names),200,200),'Unexpected raster dimensions')
     arrays=dict(zip(names,values));n=(len(names)-4)//3;require(n>=2,'Baseline unavailable')
     sar=[arrays[f's{i}_{b}'] for i in range(n) for b in ['VV','VH','angle']]
@@ -312,6 +317,7 @@ def download_url(image,parameters):
 
 
 def raw_image(ee,pair):
+    """Archived v1/v2 band layout; not a permitted new extraction interface."""
     ids,names=band_names(pair);bands=[]
     for i,asset in enumerate(ids):
         im=ee.Image(asset)
@@ -326,6 +332,12 @@ def raw_image(ee,pair):
 
 
 def extract():
+    # A repaired mask cannot authorize a new flood calculation. Neither pilot
+    # has independently corroborated date/location; retain archive validation.
+    raise ValueError('Stage 3E extraction retired: invalid GlobalSurfaceWater land-validity gate; '
+                     'use verify_jrc_auxiliary for independent diagnostics. '
+                     'A separately reviewed calibration case is required before SAR classification.')
+    # Retained below solely as the original reproducible extraction specification.
     import requests
     require(not OUTPUT.exists(),'Completed version or partial output exists; never overwrite')
     m=read(RAW/'metadata.json');require(m['method']==METHOD,'Predeclared method changed')

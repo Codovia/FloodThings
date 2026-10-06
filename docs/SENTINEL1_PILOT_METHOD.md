@@ -1,5 +1,13 @@
 # Sentinel-1 pilot method (Stage 3E)
 
+**Stage 3E2 correction (2026-10-06):** the v1/v2 method below is an archived
+specification. Its GlobalSurfaceWater mask gate incorrectly excluded otherwise
+usable SAR observations. The old `extract` entry point is disabled; its evaluator
+is retained unchanged solely to reproduce the failed v1 and completed v2.
+Use `scripts/.venv/bin/python scripts/verify_jrc_auxiliary.py diagnose` or
+`validate` for independent auxiliary diagnostics. No new flood classification is
+authorized by the mask repair.
+
 This is a feasibility/calibration experiment, not a validated flood map, label
 or operational product. GFD counts and rainfall contexts remain separate.
 
@@ -121,3 +129,96 @@ are checksum-validated; every count/sensitivity result is rebuilt from rasters.
 Commit code/tests/method/source IDs/aggregate metadata/checksums only. Original
 SOI/restricted geometry, detailed SAR rasters and evidence remain local. Source
 rights do not compel publication; no withheld data are released by this pilot.
+
+## Stage 3E2: demonstrated mask error and replacement semantics
+
+The old `raw_image` intersected `GlobalSurfaceWater` `seasonality.mask()` with
+`occurrence.mask()` into `water_valid`; `analyze` then required it alongside DEM
+validity before any SAR analysis. The old code used no other JRC product/band.
+The [official catalogue](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_GlobalSurfaceWater)
+states that never-detected-water areas are masked and documents the special
+occurrence-dependent fractional mask. Occurrence is percent water frequency,
+seasonality counts months, and max_extent bit 0 records ever-detected water.
+These are water-history masks, not general valid-land or SAR-observation masks.
+Keep fractional masks separately; count positive support without weighting it
+as observation quality or multiplying occurrence twice.
+
+Bounded live checks retrieved original values and masks for all three bands,
+[MonthlyHistory](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_MonthlyHistory)
+`water` and [YearlyHistory](https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_YearlyHistory)
+`waterClass`. The native 30 m EPSG:4326 products were nearest-sampled onto the
+**existing** 10 m UTM grids, four half-open 100x100 tiles each. Counts below are
+SAR-grid cells, not independent 30 m samples. No restricted geometry was sent.
+
+| Context | Udupi May 2018 | Udupi June 2018 (SAR acquisition month) | Kodagu January 2019 |
+| --- | ---: | ---: | ---: |
+| SAR valid | 40,000 | 40,000 | 40,000 |
+| Monthly 0: no data | 7,052 | 40,000 | 0 |
+| Monthly 1: not water | 32,948 | 0 | 40,000 |
+| Monthly 2: water | 0 | 0 | 0 |
+| Monthly masked | 0 | 0 | 0 |
+
+Both GlobalSurfaceWater occurrence/seasonality bands are masked at all 40,000
+cells; their old intersection is zero. In contrast, max_extent is unmasked
+everywhere with value 0. This band-specific result supports no detected water
+history, not proof of observation availability or absence of flood. The monthly
+not-water observations demonstrate why the summary mask cannot identify all
+valid Landsat observations. Monthly context is not event-day or SAR verification.
+
+Both event-year waterClass layers are **masked at 40,000 cells**: each explicit
+class count 0/1/2/3 is zero. Masked values remain unknown, distinct from explicit
+class 0. Zero permanent detections is not evidence of zero permanent water.
+Class 3, if observed, is the only conservative event-year permanent exclusion;
+class 2 seasonal water is retained. Yearly summaries are retrospective auxiliary
+context and can contain observations after event dates.
+
+Replacement functions keep SAR masks/finite values/local geometry independent;
+they expose monthly state, yearly class, separate monthly/yearly availability,
+permanent-water flag and **whether permanent status is known**. Class 0/masked
+values are unavailable, never imputed dry/permanent. Missing JRC cannot make SAR
+invalid. For the event-month/year combination, unavailable auxiliary context is
+7,052 Udupi and 0 Kodagu; permanent status remains unknown at every cell in both.
+These functions provide diagnostics only, not a corrected flood footprint.
+
+## Stage 3E2: event corroboration and calibration decision
+
+The retained IFI records have only district scope, no original coordinates or
+locality. Their original single-day windows remain May 29, 2018 and January 4,
+2019. Selected SAR acquisitions are June 3 (+5 days) and January 5 (+1 day),
+respectively; imagery availability does not establish flooding at the review tile.
+
+The [KSDMA 2021 flood action plan](https://ksdma.karnataka.gov.in/storage/pdf-files/ActionplanforFloodriskmanagement2021.pdf)
+(PDF page 39, printed page 11) supports broader 2018 Udupi/coastal impacts and
+August 3–10, 2019 statewide flooding. The [official Kodagu 2019 report](https://kodagu.nic.in/en/document/district-disaster-management-authority-kodagu-2019/)
+identifies August 8–10, 2019 (PDF page 18), not January 4. Publication/hosting dates
+are separate from disaster dates. Searches of inspected government records did
+not establish exact dates and the deterministic tiles' spatial correspondence.
+The indexed [Flood 2018 report](https://ksdma.karnataka.gov.in/storage/pdf-files/Flood%202018.pdf)
+supplies broader Udupi/Kundapura context, but its local download exceeded the
+20 MiB bound; it is not retained as fully inspected evidence. A KSNDMC-titled
+Blogspot mirror was excluded from authoritative corroboration because official
+ownership could not be established. No inference that the IFI events did not occur.
+
+The [public Bhuvan inventory](https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty)
+exposes Karnataka layers for August 9/10/12/13/15 and October 24, 2019, plus
+aggregate 2003–2020 maps. Original labels, WMS layer IDs and endpoints are
+retained in permitted metadata. No 2018 Karnataka dated layer or January 2019
+layer was found in the inspected list. District intersections and layer data
+access were not tested; catalogue availability cannot corroborate either pilot.
+No restricted map/service data was scraped or redistributed.
+
+Both: `year_event_supported_only`, **`calibration_candidate_temporally_weak`**,
+with exact tile correspondence unresolved. These methodological statuses do not
+replace stored `sentinel1_ambiguous`. Neither meets `calibration_candidate_supported`,
+so **no SAR calculation or 27-setting rerun was performed**, and no threshold was
+altered. Next: identify one better Sentinel-1-era anchor with official dated
+NRSC/KSDMA spatial evidence, preferably 2019–2021, before separate calibration.
+
+Diagnostics, provenance and retained source checksums live in
+`data/working/karnataka_jrc_auxiliary_v1`; raw tiles/government documents remain
+local. Reusable `retrieve` preserves originals and skips checksum-validated tiles;
+it retains 60-second requests, a 900-second phase budget, three attempts, 2/4-second
+backoff and 1 MiB raster cap. Local `validate` reproduces all counts read-only.
+Attribution: EC JRC/Google, Pekel et al. (2016), Copernicus; modified context on the
+SAR grid. Original IFI provenance/CC BY-NC 4.0 and public geometry attribution
+remain with v1/v2; no SOI or derived rainfall publication policy changed.

@@ -1,0 +1,894 @@
+{
+  "assets": {
+    "UEI-IMD-FL-2018-0023": {
+      "effective_assets": {
+        "global": "JRC/GSW1_4/GlobalSurfaceWater",
+        "monthly": {
+          "5": "JRC/GSW1_4/MonthlyHistory/2018_05",
+          "6": "JRC/GSW1_4/MonthlyHistory/2018_06"
+        },
+        "yearly": "JRC/GSW1_4/YearlyHistory/2018"
+      },
+      "native_projections": {
+        "global": {
+          "max_extent": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          },
+          "occurrence": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          },
+          "seasonality": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          }
+        },
+        "monthly": {
+          "5": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              78.00008729939917
+            ],
+            "type": "Projection"
+          },
+          "6": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              78.00008729939917
+            ],
+            "type": "Projection"
+          }
+        },
+        "yearly": {
+          "crs": "EPSG:4326",
+          "transform": [
+            0.0002694945852358564,
+            0,
+            -180.00001488697754,
+            0,
+            -0.0002694945852358564,
+            78.00008729939917
+          ],
+          "type": "Projection"
+        }
+      },
+      "returned_month_ids": {
+        "5": "2018_05",
+        "6": "2018_06"
+      },
+      "returned_year_id": "2018"
+    },
+    "UEI-IMD-FL-2019-0032": {
+      "effective_assets": {
+        "global": "JRC/GSW1_4/GlobalSurfaceWater",
+        "monthly": {
+          "1": "JRC/GSW1_4/MonthlyHistory/2019_01"
+        },
+        "yearly": "JRC/GSW1_4/YearlyHistory/2019"
+      },
+      "native_projections": {
+        "global": {
+          "max_extent": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          },
+          "occurrence": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          },
+          "seasonality": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              84.00011474509029
+            ],
+            "type": "Projection"
+          }
+        },
+        "monthly": {
+          "1": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.00026949458523585647,
+              0,
+              -180.00001488697754,
+              0,
+              -0.00026949458523585647,
+              78.00008729939917
+            ],
+            "type": "Projection"
+          }
+        },
+        "yearly": {
+          "crs": "EPSG:4326",
+          "transform": [
+            0.00026949458523585647,
+            0,
+            -180.00001488697754,
+            0,
+            -0.00026949458523585647,
+            78.00008729939917
+          ],
+          "type": "Projection"
+        }
+      },
+      "returned_month_ids": {
+        "1": "2019_01"
+      },
+      "returned_year_id": "2019"
+    }
+  },
+  "attribution": {
+    "government_documents": "Local inspection; redistribution unresolved; public identifiers and metadata only",
+    "ifi": "Saharia/IIT Delhi/HydroSense, 10.5281/zenodo.16994648, CC BY-NC 4.0; original records preserved",
+    "jrc": "Source: EC JRC/Google; Pekel et al. (2016), Nature 540, 418-422, doi:10.1038/nature20584; Copernicus free use with acknowledgement; modified grid sampling",
+    "public_review_geometry": "geoBoundaries v6, William and Mary geoLab, CC BY 4.0; original Stage3E provenance retained",
+    "sar": "Contains modified Copernicus Sentinel data 2018,2019; unchanged source versions retain complete acquisition attribution"
+  },
+  "bhuvan_inventory": {
+    "aggregated_2003_2020_karnataka_entry_found": true,
+    "dated_karnataka_products": [
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "09/08/2019-18Hr",
+        "portal_layer_id": "layer224",
+        "source_layer_id": "ka_2019_09_08_18",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "10-08-2019",
+        "portal_layer_id": "layer228",
+        "source_layer_id": "ka_2019_10_08",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "12-08-2019",
+        "portal_layer_id": "layer231",
+        "source_layer_id": "ka_2019_12_08",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "13-08-2019",
+        "portal_layer_id": "layer233",
+        "source_layer_id": "ka_2019_13_08",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "13/08/2019-18Hr",
+        "portal_layer_id": "layer237",
+        "source_layer_id": "ka_2019_13_08_18",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "15-08-2019",
+        "portal_layer_id": "layer239",
+        "source_layer_id": "ka_2019_15_08",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      },
+      {
+        "access_status": "public_catalogue_only_layer_data_not_requested",
+        "district_intersection": "not_verified",
+        "original_date_label": "24/10/2019-18Hr",
+        "portal_layer_id": "layer276",
+        "source_layer_id": "ka_2019_24_10_18",
+        "wms_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms"
+      }
+    ],
+    "interpretation": "Only the inspected portal inventory; no assertion that absent catalogue items or districts lack inundation",
+    "karnataka_2018_dated_entry_found": false
+  },
+  "bhuvan_inventory_source": "data/raw/reference/stage3e2_v1/bhuvan.html",
+  "code": {
+    "bytes": 17964,
+    "sha256": "8b4fbdb19c1777b93e7a51adc24ea98711c308c054f6642401bed32d4f236a11"
+  },
+  "corrected_semantics": {
+    "masked_value": "unknown, separate from explicit class 0",
+    "max_extent": "ever-detected water flag; actual unmasked zeros here are not general observation-availability evidence",
+    "monthly_classes": {
+      "0": "no data",
+      "1": "not water",
+      "2": "water"
+    },
+    "occurrence_mask": "retain original fractional values; positive support counted, not a quality weight or duplicated occurrence",
+    "permanent_water_exclusion": "Only observed event-year class 3; seasonal 2 retained; unknown status preserved",
+    "sar_validity": "Original SAR masks/finite values and local geometry, independent of all JRC layers",
+    "time_semantics": "Monthly not event-day; yearly/global summaries retrospective, not prediction-time features",
+    "yearly_classes": {
+      "0": "no data",
+      "1": "not water",
+      "2": "seasonal water",
+      "3": "permanent water"
+    }
+  },
+  "corroboration": [
+    {
+      "acquisition_usable": true,
+      "corroboration": "year_event_supported_only",
+      "event_id": "UEI-IMD-FL-2018-0023",
+      "exact_ifi_date_support": "unresolved_in_inspected_authoritative_records",
+      "flood_calculation_performed": false,
+      "ifi_end_inclusive": "2018-05-29",
+      "ifi_start": "2018-05-29",
+      "interpretation": "Methodological suitability only; unresolved corroboration does not prove that the IFI event did not occur",
+      "new_flood_label": null,
+      "official_evidence": [
+        {
+          "finding": "Broader 2018 Udupi/coastal impacts and statewide August 3-10 2019 floods; no exact pilot-date/tile support",
+          "pdf_page": 39,
+          "printed_page": 11,
+          "source_file": "action2021.pdf"
+        }
+      ],
+      "original_ifi_coordinates_or_locality": "not_supplied",
+      "retained_evidence_status": "sentinel1_ambiguous",
+      "review_tile_spatial_support": "unresolved; deterministic district representative-point window, not a verified flood locality",
+      "sar_acquisition_date": "2018-06-03",
+      "source_district": "Udupi",
+      "suitability": "calibration_candidate_temporally_weak"
+    },
+    {
+      "acquisition_usable": true,
+      "corroboration": "year_event_supported_only",
+      "event_id": "UEI-IMD-FL-2019-0032",
+      "exact_ifi_date_support": "unresolved_in_inspected_authoritative_records",
+      "flood_calculation_performed": false,
+      "ifi_end_inclusive": "2019-01-04",
+      "ifi_start": "2019-01-04",
+      "interpretation": "Methodological suitability only; unresolved corroboration does not prove that the IFI event did not occur",
+      "new_flood_label": null,
+      "official_evidence": [
+        {
+          "finding": "Broader 2018 Udupi/coastal impacts and statewide August 3-10 2019 floods; no exact pilot-date/tile support",
+          "pdf_page": 39,
+          "printed_page": 11,
+          "source_file": "action2021.pdf"
+        },
+        {
+          "finding": "District disaster account specifically concerns August 8-10 2019; does not corroborate January 4",
+          "pdf_page": 18,
+          "source_file": "kodagu2019.pdf"
+        }
+      ],
+      "original_ifi_coordinates_or_locality": "not_supplied",
+      "retained_evidence_status": "sentinel1_ambiguous",
+      "review_tile_spatial_support": "unresolved; deterministic district representative-point window, not a verified flood locality",
+      "sar_acquisition_date": "2019-01-05",
+      "source_district": "Kodagu",
+      "suitability": "calibration_candidate_temporally_weak"
+    }
+  ],
+  "created_at": "2026-10-06T13:42:23.278298+00:00",
+  "diagnostics": [
+    {
+      "counts": {
+        "cells_without_event_month_or_year_auxiliary_information": 7052,
+        "global": {
+          "max_extent": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 0,
+            "original_mask_range": [
+              1.0,
+              1.0
+            ],
+            "sar_valid_intersection_cells": 40000,
+            "sar_valid_masked_cells": 0,
+            "unmasked_cells": 40000,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": [
+              0.0,
+              0.0
+            ]
+          },
+          "occurrence": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 40000,
+            "original_mask_range": [
+              0.0,
+              0.0
+            ],
+            "sar_valid_intersection_cells": 0,
+            "sar_valid_masked_cells": 40000,
+            "unmasked_cells": 0,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": null
+          },
+          "seasonality": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 40000,
+            "original_mask_range": [
+              0.0,
+              0.0
+            ],
+            "sar_valid_intersection_cells": 0,
+            "sar_valid_masked_cells": 40000,
+            "unmasked_cells": 0,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": null
+          }
+        },
+        "interpretation": "Counts of 10 m SAR-grid cells with nearest 30 m JRC context; not independent 30 m sample counts or flood labels",
+        "legacy_occurrence_seasonality_intersection_cells": 0,
+        "monthly": {
+          "month_5": {
+            "data_available_cells": 32948,
+            "masked_cells": 0,
+            "no_data_class_0_cells": 7052,
+            "not_water_class_1_cells": 32948,
+            "resolution": "monthly context, not event-day verification",
+            "water_class_2_cells": 0
+          },
+          "month_6": {
+            "data_available_cells": 0,
+            "masked_cells": 0,
+            "no_data_class_0_cells": 40000,
+            "not_water_class_1_cells": 0,
+            "resolution": "monthly context, not event-day verification",
+            "water_class_2_cells": 0
+          }
+        },
+        "permanent_water_excluded_cells": 0,
+        "permanent_water_status_unknown_cells": 40000,
+        "sar_valid_cells": 40000,
+        "scope_cells": 40000,
+        "yearly": {
+          "data_available_cells": 0,
+          "masked_cells": 40000,
+          "no_data_class_0_cells": 0,
+          "not_water_class_1_cells": 0,
+          "permanent_water_class_3_cells": 0,
+          "seasonal_water_class_2_cells": 0
+        }
+      },
+      "event_end_inclusive": "2018-05-29",
+      "event_id": "UEI-IMD-FL-2018-0023",
+      "event_start": "2018-05-29",
+      "retained_evidence_status": "sentinel1_ambiguous",
+      "source_district": "Udupi"
+    },
+    {
+      "counts": {
+        "cells_without_event_month_or_year_auxiliary_information": 0,
+        "global": {
+          "max_extent": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 0,
+            "original_mask_range": [
+              1.0,
+              1.0
+            ],
+            "sar_valid_intersection_cells": 40000,
+            "sar_valid_masked_cells": 0,
+            "unmasked_cells": 40000,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": [
+              0.0,
+              0.0
+            ]
+          },
+          "occurrence": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 40000,
+            "original_mask_range": [
+              0.0,
+              0.0
+            ],
+            "sar_valid_intersection_cells": 0,
+            "sar_valid_masked_cells": 40000,
+            "unmasked_cells": 0,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": null
+          },
+          "seasonality": {
+            "fractional_mask_cells": 0,
+            "masked_cells": 40000,
+            "original_mask_range": [
+              0.0,
+              0.0
+            ],
+            "sar_valid_intersection_cells": 0,
+            "sar_valid_masked_cells": 40000,
+            "unmasked_cells": 0,
+            "use": "water-history context only; mask is neither SAR validity nor general observation availability",
+            "value_range_on_unmasked_sar_cells": null
+          }
+        },
+        "interpretation": "Counts of 10 m SAR-grid cells with nearest 30 m JRC context; not independent 30 m sample counts or flood labels",
+        "legacy_occurrence_seasonality_intersection_cells": 0,
+        "monthly": {
+          "month_1": {
+            "data_available_cells": 40000,
+            "masked_cells": 0,
+            "no_data_class_0_cells": 0,
+            "not_water_class_1_cells": 40000,
+            "resolution": "monthly context, not event-day verification",
+            "water_class_2_cells": 0
+          }
+        },
+        "permanent_water_excluded_cells": 0,
+        "permanent_water_status_unknown_cells": 40000,
+        "sar_valid_cells": 40000,
+        "scope_cells": 40000,
+        "yearly": {
+          "data_available_cells": 0,
+          "masked_cells": 40000,
+          "no_data_class_0_cells": 0,
+          "not_water_class_1_cells": 0,
+          "permanent_water_class_3_cells": 0,
+          "seasonal_water_class_2_cells": 0
+        }
+      },
+      "event_end_inclusive": "2019-01-04",
+      "event_id": "UEI-IMD-FL-2019-0032",
+      "event_start": "2019-01-04",
+      "retained_evidence_status": "sentinel1_ambiguous",
+      "source_district": "Kodagu"
+    }
+  ],
+  "files": {
+    "bhuvan_inventory.json": {
+      "bytes": 2588,
+      "sha256": "5673f6e76956f562955152969fd4215f9fcfa51b634f4cb4098a9d95ac25ae4b"
+    },
+    "corroboration.json": {
+      "bytes": 2470,
+      "sha256": "93d8123dbdb02f1b3556299ec1bb2d26ba1d036c78a29651dd8e700e6e3a876d"
+    },
+    "diagnostics.json": {
+      "bytes": 5716,
+      "sha256": "5c5230bf3b0f7c17c3c945c0982543957e62431d20dfbf4bff7d511681c8044f"
+    },
+    "official_sources.json": {
+      "bytes": 5608,
+      "sha256": "7cc801505a1ef76d6e5897662bc8038ec6b4f35bcc0fb5e20832deacb4c7470b"
+    }
+  },
+  "inputs": {
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/plan.json": {
+      "bytes": 2553,
+      "sha256": "c93786c22c36d030068c34f2ccb2f71ec376c8fd90d6b48660027a4b21978005"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/source_metadata.json": {
+      "bytes": 2458,
+      "sha256": "f82a3a7fbe7866c993ace840e65050d1c00f98fa5e78d3ab26d239a9a1f94e5d"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile0.json": {
+      "bytes": 883,
+      "sha256": "944f171d68de2254987e8a8b57e085df942a47d93df075640667a4208e839753"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile0.tif": {
+      "bytes": 5585,
+      "sha256": "ae524da5a5ab7d60fdc3898a7b3b2cd434673cc48dac0979835074048bd20a2d"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile1.json": {
+      "bytes": 883,
+      "sha256": "0741a91638615e1eab8762e56f169b98b655bf100b6a51e1955f63f3cc2da378"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile1.tif": {
+      "bytes": 5678,
+      "sha256": "363eff2c2aac1243c01341220775fdf573c3221998b5e32a8f6ae7bddd7890d2"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile2.json": {
+      "bytes": 883,
+      "sha256": "d9a6927422953112800772c3352d98233b1b0c6321e138fe13227b3810db10a5"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile2.tif": {
+      "bytes": 5574,
+      "sha256": "801861dfe6f52c2d2c19ba4bfcd5ca10267b7f2495a318f34203d4b06933d642"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile3.json": {
+      "bytes": 883,
+      "sha256": "46c87e8e9db892c184b94dfb5f09db9f4c2c104d0bfd05f6042644f7aa3f2bef"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2018-0023/tile3.tif": {
+      "bytes": 5807,
+      "sha256": "1240e6bc4a467076be02b0fc97cec33fa90c24fa6864425cc7cd2e6177b7d42c"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/plan.json": {
+      "bytes": 2522,
+      "sha256": "c656a4ffc31ae2de7a6dbf3a0db23229d7e012fb066b00e9d11a1a6b8ec52a98"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/source_metadata.json": {
+      "bytes": 2054,
+      "sha256": "667e90d1a5c7344d1d3acb0cf353134a6ab5279fdf4bc93f76fe382f78358089"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile0.json": {
+      "bytes": 848,
+      "sha256": "e0f863dd19ae8516a7f3db7877f8854ca876ff226f102a03bf6e3f8ef4a92448"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile0.tif": {
+      "bytes": 4344,
+      "sha256": "e35d48d2f7000393c481f461a2ff0303f87c8a3affcf3817b13e31d0694f45db"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile1.json": {
+      "bytes": 848,
+      "sha256": "3d47957ebb0069922ce4260aa07a67a344c0449579bbf1ea79bea168eaeef9b0"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile1.tif": {
+      "bytes": 4344,
+      "sha256": "e670aa1fb1f84200e3e28ca80d3f51648c97d0d71dd7550e124d742aba8f7b01"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile2.json": {
+      "bytes": 848,
+      "sha256": "1d6b2093b4b856d60fe8f8df37fba75146df28b04b5354fc400a24a877a5e5bd"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile2.tif": {
+      "bytes": 4344,
+      "sha256": "0d8a2cbb1fb17ef340a092c529958830463cc63bb189dbd4a95ebe5fada4051c"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile3.json": {
+      "bytes": 848,
+      "sha256": "9c3533c80aeb364c20bde77a88a67d66f1b1379ee8f97ef9ccfd2c072f5496ca"
+    },
+    "data/raw/jrc/stage3e2_v1/UEI-IMD-FL-2019-0032/tile3.tif": {
+      "bytes": 4344,
+      "sha256": "5fdb84c8ca9b5e6084e7de987f5c76ec8c70f91d076ee6dedbc4b77553f9598c"
+    },
+    "data/raw/jrc/stage3e2_v1/requests.jsonl": {
+      "bytes": 5161,
+      "sha256": "929ebed1ebdaf15e0edf51b05a18619cd34a63059cfa7cbee70d17bddf94f586"
+    },
+    "data/raw/jrc/stage3e2_v1/timing.jsonl": {
+      "bytes": 16684,
+      "sha256": "2e6f43d8f1bbd262a79c1e2bf299e2414a215cd2dddcb2a669bec97f3065bbc9"
+    },
+    "data/raw/reference/stage3e2_v1/GlobalSurfaceWater.html": {
+      "bytes": 101627,
+      "sha256": "1b4da19904e3e146cb5365eacfe2e9bcd570e2bd2affbbf95094474bfd65c72a"
+    },
+    "data/raw/reference/stage3e2_v1/GlobalSurfaceWater.html.json": {
+      "bytes": 728,
+      "sha256": "fe5904eb9b614d10395f96a3c0b4fba80bd5699c0b4ecac321406ef5ebfcc42d"
+    },
+    "data/raw/reference/stage3e2_v1/MonthlyHistory.html": {
+      "bytes": 94376,
+      "sha256": "698cfe8347998d91d0e667c8ca5b63e6581eeee5856059b29a1823364900a556"
+    },
+    "data/raw/reference/stage3e2_v1/MonthlyHistory.html.json": {
+      "bytes": 715,
+      "sha256": "c2a31e07ceee1f685b155b36f1629a8a93e5f7553a6b62a60f234aeabbc0e2e4"
+    },
+    "data/raw/reference/stage3e2_v1/YearlyHistory.html": {
+      "bytes": 94574,
+      "sha256": "2a503c4d32db967de332caaa88109e072acf099644c6b9943a487dcbbb875cbc"
+    },
+    "data/raw/reference/stage3e2_v1/YearlyHistory.html.json": {
+      "bytes": 712,
+      "sha256": "9762025f7acb4a94c021b11e4f38cbf9f767278aa211a72c903688be22a73ec7"
+    },
+    "data/raw/reference/stage3e2_v1/action2021.pdf": {
+      "bytes": 15322461,
+      "sha256": "23a1e4a9a5ca87075878d74dc1bd682cb2c914c389664bc240e8738916eb7251"
+    },
+    "data/raw/reference/stage3e2_v1/action2021.pdf.json": {
+      "bytes": 713,
+      "sha256": "68ba419d4aa55a730386bd5bb47fada5efd2f289f046f8ace7f928243fd2de80"
+    },
+    "data/raw/reference/stage3e2_v1/bhuvan.html": {
+      "bytes": 1232844,
+      "sha256": "2dee69c1977552fb0d0a250dbaf52a9ff12cc85cd8b414c334979d4b63fb2046"
+    },
+    "data/raw/reference/stage3e2_v1/bhuvan.html.json": {
+      "bytes": 666,
+      "sha256": "c3c18775e388b49e8519bcf52870e5de372e6eeb334df721b34e437a97446e89"
+    },
+    "data/raw/reference/stage3e2_v1/flood2018.pdf.json": {
+      "bytes": 426,
+      "sha256": "f7da8f0057d037ca16cfabf7ace367627d1d0a07b10ee3ddfa6c11363d1ff243"
+    },
+    "data/raw/reference/stage3e2_v1/kodagu2019.html": {
+      "bytes": 140227,
+      "sha256": "309e100884855bfe4df7af093565f2c8a223a260f0b248f2213167d9269403a7"
+    },
+    "data/raw/reference/stage3e2_v1/kodagu2019.html.json": {
+      "bytes": 685,
+      "sha256": "a7f76650b87b51d4eec5284999e9ef2983f17c0b7fe1b3fd66da74d1b9bdf4c6"
+    },
+    "data/raw/reference/stage3e2_v1/kodagu2019.pdf": {
+      "bytes": 8840639,
+      "sha256": "0c006fd9feefb83ac9af8280d66f2aab2a53d3afd5478795ea32fac649ffc0aa"
+    },
+    "data/raw/reference/stage3e2_v1/kodagu2019.pdf.json": {
+      "bytes": 716,
+      "sha256": "b675290934afbbc225186295fbce16399ddcf24e11df155e576b38dc70684bd6"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile0.tif": {
+      "bytes": 538251,
+      "sha256": "8b7dc52676e799123a84a35f122362f1451d0ee808c8d32204cf3a2d8a4b515c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile1.tif": {
+      "bytes": 538470,
+      "sha256": "a0f56b2df46dd19f0b9b053dea76fa06d9bf7b8eef8645ba46df43e6ed1b8436"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile2.tif": {
+      "bytes": 537637,
+      "sha256": "139ac163febcbeb98552bdd3928ad84bc00c09f67007212028ec9790a2907f4a"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2018-0023/tile3.tif": {
+      "bytes": 540354,
+      "sha256": "9ab3fa9d5bc6e709db2da718c809bdde35e65b16dbac6c2db3c6e423ad20a53c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile0.tif": {
+      "bytes": 334452,
+      "sha256": "1e73eed2658d36133f0c71797fec49ca627093708e1db37d37da507f3735467d"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile1.tif": {
+      "bytes": 333946,
+      "sha256": "370ae55f296379b9fcdec2eb1fd54ea7f8b3020e562a55801ae8e43a8538391c"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile2.tif": {
+      "bytes": 333821,
+      "sha256": "b7f48ea5d9a29ad091552eab86b6ec69564e6f2303f77dc23787f512c3fb1348"
+    },
+    "data/raw/sentinel1/stage3e_v2/UEI-IMD-FL-2019-0032/tile3.tif": {
+      "bytes": 333940,
+      "sha256": "59bd729aca993def2866f8aef2195216e7cfca8fe62e50550e3b718e458dcd0f"
+    },
+    "data/recovery/stage3e2_v1/jrc_retrieval_execution.py": {
+      "bytes": 3845,
+      "sha256": "3a948249dad173e1d6b901898c4319988a1859bbd12530ecaad9d4cdd48437be"
+    },
+    "data/working/karnataka_sentinel1_flood_pilot_v2/evidence.json": {
+      "bytes": 91111,
+      "sha256": "f0d6e859924c79b74486a5735d1cf9f085ec0bcefe6e022f67745bfe557ac6ea"
+    },
+    "data/working/karnataka_sentinel1_flood_pilot_v2/manifest.json": {
+      "bytes": 15173,
+      "sha256": "33f0ea0e8412435141ad220e6deb49fdc133cfcff2ed4e0900385ab247272941"
+    },
+    "data/working/karnataka_sentinel1_flood_pilot_v2/scene_inventory.json": {
+      "bytes": 294817,
+      "sha256": "d6fb257d4c5cb85728571a397e7ad22aaae1f15ed9beb9327ddf0341720f5e38"
+    }
+  },
+  "live_request_results": {
+    "accepted": 24,
+    "attempts": 25,
+    "maximum_elapsed_seconds": 7.748247135001293,
+    "no_threshold_or_flood_rerun": true,
+    "retained_failure": "First temporal query used returned basename 2018_06 without collection prefix; precise EE asset-not-found retained. Normalized full source asset IDs, no authentication/access bypass. This was a client-path error, not absence of observations.",
+    "source_downloads": 8
+  },
+  "official_source_records": [
+    {
+      "bytes": 101627,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 60,
+      "final_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_GlobalSurfaceWater",
+      "last_modified": "Wed, 06 May 2026 18:50:49 GMT",
+      "max_bytes": 2097152,
+      "name": "GlobalSurfaceWater.html",
+      "retrieved_at": "2026-10-06T13:37:37.082626+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "1b4da19904e3e146cb5365eacfe2e9bcd570e2bd2affbbf95094474bfd65c72a",
+      "source_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_GlobalSurfaceWater",
+      "started_at": "2026-10-06T13:37:36.232308+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 94376,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 60,
+      "final_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_MonthlyHistory",
+      "last_modified": "Wed, 06 May 2026 18:50:49 GMT",
+      "max_bytes": 2097152,
+      "name": "MonthlyHistory.html",
+      "retrieved_at": "2026-10-06T13:37:37.888287+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "698cfe8347998d91d0e667c8ca5b63e6581eeee5856059b29a1823364900a556",
+      "source_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_MonthlyHistory",
+      "started_at": "2026-10-06T13:37:37.092203+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 94574,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 60,
+      "final_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_YearlyHistory",
+      "last_modified": "Wed, 06 May 2026 18:50:49 GMT",
+      "max_bytes": 2097152,
+      "name": "YearlyHistory.html",
+      "retrieved_at": "2026-10-06T13:37:39.444326+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "2a503c4d32db967de332caaa88109e072acf099644c6b9943a487dcbbb875cbc",
+      "source_url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_YearlyHistory",
+      "started_at": "2026-10-06T13:37:37.891052+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 15322461,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "final_url": "https://ksdma.karnataka.gov.in/storage/pdf-files/ActionplanforFloodriskmanagement2021.pdf",
+      "last_modified": "Wed, 27 Dec 2023 06:54:52 GMT",
+      "max_bytes": 20971520,
+      "name": "action2021.pdf",
+      "retrieved_at": "2026-10-06T13:25:46.410013+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "23a1e4a9a5ca87075878d74dc1bd682cb2c914c389664bc240e8738916eb7251",
+      "source_url": "https://ksdma.karnataka.gov.in/storage/pdf-files/ActionplanforFloodriskmanagement2021.pdf",
+      "started_at": "2026-10-06T13:25:40.405186+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 1232844,
+      "content_type": "text/html; charset=UTF-8",
+      "deadline_seconds": 60,
+      "final_url": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+      "last_modified": null,
+      "max_bytes": 2097152,
+      "name": "bhuvan.html",
+      "retrieved_at": "2026-10-06T13:25:30.190342+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "2dee69c1977552fb0d0a250dbaf52a9ff12cc85cd8b414c334979d4b63fb2046",
+      "source_url": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+      "started_at": "2026-10-06T13:25:24.557488+00:00",
+      "status": "retrieved"
+    },
+    {
+      "deadline_seconds": 60,
+      "error": {
+        "message": "Document byte cap exceeded",
+        "type": "ValueError"
+      },
+      "max_bytes": 20971520,
+      "name": "flood2018.pdf",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "source_url": "https://ksdma.karnataka.gov.in/storage/pdf-files/Flood%202018.pdf",
+      "started_at": "2026-10-06T13:25:30.195589+00:00",
+      "status": "unavailable"
+    },
+    {
+      "bytes": 140227,
+      "content_type": "text/html; charset=UTF-8",
+      "deadline_seconds": 60,
+      "final_url": "https://kodagu.nic.in/en/document/district-disaster-management-authority-kodagu-2019/",
+      "last_modified": null,
+      "max_bytes": 2097152,
+      "name": "kodagu2019.html",
+      "retrieved_at": "2026-10-06T13:25:50.301217+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "309e100884855bfe4df7af093565f2c8a223a260f0b248f2213167d9269403a7",
+      "source_url": "https://kodagu.nic.in/en/document/district-disaster-management-authority-kodagu-2019/",
+      "started_at": "2026-10-06T13:25:46.483941+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 8840639,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "final_url": "https://cdn.s3waas.gov.in/s3c8ed21db4f678f3b13b9d5ee16489088/uploads/2020/10/2020102971.pdf",
+      "last_modified": "Thu, 29 Oct 2020 14:03:27 GMT",
+      "max_bytes": 12582912,
+      "name": "kodagu2019.pdf",
+      "retrieved_at": "2026-10-06T13:30:56.543855+00:00",
+      "reuse": "Local inspection only; redistribution unresolved, original bytes not published",
+      "sha256": "0c006fd9feefb83ac9af8280d66f2aab2a53d3afd5478795ea32fac649ffc0aa",
+      "source_url": "https://cdn.s3waas.gov.in/s3c8ed21db4f678f3b13b9d5ee16489088/uploads/2020/10/2020102971.pdf",
+      "started_at": "2026-10-06T13:30:51.956509+00:00",
+      "status": "retrieved"
+    }
+  ],
+  "original_stage3e_jrc_use": {
+    "asset": "JRC/GSW1_4/GlobalSurfaceWater",
+    "bands": [
+      "occurrence",
+      "seasonality"
+    ],
+    "error_demonstrated": "Both legacy intersections are zero despite 40,000 usable SAR cells and monthly not-water observations; GlobalSurfaceWater is water-history support, not valid-land/SAR validity",
+    "mask_path": "raw_image: seasonality.mask AND occurrence.mask -> water_valid; analyze: water_valid required in auxiliary/base mask"
+  },
+  "previous_remote_commit": "ecacf535a63cc32df100250de74491861885498f",
+  "processing": {
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "band_cells_per_tile": {
+      "Kodagu": 100000,
+      "Udupi": 120000
+    },
+    "bestEffort": false,
+    "download_bytes_per_tile_max": 1048576,
+    "maximum_attempts": 3,
+    "new_sar_calculations": 0,
+    "ownership": "Half-open partitions from existing verified SAR plan; local public district cell-centre clip",
+    "partition_dimensions": [
+      100,
+      100
+    ],
+    "partitions_per_scope": 4,
+    "planning_ceiling": 300000,
+    "remote_reductions_or_exports": 0,
+    "request_deadline_seconds": 60,
+    "resampling": "nearest, default EE behavior explicitly retained; no independent 10m Landsat observations",
+    "sar_source": "COPERNICUS/S1_GRD",
+    "sar_versions_unchanged": [
+      "karnataka_sentinel1_flood_pilot_v1",
+      "karnataka_sentinel1_flood_pilot_v2"
+    ],
+    "soi_geometry_transmitted": false,
+    "target_grid_crs": "EPSG:32643",
+    "target_grid_resolution_m": 10,
+    "thresholds_changed": false,
+    "total_phase_deadline_seconds": 900
+  },
+  "project": "floodpulse",
+  "publication": "Detailed source rasters, review geometry and source documents stay local. Code/tests/method/aggregate counts/source IDs/checksums only. SOI geometry and derived rainfall remain withheld.",
+  "purpose": "JRC semantics and independent event corroboration; auxiliary diagnostics only",
+  "sources": {
+    "global": "JRC/GSW1_4/GlobalSurfaceWater",
+    "monthly": "JRC/GSW1_4/MonthlyHistory",
+    "native_crs": "EPSG:4326",
+    "native_resolution_m": 30,
+    "water_history_period": "1984-2021",
+    "yearly": "JRC/GSW1_4/YearlyHistory"
+  },
+  "version": "karnataka_jrc_auxiliary_v1"
+}
