@@ -1,0 +1,1832 @@
+{
+  "annual": {
+    "daily_table_sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819",
+    "dates": 365,
+    "records": 11315,
+    "source_district_identifiers": 31
+  },
+  "antecedent_schema": [
+    "gfd_id",
+    "scope_id",
+    "gfd_start",
+    "last_allowed_date",
+    "use_class",
+    "status",
+    "rain_1d_mm",
+    "rain_3d_mm",
+    "rain_7d_mm",
+    "rain_14d_mm",
+    "rain_30d_mm",
+    "max_daily_previous_7d_mm",
+    "max_daily_previous_14d_mm"
+  ],
+  "approved_predictor_fields": [
+    "rain_1d_mm",
+    "rain_3d_mm",
+    "rain_7d_mm",
+    "rain_14d_mm",
+    "rain_30d_mm",
+    "max_daily_previous_7d_mm",
+    "max_daily_previous_14d_mm"
+  ],
+  "binary_policy": "All ml_binary_label values null; binary_targets() refuses all targets. Separate review required.",
+  "boundary_license": "CC BY 4.0; geoBoundaries v6 / William & Mary geoLab",
+  "branch": "feature/karnataka-data-foundation",
+  "code_checksums": {
+    "backend/tests/test_event_comparison.py": {
+      "bytes": 12427,
+      "sha256": "9c96f6f86377bb09edf5897edb45b3a0afed38712457f5d85e9768872b5f31ba"
+    },
+    "docs/COMPARISON_EVIDENCE_METHOD.md": {
+      "bytes": 9481,
+      "sha256": "b0840cf391629d6b0aa2c8662c0b72813613a12fa5e3dd6fac1a613d437762da"
+    },
+    "scripts/build_event_comparison.py": {
+      "bytes": 22595,
+      "sha256": "7af826e9b7cf5a2a774647ff704378084ddced2adc4dcdea3c3eec8035f753f5"
+    }
+  },
+  "coverage": [
+    {
+      "antecedent_days": 30,
+      "available_antecedent_days": 30,
+      "event_window_days": 25,
+      "gfd_id": 2698,
+      "not_retrieved_dates": [],
+      "requested_days": 55,
+      "unavailable_or_partial_dates": []
+    },
+    {
+      "antecedent_days": 30,
+      "available_antecedent_days": 30,
+      "event_window_days": 13,
+      "gfd_id": 3107,
+      "not_retrieved_dates": [],
+      "requested_days": 43,
+      "unavailable_or_partial_dates": []
+    }
+  ],
+  "created_at": "2026-10-06T11:23:47.127846+00:00",
+  "current_lgd": "0/31 independently verified; source identifiers retained, no guessed matches.",
+  "descriptive_rule": "DESCRIPTIVE_ONLY_NOT_PREDICTION_FEATURE",
+  "descriptive_schema": [
+    "gfd_id",
+    "scope_id",
+    "gfd_start",
+    "gfd_end_inclusive",
+    "use_class",
+    "status",
+    "event_window_total_mm",
+    "event_window_daily_mean_mm",
+    "event_window_max_daily_mm"
+  ],
+  "download_parameters": {
+    "2698": {
+      "bands": [
+        "precipitation",
+        "valid_mask"
+      ],
+      "crs": "EPSG:4326",
+      "crs_transform": [
+        0.05,
+        0.0,
+        75.30000000000001,
+        0.0,
+        -0.05,
+        17.5
+      ],
+      "dimensions": [
+        24,
+        27
+      ],
+      "filePerBand": false,
+      "format": "GEO_TIFF"
+    },
+    "3107": {
+      "bands": [
+        "precipitation",
+        "valid_mask"
+      ],
+      "crs": "EPSG:4326",
+      "crs_transform": [
+        0.05,
+        0.0,
+        76.19999999999999,
+        0.0,
+        -0.05,
+        16.6
+      ],
+      "dimensions": [
+        28,
+        22
+      ],
+      "filePerBand": false,
+      "format": "GEO_TIFF"
+    }
+  },
+  "event_provenance": [
+    {
+      "evidence_class": "observed_zero_event",
+      "gfd_end_inclusive": "2005-08-16",
+      "gfd_id": 2698,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2005-07-23",
+      "ifi_association_status": "provisional_temporal_only",
+      "ifi_associations": [
+        {
+          "ifi_end_inclusive": "2005-08-01",
+          "ifi_source_event_id": "UEI-IMD-FL-2005-0059",
+          "ifi_start": "2005-08-01",
+          "status": "provisional_temporal_only"
+        }
+      ],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "clear_perc_mean_valid_raw": 0.9894841251031686,
+        "clear_views_mean_valid_raw": 52.2362406168923,
+        "minimum_valid_fraction_gate": 0.95,
+        "permanent_water_cells": 765,
+        "quality_gate_is_not_statistical_absence_confidence": true,
+        "region_cells": 166424,
+        "valid_fraction": 0.998191366629813
+      },
+      "original_observation_status": "observed_no_qualifying_floodwater",
+      "qualifying_floodwater_cells": 0,
+      "scope_id": "76128533B40495457052818",
+      "scope_name": "Bijapur",
+      "valid_gfd_observation_cells": 166123
+    },
+    {
+      "evidence_class": "satellite_positive",
+      "gfd_end_inclusive": "2005-09-30",
+      "gfd_id": 2728,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2005-09-14",
+      "ifi_association_status": "unmatched_no_deterministic_source_link",
+      "ifi_associations": [],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "original_quality_evidence_retained": true,
+        "status": "confirmed_mapped_nonpermanent_floodwater"
+      },
+      "original_observation_status": "confirmed_mapped_nonpermanent_floodwater",
+      "qualifying_floodwater_cells": 33,
+      "scope_id": "76128533B4839184447445",
+      "scope_name": "Udupi",
+      "valid_gfd_observation_cells": 41352
+    },
+    {
+      "evidence_class": "satellite_positive",
+      "gfd_end_inclusive": "2005-12-09",
+      "gfd_id": 2758,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2005-10-23",
+      "ifi_association_status": "provisional_temporal_only",
+      "ifi_associations": [
+        {
+          "ifi_end_inclusive": "2005-10-28",
+          "ifi_source_event_id": "UEI-IMD-FL-2005-0065",
+          "ifi_start": "2005-10-22",
+          "status": "provisional_temporal_only"
+        }
+      ],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "original_quality_evidence_retained": true,
+        "status": "satellite_positive"
+      },
+      "original_observation_status": "satellite_positive",
+      "qualifying_floodwater_cells": 329,
+      "scope_id": "76128533B29292403538801",
+      "scope_name": "Kolar",
+      "valid_gfd_observation_cells": 63302
+    },
+    {
+      "evidence_class": "observed_zero_event",
+      "gfd_end_inclusive": "2007-07-04",
+      "gfd_id": 3107,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2007-06-22",
+      "ifi_association_status": "provisional_temporal_only",
+      "ifi_associations": [
+        {
+          "ifi_end_inclusive": "2007-06-27",
+          "ifi_source_event_id": "UEI-IMD-FL-2007-0062",
+          "ifi_start": "2007-06-27",
+          "status": "provisional_temporal_only"
+        }
+      ],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "clear_perc_mean_valid_raw": 0.9886144805690739,
+        "clear_views_mean_valid_raw": 30.260000754062514,
+        "minimum_valid_fraction_gate": 0.95,
+        "permanent_water_cells": 854,
+        "quality_gate_is_not_statistical_absence_confidence": true,
+        "region_cells": 135207,
+        "valid_fraction": 0.9808293949277774
+      },
+      "original_observation_status": "observed_no_qualifying_floodwater",
+      "qualifying_floodwater_cells": 0,
+      "scope_id": "76128533B284680734793",
+      "scope_name": "Raichur",
+      "valid_gfd_observation_cells": 132615
+    },
+    {
+      "evidence_class": "satellite_positive",
+      "gfd_end_inclusive": "2009-10-12",
+      "gfd_id": 3551,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2009-09-25",
+      "ifi_association_status": "unmatched_no_deterministic_source_link",
+      "ifi_associations": [
+        {
+          "ifi_end_inclusive": "2009-10-07",
+          "ifi_source_event_id": "UEI-IMD-FL-2009-0033",
+          "ifi_start": "2009-10-01",
+          "status": "documentary_overlap_for_review_only_not_confirmed"
+        }
+      ],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "original_quality_evidence_retained": true,
+        "status": "confirmed_mapped_nonpermanent_floodwater"
+      },
+      "original_observation_status": "confirmed_mapped_nonpermanent_floodwater",
+      "qualifying_floodwater_cells": 23,
+      "scope_id": "76128533B4839184447445",
+      "scope_name": "Udupi",
+      "valid_gfd_observation_cells": 41352
+    },
+    {
+      "evidence_class": "satellite_positive",
+      "gfd_end_inclusive": "2010-05-24",
+      "gfd_id": 3652,
+      "gfd_observation_criteria": "Valid flooded, jrc_perm_water and clear_views masks; clear_views>0; flooded=1 and jrc_perm_water=0. Event-window maximum, never daily occurrence.",
+      "gfd_processing_crs": "EPSG:32643",
+      "gfd_processing_scale_m": 250,
+      "gfd_start": "2010-05-18",
+      "ifi_association_status": "provisional_temporal_only",
+      "ifi_associations": [
+        {
+          "ifi_end_inclusive": "2010-05-20",
+          "ifi_source_event_id": "UEI-IMD-FL-2010-0056",
+          "ifi_start": "2010-05-20",
+          "status": "provisional_temporal_only"
+        }
+      ],
+      "ml_binary_label": null,
+      "observation_quality": {
+        "original_quality_evidence_retained": true,
+        "status": "satellite_positive"
+      },
+      "original_observation_status": "satellite_positive",
+      "qualifying_floodwater_cells": 2,
+      "scope_id": "76128533B47594161132413",
+      "scope_name": "Chitradurga",
+      "valid_gfd_observation_cells": 125242
+    }
+  ],
+  "evidence_schema": [
+    "antecedent_features",
+    "descriptive_event_window_rainfall",
+    "evidence_class",
+    "evidence_provenance",
+    "gfd_end_inclusive",
+    "gfd_id",
+    "gfd_observation_criteria",
+    "gfd_processing_crs",
+    "gfd_processing_scale_m",
+    "gfd_start",
+    "ifi_association_status",
+    "ifi_associations",
+    "ml_binary_label",
+    "observation_quality",
+    "original_observation_status",
+    "qualifying_floodwater_cells",
+    "rainfall_provenance",
+    "scope_id",
+    "scope_name",
+    "valid_gfd_observation_cells"
+  ],
+  "excluded_evidence": [
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 3160,
+      "original_file_checksum": {
+        "bytes": 709448,
+        "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Chikkaballapura"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 2690,
+      "original_file_checksum": {
+        "bytes": 709448,
+        "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Dharwad"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 4382,
+      "original_file_checksum": {
+        "bytes": 709448,
+        "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Raichur"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 4508,
+      "original_file_checksum": {
+        "bytes": 709448,
+        "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Gadag"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 2935,
+      "original_file_checksum": {
+        "bytes": 860202,
+        "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Mandya"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 2507,
+      "original_file_checksum": {
+        "bytes": 860202,
+        "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Dharwad"
+    },
+    {
+      "evidence_class": "insufficient_observation",
+      "gfd_id": 4378,
+      "original_file_checksum": {
+        "bytes": 860202,
+        "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+      },
+      "original_status": "insufficient_observation",
+      "rainfall_extracted": false,
+      "scope_name": "Kodagu"
+    }
+  ],
+  "execution_code": {
+    "scripts/build_event_comparison.py": {
+      "bytes": 22595,
+      "sha256": "7af826e9b7cf5a2a774647ff704378084ddced2adc4dcdea3c3eec8035f753f5"
+    },
+    "scripts/extract_positive_event_rainfall.py": {
+      "bytes": 26954,
+      "sha256": "d6a009edbdb02e871a646ab4a72bdb29d819df952205df81c8c58eabc699653c"
+    }
+  },
+  "gfd_citation": "Tellman et al. (2021), doi:10.1038/s41586-021-03695-w",
+  "gfd_license": "CC BY-NC 4.0; Tellman et al. (2021), Cloud to Street / DFO",
+  "ifi_citation": "Saharia / IIT Delhi / HydroSense Lab, doi:10.5281/zenodo.16994648",
+  "ifi_license": "CC BY-NC 4.0; Saharia / IIT Delhi / HydroSense Lab",
+  "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "limitations": [
+    "District means, not station/locality measurements; sums of daily regional means.",
+    "Final CHIRPS is retrospective; contemporaneous release/availability at historical prediction times not verified.",
+    "Modern review polygons are not historical district boundaries or independently current-LGD reconciled.",
+    "IFI dates remain separate/provisional; GFD-start antecedents need not precede an earlier reported IFI onset.",
+    "No causal threshold, statewide model readiness or equal evidential weight for 2 versus 329 flood cells.",
+    "Observed-zero is scope/window/resolution-specific non-detection, not verified flood absence.",
+    "95% spatial valid-observation gate is an existing research rule, not a calibrated absence confidence.",
+    "No background windows collected; selection of future comparable windows requires separate review."
+  ],
+  "local_manifest_checksum": {
+    "bytes": 421081,
+    "sha256": "0698d13f9ec403261c9f40f9a93786537ced6f134f36acee9476cc1c5a7f71bd"
+  },
+  "local_output_checksums": {
+    "comparison_antecedent_features.csv": {
+      "bytes": 614,
+      "sha256": "29581a7daff6f754c6e81e822011047c701c548be0d6b54bc076a6ea6264061d"
+    },
+    "comparison_descriptive_event_rainfall.csv": {
+      "bytes": 444,
+      "sha256": "0abd54a2bf441bc8ad318130c2fd444fb954329ba304286229eb04f7388c89e6"
+    },
+    "daily_comparison_rainfall.csv": {
+      "bytes": 31365,
+      "sha256": "71286926fecc4b0cb90dabf1251bcf8f4d79586c17a9d733d814b805ec4915d1"
+    },
+    "evidence.json": {
+      "bytes": 21166,
+      "sha256": "d924d7435aff3629ff19e1c3310730eebbabe94e4b351594b89a8abe8d2cc7fa"
+    }
+  },
+  "local_sizes_bytes": {
+    "dataset": 474670,
+    "raw_rasters_and_journals": 745588
+  },
+  "method": "Unweighted mean/min/max of valid native CHIRPS cell centres strictly inside retained local WGS84 polygons; planar coordinate membership, boundary centres excluded, no area weighting/resampling/centroid substitution.",
+  "methodology_references": [
+    "https://zenodo.org/records/16994648",
+    "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+    "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+    "https://cseweb.ucsd.edu/~elkan/posonly.pdf",
+    "https://www.whoi.edu/cms/files/Phillips_EcolApp_2009_53454.pdf"
+  ],
+  "pilot_class_counts": {
+    "observed_zero_event": 2,
+    "satellite_positive": 4
+  },
+  "previous_verified_remote_commit": "195fac5ccd48d4f5723008baa8a5706015bfb3c6",
+  "project": "floodpulse",
+  "publication": "Detailed rainfall/evidence/raster products stay local; permitted metadata/code/methodology only.",
+  "rainy_day_counts": "omitted identically to Stage3C",
+  "raw_journal_checksums": {
+    "access_attempt1.json": {
+      "bytes": 163,
+      "sha256": "041ce5acddd38f838c30957b6af1f52ab0ec0bafca5315c5e0e62dcdbac908ea"
+    },
+    "plan.json": {
+      "bytes": 77803,
+      "sha256": "3f3c33cc1dac6780d0b5d95f33e446b713308a0281d0ff5b6eb9fac436a3eeae"
+    },
+    "requests.jsonl": {
+      "bytes": 57982,
+      "sha256": "8463c7ef9208b0d6bcf3cb7e09d4a579c48502e7d7213e1c524a54853c1210a1"
+    },
+    "retrieval.jsonl": {
+      "bytes": 168800,
+      "sha256": "152178c8689937cb27d1fa53f73a5f2b28bb00825ad1cd24cbeaa5f3f153289d"
+    },
+    "timing.jsonl": {
+      "bytes": 194394,
+      "sha256": "43474b9089ff3178481205ef9fda708f69164bfaa3f042acbbf3d5e69a98c988"
+    }
+  },
+  "readiness_recommendation": "Continued evidence collection; PU conceptually relevant but no reviewed background/class prevalence; supervised negatives and ranking validation unavailable.",
+  "request_limits": {
+    "attempts_maximum": 3,
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "download_bytes_maximum": 1048576,
+    "per_request_seconds": 60,
+    "total_suspend_inclusive_seconds": 900
+  },
+  "request_telemetry": {
+    "accepted": 296,
+    "attempts": 296,
+    "failed_or_rejected": 0,
+    "live_query_span_seconds": 302.80159328599984,
+    "maximum_request_seconds": 25.817804997997882,
+    "suspension_detected": false
+  },
+  "soi_publication": "Unresolved; originals and derived tables remain local.",
+  "source": {
+    "citation": "Funk et al. (2015), doi:10.1038/sdata.2015.66",
+    "collection": "UCSB-CHG/CHIRPS/DAILY",
+    "license": "Public domain",
+    "native_resolution_degrees": 0.05,
+    "units": "mm/day",
+    "url": "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+    "version": "CHIRPS v2.0 Final"
+  },
+  "source_input_checksums": {
+    "data/processed/udupi_flood_spatial_v1/event_2728.geojson": {
+      "bytes": 49455,
+      "sha256": "1ccaef876a7fa0cc396d284f8a40d8053c5ab927ec7ec90a83b16f951665a5b5"
+    },
+    "data/processed/udupi_flood_spatial_v1/event_2728.tif": {
+      "bytes": 6955,
+      "sha256": "75a250499e337ee552596352945e39ce09ddbcd8a2e2c31455eecec8b2be96ad"
+    },
+    "data/processed/udupi_flood_spatial_v1/event_3551.geojson": {
+      "bytes": 34289,
+      "sha256": "c6ad0fe7b82ea2b02a477c2af42a798e24dfc5d3c3f07a504e7c4627654ec408"
+    },
+    "data/processed/udupi_flood_spatial_v1/event_3551.tif": {
+      "bytes": 6932,
+      "sha256": "796ac49b811f5f347558ba42a89f84daa61844ed76f6474888e2a3abe6bc458b"
+    },
+    "data/processed/udupi_flood_spatial_v1/manifest.json": {
+      "bytes": 7508,
+      "sha256": "6c16b2d3731e9404adfdb56ad35b53721c18331b5a3207bac81e46974a061dca"
+    },
+    "data/processed/udupi_flood_spatial_v1/udupi_boundary.geojson": {
+      "bytes": 15156,
+      "sha256": "4f977a68cce0c55ceedad9c2d30c2d774a79ba10243816d14069ea84ea4a43df"
+    },
+    "data/processed/udupi_historical_v1/daily_rainfall.csv": {
+      "bytes": 13085,
+      "sha256": "f6dd8cdd73b3f67bdba4d733f410f84527f93024d1ae8a1654b8d1030c9667a3"
+    },
+    "data/processed/udupi_historical_v1/event_evidence.csv": {
+      "bytes": 970,
+      "sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6"
+    },
+    "data/processed/udupi_historical_v1/manifest.json": {
+      "bytes": 15442,
+      "sha256": "6432a0730512012c7e9a048139b092636e9a3e005039191f75cc24fe95e389b1"
+    },
+    "data/working/karnataka_flood_events_v1/events.json": {
+      "bytes": 1117098,
+      "sha256": "770480e56cd36c91a8e157df0ceb0c4251e396961ad6c1146ed0f6be06a96874"
+    },
+    "data/working/karnataka_flood_events_v1/manifest.json": {
+      "bytes": 10315,
+      "sha256": "eecfa782e11c6177dff94b8f9e7424ee0d4d8910d0d5f6318101e7ce8843a7ea"
+    },
+    "data/working/karnataka_positive_event_rainfall_v1/antecedent_features.csv": {
+      "bytes": 1058,
+      "sha256": "42ed86986e88858eb9754ea7e3c211c7e35638e1bf898ff830fa72ef5024af80"
+    },
+    "data/working/karnataka_positive_event_rainfall_v1/daily_rainfall.csv": {
+      "bytes": 66179,
+      "sha256": "6a46c9dea8ae012269959d08d9c69e3187b846033f4c2fdaed1638f419017910"
+    },
+    "data/working/karnataka_positive_event_rainfall_v1/descriptive_event_rainfall.csv": {
+      "bytes": 759,
+      "sha256": "91cf36da57017fe977701cce0035d27c6c6d0d4b1997e6f80ae62c009b31f713"
+    },
+    "data/working/karnataka_positive_event_rainfall_v1/manifest.json": {
+      "bytes": 883036,
+      "sha256": "9a90be720fbde859b673261e41ffda61f2a07cbb9c45397834d5119567e7d8f7"
+    },
+    "data/working/karnataka_satellite_event_evidence_v2/candidates.json": {
+      "bytes": 420298,
+      "sha256": "a907c74f532633ad5d791a45d04ca742b06edb895dd6f9bc814055d421e44578"
+    },
+    "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json": {
+      "bytes": 709448,
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    "data/working/karnataka_satellite_event_evidence_v2/manifest.json": {
+      "bytes": 6536,
+      "sha256": "83c09502ac74bab279be2887cabfebf09845f602954d5d63e0feb4554d1ce4da"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/candidates.json": {
+      "bytes": 420298,
+      "sha256": "a907c74f532633ad5d791a45d04ca742b06edb895dd6f9bc814055d421e44578"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json": {
+      "bytes": 860202,
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/manifest.json": {
+      "bytes": 10046,
+      "sha256": "938e52f6648cc815c675f65374ddbcd93754bc7deb2fb34da2e7bf925d4dc2e9"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/selection.json": {
+      "bytes": 170339,
+      "sha256": "a8568c3070ec38ce5898d6fe2fcef9000cf19a13cf91e953b7846db89a431703"
+    }
+  },
+  "source_rasters": [
+    {
+      "bytes": 1807,
+      "date": "2005-06-23",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "829a336b7f820d1f3a991a2aa57997b59655e85309a665e04ab9c397f1fefe0a",
+      "retrieved_at": "2026-10-06T11:16:32.318148+00:00",
+      "sha256": "d58f21d3e6f82656355f96f8968a9a916a9a251725683fde003410c9ac1a02ab",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050623",
+      "source_image_version": 1747259050694405,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1257,
+      "date": "2005-06-24",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "e5d636905cd44985f0397ea3a7cee0008332ccc602c24beb3129f3db002062da",
+      "retrieved_at": "2026-10-06T11:16:33.999607+00:00",
+      "sha256": "57c913b208f62278fbe6536fc0589252c9fee70c98d82d1a699793140b8a1663",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050624",
+      "source_image_version": 1747257933975338,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2823,
+      "date": "2005-06-25",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "1e1d88bf2324d3fcde0552571bf890e7a542862f2449c36907060ace176ed630",
+      "retrieved_at": "2026-10-06T11:16:37.140337+00:00",
+      "sha256": "c502286a86c058dc43741882971804a13a6cf3fd7ffde6488737d9b53c7be231",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050625",
+      "source_image_version": 1747258840414261,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1936,
+      "date": "2005-06-26",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "ef30826fb2424d8732f6fcacc258a8d85272eb7921378062e6730577614254d8",
+      "retrieved_at": "2026-10-06T11:16:44.512482+00:00",
+      "sha256": "efe6aa722b63bf869619b0c42b1705bb1bb874f7b3a76d131d61fe7e757fbb85",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050626",
+      "source_image_version": 1747258015122873,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2784,
+      "date": "2005-06-27",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "1e402f3c33032af9e378c70483768d8e08cd3ef2a125120e3635af7291e5550b",
+      "retrieved_at": "2026-10-06T11:16:48.937895+00:00",
+      "sha256": "add70bfd35dc2681786a3fadaf3f4d99802bb9edbf904b688d1a719ac71b3e0d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050627",
+      "source_image_version": 1747258027464760.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1400,
+      "date": "2005-06-28",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "2051be2d8e0eaea9218b39ee0923ac0c24ebcf37b06ce0d479368e7aac214cc1",
+      "retrieved_at": "2026-10-06T11:16:51.656034+00:00",
+      "sha256": "5b4739efd8961cd950776cea50cf0ae42298452e5c42053d901b533fc499a58f",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050628",
+      "source_image_version": 1747259094325082,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1027,
+      "date": "2005-06-29",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "99f62f8380780aa6c27ee180900060cbd7fc55937ffb9afd4b3acd0da2ad845f",
+      "retrieved_at": "2026-10-06T11:16:54.342781+00:00",
+      "sha256": "53076d9b9bb2ce608d9c75f1db7ea8713e1677bf76c8684510d4dd4f0c45fe0f",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050629",
+      "source_image_version": 1747258407996379,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1079,
+      "date": "2005-06-30",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "452af17bd40f1da2901953c11a5461a4ee98d8a5e00bc3da8fb96a3d9b98bcda",
+      "retrieved_at": "2026-10-06T11:16:56.390668+00:00",
+      "sha256": "2aa1f663ea5eb5cb6b250ffbea9bc9f620b524a69fdcf5ecb59e6a8ff1e9c702",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050630",
+      "source_image_version": 1747258658298827,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1023,
+      "date": "2005-07-01",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5043c6e83eba7c073c6b75c4fe5a7c3317750e5f41db50296a4556aad58a3f4d",
+      "retrieved_at": "2026-10-06T11:16:59.257934+00:00",
+      "sha256": "b10d619da4c47345cad759da2d4c7796217476c3c327fedad1d56ff0a5816107",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050701",
+      "source_image_version": 1747258788527556,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1174,
+      "date": "2005-07-02",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "008e96ba7b86d3beeef8cd33469cbbdafd4a7055082c5433da628eaac6aaee75",
+      "retrieved_at": "2026-10-06T11:17:02.329980+00:00",
+      "sha256": "4a58888582ae94fbcb8b01a316348d5fedb43dd9ef69d1845a9fc3874ace1071",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050702",
+      "source_image_version": 1747258441855417,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2578,
+      "date": "2005-07-03",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3c42764803bc64ef138cf51655c1ed604d27fc133f94345f8d63a1c072dcc85b",
+      "retrieved_at": "2026-10-06T11:17:06.426390+00:00",
+      "sha256": "96c61b156829cc1313bdfdeefcfc287fd3bcec8c0792c40f9bc4c7ddec03cf6a",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050703",
+      "source_image_version": 1747258213998052,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 3697,
+      "date": "2005-07-04",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "fcc17699704a748c02c20e97830dd88cd6b983c54c99625fe4d1f7b1f2d1aaa5",
+      "retrieved_at": "2026-10-06T11:17:07.918139+00:00",
+      "sha256": "9d8419edce1b89d488ec2179ad1184737c54cdad656beb0857fb5135e4dc110a",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050704",
+      "source_image_version": 1747258322017373,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1857,
+      "date": "2005-07-05",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "bfd0bba937c2a7d8931c70e96d5416043b2fa8c71dfd3dc9bcdce8202b8c23b4",
+      "retrieved_at": "2026-10-06T11:17:11.034049+00:00",
+      "sha256": "40f0242d28063944d8327d2503d6451f174663e223f7a29775fea6528f674d84",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050705",
+      "source_image_version": 1747259278685128,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1307,
+      "date": "2005-07-06",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "d46fec26d535fac4573b250f305081da9f612a1c401515ca9ec5465d02b8809d",
+      "retrieved_at": "2026-10-06T11:17:14.822921+00:00",
+      "sha256": "95dd35dfc6615163a19875a3ed1a577d287a7decdae8ecda9714de319803aad0",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050706",
+      "source_image_version": 1747259345944408,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1271,
+      "date": "2005-07-07",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "346f5d78005a0195bc4f3b4f3993555ed784ef6bf6e6f38033fab6fb1183df27",
+      "retrieved_at": "2026-10-06T11:17:20.699639+00:00",
+      "sha256": "24073ebe251fe98de16214a6f27ccc3aa9036fb94bb99218b578f24cb0ea2b16",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050707",
+      "source_image_version": 1747258624067264,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2698,
+      "date": "2005-07-08",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "f804f4e38ee23c3d3696060486504dcd6b28f9a3bec8c3b6d98213f933df9cee",
+      "retrieved_at": "2026-10-06T11:17:23.358058+00:00",
+      "sha256": "b908046ae712c8c73699c5d70f4fbf045c751963b91deabbebdf5750fc445bc8",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050708",
+      "source_image_version": 1747258185771937,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4203,
+      "date": "2005-07-09",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "75640bf6d9dc248bd865d3d2960319cbddcd24244a67d31e9d405b99a13ee3cd",
+      "retrieved_at": "2026-10-06T11:17:33.091066+00:00",
+      "sha256": "d5a8aa4b913aac711395cfbd04251c2aa3d7f34f94bb3b9cdaf16b6e34529e33",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050709",
+      "source_image_version": 1747258521545685,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2364,
+      "date": "2005-07-10",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5439c2fecfb5fee24958ac01f901e9a20dd0c71a409beee1e624ae17f4c91d65",
+      "retrieved_at": "2026-10-06T11:17:36.736716+00:00",
+      "sha256": "daa150534206b2502e0b4f07a91d19af16aa9cd54836f74b97f08c2d5dfc879e",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050710",
+      "source_image_version": 1747258119285579,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1007,
+      "date": "2005-07-11",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "d8c8a7a44b8fdf38dea66649f38bb217429ceea848e3bcb7dec773a593e98b61",
+      "retrieved_at": "2026-10-06T11:17:39.809448+00:00",
+      "sha256": "782b58646e3b9e347f3395e982d3e1805b5cc177761e96072c0d8e10f52f8876",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050711",
+      "source_image_version": 1747257983787062,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1709,
+      "date": "2005-07-12",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "c4a03c03d659912c6c61a066d63410040d925e8225e6eef5d1c8a9caada9b6f3",
+      "retrieved_at": "2026-10-06T11:17:42.346987+00:00",
+      "sha256": "ebada5eb35acc4fecd42a1eb9c0164461dade43fea2b0807fc56ab41c31357a0",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050712",
+      "source_image_version": 1747259321747680.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 3668,
+      "date": "2005-07-13",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5210b0379e4fd84320975dced3f3822eb226d13f6b4233557b3b93a7c1a8b19e",
+      "retrieved_at": "2026-10-06T11:17:43.766470+00:00",
+      "sha256": "876fe226488f631183362129c446f6aacb52f7cd10f4ad3249d5fa4a1974e608",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050713",
+      "source_image_version": 1747258422116909,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2476,
+      "date": "2005-07-14",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "64f256cfcaa0cf2ba52a28c69d205d5515852925cf586a18dbeb4de9f8fd241a",
+      "retrieved_at": "2026-10-06T11:17:46.333664+00:00",
+      "sha256": "6f4a816ca9f46084539c3536b1b1a7dc2caa0bdf07664f3ff260e8a29d3e2cf8",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050714",
+      "source_image_version": 1747259079069272,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4242,
+      "date": "2005-07-15",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "8cbb9f2e97db09fa894e5f0d04b44072ea363ce448eb9d0a23d3e27d744c3ad3",
+      "retrieved_at": "2026-10-06T11:17:50.050402+00:00",
+      "sha256": "4352e415c8b2fc6edf78f271ba5798dd357c9728cbfffa4de4243caa1a8bd327",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050715",
+      "source_image_version": 1747258325283177,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4239,
+      "date": "2005-07-16",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "aee9b68687035348d9e1a8071e761f6bb55da3488a33aed8de2f3e7485702ce7",
+      "retrieved_at": "2026-10-06T11:17:52.575423+00:00",
+      "sha256": "149312eb9f5e83414bff100aa6ae279469a808e5f2286e563f1fc416ed77a52e",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050716",
+      "source_image_version": 1747259144226551,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4129,
+      "date": "2005-07-17",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "9cac7b3d5e894b6ab9139fd529b6204cf7c119c043291ee91ba14fb27e351042",
+      "retrieved_at": "2026-10-06T11:17:55.431774+00:00",
+      "sha256": "e06ffb59595627be1ed36cc434f80bcdc1da2e8f1fc3c12a268064ef4a5691e6",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050717",
+      "source_image_version": 1747258584803850.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1981,
+      "date": "2005-07-18",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3810af35f387feb706c760db14fa4a2064c35092f33ddef2f9a9da31f4b58eec",
+      "retrieved_at": "2026-10-06T11:17:57.166544+00:00",
+      "sha256": "c7bbfe7f2543b6b30b2f5038d0e77a77f89202e65237fbf205dd316625efb7b7",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050718",
+      "source_image_version": 1747259107141472,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4202,
+      "date": "2005-07-19",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "e9dbfea78625f0799b6fba514331821a7ad8e03505dd81be710702eef59e2c13",
+      "retrieved_at": "2026-10-06T11:17:58.947628+00:00",
+      "sha256": "1c9a71e1757c22124591507e8d0d7d1514d746c39c00814f10eb22f40563b135",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050719",
+      "source_image_version": 1747257892584861,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4035,
+      "date": "2005-07-20",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3cea4986435a93c36afe4bd6ea6b97929afe6c0eac4dc2ad3d5dcbf93d0029a8",
+      "retrieved_at": "2026-10-06T11:18:00.474712+00:00",
+      "sha256": "fe617ecfd833549733e39a018dbb08ac3713c0ecc2b240598c7be24150b29dfa",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050720",
+      "source_image_version": 1747259018417752,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2135,
+      "date": "2005-07-21",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "04b682ab26d246b4710cc4479c5b0d343533780fdc9407cfa154d126b97dc32c",
+      "retrieved_at": "2026-10-06T11:18:03.771202+00:00",
+      "sha256": "b5726ef8b6522a0812eb156feda60ccacb89f4288dec69c0b427e510a067f6bc",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050721",
+      "source_image_version": 1747258226797163,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4091,
+      "date": "2005-07-22",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "c31f2f40a8a4a0b1bf64af4580a7fc9d76870cfb7901fc718b7297962fb667b0",
+      "retrieved_at": "2026-10-06T11:18:06.823709+00:00",
+      "sha256": "0618117219e52eee6e51f193ddebd762ac95786fe1c4731e6090d0d741fb260c",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050722",
+      "source_image_version": 1747258127843073,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 3096,
+      "date": "2005-07-23",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3ef9088fa63eaee6b2b3dce585943bc99e45b077291fc62bafb8278ecdd5f597",
+      "retrieved_at": "2026-10-06T11:18:08.890517+00:00",
+      "sha256": "4ab8ed36a656d0d8aaf9f7aadff88b3e7f1dc475be47cb426b68da6b75925086",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050723",
+      "source_image_version": 1747258952714512,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4025,
+      "date": "2005-07-24",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "363b30cad7d56175d8c3f1fe4c2f254a23a4b2e560a7fc4f9c941e157299b52b",
+      "retrieved_at": "2026-10-06T11:18:11.655086+00:00",
+      "sha256": "fcc72a173da7b6831ed1cf85111de6de4fef6e546b89760047b652e0554b3fc9",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050724",
+      "source_image_version": 1747258263668425,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 3697,
+      "date": "2005-07-25",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "a257e3021c3d3974b3e6c78ad1ae063f620e9da25d973718c03e5da1f05df25d",
+      "retrieved_at": "2026-10-06T11:18:13.600856+00:00",
+      "sha256": "bff3a5534e4a9e7d9e9bd21b73d3dcff1aabab5cbbb1d0db07de5305e56ee066",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050725",
+      "source_image_version": 1747258854012908,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4169,
+      "date": "2005-07-26",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "b8a3e2c5b985129f2bedad056a01de8cc0a1e365a1e94b58a9425d18238d9b84",
+      "retrieved_at": "2026-10-06T11:18:16.570239+00:00",
+      "sha256": "6b41a4852e3366a584195f59319b6f9423708c0b43670863e100c7345dba99c2",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050726",
+      "source_image_version": 1747258286406258,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4216,
+      "date": "2005-07-27",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "42a2c5d4cfcbbfd52090e3664980b3b27b1b3444b03595d6479f8cc2bce74fe2",
+      "retrieved_at": "2026-10-06T11:18:21.792910+00:00",
+      "sha256": "b356dfe345a6fede92625f5de5b9e50ef0b94f1ab22724b9a3555f86d76bbd69",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050727",
+      "source_image_version": 1747258074007498,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1064,
+      "date": "2005-07-28",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "618b6effac60238946972783404b42ebf0b617d754b45f75e0035de082afb764",
+      "retrieved_at": "2026-10-06T11:18:23.532981+00:00",
+      "sha256": "cac55140d18bcd3ed30e1ea37608c9787edea384736682cf62308819d3ee84b7",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050728",
+      "source_image_version": 1747257996728094,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1007,
+      "date": "2005-07-29",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "fe03cad1f19d0921701971d43f96ac2603905f214f454f2d4e566cdf72315f90",
+      "retrieved_at": "2026-10-06T11:18:25.990897+00:00",
+      "sha256": "782b58646e3b9e347f3395e982d3e1805b5cc177761e96072c0d8e10f52f8876",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050729",
+      "source_image_version": 1747258450742806,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2617,
+      "date": "2005-07-30",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5cc0464e7337c3680cd4a4ec9bdaea04ca628c324f7511e377f2af0406ba785a",
+      "retrieved_at": "2026-10-06T11:18:27.424608+00:00",
+      "sha256": "6a98e08f1a388e04c201f1e4748f8b8630142b9b3a3d2a11467d32488d99da2c",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050730",
+      "source_image_version": 1747258131802072,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 3255,
+      "date": "2005-07-31",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "981ad99ed61b24d4b84335beb51d41897d67706a5acd644e84e6b26ed8367f33",
+      "retrieved_at": "2026-10-06T11:18:31.418231+00:00",
+      "sha256": "7330aa19118db69cca6dbae6ba2109b40b58971f1aafa3631a4f2b87938514d2",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050731",
+      "source_image_version": 1747259437533859,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2636,
+      "date": "2005-08-01",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "fba73ab69f38f4c84e9f3bb3092058b369d2153bc6112da156f17096a44de236",
+      "retrieved_at": "2026-10-06T11:18:35.207236+00:00",
+      "sha256": "a94ab176188b1504773cbe85b2ef6bb61584a224b95456bc2d8f308ab37c49a4",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050801",
+      "source_image_version": 1747259168029160.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1355,
+      "date": "2005-08-02",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "73fcee01caa3a194941a7a197bfd853a3ed504a090d8b75bd87c20e4c5814026",
+      "retrieved_at": "2026-10-06T11:19:01.985866+00:00",
+      "sha256": "4936ff14c176473089a6a83ee0d0aa0d52bf4a8a393746aa6733ecf620b5a107",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050802",
+      "source_image_version": 1747257975734549,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1199,
+      "date": "2005-08-03",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "468634bd0bb6dbe766b8bd09ab9feead825380cf55a21fa2a0baa603c6b1062f",
+      "retrieved_at": "2026-10-06T11:19:05.005693+00:00",
+      "sha256": "8ee0ab996f77aa84a6c5408ed203f34ba46d60f9982733546a0711ad1102d3f4",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050803",
+      "source_image_version": 1747259045416862,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2324,
+      "date": "2005-08-04",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3c24a7a34dee9398a3c040fd0b9701824595a9b9120b1e79bd33ae0e8dc7b918",
+      "retrieved_at": "2026-10-06T11:19:08.077913+00:00",
+      "sha256": "a8d8ed535c8cf6eafc4a5426da97f06eb75fc082dd69c173793c2c22ecab2a10",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050804",
+      "source_image_version": 1747258838668787,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 4115,
+      "date": "2005-08-05",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "2f39825434ab0f2924fd225ec082be65c2bc4f0560f41707622a93a26ea85152",
+      "retrieved_at": "2026-10-06T11:19:10.034435+00:00",
+      "sha256": "e7c3b51e5087c4f2f211a8075f872070d86b239c86d1c1b48c4b925acb1b2752",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050805",
+      "source_image_version": 1747258073652389,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1148,
+      "date": "2005-08-06",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "15630d20f7a1f0ced95065fc0cebce61aa7ff5f76fe386640f2017f572e0916e",
+      "retrieved_at": "2026-10-06T11:19:14.061315+00:00",
+      "sha256": "8c01729d26628a3db56e8046d6812f67e685d756717d987a89f3ab9457da97ae",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050806",
+      "source_image_version": 1747259365178785,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1007,
+      "date": "2005-08-07",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "d2525a64cde1116ba5dd545ca5de89fc9cc87042fc52f118eec2703d340456a2",
+      "retrieved_at": "2026-10-06T11:19:15.655222+00:00",
+      "sha256": "782b58646e3b9e347f3395e982d3e1805b5cc177761e96072c0d8e10f52f8876",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050807",
+      "source_image_version": 1747258507488850.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1098,
+      "date": "2005-08-08",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3e307cc098d39463b8e4041d5929194eba261d5fb24ead87003e07ba3f552c5a",
+      "retrieved_at": "2026-10-06T11:19:19.373373+00:00",
+      "sha256": "39ab70d07d47976856b306a1a2d033029df9131c33f9e0f78b97ad40054bf9bd",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050808",
+      "source_image_version": 1747259071699037,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1308,
+      "date": "2005-08-09",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5260a8f8197d0093f9bf489c6b8a31c41d324c86ce1af8de4cf1c9bb10a9ead0",
+      "retrieved_at": "2026-10-06T11:19:20.879743+00:00",
+      "sha256": "a9b45e965fac3aa65a2faf828cf84eba92b89b930e6633a626c12b325cb36752",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050809",
+      "source_image_version": 1747259087289716,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1017,
+      "date": "2005-08-10",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "96af364e6be52039a7abc15f9db532ae1bd08c0730adf1b3f27dc1e2c760b35d",
+      "retrieved_at": "2026-10-06T11:19:24.256632+00:00",
+      "sha256": "ddc682dff09b18da6265d4e31bb139eff415fdaf1ce80e0008c17177e984e2cf",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050810",
+      "source_image_version": 1747259368312908,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1007,
+      "date": "2005-08-11",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "3b910e779dc203ae082094dc67c2222475ef86219fa3e3239f910b4458e09e76",
+      "retrieved_at": "2026-10-06T11:19:26.696355+00:00",
+      "sha256": "782b58646e3b9e347f3395e982d3e1805b5cc177761e96072c0d8e10f52f8876",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050811",
+      "source_image_version": 1747258882059506,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1007,
+      "date": "2005-08-12",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "b495240f462cd4d01b6d40004749873f2a789ec5601999e7bf58f3de49087fb2",
+      "retrieved_at": "2026-10-06T11:19:29.991060+00:00",
+      "sha256": "782b58646e3b9e347f3395e982d3e1805b5cc177761e96072c0d8e10f52f8876",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050812",
+      "source_image_version": 1747259178717323,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1981,
+      "date": "2005-08-13",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "cb8f492b18a190fe001c1648073f8dc7ade9851a21b12118639feb1395ba8ff1",
+      "retrieved_at": "2026-10-06T11:19:31.834732+00:00",
+      "sha256": "69e00f3621fcae211b50fc23c64b30cb9b0dbf32a95bc84d2788b02302361ec5",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050813",
+      "source_image_version": 1747258064950578,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 2144,
+      "date": "2005-08-14",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "55afbb174073a0f807897bef5de7320de735ad0cc84b169cbe6d3d3232773c84",
+      "retrieved_at": "2026-10-06T11:19:35.726040+00:00",
+      "sha256": "e06b8b9b8051b560bf2d78b12c18d33de71ace0c0349beb8e7900b95310b2424",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050814",
+      "source_image_version": 1747259438978110.0,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1948,
+      "date": "2005-08-15",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "5018ffc70ab1f35fe25edf6755ffc4e202ecad1f82ade33974a95e4db2469b46",
+      "retrieved_at": "2026-10-06T11:19:37.773953+00:00",
+      "sha256": "9244c97e3a63f19d90601631d7135bc54fda08f10beac481864c84c8afefa367",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050815",
+      "source_image_version": 1747258643803148,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1939,
+      "date": "2005-08-16",
+      "gfd_id": 2698,
+      "original_metadata_sha256": "2a7caddbcb5e64579f811bf1a0e2ed1eeb841453cfa965fa3e694af957eb7fa0",
+      "retrieved_at": "2026-10-06T11:19:40.231653+00:00",
+      "sha256": "db2f41589231314c539babaa2021f3e50107e66c84e6e9f4f51d75ad72ff863f",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20050816",
+      "source_image_version": 1747258203365885,
+      "valid_window_pixels": 648,
+      "window_pixels": 648
+    },
+    {
+      "bytes": 1769,
+      "date": "2007-05-23",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "d3a43f10734ef103a2dff16d9f19d09ef9fe1d35d22e22e6a2ae64a4be79deaf",
+      "retrieved_at": "2026-10-06T11:19:42.718701+00:00",
+      "sha256": "e483b54eeb95768c2b472af9a9b331d74045073ec9b8c3b2f1596fe92e7236b4",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070523",
+      "source_image_version": 1747258161500291,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3884,
+      "date": "2007-05-24",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "2a96919a3707be79f8b1ca9d9ad4103a2cd06465504d3921022e7b432858c6bc",
+      "retrieved_at": "2026-10-06T11:19:46.194513+00:00",
+      "sha256": "170875d3392c834635396d1688c912292d16d6c37835aaa1f7af1b2c4319c425",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070524",
+      "source_image_version": 1747259220689760.0,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 2498,
+      "date": "2007-05-25",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "8775410f6960db6a8db963fc03aafbe0a7620eb379d5a79c02193b9ab9b8bcf4",
+      "retrieved_at": "2026-10-06T11:19:47.601278+00:00",
+      "sha256": "1bf08d6ca0baa3d72cbcd10ee03c24125a31df0de8abbb05984f26a796abb2ae",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070525",
+      "source_image_version": 1747258357700231,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 2428,
+      "date": "2007-05-26",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "6fb2038a5a555005e9627320db1635c5c9e11152b873af02b852ee225d633427",
+      "retrieved_at": "2026-10-06T11:19:50.164633+00:00",
+      "sha256": "7915ce9ccf9e6f3f0e18349cc7a3ae7f1f029447bec5b58b52866d31dfb94767",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070526",
+      "source_image_version": 1747258900902474,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3715,
+      "date": "2007-05-27",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "39e40329bd6b6f0da3b361c03fc7e4606dbbf2fcfb76f4548646980fd9e3e2fb",
+      "retrieved_at": "2026-10-06T11:19:53.955715+00:00",
+      "sha256": "414ce5745147c5d916aaac24e02d17b7c018a988d9cf78a5e9d662479d247cd0",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070527",
+      "source_image_version": 1747258131457609,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3995,
+      "date": "2007-05-28",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "141503ea09490876b67808250aa149e7217f436781eba51def2c3692f3782a16",
+      "retrieved_at": "2026-10-06T11:19:55.182153+00:00",
+      "sha256": "b6a8ac9bd218707a6c36cb6a824e012a934ee2558c7eed53bdf7eb341a285a3d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070528",
+      "source_image_version": 1747258286730819,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1166,
+      "date": "2007-05-29",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "eef1bf22e548515c62be804f61938fa1d05684636651f77eec212ece684cbc69",
+      "retrieved_at": "2026-10-06T11:19:57.785378+00:00",
+      "sha256": "6d13cdad2f76a63027af1e6f69aa061e72689a87926bbd08e8e444a18bad945d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070529",
+      "source_image_version": 1747258473154766,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 997,
+      "date": "2007-05-30",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "84f75c3e4aa581b94e7db0676e0360b4d222268853e4718f4eb416390e3d7d60",
+      "retrieved_at": "2026-10-06T11:20:00.255242+00:00",
+      "sha256": "d837080e4fb199c122834c6f2caaeea3f6820fff3ef6cefc084232aabd262354",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070530",
+      "source_image_version": 1747258644541027,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 997,
+      "date": "2007-05-31",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "38823edf5bb1a996517c6feeda45d8a12c213a8b77ae7f94ccf91770e06ff983",
+      "retrieved_at": "2026-10-06T11:20:01.940705+00:00",
+      "sha256": "d837080e4fb199c122834c6f2caaeea3f6820fff3ef6cefc084232aabd262354",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070531",
+      "source_image_version": 1747258924229797,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 997,
+      "date": "2007-06-01",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "57900713d0d2876769403636e61a4f408b23d05659f3cd20975a0ab439a3948a",
+      "retrieved_at": "2026-10-06T11:20:04.280716+00:00",
+      "sha256": "d837080e4fb199c122834c6f2caaeea3f6820fff3ef6cefc084232aabd262354",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070601",
+      "source_image_version": 1747258045854787,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3336,
+      "date": "2007-06-02",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "4de8e0b5f8c30b2ce7b19f13b70a626004ebb1f21afdd2abb54e2a672f9d150d",
+      "retrieved_at": "2026-10-06T11:20:06.139373+00:00",
+      "sha256": "b660ad2cd8b023b3d66110b795df7780ece85954df80839a3c230573d258586f",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070602",
+      "source_image_version": 1747258652816514,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1460,
+      "date": "2007-06-03",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "fd1b0af5a846e9ff1eabbafe2a84dce4ae6133cb7523d81163c41a569249f499",
+      "retrieved_at": "2026-10-06T11:20:09.814577+00:00",
+      "sha256": "7cca01e41d79507a829a080d8ab1c9fb4f1d55d72d633a678af2198ffb38b3f5",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070603",
+      "source_image_version": 1747259041112197,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1971,
+      "date": "2007-06-04",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "b27dc9c28a40761aa83fe403d19ebbbe9afe9a74f491a5eb97de83043f30a0c3",
+      "retrieved_at": "2026-10-06T11:20:11.135447+00:00",
+      "sha256": "97aa0d90506e777639f4d78b85460735c224e8ceb296128f7f445a0a421a1824",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070604",
+      "source_image_version": 1747259011431376,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3053,
+      "date": "2007-06-05",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "51533e0d7ccc48c3c5194126b71f452080d5896c4710a6699807bc4414df75e8",
+      "retrieved_at": "2026-10-06T11:20:12.795479+00:00",
+      "sha256": "e81cf6f32f775bea9f891339367d512f76715fa969bd2cd7619fa2472c847bd6",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070605",
+      "source_image_version": 1747259351820043,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3590,
+      "date": "2007-06-06",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "593f4903122bad15ee63efa1de9a06dbb6dfd42333ca6ed52dd8ad29277c6d34",
+      "retrieved_at": "2026-10-06T11:20:14.638757+00:00",
+      "sha256": "470310bd13e9511a1200be8b98072a66e27f8c00bca99b55328fc7ae9abc66c1",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070606",
+      "source_image_version": 1747257994618571,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4055,
+      "date": "2007-06-07",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "6c36ebd85c27090200f4219eb870eccbbf0c23f360e466f5bfc04cea3f0c8077",
+      "retrieved_at": "2026-10-06T11:20:18.953650+00:00",
+      "sha256": "16ec24a32e8ee095728e5c584ed3c9f1e20bcc25c5fbaef2db8bfff487954d1f",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070607",
+      "source_image_version": 1747258074470441,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1345,
+      "date": "2007-06-08",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "c12542cc6d839fe0080aef671cc3912d347cffcc80baae5c79ad5504e1e5e002",
+      "retrieved_at": "2026-10-06T11:20:22.644474+00:00",
+      "sha256": "b80a2a1923f426533687ad8b216b0500cd35f8009d5f92de7d7474e57bb318b1",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070608",
+      "source_image_version": 1747258913052195,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4045,
+      "date": "2007-06-09",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "23aca2fbc3496f599edde8a0d20881ab214a5d423f9bba23a94b88bc9d61ae97",
+      "retrieved_at": "2026-10-06T11:20:25.492754+00:00",
+      "sha256": "8ae5093bc9e733d315600f8e3c768eafcaef644ab53e09fd8b05246de6703ee1",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070609",
+      "source_image_version": 1747258768534441,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1992,
+      "date": "2007-06-10",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "e2ea2ffadcb7157ad65aa3c407d2a04b6176056db34f9fc272e9cfc142aaf9bf",
+      "retrieved_at": "2026-10-06T11:20:28.155082+00:00",
+      "sha256": "099c3f1fa79afa404ffe1777821469a278a68d545fcd37d73daf2e435cacb403",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070610",
+      "source_image_version": 1747259016409858,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 2487,
+      "date": "2007-06-11",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "7aad57b2d36caa8c26fc56c72e3fe929a6e390f843cfff716e6289fad1343307",
+      "retrieved_at": "2026-10-06T11:20:30.509881+00:00",
+      "sha256": "74ec575261a08a4bfe433405e5619f359b77a3ccc9bfdfc39545263d43824f00",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070611",
+      "source_image_version": 1747259180379761,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4082,
+      "date": "2007-06-12",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "3bc4fd9e4f88871bf64eeab1e2f9cfc91d1235a282672a53c3871079055f0f7e",
+      "retrieved_at": "2026-10-06T11:20:34.216952+00:00",
+      "sha256": "3a295e022935527522e1ca6e973e08bd08ef4716d9150e011118d2f6070a205d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070612",
+      "source_image_version": 1747258813217432,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4086,
+      "date": "2007-06-13",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "0a321b0fce2a38e0769ed546b4fd63751e12111f2e9ae5a58793368d9d61cc29",
+      "retrieved_at": "2026-10-06T11:20:37.370951+00:00",
+      "sha256": "c3cccd2a3c2b261c6bf367d97c2bc690762f3015298fba63572fbc94e5bdcff7",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070613",
+      "source_image_version": 1747259108532872,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3908,
+      "date": "2007-06-14",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "7e33be63c4722ff44174ab2308dd2158a5c8d14e8507d520ed382ec6b0d5676b",
+      "retrieved_at": "2026-10-06T11:20:39.158293+00:00",
+      "sha256": "43181bd020c3ebda4893b9e9eb46fee21a13c64acefc69f6965362e92f6fbbc5",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070614",
+      "source_image_version": 1747259131342532,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3708,
+      "date": "2007-06-15",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "a886606c54cb68b2a34d2b675f13a49b723c59e457dfdb6c36259b6c20832e6e",
+      "retrieved_at": "2026-10-06T11:20:41.057675+00:00",
+      "sha256": "a8496194c810388f129e26441f7d4d052d91b65fea2cbbdfad0fea7df6b06332",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070615",
+      "source_image_version": 1747258720790039,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 2227,
+      "date": "2007-06-16",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "5205966239795ba3d1e1645803c3c3224f05e2ed3b08cb006606915065e6cd8e",
+      "retrieved_at": "2026-10-06T11:20:44.334531+00:00",
+      "sha256": "d68e9a8f449d576ddd3341e7aaa27bcc26a5c1c73204509070b37dd6842640b7",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070616",
+      "source_image_version": 1747259086587015,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1616,
+      "date": "2007-06-17",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "2331a0aa7a9e8b55afc5b8edf66aa43426f2f10d9e71d7a29d25bf9eaee601b1",
+      "retrieved_at": "2026-10-06T11:20:46.382267+00:00",
+      "sha256": "04a767a8c2fbb5de1868cc764820584c7995c83de13c9a2de9e3ad541966ed4e",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070617",
+      "source_image_version": 1747258953717637,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1012,
+      "date": "2007-06-18",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "eff0e2e7dfa2be61cb338ed930ccf41032af3e8cbfce02e1292bc9c6f1f1255d",
+      "retrieved_at": "2026-10-06T11:20:49.576247+00:00",
+      "sha256": "11541eadecc15c1b0b4fe0d9d02c0defcbf235ac80e02011bd8122672f8b7138",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070618",
+      "source_image_version": 1747258286739640.0,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3236,
+      "date": "2007-06-19",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "8508a82da518115dd9cf81a176cff1141fb61d8a0f088e26d0e85d6e8607eac8",
+      "retrieved_at": "2026-10-06T11:20:54.574170+00:00",
+      "sha256": "6a5585db9255478498cb947eee6fcfdd27a56f7e14e027b4871690946c3df36d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070619",
+      "source_image_version": 1747258184916972,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1932,
+      "date": "2007-06-20",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "f817dcc54da5d794132f461d190e9ceb900abb4d486dc855057094712c6e5a11",
+      "retrieved_at": "2026-10-06T11:20:56.623285+00:00",
+      "sha256": "d83078d6fd579f4cc3c9a79224ad71d8174e76746306816a3473223e758ff791",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070620",
+      "source_image_version": 1747258729516576,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4101,
+      "date": "2007-06-21",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "5dd403f8aa159d18d0b4f0b6b51b6aa7769f60d5c25b816d4e130fbe7af41c0e",
+      "retrieved_at": "2026-10-06T11:20:59.489600+00:00",
+      "sha256": "803dce1390b5173ee5b1c61f2d913077d3308ca3139828e19488edf16f7a26ff",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070621",
+      "source_image_version": 1747259082984056,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4081,
+      "date": "2007-06-22",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "6ad7682ddff1fc2e4fcddb6238a2610f6fbeaf358c1c41a5613cd61df910651b",
+      "retrieved_at": "2026-10-06T11:21:01.336665+00:00",
+      "sha256": "55914710038226f91377d72d79c43b817555602efbdadd081b45dca7be8a26a4",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070622",
+      "source_image_version": 1747259012420947,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3905,
+      "date": "2007-06-23",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "a3677e32332e1cf4e7fd3635af18d5b1b4e7dcc1a35acbda87b83a3e8635708a",
+      "retrieved_at": "2026-10-06T11:21:03.176068+00:00",
+      "sha256": "5ba708805b1687682fe8482a14d960433973a02647644bc4a2238deeab7e914d",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070623",
+      "source_image_version": 1747259137627441,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1990,
+      "date": "2007-06-24",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "13fe9427dd7f4df751d81a87b3b12c72e3de165265976a96f2d1159f2d458195",
+      "retrieved_at": "2026-10-06T11:21:06.145378+00:00",
+      "sha256": "df18d3f6141c199a170e722e14e91fd879e296f40787cfe61b6c532fc19b282b",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070624",
+      "source_image_version": 1747258273114621,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1162,
+      "date": "2007-06-25",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "ceedfe9aaef6319553e93621687c0bd81b1d1722a959a98da1163bc314923bdd",
+      "retrieved_at": "2026-10-06T11:21:08.500479+00:00",
+      "sha256": "df717cb69d68d36b34839da80434ba3db1cb962602c2bf95c45bfac537576ce9",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070625",
+      "source_image_version": 1747259341267253,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4042,
+      "date": "2007-06-26",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "93fc76741441992ce40b771c76335a0aee0bf1c56e62108f42b7159132efd0ec",
+      "retrieved_at": "2026-10-06T11:21:12.392009+00:00",
+      "sha256": "7d1fa9708bebd64a8178c7a10b25f060cbcbd948b2730fa98de1a5c7ee21d8dd",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070626",
+      "source_image_version": 1747258098674565,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4088,
+      "date": "2007-06-27",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "66bbbf1fd3766092e172e7a0bbacd89e19f5de5b067d490558c40b593ee8c0be",
+      "retrieved_at": "2026-10-06T11:21:14.048726+00:00",
+      "sha256": "4ae48f108957f7bee63e33a1f534ead7e8e789cd51f8c6af1fbe6d9052f19305",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070627",
+      "source_image_version": 1747259051547624,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3978,
+      "date": "2007-06-28",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "0a3fe63467cb843865e0026ea7a9717d83de8cc876fcae3817b453e368b72477",
+      "retrieved_at": "2026-10-06T11:21:15.668949+00:00",
+      "sha256": "0a5de10d0bc5bd06ca9a08c672eb184ffd76a3fee1b259d85855a84f6e72ceb5",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070628",
+      "source_image_version": 1747258722905914,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 4056,
+      "date": "2007-06-29",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "fe1e80e554e788cf9548215d8f5bb1ef1b4f2ffdedf6be2ab7b3e796c5f6fd5a",
+      "retrieved_at": "2026-10-06T11:21:17.716797+00:00",
+      "sha256": "8c12501b33f52fce2aab9ba31dda99ba49ac3f8ed22d13233040f776ec372916",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070629",
+      "source_image_version": 1747258163353908,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3192,
+      "date": "2007-06-30",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "62725c4196dcd2382ecc06b54797b602f4c286912a3443039929ada5aef0804f",
+      "retrieved_at": "2026-10-06T11:21:19.560038+00:00",
+      "sha256": "7eab3643cc5118930db6c3bddf024dbbc0ed31800f93f6405c52b41d5137c9a1",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070630",
+      "source_image_version": 1747258996855934,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 3328,
+      "date": "2007-07-01",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "040693864870b1e47be93f79356aa6d676937a335bba9df6b4bce7c71d2e356b",
+      "retrieved_at": "2026-10-06T11:21:21.300391+00:00",
+      "sha256": "8db97b9e7f363c777ac918260879c50c8168a988e35d966d50133a970ecdc60a",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070701",
+      "source_image_version": 1747258893874627,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 2298,
+      "date": "2007-07-02",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "998ebcd89813b916ce67319514d38d0f32b5d729d3890fc8c0d7580f3f3cb884",
+      "retrieved_at": "2026-10-06T11:21:23.368957+00:00",
+      "sha256": "58368d5fb385ffaafeb2e553e08a26e53580f0f95a02b29668825097d923dc05",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070702",
+      "source_image_version": 1747259029562076,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 997,
+      "date": "2007-07-03",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "5e4929ca3190b49eb7cec36288bf2dda8610f60b87dc5df3f0cd0be5e5bde6ae",
+      "retrieved_at": "2026-10-06T11:21:24.781808+00:00",
+      "sha256": "d837080e4fb199c122834c6f2caaeea3f6820fff3ef6cefc084232aabd262354",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070703",
+      "source_image_version": 1747258679618072,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    },
+    {
+      "bytes": 1063,
+      "date": "2007-07-04",
+      "gfd_id": 3107,
+      "original_metadata_sha256": "1484ab5b050108e529601b37bed52656e5fc21ca9cc87701d8b1c03beb366dff",
+      "retrieved_at": "2026-10-06T11:21:28.366099+00:00",
+      "sha256": "6acc9200ca0d25f858eff03125996298de6f52ca62eff5bf4618b7a4121cafef",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20070704",
+      "source_image_version": 1747258497408427,
+      "valid_window_pixels": 616,
+      "window_pixels": 616
+    }
+  ],
+  "validation": {
+    "background_windows_created": 0,
+    "binary_targets_created": 0,
+    "evidence_class_counts": {
+      "observed_zero_event": 2,
+      "satellite_positive": 4
+    },
+    "excluded_evidence_count": 7,
+    "independent_scalar_checks": 98,
+    "new_daily_records": 98,
+    "satellite_regressions": {
+      "2698": {
+        "qualifying_cells": 0,
+        "valid_cells": 166123
+      },
+      "2728": {
+        "qualifying_cells": 33,
+        "valid_cells": 41352
+      },
+      "2758": {
+        "qualifying_cells": 329,
+        "valid_cells": 63302
+      },
+      "3107": {
+        "qualifying_cells": 0,
+        "valid_cells": 132615
+      },
+      "3551": {
+        "qualifying_cells": 23,
+        "valid_cells": 41352
+      },
+      "3652": {
+        "qualifying_cells": 2,
+        "valid_cells": 125242
+      }
+    }
+  },
+  "version": "karnataka_event_comparison_v1",
+  "vocabulary": [
+    "candidate_mismatch",
+    "insufficient_observation",
+    "observed_zero_event",
+    "satellite_positive",
+    "unlabeled_background"
+  ]
+}
