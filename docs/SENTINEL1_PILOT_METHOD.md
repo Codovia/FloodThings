@@ -268,3 +268,60 @@ checksums and unavailable outcome offline. Original documents and local geometry
 are withheld; Git receives only code/tests/method/source metadata/checksums.
 Next: obtain a permitted georeferenced reference plus usable SAR imagery for this
 event, or separately authorize a better supported acquisition anchor.
+
+
+## Stage 3E4: July 2021 official anchor and incremental availability gate
+
+The primary official observation is WorldView-3 on 2021-07-26; the broader
+Resourcesat-2A LISS-III map is 2021-07-28. Both listing and issue dates are July 29;
+PDF creation and unspecified analysis/acquisition-hour metadata stay separate.
+Both PDFs contain GEO registrations. Programmatic viewport extraction records
+source corners/WKT (declared main-map UTM45N); it supplies map coverage only,
+never digitized flood shapes or pixel labels. Reference status is
+`official_map_reference_available`. Original optical clouds and official-use/
+International Charter restrictions remain. IFI exact-token/date overlap yields
+no association. July 26–28 is a project-derived observation bracket; broader
+source language supports fourth-week flooding, not exact daily occurrence.
+
+Availability starts with date+footprint only (June 15–August 15). Public OSM
+Hulagabali coordinates define nested 2/25/90/180 km retrieval windows, not official
+boundaries: counts 11/11/11/30. Record each area, bound, earliest/latest time and
+all unfiltered scene footprints before grouping. IW/VV/VH branches retain 30;
+ascending 2/descending 28; orbit 136:18, 63:10, 71:2; platform A28/B2. Preserve original
+numeric histogram keys alongside normalized comparison keys. Intersections and
+denominators must use the same area convention; projected area is separate.
+Raw responses and completed AOIs survive local validation errors; cached
+metadata can be assembled offline without repeated provider initialization.
+
+Group by exact mode/polarizations/pass/relative orbit/H/10m and strict platform.
+Retain all frames but use at most two distinct baseline dates, so adjacent
+same-pass frames are not independent baselines. Narrow diagnostic footprint must
+be covered by each selected scene. Temporal ranking prefers July 26, then the
+observation bracket, then up to 7 days after July 28. Selected relative 63/A/descending
+uses July 5+17 and July 29: shortly-after, not exact flood-date evidence. No scene
+inside July 26–28. Metadata availability never establishes flood presence.
+
+Both gates passed for one continuous-only extraction: 2 km/10m EPSG:32643, four
+half-open 100x100 tiles, 13 source bands, 130000 band-cells/162500 with safety factor 1.25;
+250000 target/300000 ceiling/bestEffortFalse unchanged. SAR medians, event values
+and dB differences remain continuous. JRC Monthly 2021_07/Yearly 2021 are flags,
+not SAR validity. Unknown/masked/class 0 stay unknown; yearly 3 known permanent,
+yearly 2 seasonal retained. Source SAR VV/VH 10 m grid, approximate angle nominal
+~16.083 km and JRC 30 m metadata remain distinct from 10 m processing grid.
+
+Result 40000 valid SAR cells. All angle differences meet the unchanged ≤1 degree
+diagnostic; angles 45.55–45.70 lie outside the unchanged 30–45 degree range.
+Original combined-range/agreement count 0 is preserved. These diagnostics were
+separated for interpretation without changing any cutoff. No flood threshold,
+sensitivity rerun, classification, label or promotion. Independent scalar
+medians/changes/math.fsum and raster mask/georeferencing checks reproduce every
+valid pixel. Continuous pipeline established; methodological calibration remains
+inconclusive without independent categorical spatial reference and separate
+review of near-event timing/incidence limitations.
+
+Original products, footprints and rasters remain local. Permitted source/schema/
+aggregate/checksum metadata are versioned separately. `evaluate_belagavi_2021.py`
+provides metadata, extract, freeze, validate; completed versions refuse overwrite,
+validation is offline/read-only. No prior 2019 result or archived v1/v2 method is
+rewritten. Next: obtain legitimate inundation reference for this event and
+predeclare calibration/assessment and incidence treatment in a separate task.

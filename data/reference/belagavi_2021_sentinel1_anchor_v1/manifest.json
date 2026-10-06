@@ -1,0 +1,603 @@
+{
+  "aois": [
+    {
+      "area_m2_projected": 4000000,
+      "crs": "EPSG:32643",
+      "geographic_bounds": [
+        74.98621615829643,
+        16.65221933840993,
+        75.00497302824684,
+        16.670299429722153
+      ],
+      "level": 1,
+      "response": {
+        "area_m2_ee": 4016751.6600644286,
+        "count": 11,
+        "earliest_ms": 1623804937000,
+        "latest_ms": 1628988940000
+      },
+      "retrieved_at": "2026-10-06T16:52:18.834738+00:00",
+      "scope_type": "retrieval_window_not_official_flood_boundary",
+      "side_m": 2000
+    },
+    {
+      "area_m2_projected": 625000000,
+      "crs": "EPSG:32643",
+      "geographic_bounds": [
+        74.8782983385538,
+        16.548225526721733,
+        75.1128860932735,
+        16.774226193760864
+      ],
+      "level": 2,
+      "response": {
+        "area_m2_ee": 627617434.6987453,
+        "count": 11,
+        "earliest_ms": 1623804937000,
+        "latest_ms": 1628988940000
+      },
+      "retrieved_at": "2026-10-06T16:52:20.713666+00:00",
+      "scope_type": "retrieval_window_not_official_flood_boundary",
+      "side_m": 25000
+    },
+    {
+      "area_m2_projected": 8100000000,
+      "crs": "EPSG:32643",
+      "geographic_bounds": [
+        74.57267624244872,
+        16.25403139787737,
+        75.41849475373698,
+        17.06761324352926
+      ],
+      "level": 3,
+      "response": {
+        "area_m2_ee": 8133818123.461872,
+        "count": 11,
+        "earliest_ms": 1623804937000,
+        "latest_ms": 1628988940000
+      },
+      "retrieved_at": "2026-10-06T16:52:22.279131+00:00",
+      "scope_type": "retrieval_window_not_official_flood_boundary",
+      "side_m": 90000
+    },
+    {
+      "area_m2_projected": 32400000000,
+      "crs": "EPSG:32643",
+      "geographic_bounds": [
+        74.14792550983856,
+        15.84599530307797,
+        75.84322689320163,
+        17.47302534988344
+      ],
+      "level": 4,
+      "response": {
+        "area_m2_ee": 32533524237.2952,
+        "count": 30,
+        "earliest_ms": 1623804912000,
+        "latest_ms": 1628988965000
+      },
+      "retrieved_at": "2026-10-06T16:52:22.761901+00:00",
+      "scope_type": "retrieval_window_not_official_flood_boundary",
+      "side_m": 180000
+    }
+  ],
+  "attribution": {
+    "coordinates": "OpenStreetMap contributors, ODbL1.0; named-place node only",
+    "ifi": "Saharia/IIT Delhi HydroSense India Flood Inventory, CC BY-NC4.0; no forced match",
+    "jrc": "EC JRC/Google/Pekel et al.2016; 2021 MonthlyHistory/YearlyHistory auxiliary context sampled to SAR grid",
+    "official": "Source: NRSC, ISRO/DOS; https://www.nrsc.gov.in; products retained locally",
+    "sar": "Copernicus Sentinel-1/ESA, Earth Engine calibrated/terrain-corrected sigma0 dB"
+  },
+  "calibration_status": "calibration_inconclusive",
+  "code": {
+    "scripts/evaluate_belagavi_2021.py": {
+      "bytes": 43904,
+      "sha256": "726b96962b568de3435258c145f6d2356d21fd736c43e5fe88b8134ea15c24cc"
+    },
+    "scripts/verify_jrc_auxiliary.py": {
+      "bytes": 17964,
+      "sha256": "8b4fbdb19c1777b93e7a51adc24ea98711c308c054f6642401bed32d4f236a11"
+    },
+    "scripts/verify_sentinel1_pilot.py": {
+      "bytes": 34609,
+      "sha256": "a6736e479604afc37d235f8e74fead903ac138550110ac90ceb62753f157ed6f"
+    }
+  },
+  "contextual_observation_bracket": {
+    "end_inclusive": "2021-07-28",
+    "start": "2021-07-26",
+    "status": "derived_bracket_between_two_official_observations_not_daily_flood_labels"
+  },
+  "continuous_diagnostic_summary": {
+    "auxiliary_unknown_cells": 11060,
+    "continuous_statistics": {
+      "baseline_VH": {
+        "cells": 40000,
+        "max": -5.448830604553223,
+        "mean": -18.04192579803467,
+        "min": -33.59452438354492
+      },
+      "baseline_VV": {
+        "cells": 40000,
+        "max": 8.19867992401123,
+        "mean": -13.060078724675625,
+        "min": -31.990203857421875
+      },
+      "baseline_angle": {
+        "cells": 40000,
+        "max": 45.68736267089844,
+        "mean": 45.61602222366333,
+        "min": 45.54734802246094
+      },
+      "change_VH": {
+        "cells": 40000,
+        "max": 12.070537567138672,
+        "mean": -4.629968320000172,
+        "min": -25.147384643554688
+      },
+      "change_VV": {
+        "cells": 40000,
+        "max": 17.482166290283203,
+        "mean": -4.86585389521718,
+        "min": -34.63391876220703
+      },
+      "change_angle": {
+        "cells": 40000,
+        "max": 0.0086822509765625,
+        "mean": 0.008451454448699951,
+        "min": 0.007884979248046875
+      },
+      "event_VH": {
+        "cells": 40000,
+        "max": -5.967121601104736,
+        "mean": -22.671894117808343,
+        "min": -42.99496841430664
+      },
+      "event_VV": {
+        "cells": 40000,
+        "max": 10.862176895141602,
+        "mean": -17.92593262032764,
+        "min": -46.45419692993164
+      },
+      "event_angle": {
+        "cells": 40000,
+        "max": 45.696041107177734,
+        "mean": 45.62447367811203,
+        "min": 45.555233001708984
+      }
+    },
+    "flood_label": null,
+    "incidence_comparable_cells": 0,
+    "interpretation": "Near-event SAR change only; no pixel-level NRSC inundation truth, classification, threshold or accuracy claim",
+    "monthly_counts": {
+      "-1": 0,
+      "0": 13964,
+      "1": 26036,
+      "2": 0
+    },
+    "permanent_water_cells": 1586,
+    "permanent_water_status_unknown_cells": 36529,
+    "sar_valid_cells": 40000,
+    "status": "continuous_diagnostics_completed_not_flood_verification",
+    "threshold_analysis_performed": false,
+    "threshold_sensitivity": [],
+    "yearly_counts": {
+      "-1": 36529,
+      "0": 0,
+      "1": 414,
+      "2": 1471,
+      "3": 1586
+    }
+  },
+  "created_at": "2026-10-06T17:05:56.690148+00:00",
+  "documented_period_literal": "fourth week of July, 2021",
+  "event_id": "fp-official-belagavi-20210726",
+  "filter_attrition_normalized": {
+    "IW": 30,
+    "IW_VH": 30,
+    "IW_VV": 30,
+    "IW_VV_VH": 30,
+    "ascending": 2,
+    "descending": 28,
+    "platforms": {
+      "A": 28,
+      "B": 2
+    },
+    "relative_orbits": {
+      "136": 18,
+      "63": 10,
+      "71": 2
+    },
+    "unfiltered": 30
+  },
+  "filter_attrition_original": {
+    "IW": 30,
+    "IW_VH": 30,
+    "IW_VV": 30,
+    "IW_VV_VH": 30,
+    "ascending": 2,
+    "descending": 28,
+    "platforms": {
+      "A": 28,
+      "B": 2
+    },
+    "relative_orbits": {
+      "136.0": 18,
+      "63.0": 10,
+      "71.0": 2
+    },
+    "unfiltered": 30
+  },
+  "group_summaries": [
+    {
+      "acquisition_dates": [
+        "2021-08-04",
+        "2021-08-04"
+      ],
+      "configuration": [
+        "IW",
+        "ASCENDING",
+        71,
+        10,
+        [
+          "VH",
+          "VV"
+        ],
+        "B",
+        "H"
+      ],
+      "event_window_scenes": 0,
+      "post_event_scenes": 2,
+      "pre_event_scenes": 0,
+      "scenes": 2,
+      "shortly_after_scenes": 2
+    },
+    {
+      "acquisition_dates": [
+        "2021-06-16",
+        "2021-06-16",
+        "2021-06-16",
+        "2021-06-28",
+        "2021-06-28",
+        "2021-06-28",
+        "2021-07-10",
+        "2021-07-10",
+        "2021-07-10",
+        "2021-07-22",
+        "2021-07-22",
+        "2021-07-22",
+        "2021-08-03",
+        "2021-08-03",
+        "2021-08-03",
+        "2021-08-15",
+        "2021-08-15",
+        "2021-08-15"
+      ],
+      "configuration": [
+        "IW",
+        "DESCENDING",
+        136,
+        10,
+        [
+          "VH",
+          "VV"
+        ],
+        "A",
+        "H"
+      ],
+      "event_window_scenes": 0,
+      "post_event_scenes": 6,
+      "pre_event_scenes": 12,
+      "scenes": 18,
+      "shortly_after_scenes": 3
+    },
+    {
+      "acquisition_dates": [
+        "2021-06-23",
+        "2021-06-23",
+        "2021-07-05",
+        "2021-07-05",
+        "2021-07-17",
+        "2021-07-17",
+        "2021-07-29",
+        "2021-07-29",
+        "2021-08-10",
+        "2021-08-10"
+      ],
+      "configuration": [
+        "IW",
+        "DESCENDING",
+        63,
+        10,
+        [
+          "VH",
+          "VV"
+        ],
+        "A",
+        "H"
+      ],
+      "event_window_scenes": 0,
+      "post_event_scenes": 4,
+      "pre_event_scenes": 6,
+      "scenes": 10,
+      "shortly_after_scenes": 2
+    }
+  ],
+  "ifi_association": {
+    "primary_anchor_changed": false,
+    "records": [],
+    "status": "none"
+  },
+  "independent_check_summary": {
+    "all_valid_cells_checked": 40000,
+    "angle_difference_within_predeclared_one_degree_cells": 40000,
+    "incidence_comparable_cells_definition": "Original diagnostics field intersects both30-45degree range and<=1degree difference; zero is not zero SAR validity or zero angle agreement",
+    "outside_legacy_30_45_degree_range_cells": 40000,
+    "scalar_statistics": {
+      "baseline_VH": {
+        "cells": 40000,
+        "scalar_mean": -18.04192579803467
+      },
+      "baseline_VV": {
+        "cells": 40000,
+        "scalar_mean": -13.060078724675625
+      },
+      "baseline_angle": {
+        "cells": 40000,
+        "scalar_mean": 45.61602222366333
+      },
+      "change_VH": {
+        "cells": 40000,
+        "scalar_mean": -4.629968320000172
+      },
+      "change_VV": {
+        "cells": 40000,
+        "scalar_mean": -4.86585389521718
+      },
+      "change_angle": {
+        "cells": 40000,
+        "scalar_mean": 0.008451454448699951
+      },
+      "event_VH": {
+        "cells": 40000,
+        "scalar_mean": -22.671894117808343
+      },
+      "event_VV": {
+        "cells": 40000,
+        "scalar_mean": -17.92593262032764
+      },
+      "event_angle": {
+        "cells": 40000,
+        "scalar_mean": 45.62447367811203
+      }
+    },
+    "thresholds_changed": false,
+    "within_legacy_30_45_degree_range_cells": 0
+  },
+  "local_manifest": {
+    "bytes": 10128,
+    "path": "data/working/belagavi_2021_sentinel1_anchor_v1/manifest.json",
+    "sha256": "e76f9efd089a66977609b4e0da66df5d0d80ee44a5c3bcf0b7c0e1503c535f7a"
+  },
+  "local_outputs": {
+    "anchor.json": {
+      "bytes": 18444,
+      "sha256": "c90f72f0b10e28f9107ac82d9adbb08ea53caf58c8f28885c0510971e6d0205f"
+    },
+    "continuous_diagnostics.json": {
+      "bytes": 2033,
+      "sha256": "9f35d6c0cca9ec2805c48942546440dc14807a4f01858cc7eb1e9f4583acee14"
+    },
+    "independent_checks.json": {
+      "bytes": 1253,
+      "sha256": "9b521f3731e8492e83459f0789411f59986495c0256996dde769113bb97cc023"
+    },
+    "scene_inventory.json": {
+      "bytes": 180527,
+      "sha256": "437ef0365d9195df5e1377b7f590ccec35709ef9fba78372854c7538780259f4"
+    }
+  },
+  "map_coverage": "Source GeoPDF registration retained locally; not a categorical flood layer",
+  "method": {
+    "aoi_sides_m": [
+      2000,
+      25000,
+      90000,
+      180000
+    ],
+    "auxiliary": "JRC MonthlyHistory2021_07 and YearlyHistory2021; masked/class0 unknown, yearly3 permanent only, yearly2 retained",
+    "baseline": "up to two distinct pre-July26 acquisitions, latest first, median dB",
+    "continuous": "VV/VH/angle baseline median, event and event-minus-baseline dB; no flood classes or thresholds",
+    "event": "July26 exact preferred; otherwise July26-28 contextual bracket, then <=7days after July28; near-event is not verified daily flood",
+    "flood_label": null,
+    "grid": "2km EPSG:32643 10m nearest analysis window, four half-open100x100 partitions; source resolution retained separately",
+    "grouping": "same IW, exact VV+VH combination, orbit pass/relative orbit, H/10m, strict same platform",
+    "limits": {
+      "attempts": 3,
+      "backoff_seconds": [
+        2,
+        4
+      ],
+      "bestEffort": false,
+      "maxPixels": 300000,
+      "phase_seconds": 900,
+      "raster_bytes": 1048576,
+      "raster_seconds": 30,
+      "request_seconds": 60,
+      "safety_factor": 1.25,
+      "target_band_pixels": 250000
+    },
+    "metadata_cap": 192,
+    "metadata_search": [
+      "2021-06-15",
+      "2021-08-16"
+    ],
+    "reference": "official GeoPDF map coverage only; no pixel-level inundation ground truth",
+    "sar_validity": "finite original SAR masks/nodata only; independent of JRC and terrain",
+    "scope": "retrieval_window_not_official_flood_boundary",
+    "source": "COPERNICUS/S1_GRD",
+    "threshold_analysis_performed": false,
+    "timing": "July26 primary WorldView3 observation, July28 separate Resourcesat2A corroboration, July29 listing/issue"
+  },
+  "pair_status": "sentinel1_pair_available",
+  "preflight": {
+    "bands": 13,
+    "bestEffort": false,
+    "maxPixels": 300000,
+    "maximum_safe_band_workload": 162500,
+    "partitions": 4
+  },
+  "publication": "Original maps/imagery/source footprints/raw rasters stay local; source metadata/checksums and aggregate provenance only",
+  "reference_status": "official_map_reference_available",
+  "scientific_limitations": [
+    "Near-event July29 is not July26/28 pixel truth",
+    "No machine-readable independent inundation labels",
+    "All angles outside old30-45degree range; cutoff not relaxed",
+    "Continuous backscatter change is not a verified flood-positive count or classification"
+  ],
+  "selected": {
+    "baseline_ids": [
+      "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210705T004732_20210705T004757_038635_048F13_BF03",
+      "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210717T004732_20210717T004757_038810_049451_0405"
+    ],
+    "configuration": [
+      "IW",
+      "DESCENDING",
+      63,
+      10,
+      [
+        "VH",
+        "VV"
+      ],
+      "A",
+      "H"
+    ],
+    "days_from_primary_observation": 3,
+    "event_id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210729T004733_20210729T004758_038985_049989_7AE1",
+    "event_utc": "2021-07-29T00:47:33+00:00",
+    "temporal_role": "shortly_after_event"
+  },
+  "source_listing": {
+    "bytes": 89002,
+    "content_type": "text/html; charset=UTF-8",
+    "deadline_seconds": 60,
+    "last_modified": null,
+    "max_bytes": 20971520,
+    "redistribution": "Originals retained locally; government product restrictions and external imagery rights require review",
+    "retrieved_at": "2026-10-06T16:42:23.501009+00:00",
+    "sha256": "afa0dc92133b17204236a828b6ae52ceba3e6159cee95d03703cf17f54477b7c",
+    "started_at": "2026-10-06T16:42:22.622257+00:00",
+    "status": "retrieved",
+    "url": "https://www.nrsc.gov.in/nrscnew/2021_Floods.php"
+  },
+  "source_reuse": "NRSC non-commercial attributed use and derivatives allowed by inspected terms; For official use/International Charter external image rights retained; originals remain local, no PDF reproduction or flood digitization",
+  "sources": {
+    "corroborating_map": {
+      "acquisition_date": "2021-07-28",
+      "analysis_date": "not_documented_separately_from_issue",
+      "disaster_event_id": "08-FL-2021-MH",
+      "issue_date": "2021-07-29",
+      "limitations": [
+        "Visible optical cloud obscuration",
+        "For official use notice",
+        "GeoPDF registration maps viewport, not categorical flood extent",
+        "Declared main-map projection WGS1984UTM45N; preserved without silently substituting local43N"
+      ],
+      "listing_date": "2021-07-29",
+      "localities": [
+        "Hulagabali",
+        "Kudachi",
+        "Shedbal",
+        "Boragaon",
+        "Janwad"
+      ],
+      "map_id": "2021/06",
+      "pdf_creation_timestamp": "2021-07-29T16:16:53+05:30",
+      "provenance": {
+        "bytes": 4041023,
+        "content_type": "application/pdf",
+        "deadline_seconds": 60,
+        "last_modified": "Wed, 20 Aug 2025 07:49:09 GMT",
+        "max_bytes": 20971520,
+        "redistribution": "Originals retained locally; government product restrictions and external imagery rights require review",
+        "retrieved_at": "2026-10-06T16:42:30.641982+00:00",
+        "sha256": "f92b680bb87b1c675bb76da47ca482800085838102126cb6c0cd07007099c676",
+        "started_at": "2026-10-06T16:42:25.308397+00:00",
+        "status": "retrieved",
+        "url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/maps_dms/Maharashtra_floods_28jul_VAP_tile6.pdf"
+      },
+      "sensor": "Resourcesat-2A LISS-III",
+      "spatial_resolution": "not_documented_in_product",
+      "title": "Flood Inundated Areas in Part of Maharashtra and Karnataka States"
+    },
+    "primary": {
+      "acquisition_date": "2021-07-26",
+      "analysis_date": "not_documented_separately_from_issue",
+      "disaster_event_id": "09-FL-2021-KA",
+      "issue_date": "2021-07-29",
+      "limitations": [
+        "Visible optical cloud obscuration",
+        "For official use notice",
+        "GeoPDF registration maps viewport, not categorical flood extent",
+        "Declared main-map projection WGS1984UTM45N; preserved without silently substituting local43N"
+      ],
+      "listing_date": "2021-07-29",
+      "localities": [
+        "Hulagabali",
+        "Halyal",
+        "Sankaratti"
+      ],
+      "map_id": "2021/01",
+      "pdf_creation_timestamp": "2021-07-29T17:32:23+05:30",
+      "provenance": {
+        "bytes": 2732373,
+        "content_type": "application/pdf",
+        "deadline_seconds": 60,
+        "last_modified": "Wed, 20 Aug 2025 07:49:09 GMT",
+        "max_bytes": 20971520,
+        "redistribution": "Originals retained locally; government product restrictions and external imagery rights require review",
+        "retrieved_at": "2026-10-06T16:42:25.297864+00:00",
+        "sha256": "e9ef7fa6beeb9eec773dec6fdcd1c2ca223a021d91156e7b7f71e4247e70ecdf",
+        "started_at": "2026-10-06T16:42:23.502040+00:00",
+        "status": "retrieved",
+        "url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/maps_dms/Karnataka_floods_26jul_VAP_tile1.pdf"
+      },
+      "sensor": "WorldView-3",
+      "spatial_resolution": "not_documented_in_product",
+      "title": "Heavy Rain Affected Areas in Parts of Belgaum, Karnataka"
+    }
+  },
+  "spatial_evidence_type": "official_georeferenced_map_only",
+  "terms": {
+    "bytes": 80896,
+    "content_type": "text/html; charset=UTF-8",
+    "deadline_seconds": 60,
+    "last_modified": null,
+    "max_bytes": 20971520,
+    "redistribution": "Originals retained locally; government product restrictions and external imagery rights require review",
+    "retrieved_at": "2026-10-06T16:42:38.746167+00:00",
+    "sha256": "7c7be3a720ea4c2bf609a1857a272cb53b49fda601b3042de5188abdf2c21477",
+    "started_at": "2026-10-06T16:42:30.655168+00:00",
+    "status": "retrieved",
+    "url": "https://www.nrsc.gov.in/nrscnew/termsConditions.php"
+  },
+  "validation": {
+    "aoi_scene_counts": [
+      11,
+      11,
+      11,
+      30
+    ],
+    "event_id": "fp-official-belagavi-20210726",
+    "homogeneous_groups": 3,
+    "independent_cells_checked": 40000,
+    "live_requests": 0,
+    "pair_status": "sentinel1_pair_available",
+    "reference_status": "official_map_reference_available",
+    "sar_valid_cells": 40000,
+    "scene_inventory_count": 30,
+    "source_and_pixel_reproducibility": true,
+    "thresholds_or_binary_labels": 0
+  },
+  "version": "belagavi_2021_sentinel1_anchor_v1"
+}
