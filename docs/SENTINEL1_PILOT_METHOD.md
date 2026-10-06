@@ -325,3 +325,52 @@ provides metadata, extract, freeze, validate; completed versions refuse overwrit
 validation is offline/read-only. No prior 2019 result or archived v1/v2 method is
 rewritten. Next: obtain legitimate inundation reference for this event and
 predeclare calibration/assessment and incidence treatment in a separate task.
+
+
+## Stage 3E5: incidence audit and official reference acceptance
+
+The Stage 3E4 source rasters and 40,000-cell continuous product stay immutable.
+Use `scripts/.venv/bin/python -B scripts/audit_belagavi_incidence.py validate`
+for offline read-only reproduction. New `discover`, `terrain` and `freeze` commands
+are bounded and refuse completed outputs; they do not authorize classification.
+
+The legacy 30–45° rule originated as a project heuristic, not a documented universal
+SAR validity criterion. Earth Engine's angle is approximate ellipsoid incidence;
+local incidence requires the terrain normal and radar line of sight. Official IW
+characteristics extend to 46°. A Google tutorial's 30–39° AOI is not a universal rule.
+Stage 3E5 classifies the exact legacy range as `legacy_angle_filter_unsubstantiated`.
+Archived values/results are unchanged, and no replacement absolute-angle filter is
+introduced. All three original angle distributions and the per-pixel baseline/event
+absolute differences are reported without absolute-range filtering. Source angle
+metadata's coarse nominal scale remains distinct from the 10 m analysis grid.
+
+Use original finite/masked VV/VH and angle cells separately, reporting intersection
+counts. Linear quantiles, means and float32 median differences have independent
+sorted-scalar/statistics.median/math.fsum checks. Ellipsoid geometry agreement is
+40,000/40,000 within the pre-existing ≤1° diagnostic, with mean difference 0.008451°.
+The 45.6° values support an explicitly inferred far-range interpretation; full source
+footprints and projected boundary distances are retained, with no invented edge
+threshold or automatic rejection. This does not determine local terrain incidence.
+
+Existing SRTM source is queried only for the exact 2 km tile. Native four-connected
+slope is computed before nearest sampling; it is contextual February 2000 DSM
+information, not local-incidence/layover/shadow correction. 160,000 band-cells,
+200,000 safety workload, 250,000 target and 300,000 ceiling; no bestEffort or limits
+raised. Original source masks/nodata stay explicit. No steepness cutoff, fraction
+or terrain mask introduced. Elevation 522–542 m and slope median 1.85°, P95 4.76°,
+P99 15.10°, maximum 20.57° retain localized terrain uncertainty.
+
+Public NRSC landing-page capability links only: WFS disabled, WCS/WMS incomplete
+bounded responses, WMTS HTTP 400 configuration mismatch. Stop after these attempts.
+A service advertisement, HTTP 200 response header, portal zoom rectangle or WMS
+rendered image is not independent flood-class data. Accept a WFS/WCS original
+subset only after official identity, July 2021 date, actual tile overlap, CRS/grid,
+class/nodata semantics, legitimate retrieval and internal-use conditions pass.
+Otherwise retain `machine_readable_reference_unavailable`; the georeferenced optical
+PDF maps remain `official_map_reference_available`, without tracing their floodwater.
+
+Final `ready_for_unlabelled_sar_method_research` is methodology readiness only.
+Machine-readable reference access is blocked; no threshold calibration, candidate
+polygons or evidence promotion. Obtain a permitted dated GIS subset for this exact
+anchor, then separately predeclare temporal/terrain/incidence treatment before any
+bounded calibration. Keep originals/local geometry/rasters outside Git.

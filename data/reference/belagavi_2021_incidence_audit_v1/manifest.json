@@ -1,0 +1,824 @@
+{
+  "calibration": "not_ready_without_independent_machine_readable_inundation; no absolute range assumption or threshold change",
+  "code_checksums": {
+    "scripts/audit_belagavi_incidence.py": {
+      "bytes": 30370,
+      "sha256": "1090ea6efe399f554ab4165eac5ae6b0ded690f4a23d4694527f9b7e939c4d7b"
+    },
+    "scripts/evaluate_belagavi_2021.py": {
+      "bytes": 43904,
+      "sha256": "726b96962b568de3435258c145f6d2356d21fd736c43e5fe88b8134ea15c24cc"
+    },
+    "scripts/verify_jrc_auxiliary.py": {
+      "bytes": 17964,
+      "sha256": "8b4fbdb19c1777b93e7a51adc24ea98711c308c054f6642401bed32d4f236a11"
+    },
+    "scripts/verify_sentinel1_pilot.py": {
+      "bytes": 34609,
+      "sha256": "a6736e479604afc37d235f8e74fead903ac138550110ac90ceb62753f157ed6f"
+    }
+  },
+  "created_at": "2026-10-06T17:43:11.959352+00:00",
+  "event_id": "fp-official-belagavi-20210726",
+  "incidence": {
+    "absolute_difference_degrees": {
+      "count": 40000,
+      "max": 0.0086822509765625,
+      "mean": 0.008451454448699951,
+      "median": 0.00850677490234375,
+      "min": 0.007884979248046875,
+      "percentiles": {
+        "1": 0.007968902587890625,
+        "25": 0.008304595947265625,
+        "5": 0.008068084716796875,
+        "50": 0.00850677490234375,
+        "75": 0.00862884521484375,
+        "95": 0.00867462158203125,
+        "99": 0.008678436279296875
+      }
+    },
+    "agreement_le_1_degree_cells": 40000,
+    "angle_geometry_status": "matching_acquisition_geometry_no_detected_inconsistency",
+    "angle_semantics": "Approximate incidence from ellipsoid, not local terrain incidence",
+    "baseline_angle_degrees": {
+      "count": 40000,
+      "max": 45.68736267089844,
+      "mean": 45.61602222366333,
+      "median": 45.61558532714844,
+      "min": 45.54734802246094,
+      "percentiles": {
+        "1": 45.55376804351807,
+        "25": 45.58595561981201,
+        "5": 45.56219081878662,
+        "50": 45.61558532714844,
+        "75": 45.64584827423096,
+        "95": 45.67109317779541,
+        "99": 45.68028266906738
+      }
+    },
+    "comparison_cells": 40000,
+    "event_angle_degrees": {
+      "count": 40000,
+      "max": 45.696041107177734,
+      "mean": 45.62447367811203,
+      "median": 45.62409210205078,
+      "min": 45.555233001708984,
+      "percentiles": {
+        "1": 45.561733169555666,
+        "25": 45.59425735473633,
+        "5": 45.57025909423828,
+        "50": 45.62409210205078,
+        "75": 45.6544771194458,
+        "95": 45.679767799377444,
+        "99": 45.68896110534668
+      }
+    },
+    "independent_scalar_cells_checked": 40000,
+    "legacy_30_45_range_cells": 0,
+    "legacy_filter_origin": "project_heuristic",
+    "legacy_filter_status": "legacy_angle_filter_unsubstantiated",
+    "local_incidence_computed": false,
+    "processing_thresholds_changed": false,
+    "scenes": [
+      {
+        "acquisition_utc": "2021-07-05T00:47:32+00:00",
+        "angle_degrees": {
+          "count": 40000,
+          "max": 45.68757629394531,
+          "mean": 45.61617351837158,
+          "median": 45.61574172973633,
+          "min": 45.547393798828125,
+          "percentiles": {
+            "1": 45.55382907867432,
+            "25": 45.586073875427246,
+            "5": 45.5622673034668,
+            "50": 45.61574172973633,
+            "75": 45.64603519439697,
+            "95": 45.67129917144776,
+            "99": 45.68049247741699
+          }
+        },
+        "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210705T004732_20210705T004757_038635_048F13_BF03",
+        "intersection_cells": 40000,
+        "minimum_tile_distance_to_footprint_edge_m": 2248.13934787977,
+        "pass": "DESCENDING",
+        "platform": "A",
+        "range_interpretation": "far_range_inferred_from_45plus_ellipsoid_angles_near_documented_IW_upper_range; precise_subswath_unverified",
+        "relative_orbit": 63,
+        "scene_edge_interpretation": "boundary_distance_only; no invented edge-rejection threshold",
+        "unmasked_angle_cells": 40000,
+        "valid_vv_vh_cells": 40000
+      },
+      {
+        "acquisition_utc": "2021-07-17T00:47:32+00:00",
+        "angle_degrees": {
+          "count": 40000,
+          "max": 45.68714904785156,
+          "mean": 45.61587093439102,
+          "median": 45.61542510986328,
+          "min": 45.547298431396484,
+          "percentiles": {
+            "1": 45.55370700836182,
+            "25": 45.58583736419678,
+            "5": 45.562114524841306,
+            "50": 45.61542510986328,
+            "75": 45.645660400390625,
+            "95": 45.67088718414307,
+            "99": 45.680069046020506
+          }
+        },
+        "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210717T004732_20210717T004757_038810_049451_0405",
+        "intersection_cells": 40000,
+        "minimum_tile_distance_to_footprint_edge_m": 2272.570069753066,
+        "pass": "DESCENDING",
+        "platform": "A",
+        "range_interpretation": "far_range_inferred_from_45plus_ellipsoid_angles_near_documented_IW_upper_range; precise_subswath_unverified",
+        "relative_orbit": 63,
+        "scene_edge_interpretation": "boundary_distance_only; no invented edge-rejection threshold",
+        "unmasked_angle_cells": 40000,
+        "valid_vv_vh_cells": 40000
+      },
+      {
+        "acquisition_utc": "2021-07-29T00:47:33+00:00",
+        "angle_degrees": {
+          "count": 40000,
+          "max": 45.696041107177734,
+          "mean": 45.62447367811203,
+          "median": 45.62409210205078,
+          "min": 45.555233001708984,
+          "percentiles": {
+            "1": 45.561733169555666,
+            "25": 45.59425735473633,
+            "5": 45.57025909423828,
+            "50": 45.62409210205078,
+            "75": 45.6544771194458,
+            "95": 45.679767799377444,
+            "99": 45.68896110534668
+          }
+        },
+        "id": "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210729T004733_20210729T004758_038985_049989_7AE1",
+        "intersection_cells": 40000,
+        "minimum_tile_distance_to_footprint_edge_m": 2116.9183918170315,
+        "pass": "DESCENDING",
+        "platform": "A",
+        "range_interpretation": "far_range_inferred_from_45plus_ellipsoid_angles_near_documented_IW_upper_range; precise_subswath_unverified",
+        "relative_orbit": 63,
+        "scene_edge_interpretation": "boundary_distance_only; no invented edge-rejection threshold",
+        "unmasked_angle_cells": 40000,
+        "valid_vv_vh_cells": 40000
+      }
+    ]
+  },
+  "local_outputs": {
+    "audit.json": {
+      "bytes": 30688,
+      "sha256": "b128ab5a99ac15293e4c395d372907e72be2e4d07251ad2b8e4a0c2349681779"
+    },
+    "manifest.json": {
+      "bytes": 9841,
+      "sha256": "3cd9490d59955c34fd0a2b57f0d1cb241740b428fdd5038fd29948620805f941"
+    }
+  },
+  "method": {
+    "agreement_degrees": 1,
+    "angle": "Approximate incidence from ellipsoid, not local terrain incidence",
+    "comparison": "Per-pixel float32 median of July5/17 angles vs July29; absolute difference, <=1degree diagnostic reproduced unchanged",
+    "flood_labels": null,
+    "legacy_range": [
+      30,
+      45
+    ],
+    "publication": "Source documents/capabilities/footprints/rasters local; code/tests/aggregate metadata/checksums only",
+    "requests": {
+      "capability_attempts": 2,
+      "capability_total_seconds": 180,
+      "max_raster_bytes": 1048576,
+      "max_source_bytes": 8388608,
+      "phase_seconds": 900,
+      "seconds": 60
+    },
+    "rule_origin": "project_heuristic",
+    "rule_status": "legacy_angle_filter_unsubstantiated",
+    "statistics": "Finite original angle masks/nodata; no absolute-angle filtering; NumPy linear quantiles independently checked by sorted scalar interpolation",
+    "steep_fraction": "omitted: no independently justified steepness threshold for radar artefacts",
+    "terrain": "Existing Stage3E SRTM asset, February2000 DSM; native ee.Terrain.slope four-connected gradient, nearest sampled to exact retained SAR tile; no local incidence/layover/shadow model",
+    "threshold_generation": false
+  },
+  "publication": "Source documents/capabilities/footprints/rasters local; code/tests/aggregate metadata/checksums only",
+  "readiness": "ready_for_unlabelled_sar_method_research",
+  "reference_access_status": "public_service_access_failed_or_no_accepted_reference",
+  "service_discovery": {
+    "advertised_services": {
+      "WCS": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wcs&version=1.0.0&request=GetCapabilities",
+      "WFS": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wfs&version=1.0.0&request=GetCapabilities",
+      "WMS": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wms&version=1.1.1&request=GetCapabilities",
+      "WMTS": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wmts?REQUEST=GetCapabilities"
+    },
+    "july_karnataka_products": [
+      {
+        "date_semantics": "Literal public product label; sensor/acquisition hour not independently verified",
+        "id": "ka_2021_25-27_07",
+        "portal_control_id": "layer229",
+        "service_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms",
+        "source": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+        "spatial_coverage": "not_verified; portal zoom extent is not flood footprint",
+        "title": "25-27/07/2021"
+      },
+      {
+        "date_semantics": "Literal public product label; sensor/acquisition hour not independently verified",
+        "id": "ka_2021_25_07",
+        "portal_control_id": "layer224",
+        "service_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms",
+        "source": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+        "spatial_coverage": "not_verified; portal zoom extent is not flood footprint",
+        "title": "25/07/2021"
+      },
+      {
+        "date_semantics": "Literal public product label; sensor/acquisition hour not independently verified",
+        "id": "ka_2021_28_07",
+        "portal_control_id": "layer231",
+        "service_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms",
+        "source": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+        "spatial_coverage": "not_verified; portal zoom extent is not flood footprint",
+        "title": "28/07/2021"
+      },
+      {
+        "date_semantics": "Literal public product label; sensor/acquisition hour not independently verified",
+        "id": "ka_2021_29_07",
+        "portal_control_id": "layer234",
+        "service_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms",
+        "source": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+        "spatial_coverage": "not_verified; portal zoom extent is not flood footprint",
+        "title": "29/07/2021"
+      },
+      {
+        "date_semantics": "Literal public product label; sensor/acquisition hour not independently verified",
+        "id": "ka_2021_29_07_18",
+        "portal_control_id": "layer236",
+        "service_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms",
+        "source": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+        "spatial_coverage": "not_verified; portal zoom extent is not flood footprint",
+        "title": "29/07/2021-18Hr"
+      }
+    ],
+    "known_pdf_reference": "official_map_reference_available",
+    "landing_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/web/",
+    "no_private_namespace_enumeration": true,
+    "no_rendered_color_digitization": true,
+    "portal_url": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+    "reference_status": "machine_readable_reference_unavailable",
+    "services": [
+      {
+        "access_status": "unavailable",
+        "matching_layers": [],
+        "retrieval": {
+          "access_status": "unavailable",
+          "attempts": [
+            {
+              "attempt": 1,
+              "elapsed_seconds": 20.020128176998696,
+              "error_type": "ReadTimeout",
+              "finished_at": "2026-10-06T17:38:13.153932+00:00",
+              "http_status": null,
+              "started_at": "2026-10-06T17:37:53.133798+00:00"
+            },
+            {
+              "attempt": 2,
+              "elapsed_seconds": 35.60993395699916,
+              "error_type": "ConnectionError",
+              "finished_at": "2026-10-06T17:38:50.764006+00:00",
+              "http_status": 200,
+              "started_at": "2026-10-06T17:38:15.154052+00:00"
+            }
+          ],
+          "error_type": "ConnectionError",
+          "headers": {},
+          "http_status": 200,
+          "original": {
+            "bytes": 263709,
+            "sha256": "5e5200a3028c9e36cdf2965a5aeac791c62196a9422dcdd10b683c7a46f14b2c"
+          },
+          "retrieved_at": "2026-10-06T17:38:50.764314+00:00",
+          "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wcs&version=1.0.0&request=GetCapabilities"
+        },
+        "service": "WCS",
+        "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wcs&version=1.0.0&request=GetCapabilities"
+      },
+      {
+        "access_status": "capabilities_invalid",
+        "matching_layers": [],
+        "parser_error": "Not requested service capabilities",
+        "retrieval": {
+          "access_status": "retrieved",
+          "attempts": [
+            {
+              "attempt": 1,
+              "elapsed_seconds": 2.6675229920001584,
+              "error_type": null,
+              "finished_at": "2026-10-06T17:38:53.433644+00:00",
+              "http_status": 200,
+              "started_at": "2026-10-06T17:38:50.766125+00:00"
+            }
+          ],
+          "error_type": null,
+          "headers": {
+            "Content-Type": "application/xml",
+            "Last-Modified": null,
+            "Location": null
+          },
+          "http_status": 200,
+          "original": {
+            "bytes": 559,
+            "sha256": "2bea6ece456d5510a3c64a1d63f0c0a20736b46b94ee9c9378add1384fe18873"
+          },
+          "retrieved_at": "2026-10-06T17:38:53.433811+00:00",
+          "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wfs&version=1.0.0&request=GetCapabilities"
+        },
+        "service": "WFS",
+        "service_exceptions": [
+          "org.geoserver.platform.ServiceException: Service WFS is disabled\nService WFS is disabled"
+        ],
+        "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wfs&version=1.0.0&request=GetCapabilities"
+      },
+      {
+        "access_status": "unavailable",
+        "matching_layers": [],
+        "retrieval": {
+          "access_status": "unavailable",
+          "attempts": [
+            {
+              "attempt": 1,
+              "elapsed_seconds": 21.748165662000247,
+              "error_type": "ConnectionError",
+              "finished_at": "2026-10-06T17:39:15.183044+00:00",
+              "http_status": 200,
+              "started_at": "2026-10-06T17:38:53.434876+00:00"
+            },
+            {
+              "attempt": 2,
+              "elapsed_seconds": 23.00071468600072,
+              "error_type": "ConnectionError",
+              "finished_at": "2026-10-06T17:39:40.183966+00:00",
+              "http_status": 200,
+              "started_at": "2026-10-06T17:39:17.183244+00:00"
+            }
+          ],
+          "error_type": "ConnectionError",
+          "headers": {},
+          "http_status": 200,
+          "original": {
+            "bytes": 238096,
+            "sha256": "a979cdafaa6934c082abca35233dfe796b0121bee2c8dffe00a7d7ab0dd0f911"
+          },
+          "retrieved_at": "2026-10-06T17:39:40.184252+00:00",
+          "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wms&version=1.1.1&request=GetCapabilities"
+        },
+        "service": "WMS",
+        "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/ows?service=wms&version=1.1.1&request=GetCapabilities"
+      },
+      {
+        "access_status": "unavailable",
+        "matching_layers": [],
+        "provider_error_summary": "GWC Error 400: Could not locate a layer or layer group with id LayerInfoImpl--5a58f9e6:18c24c13348:5ce7 within GeoServer configuration, the GWC configuration seems to be out of synch",
+        "retrieval": {
+          "access_status": "unavailable",
+          "attempts": [
+            {
+              "attempt": 1,
+              "elapsed_seconds": 2.870596293003473,
+              "error_type": null,
+              "finished_at": "2026-10-06T17:41:15.872825+00:00",
+              "http_status": 400,
+              "started_at": "2026-10-06T17:41:13.002229+00:00"
+            }
+          ],
+          "error_type": null,
+          "headers": {
+            "Content-Type": "text/html; charset=UTF-8",
+            "Last-Modified": null,
+            "Location": null
+          },
+          "http_status": 400,
+          "original": {
+            "bytes": 419,
+            "sha256": "a5413e1a030d9792b386a3b589093931fcc4a9de8db0b7acafe910d5560b582c"
+          },
+          "retrieved_at": "2026-10-06T17:41:15.872969+00:00",
+          "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wmts?REQUEST=GetCapabilities"
+        },
+        "service": "WMTS",
+        "url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wmts?REQUEST=GetCapabilities"
+      }
+    ],
+    "spatial_overlap": "Portal zoom bounds only; product coverage and original flood data not verified"
+  },
+  "source_checksums": {
+    "data/raw/reference/stage3e5_v1/flood_portal.html": {
+      "bytes": 1232844,
+      "sha256": "2dee69c1977552fb0d0a250dbaf52a9ff12cc85cd8b414c334979d4b63fb2046"
+    },
+    "data/raw/reference/stage3e5_v1/flood_portal.html.json": {
+      "bytes": 725,
+      "sha256": "db43d3a6511e642f7a016adb22493883cc81371356a35424c866e36c71daccde"
+    },
+    "data/raw/reference/stage3e5_v1/geoserver.html": {
+      "bytes": 9323,
+      "sha256": "a3304bb03ae8aa3cb19c3eeb2f1797bb7b275b414f82dbe2adbb999b1df11c4a"
+    },
+    "data/raw/reference/stage3e5_v1/geoserver.html.json": {
+      "bytes": 686,
+      "sha256": "451c00872e24c20e0bd3d74d657b7449c410e3ee7d5748c5106a05e717c8711d"
+    },
+    "data/raw/reference/stage3e5_v1/legacy_method.md.txt": {
+      "bytes": 7980,
+      "sha256": "2e760b53dbfa09d3aecf301bdcda0ef5105723999995e3d8c8a22914e0511abe"
+    },
+    "data/raw/reference/stage3e5_v1/legacy_provenance.json": {
+      "bytes": 833,
+      "sha256": "267d8f2c062d43677f3176bf099f8471721fb855d24821c69bc2138d91c223ff"
+    },
+    "data/raw/reference/stage3e5_v1/legacy_source.py.txt": {
+      "bytes": 33765,
+      "sha256": "90a286823d5084407667b779264d51dfe226bf12fbd8dbf19b8ea12a601fe052"
+    },
+    "data/raw/reference/stage3e5_v1/nrsc_terms.html": {
+      "bytes": 80896,
+      "sha256": "3d0453df9df5235636eb8c967cf641873a0646b86408de3a824d43ff5ef8f0a3"
+    },
+    "data/raw/reference/stage3e5_v1/nrsc_terms.html.json": {
+      "bytes": 696,
+      "sha256": "0c8e4fcca02d3ef61e000ce4cb7b08db50db6bd711833e7994d1a94d0484760e"
+    },
+    "data/raw/reference/stage3e5_v1/s1_catalogue.html": {
+      "bytes": 128956,
+      "sha256": "866fceefabcd81b0a4173f35d8ab12fde69da38082bfa714713999ec99746c83"
+    },
+    "data/raw/reference/stage3e5_v1/s1_catalogue.html.json": {
+      "bytes": 750,
+      "sha256": "95ffe9551d9cb88e5c06ce4771183cf7c16c1c67b975499903155d8a23b3dbac"
+    },
+    "data/raw/reference/stage3e5_v1/s1_mission.html": {
+      "bytes": 130939,
+      "sha256": "15c11f9499d867c5b13d9c31aaf52f2a76c1371c3dcdd27fa3fab6dd158c1108"
+    },
+    "data/raw/reference/stage3e5_v1/s1_mission.html.json": {
+      "bytes": 678,
+      "sha256": "753ba9c19bf0646328eb0be272c41ad4dffbb7137aeee7819993577bc48877e4"
+    },
+    "data/raw/reference/stage3e5_v1/sar_tutorial.html": {
+      "bytes": 129581,
+      "sha256": "8d46691394ae09dcac0b078e9e3f70c8fd2a773eba201c34afcf1a2d3d382e3e"
+    },
+    "data/raw/reference/stage3e5_v1/sar_tutorial.html.json": {
+      "bytes": 747,
+      "sha256": "f7b6d17eaaada78018d9da33a6aa8593d414a0ecfc4154bb31deb74483a7094e"
+    },
+    "data/raw/reference/stage3e5_v1/service_discovery.json": {
+      "bytes": 8430,
+      "sha256": "6321f944e5e7def7bbc96902b5c5b18000b0765d573889e193963da464f55d1b"
+    },
+    "data/raw/reference/stage3e5_v1/service_discovery_first_pass.json": {
+      "bytes": 7105,
+      "sha256": "1cee5702d915fc6bd2862cfe68b3c4076ac90f1a4404deece539ef0761a76bec"
+    },
+    "data/raw/reference/stage3e5_v1/slope_method.html": {
+      "bytes": 551754,
+      "sha256": "7253045ac55845ab7789a7ce99c36130357fcb9554361a56dfd18109e8f7ab02"
+    },
+    "data/raw/reference/stage3e5_v1/slope_method.html.json": {
+      "bytes": 741,
+      "sha256": "2800b49b96d83da9356212f75ac30bd8de9e032f96087719524187f333bb7d43"
+    },
+    "data/raw/reference/stage3e5_v1/srtm_catalogue.html": {
+      "bytes": 96938,
+      "sha256": "e851aafd4be2487366dd81c65cfd436b89749cf48136641dbfbb8fc8c42ab014"
+    },
+    "data/raw/reference/stage3e5_v1/srtm_catalogue.html.json": {
+      "bytes": 749,
+      "sha256": "19df6249cb9332e34b0d8e381eddd97d4062607cea169fd9f8a906fb85f42902"
+    },
+    "data/raw/reference/stage3e5_v1/wcs_capabilities.xml": {
+      "bytes": 263709,
+      "sha256": "5e5200a3028c9e36cdf2965a5aeac791c62196a9422dcdd10b683c7a46f14b2c"
+    },
+    "data/raw/reference/stage3e5_v1/wcs_capabilities.xml.json": {
+      "bytes": 918,
+      "sha256": "776194ec28c7134a696a4ac7e061bd4d17ee1aedc232bea3ea8d7fa64c9be485"
+    },
+    "data/raw/reference/stage3e5_v1/wfs_capabilities.xml": {
+      "bytes": 559,
+      "sha256": "2bea6ece456d5510a3c64a1d63f0c0a20736b46b94ee9c9378add1384fe18873"
+    },
+    "data/raw/reference/stage3e5_v1/wfs_capabilities.xml.json": {
+      "bytes": 726,
+      "sha256": "8db281b2a5020e5a91285a9dcd95478526b1325d341fdfd69052d3a4d236c065"
+    },
+    "data/raw/reference/stage3e5_v1/wms_capabilities.xml": {
+      "bytes": 238096,
+      "sha256": "a979cdafaa6934c082abca35233dfe796b0121bee2c8dffe00a7d7ab0dd0f911"
+    },
+    "data/raw/reference/stage3e5_v1/wms_capabilities.xml.json": {
+      "bytes": 921,
+      "sha256": "1f2427f02015114727c3eb7a954ced4829b56d00a41a273a46215de5204650c2"
+    },
+    "data/raw/reference/stage3e5_v1/wmts_capabilities.xml": {
+      "bytes": 419,
+      "sha256": "a5413e1a030d9792b386a3b589093931fcc4a9de8db0b7acafe910d5560b582c"
+    },
+    "data/raw/reference/stage3e5_v1/wmts_capabilities.xml.json": {
+      "bytes": 723,
+      "sha256": "7990dcc9f929529d0d9df8080d09f66fba8970e79a03c9471903e67009f1426e"
+    },
+    "data/raw/sentinel1/stage3e4_v1/diagnostic_preflight.json": {
+      "bytes": 4490,
+      "sha256": "d579d2714d65545f561e08add8db87fe75dd6a550654c2efdc543ec676a1e2c8"
+    },
+    "data/raw/sentinel1/stage3e4_v1/metadata.json": {
+      "bytes": 180527,
+      "sha256": "437ef0365d9195df5e1377b7f590ccec35709ef9fba78372854c7538780259f4"
+    },
+    "data/raw/sentinel1/stage3e4_v1/native_source_metadata.json": {
+      "bytes": 4264,
+      "sha256": "cb26764e4fde8c1b272f3fe20aedf66295b1a933510303c45d9fff51232deff2"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile0.json": {
+      "bytes": 851,
+      "sha256": "a0c9b9b6934f3f23a91b45bdb365b191924b2541ee4af06eb97f185f5026a0b9"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile0.tif": {
+      "bytes": 321269,
+      "sha256": "7dbd6c4738336a9e8f64226788c5022d8911f6d58b455461261fa089122cda18"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile1.json": {
+      "bytes": 851,
+      "sha256": "108a3d114166dbbf9ab1ca3313121fb3b0d5f1262b003ee079f1abb48810fa10"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile1.tif": {
+      "bytes": 321022,
+      "sha256": "3a2a2ac4349ccb2139a9dc599ed4b559bbf788fc826c0d671bb98d993766e789"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile2.json": {
+      "bytes": 851,
+      "sha256": "ff65626c7238a9021b50ad6e6544b79f6a0228b86d9d28f1714ab9342faea9f1"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile2.tif": {
+      "bytes": 322007,
+      "sha256": "75243aebc6f7e32ac4e5bec901e5bc59a29ee9974f21b63fd80b5956b33176b7"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile3.json": {
+      "bytes": 851,
+      "sha256": "4bdfa0b09c99e070b6751f3d69c108a3d84fb722a6f2d06fabb4c4c59e4bd8c0"
+    },
+    "data/raw/sentinel1/stage3e4_v1/tile3.tif": {
+      "bytes": 320500,
+      "sha256": "a25ae56b53e17196b84f388d7fa5f54e913defb204b6fad666edcae543c72a2e"
+    },
+    "data/raw/terrain/stage3e5_v1/requests.jsonl": {
+      "bytes": 931,
+      "sha256": "ea87cb0e75593f587d31f91c9bd0d84117c139e4922bbdc139fc173fa62fa12a"
+    },
+    "data/raw/terrain/stage3e5_v1/terrain.json": {
+      "bytes": 1510,
+      "sha256": "3b001fa8639de2fb3e78d15c3820907e0f1c5f18d402068b6534cb985a8864a1"
+    },
+    "data/raw/terrain/stage3e5_v1/terrain.tif": {
+      "bytes": 20972,
+      "sha256": "dc522ffc8c764d0cbf377107ea78b818a2c0eff74a0c3ab9acb86f544a409d41"
+    },
+    "data/raw/terrain/stage3e5_v1/timing.jsonl": {
+      "bytes": 3245,
+      "sha256": "4b89708049dc425a75f0a7dc403af835c157579135bec0f2a1a440fe781e1b0b"
+    },
+    "data/working/belagavi_2021_sentinel1_anchor_v1/manifest.json": {
+      "bytes": 10128,
+      "sha256": "e76f9efd089a66977609b4e0da66df5d0d80ee44a5c3bcf0b7c0e1503c535f7a"
+    }
+  },
+  "source_semantics": {
+    "angle_definition": "Approximate incidence from ellipsoid, not local terrain incidence",
+    "catalogue_nominal_angle_pixel_size_m": 20000,
+    "legacy_filter_status": "legacy_angle_filter_unsubstantiated",
+    "local_incidence": "Relative to terrain normal, not ellipsoid normal; not computed",
+    "official_IW_incidence_range_degrees": [
+      29.1,
+      46.0
+    ],
+    "official_urls": {
+      "flood_portal": "https://bhuvan-app1.nrsc.gov.in/disaster/usrtasks/flood/flood.php?uname=empty",
+      "geoserver": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/web/",
+      "nrsc_terms": "https://www.nrsc.gov.in/nrscnew/termsConditions.php",
+      "s1_catalogue": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_S1_GRD",
+      "s1_mission": "https://sentiwiki.copernicus.eu/web/s1-mission",
+      "sar_tutorial": "https://developers.google.com/earth-engine/tutorials/community/sar-basics",
+      "slope_method": "https://developers.google.com/earth-engine/apidocs/ee-terrain-slope",
+      "srtm_catalogue": "https://developers.google.com/earth-engine/datasets/catalog/USGS_SRTMGL1_003"
+    },
+    "retained_selected_source_projection_metadata": {
+      "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210705T004732_20210705T004757_038635_048F13_BF03": {
+        "VH": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476448.6461834511,
+              0,
+              -10,
+              1920158.8835365165
+            ],
+            "type": "Projection"
+          }
+        },
+        "VV": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476448.6461834511,
+              0,
+              -10,
+              1920158.8835365165
+            ],
+            "type": "Projection"
+          }
+        },
+        "angle": {
+          "nominal_scale_m": 16083.045599548215,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              -12419.916840971331,
+              -3637.0234462862136,
+              757274.5570924915,
+              2310.6138801358175,
+              -20149.94159012474,
+              1872208.8215323444
+            ],
+            "type": "Projection"
+          }
+        }
+      },
+      "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210717T004732_20210717T004757_038810_049451_0405": {
+        "VH": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476420.9010987412,
+              0,
+              -10,
+              1920151.4462874793
+            ],
+            "type": "Projection"
+          }
+        },
+        "VV": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476420.9010987412,
+              0,
+              -10,
+              1920151.4462874793
+            ],
+            "type": "Projection"
+          }
+        },
+        "angle": {
+          "nominal_scale_m": 16083.141002078968,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              -12420.022163198912,
+              -3637.2736995104933,
+              757237.6718135249,
+              2310.7452608067542,
+              -20149.932765087346,
+              1872200.7288751188
+            ],
+            "type": "Projection"
+          }
+        }
+      },
+      "COPERNICUS/S1_GRD/S1A_IW_GRDH_1SDV_20210729T004733_20210729T004758_038985_049989_7AE1": {
+        "VH": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476586.34302022954,
+              0,
+              -10,
+              1920158.7981310517
+            ],
+            "type": "Projection"
+          }
+        },
+        "VV": {
+          "nominal_scale_m": 10,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              10,
+              0,
+              476586.34302022954,
+              0,
+              -10,
+              1920158.7981310517
+            ],
+            "type": "Projection"
+          }
+        },
+        "angle": {
+          "nominal_scale_m": 16083.102529149646,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              -12419.94503504876,
+              -3637.1187724723713,
+              757401.9424251278,
+              2310.761754387757,
+              -20149.98225042969,
+              1872207.396170502
+            ],
+            "type": "Projection"
+          }
+        }
+      }
+    },
+    "rule_provenance": {
+      "basis": "Initial implementation and method explicitly call all numerical gates experimental; method says UN-SPIDER does not validate these thresholds. No exact authoritative 30-45 citation supplied.",
+      "code_path_at_commit": "scripts/verify_sentinel1_pilot.py",
+      "first_commit": "ecacf535a63cc32df100250de74491861885498f",
+      "git_search": "git log --reverse -S incidence_angle_degrees -- scripts/verify_sentinel1_pilot.py",
+      "method_path_at_commit": "docs/SENTINEL1_PILOT_METHOD.md",
+      "origin": "project_heuristic",
+      "source_files": {
+        "legacy_method.md.txt": {
+          "bytes": 7980,
+          "sha256": "2e760b53dbfa09d3aecf301bdcda0ef5105723999995e3d8c8a22914e0511abe"
+        },
+        "legacy_source.py.txt": {
+          "bytes": 33765,
+          "sha256": "90a286823d5084407667b779264d51dfe226bf12fbd8dbf19b8ea12a601fe052"
+        }
+      }
+    },
+    "scene_range_inference": "Far range inferred, not independently identified subswath; retained footprints quantify boundary proximity",
+    "tutorial_range": "30-39degrees explicitly for its AOI, not a universal validity criterion"
+  },
+  "terrain": {
+    "elevation_m": {
+      "count": 40000,
+      "max": 542.0,
+      "mean": 531.9978,
+      "median": 533.0,
+      "min": 522.0,
+      "percentiles": {
+        "1": 522.0,
+        "25": 531.0,
+        "5": 522.0,
+        "50": 533.0,
+        "75": 534.0,
+        "95": 536.0,
+        "99": 538.0
+      }
+    },
+    "layover_shadow_verified": false,
+    "limitations": "Coarse historical DSM slope is context only; vegetation/buildings/local steep banks and radar look orientation are not resolved; no terrain masking or guarantee of absent artefacts",
+    "local_incidence_computed": false,
+    "method": "Existing Stage3E SRTM asset, February2000 DSM; native ee.Terrain.slope four-connected gradient, nearest sampled to exact retained SAR tile; no local incidence/layover/shadow model",
+    "native_resolution_m": 30.922080775909325,
+    "slope_degrees": {
+      "count": 40000,
+      "max": 20.571659088134766,
+      "mean": 2.148843020872772,
+      "median": 1.8543341159820557,
+      "min": 0.0,
+      "percentiles": {
+        "1": 0.0,
+        "25": 0.9680353403091431,
+        "5": 0.0,
+        "50": 1.8543341159820557,
+        "75": 2.6794700622558594,
+        "95": 4.757452487945557,
+        "99": 15.101592063903809
+      }
+    },
+    "source": "USGS/SRTMGL1_003",
+    "steep_fraction": null,
+    "valid_elevation_cells": 40000,
+    "valid_slope_cells": 40000
+  },
+  "version": "belagavi_2021_incidence_audit_v1"
+}
