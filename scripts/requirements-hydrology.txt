@@ -1,0 +1,2 @@
+# Optional offline CWC PDF table reproduction; unit tests do not import this.
+pdfplumber==0.11.9
