@@ -1,0 +1,178 @@
+{
+  "attribution": {
+    "ifi": "Saharia/IIT Delhi HydroSense India Flood Inventory; CC BY-NC 4.0; association derived without source correction",
+    "official": "NRSC/ISRO; Government of India DoWR/CWC and MHA",
+    "sar": "Copernicus Sentinel-1/ESA, Earth Engine catalogue"
+  },
+  "created_at": "2026-10-06T14:41:09.777544+00:00",
+  "derived_contextual_union": {
+    "end_inclusive": "2019-08-14",
+    "start": "2019-08-06",
+    "type": "project_derived_union_not_original_station_value"
+  },
+  "event_id": "fp-official-belagavi-chikodi-20190809",
+  "evidence_limitations": "Official event/locality supported; no SAR pair or pixel-level spatial calibration reference, no calibration_reference_established status, no daily/binary labels or threshold analysis",
+  "ifi_association": {
+    "primary_anchor_changed": false,
+    "records": [
+      {
+        "association_basis": "Exact literal district token and interval overlap; multi-district/no-locality association, not spatial identity",
+        "association_status": "ambiguous",
+        "date_uncertainty": "Source duration conflicts with parsed dates; no month/day reinterpretation",
+        "derived_duration_from_retained_parser": 93,
+        "ifi_event_id": "UEI-IMD-FL-2019-0041",
+        "retained_parsed_end_inclusive": "2019-08-08",
+        "retained_parsed_start": "2019-05-08",
+        "source_district_token": "Belagavi, Chikkaballapura, Dakshina Kannada, Dharwad, Kodagu, Raichur, Shivamogga, Udupi, Uttar Kashia Kannada, Yadgir",
+        "source_duration_days": "4",
+        "source_end": "08-08-2019 00:00",
+        "source_lgd_token": "527, 630, 534, 536, 541, 546, 547, 549, None, 635",
+        "source_row_ordinal": 4458,
+        "source_start": "08-05-2019 00:00"
+      }
+    ],
+    "status": "ambiguous"
+  },
+  "local_geometry_metadata": {
+    "bytes": 14550,
+    "path": "data/working/belagavi_2019_sentinel1_calibration_v1/scene_inventory.json",
+    "sha256": "e9fcb2df7de470aa4ec60c29f32105890c985e308dc6b7ef101a4b69ac24db28"
+  },
+  "local_manifest": {
+    "bytes": 5909,
+    "path": "data/working/belagavi_2019_sentinel1_calibration_v1/manifest.json",
+    "sha256": "4857b2545d1d1ee08f62bb816e06b0598ac62187126b04575847d2eb8837df6e"
+  },
+  "local_outputs": {
+    "anchor.json": {
+      "bytes": 7614,
+      "sha256": "248c218da3b003336f24421ea75ff8b8f73a3113bd5527f3f8371921a6ddd4bc"
+    },
+    "event_evidence.json": {
+      "bytes": 564,
+      "sha256": "301d628adc425c2e3194c0e363aedc2823c54b79df3730723b45892625f0f78b"
+    },
+    "scene_inventory.json": {
+      "bytes": 14550,
+      "sha256": "e9fcb2df7de470aa4ec60c29f32105890c985e308dc6b7ef101a4b69ac24db28"
+    }
+  },
+  "method": {
+    "auxiliary": "JRC MonthlyHistory2019_08 and YearlyHistory2019; classes/masks separate; no-data not dry or invalid SAR",
+    "baseline": "median of up to four distinct UTC pre-August6 acquisitions in dB; July1-August5 only",
+    "change": "event minus median baseline dB; continuous VV/VH, never dB ratios",
+    "event": "closest to August9 within the Sadalga station August7-14 window; same platform/orbit/pass/IW/VV+VH/10m",
+    "grid": "2km square at official approximate CWC Sadalga station coordinate; EPSG:32643,10m,nearest",
+    "incidence": "preserve baseline/event/difference,30-45degree and<=1degree count diagnostics only, no threshold classification",
+    "permanent_water": "observed yearly class3 only; unknown preserved; seasonal2 retained",
+    "radiometric_terrain_flattening": false,
+    "sar_validity": "finite unmasked SAR VV/VH/angle at every selected scene; independent of JRC/DEM",
+    "scope_type": "retrieval_window_not_official_flood_boundary",
+    "spatial_reference": "published unreferenced NRSC map corroborates event/locality only; no pixel-level ground truth",
+    "speckle_filter": false,
+    "terrain": "SRTM~30m/circa2000 surface elevation and degrees slope; percent=100*tan(degrees); context only, no rejection",
+    "threshold_analysis": false
+  },
+  "mha_district_survey_date": "2019-08-11",
+  "official_hydrological_event_window": [
+    {
+      "district": "Belagavi",
+      "end_inclusive": "2019-08-14",
+      "river": "Dudhganga",
+      "start": "2019-08-07",
+      "station": "Sadalga",
+      "type": "official_hydrological_event_window"
+    },
+    {
+      "district": "Belagavi",
+      "end_inclusive": "2019-08-12",
+      "river": "Ghataprabha",
+      "start": "2019-08-06",
+      "station": "Gokak Falls",
+      "type": "official_hydrological_event_window"
+    }
+  ],
+  "primary_spatial_calibration_observation_date": "2019-08-09",
+  "public_bhuvan_layer": {
+    "access_result": "HTTP 400; no usable machine-readable inundation reference",
+    "capabilities_url": "https://bhuvan-gp1.nrsc.gov.in/bhuvan/gwc/service/wms?service=WMS&request=GetCapabilities&version=1.1.1",
+    "id": "ka_2019_09_08_18",
+    "original_date_label": "09/08/2019-18Hr"
+  },
+  "publication": "Local source documents/geometry/scene metadata; Git contains only references, checksums and aggregate provenance",
+  "query": {
+    "attempt_limit": 3,
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "collection": "COPERNICUS/S1_GRD",
+    "crs_checks": [
+      "EPSG:32643",
+      "EPSG:4326"
+    ],
+    "deadline_seconds": 60,
+    "end_exclusive": "2019-08-19",
+    "homogeneous_groups": 0,
+    "project": "floodpulse",
+    "scene_count": 0,
+    "start": "2019-07-01",
+    "total_phase_seconds": 900
+  },
+  "result": {
+    "calibration_status": "calibration_inconclusive",
+    "continuous_analysis_status": "not_performed_pair_unavailable",
+    "flood_label": null,
+    "pair_status": "sentinel1_pair_unavailable",
+    "reason": "Zero scenes in both UTM and geographic-window metadata queries; no homogeneous pair or raster processing. Official NRSC map supports event/locality but supplies no usable machine-readable inundation reference.",
+    "spatial_reference_status": "calibration_spatial_reference_insufficient",
+    "threshold_analysis_performed": false,
+    "threshold_sensitivity": []
+  },
+  "scope_description": "2km square around approximate CWC Sadalga station CW1KRU000083; 2025 station metadata; no administrative or inundation boundary",
+  "scope_type": "retrieval_window_not_official_flood_boundary",
+  "source_terms": "Original government products redistribution unresolved; retained locally. No imagery or source geometry published.",
+  "sources": {
+    "cwc_location": {
+      "bytes": 18510624,
+      "pdf_page": 96,
+      "retrieved_at": "2026-10-06T14:21:59.411779+00:00",
+      "sha256": "b44e4cf9a419d87730d9e79098f60cd70cc32fa042ad684d1333ffe583bc1c13",
+      "url": "https://cwc.gov.in/sites/default/files/ho-metadata-book-2025final-publishedsigned.pdf"
+    },
+    "cwc_windows": {
+      "bytes": 5674569,
+      "pdf_page": 57,
+      "retrieved_at": "2026-10-06T14:20:58.741909+00:00",
+      "sha256": "c1fb0e369bf5afebcdd1e4ba54456423dae82ffff88ec332163e18c080ec7895",
+      "url": "https://www.jalshakti-dowr.gov.in/static/uploads/2024/05/2023022089.pdf"
+    },
+    "mha": {
+      "bytes": 315676,
+      "pdf_page": 3,
+      "retrieved_at": "2026-10-06T14:21:00.168005+00:00",
+      "sha256": "c439ae748f0b9f5451e851ba6899c7557f6d966203b77b10ba47c38d113878f2",
+      "url": "https://ndmindia.mha.gov.in/ndmi/viewUploadedDocument?uid=NEW465"
+    },
+    "nrsc": {
+      "bytes": 6582757,
+      "pdf_page": 1,
+      "retrieved_at": "2026-10-06T14:21:53.757207+00:00",
+      "sha256": "3ff3f96f11c821c791474de16af100e0b8b38e3597a3ab37af3395c1dab505d3",
+      "url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/maps_dms/Mh_Ka_Flood2019_web.pdf"
+    }
+  },
+  "validation": {
+    "binary_labels": 0,
+    "calibration_status": "calibration_inconclusive",
+    "event_id": "fp-official-belagavi-chikodi-20190809",
+    "homogeneous_groups": 0,
+    "live_requests": 0,
+    "pair_status": "sentinel1_pair_unavailable",
+    "scenes": 0,
+    "source_and_metadata_reproducibility": true,
+    "spatial_reference_status": "calibration_spatial_reference_insufficient",
+    "threshold_analysis_performed": false
+  },
+  "version": "belagavi_2019_sentinel1_calibration_v1"
+}

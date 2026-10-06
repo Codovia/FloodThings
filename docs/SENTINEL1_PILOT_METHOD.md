@@ -222,3 +222,49 @@ backoff and 1 MiB raster cap. Local `validate` reproduces all counts read-only.
 Attribution: EC JRC/Google, Pekel et al. (2016), Copernicus; modified context on the
 SAR grid. Original IFI provenance/CC BY-NC 4.0 and public geometry attribution
 remain with v1/v2; no SOI or derived rainfall publication policy changed.
+
+
+## Stage 3E3: Belagavi–Chikodi/Sadalgi official event, calibration inconclusive
+
+The independently dated NRSC Radarsat-2 observation is **2019-08-09**.
+CWC Sadalga August 7–14 and Gokak Falls August 6–12 remain separate station
+records; August 6–14 is a derived union only. MHA August 11 district response
+corroboration and ambiguous IFI0041 stay separate evidence. The full source
+hierarchy and original document checksums are retained in the new local version
+and the existing source register.
+
+No publisher-hosted georeferenced inundation product was obtained: the published
+NRSC map is visual/event corroboration only, and public WMS capabilities returned
+HTTP 400. No PDF digitization or reference labels. Scope is a documented 2 km
+retrieval window near official CWC Sadalga station CW1KRU000083, not an official
+flood boundary. Approximate 2025 station coordinates are not historical flood
+measurements; the window can include adjacent Maharashtra.
+
+Two same-window Earth Engine metadata checks, UTM and geographic coordinates,
+returned **zero Sentinel-1 scenes** for July 1–August 18, 2019. No homogeneous group,
+usable pair or best temporal scene exists for this query. This is not a claim
+about every Belagavi location. Statuses are `sentinel1_pair_unavailable`,
+`calibration_spatial_reference_insufficient`, `calibration_inconclusive`.
+No imagery, continuous statistics or thresholds were computed live.
+
+The new separate adapter defines prospective median baseline VV/VH and dB change,
+incidence and terrain context. Its controlled fixture tests enforce same-orbit,
+pass/platform/IW/VV+VH pairing, multiple baselines, exact-date priority and the
+local station interval. Event scenes after August14 cannot substitute for an
+in-window observation. These functions were tested with isolated arrays only;
+no live continuous-processing result is claimed. Raster processing refuses to
+initialize a provider when the metadata has no pair.
+
+SAR validity stays independent of JRC. Monthly0/masked and yearly0/masked retain
+unknown/no-data; observed yearly class 3 alone supports permanent exclusion; yearly2
+seasonal water remains. The original27 settings are preserved without rerunning
+or choosing any threshold. Threshold analysis requires a separately reviewed
+machine-readable independent reference and separate calibration/assessment;
+no pixel truth or binary/daily labels are created here.
+
+`calibrate_belagavi_sentinel1.py freeze` refuses completed output/reference paths.
+`validate` reproduces anchor, scope, IFI association, empty grouping, source
+checksums and unavailable outcome offline. Original documents and local geometry
+are withheld; Git receives only code/tests/method/source metadata/checksums.
+Next: obtain a permitted georeferenced reference plus usable SAR imagery for this
+event, or separately authorize a better supported acquisition anchor.
