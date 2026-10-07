@@ -1129,3 +1129,120 @@ All existing and new dataset validators passed. All1628starting protected files 
 SHA-256/size/nanosecondmtime; annual11315/365/31 and original hash, GFD33/23/2/329,
 Stage3/Sentinel1 and original hydrology evidence preserved. No frontend edits.
 Current-LGD reconciliation, SOI/CWC reuse, datum, coordinate and revision caveats remain.
+
+
+## 2026-10-08 — Stage 5: prediction-time availability and methodology
+
+**Decision:** completed review, **ml_training_not_ready**; zero training features,
+training matrices, new labels, extracted observations or models. The original
+FR1–FR5 mixed district/locality Low/Medium/High, seven daily weather forecasts
+and six-hour updates does not define occurrence/impact/susceptibility, class
+boundaries or exact issue/valid intervals. Current application is a three-day
+Bengaluru weather dashboard plus historical/research maps. No primary horizon
+is selected: **prediction_horizon_not_yet_trainable**. Obsolete QandA completion,
+synthetic/proxy/locality-score assumptions are not evidence.
+
+**Sources:** 20 bounded unauthenticated original HTML responses from CHC/UCSB,
+Open-Meteo, Copernicus EWDS/ECMWF, Earth Engine primary product catalogues and
+OpenStreetMap, retained unchanged with HTTP receipts, exact URLs, titles,
+publishers, versions/sections, actual retrieval timestamps and SHA-256 hashes.
+One request per source, 30-second deadline, 8 MiB ceiling. Raw local research:
+`data/raw/reference/stage5_v1/` (42 files, 3,655,565 bytes). No live weather,
+Earth Engine, NWDP or GloFAS observation retrieval in this stage. Current
+product listings are catalogue verification, not acquired environmental data.
+
+**Rainfall availability:** [CHIRPS v2 FAQ](https://wiki.chc.ucsb.edu/CHIRPS2_FAQ)
+places Final release in the third week of the following month; preliminary
+release two days after a complete pentad is distinct. Stage3C/3D antecedent
+calendar windows remain leakage-safe by date but Final first availability
+was later than the event anchor: retrospective research, not an operational
+backtest. Native 0.05° mm/day cell-centre means remain unchanged. Event-window
+rainfall remains DESCRIPTIVE_ONLY_NOT_PREDICTION_FEATURE. The
+[producer](https://chc.ucsb.edu/data/chirps/) ends v2 production after December
+2026; no silent v3 substitution.
+
+[Open-Meteo historical weather](https://open-meteo.com/en/docs/historical-weather-api)
+ERA5/ERA5-Land reanalysis has a stated five-day delay; IFS analysis differs.
+No retained Open-Meteo historical extraction was found in this checkout.
+Live forecasts/current model estimates are not measured rainfall. The working
+adapter preserves valid/retrieval times but has null forecast issue time and
+no retained pinned-run snapshots. Stitched historical forecasts, fixed-lead
+previous runs and [single runs](https://open-meteo.com/en/docs/single-runs-api)
+are separate archives; single IFS begins 2024-03-14, other models 2026-04-02.
+No confirmed precipitation forecast archive covers the four 2005–2010 positive
+anchors. Initialization is not delivery. Data CC BY4.0 and free hosted service
+noncommercial/usage terms remain distinct; no operational SLA inferred.
+
+**Hydrology:** retained v5 consolidated ERA5 historical discharge is
+RETROSPECTIVE_ONLY. Monthly consolidated and daily ERA5T intermediate updates
+are not exact publication latency. [Forecast catalogue](https://ewds.climate.copernicus.eu/datasets/cems-glofas-forecast?tab=overview)
+lists v4 daily ensembles and a legacy 30-day series, with discharge archive
+from 2019-11-05, after the August2019 pilot. Current ECMWF forcing describes
+15-day medium-range/46-day subseasonal products; these are not one uniform
+EWDS archive/service. Retrospective reforecasts do not prove historical issue-time
+availability. Operational weather forcing, initialization, model/static version,
+ensemble, first-delivery and licence parity remain unvalidated.
+
+Official version disagreement retained explicitly: [historical catalogue](https://ewds.climate.copernicus.eu/datasets/cems-glofas-historical?tab=overview)
+retrieved 2026-10-08 calls v5 operational from 2026-07-15, while the
+[29 July API note](https://confluence.ecmwf.int/spaces/CEMS/pages/699325478/Changes+to+the+EWDS+API+Request+to+download+GloFAS+Historical)
+calls v5 pre-operational/v4 operational and the forecast catalogue lists v4.
+No source preference/version fallback; operational v5 forecast parity unresolved.
+Stage4F Gokak canonical-cell exclusion, coordinate conflicts, NWDP time/datum,
+calibration, revision and reuse caveats remain. Zero quantitative CWC/model pairs.
+
+**Static context:** only existing dated Udupi 3 km research layers (DSM elevation,
+Horn slope, 2021 WorldCover) are SAFE_NOW for current research display/context,
+not an approved supervised prediction set. DSM is surface/EGM2008, not underground
+drainage; 2024-edition/2010–2020 acquisitions and 2021 land cover cannot silently
+describe 2005–2009 conditions. SOI geometry/derived detailed tables stay local;
+current-LGD identity/reuse remain unresolved. Version-compatible model-network
+and public review-boundary context require validation. OSM zero returned mapped
+drains means unknown infrastructure. Full-history JRC contains post-event data.
+No river-distance, reservoir, verified locality-profile or drainage-capacity
+feature is manufactured.
+
+**Labels/leakage/parity:** four satellite-positive event scopes retain
+2728=33,3551=23,3652=2,2758=329 qualifying cells across three regions; event-window
+maxima are not daily occurrence/onset or Low/Medium/High labels. Observed-zero
+2698/3107 and unknown/unobserved/absent records remain unlabeled; no verified
+negatives. IFI and SAR/NRSC post-event evidence stay separate from inputs,
+without evidence promotion. At issuance T require documented availability<=T,
+elapsed interval end<=T, forecast initialization/delivery<=T and static vintage
+available<=T with explicit timezones. Future/event rain, full-window peaks,
+flood outcomes, ambiguous Gokak, unsafe datum/temporal comparisons and invented
+infrastructure are prohibited. No dynamic source has validated exact
+training/serving parity; matching JSON formats or a historical archive do not
+establish it. No restricted geometry/tables/source imagery published.
+
+**Outputs:** `scripts/review_prediction_availability.py`, isolated tests,
+`docs/PREDICTION_FEATURE_METHOD.md` and permitted
+`data/reference/karnataka_prediction_methodology_v1/manifest.json` (92,560 bytes).
+Local immutable review `data/working/karnataka_prediction_methodology_v1/`
+contains 16 JSON files/201,356 bytes; local manifest SHA-256
+ace383ceb53ae3a33f2f1848b4a7aee8fbbc0660dc335c7d8218c1220f85b16a.
+Canonical 37-row matrix: 3 SAFE_NOW context-only, 11 SAFE_AFTER_VALIDATION,
+12 RESEARCH_ONLY, 11 PROHIBITED; all allowed_for_training=false. Includes target,
+source, availability, leakage, parity, horizon, safe-set, readiness, uncertainty
+and source-disagreement records. Offline create-only builder refuses an existing
+version; read-only validator reproduces every output and verifies original input,
+code/source/output hashes. Public metadata contains own methodology/status/counts,
+source references and checksums; original documents and restricted products local.
+
+**Next stage:** Stage5A bounded operational-source and issuance-preserving archive
+validation plus an explicit outcome/geographic/horizon protocol. Develop independently
+time-resolved positive/comparison evidence in a compatible forecast archive period.
+No training matrix/model fitting until label, availability/parity, reuse and
+sample-size gates pass; include relevant cross-border upstream catchments.
+
+
+**Verification:**51 Stage5 focused tests,403 combined hydrology/availability,
+310 relevant rainfall/satellite/static methodology and1062 full backend tests
+passed. The focused data group timed out120s at the known sandbox TestClient
+stall; unchanged outside-sandbox rerun passed310. Full suite ran directly outside
+sandbox with controlled temporary fixtures and external network/database guards;
+one existing Starlette deprecation warning. Frontend14, normal configured browser4
+and production build passed, no fallback or frontend changes. All existing/new
+read-only dataset validators passed. Protected1667/1667 exact SHA-256/size/nanosecond
+mtime, annual11315/365/31 and original SHA unchanged, GFD33/23/2/329 and
+hydrology1697/81/14/33 preserved. QandA.md and independent log whitespace excluded.
