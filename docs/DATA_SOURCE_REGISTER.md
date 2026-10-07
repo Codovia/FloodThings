@@ -1060,3 +1060,72 @@ paraphrased method, references/checksums/aggregate provenance are published.
 Next obtain official Gokak gauge-to-reach evidence and NWDP exact daily field,
 timezone/aggregation clarification using the unsent local questions. Limited
 semantic closure does not authorize feature engineering or ML.
+
+
+## Stage 4F — bounded external hydrology evidence closure (7 October 2026)
+
+**Status: `external_hydrology_closure_complete_with_unresolved_items`.** Public
+research was closed after 24 targeted official-source searches and eight successful,
+single-attempt public document/metadata downloads. This is successful evidence-limit
+closure, not missing-data proof or automatic feature permission. No authenticated
+requests, new observation/model extraction, comparisons, metrics, features or labels.
+
+**Gokak:** CWC's [1 June 2012 network inventory](https://cwc.gov.in/sites/default/files/hydrological-network-details-of-cwc.pdf),
+PDF88/printed54, and [30 September 2020 station inventory](https://cwc.gov.in/sites/default/files/ho-book-2020compressed-edited-latest.pdf),
+PDF196/printed186, retain Ghataprabha/2,770km² station context but different published
+coordinates. Neither supplies a gauge/junction crosswalk or explicit relocation
+history. The [India-WRIS/CWC/NRSC Krishna Basin v2 report](https://indiawris.gov.in/downloads/Krishna%20Basin.pdf),
+Map20 PDF68/printed60 and AnnexureV:A PDF162/printed154, and the previously retained
+CWC basin map are overview-scale evidence, not a defensible 0.05° cell crosswalk.
+No map was georeferenced to create false precision. The already-known truncated
+Stage4A basin download remains unchanged; a separately named complete official copy
+was retrieved. West drains east, and east is a three-branch model junction as verified
+in Stage4E; this does not identify the physical gauge. Final
+**`gokak_reach_externally_unresolved`**, selected cell null,
+`station_grid_match_ambiguous`; `coordinate_conflict_unresolved` unchanged.
+
+**NWDP:** the exact Karnataka CWC daily-discharge resource, Preview, published
+catalogue API and generic API help were accessible. Original field labels and units
+are verified, but the exact field's **value statistic, observation timezone,
+Data Acquisition Time role, aggregation bounds and Year Book equivalence are each
+unresolved**. Overall `nwdp_temporal_semantics_externally_unresolved`.
+The [January2017 CWC handbook](https://cwc.gov.in/sites/default/files/final-hm-handbook-jan-2017.pdf),
+§4.6 PDF45/printed43, documents general0800 RD1 observation/eSWIS/yearbook processing;
+it does not define this exact CSV or its2019 record lineage. Portal IST display-clock
+code is not observation-timezone evidence. Stage4E's general procedural findings
+and independent GloFAS preceding24hUTC mean semantics remain unchanged. Quantitative
+aligned comparisons remain zero; all1697/81/14/33 hydrology counts/statuses preserved.
+
+**Sources/products:** raw original artifacts/receipts/review/query log remain local
+in `data/raw/reference/stage4f_v1/` (19files,43,882,537bytes); immutable new evidence
+`data/working/karnataka_external_hydrology_closure_v1/` (12files,43,143bytes).
+Local manifest SHA-256: d1f1262d2b0e8d85c2698fa5a668c05bc67641ac22f84e6f6645866f8db7ea21. Permitted source URLs,
+titles/publishers/versions/sections/retrieval times/checksums, aggregate decisions
+and12-row Stage5 usage matrix: `data/reference/karnataka_external_hydrology_closure_v1/manifest.json`.
+Method and unsent clarification template: `docs/EXTERNAL_HYDROLOGY_CLOSURE_METHOD.md`.
+CWC source-document redistribution (including office-use-only2020 metadata), detailed
+coordinates, source observations and SOI-derived products remain withheld locally.
+No messages were sent. Source hashes include basin7dff1a5c5b8661adfaffaa3eb3c87dc20b85596d313f440f41fc6134f013a4b3,
+2012networkc064b5fa4828ebda0f3d712a971a0eb3703009746b19b2f2194ba3c5c261cb51,
+2020inventory55864c228729f55b6e466b36ea81a2494968e8204bad949865be60b672eb3f4f,
+2017handbook0ab47bb635a1296ccc18e5dc3597db0b7384bf4b9d09747d1be9e6fab5b421ce;
+all source/input/output checksums recorded, no raw binaries published.
+
+**Stage5:** may design supported Sadalga/Huvinhedgi modelled context and prior-date
+rainfall/independently verified static context, retaining spatial/time/version/reuse
+and historical availability caveats. Must exclude canonical Gokak, quantitative
+CWC/GloFAS metrics/calibration/alignment, unresolved-datum thresholds, automatic
+water-level-change features without review, assumed immediate publication,
+modelled substitution for measured gaps and missing-to-negative labels. Precise
+unsent requests ask CWC for dated gauge/site/junction history and CWC/NWIC for the
+exact discharge statistic/timezone/acquisition role/aggregation bounds/YearBook link.
+Further closure requires a new authoritative response/document, not indefinite searching.
+
+**Verification:**52new tests,352combined hydrology,1011full backend passed; frontend14,
+normal unchanged browser4 and production build passed. Initial sandbox backend run
+stalled at an existing TestClient test and was interrupted; the unchanged single test
+and full suite pass outside the sandbox with isolated/network-denied fixtures.
+All existing and new dataset validators passed. All1628starting protected files retain
+SHA-256/size/nanosecondmtime; annual11315/365/31 and original hash, GFD33/23/2/329,
+Stage3/Sentinel1 and original hydrology evidence preserved. No frontend edits.
+Current-LGD reconciliation, SOI/CWC reuse, datum, coordinate and revision caveats remain.

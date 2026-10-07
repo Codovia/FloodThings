@@ -1,0 +1,427 @@
+{
+  "created_at": "2026-10-07T17:59:09.337338+00:00",
+  "files": {
+    "clarification_request_package.json": {
+      "bytes": 2565,
+      "sha256": "fea963fbe8ff4525a014c835c8d3f520d60fced469e4f93a3dd50864fd56b47e"
+    },
+    "external_source_register.json": {
+      "bytes": 8079,
+      "sha256": "74aa66c8ac17129a614a8cf317f276a8778c98a58b077842123cedcdd147947e"
+    },
+    "gokak_external_evidence.json": {
+      "bytes": 9024,
+      "sha256": "d86b7d8cd19dd44e8ad04f82c4d7d8168884dfac12003f9688f9134e4a13be4c"
+    },
+    "gokak_reach_decision.json": {
+      "bytes": 277,
+      "sha256": "fef4956ac39578b10407067dbd72ff98c436874eab1df5d9cac0db8761fb2cd4"
+    },
+    "methodology_limitations.json": {
+      "bytes": 4205,
+      "sha256": "1248d34e5e774f077aecdca15ba299f70137205decd67626acbece186b29e1ad"
+    },
+    "nwdp_semantics_decision.json": {
+      "bytes": 1152,
+      "sha256": "3c14bae53c44948a2edbac70cd64e127904071b5e9b8eae884544372c13e2868"
+    },
+    "nwdp_temporal_source_register.json": {
+      "bytes": 976,
+      "sha256": "28a3e3206d932b12f4696e6452c71245db448a34ce2039c0141842313590cc3e"
+    },
+    "stage5_hydrology_usage_matrix.json": {
+      "bytes": 2880,
+      "sha256": "8357bd450e281db3a1ed980295a1c247a7bb4a9e230b62402f018a8d0b71c2f8"
+    },
+    "static_sources.json": {
+      "bytes": 2764,
+      "sha256": "dfa1f51aa68dacd85def2a2125839bd40bd7d606804154db3f25385ad76b9a97"
+    },
+    "summary.json": {
+      "bytes": 909,
+      "sha256": "ea79ceaedf07e711cb601e1bd085ebce05d81f716ffef445c9153943407dd842"
+    },
+    "unresolved_external_questions.json": {
+      "bytes": 1229,
+      "sha256": "73a7ecc6822709a3f26fe3f344934930fc919691b967df8e5ee5dff0fae72e4d"
+    }
+  },
+  "inputs": [
+    {
+      "bytes": 903011,
+      "path": "data/raw/reference/stage4a_v1/cwc_krishna_map.pdf",
+      "sha256": "02435fe8965a226458e835e0dec55b77768de376e76ce478e91bf97ab01322c7"
+    },
+    {
+      "bytes": 609,
+      "path": "data/raw/reference/stage4a_v1/cwc_krishna_map.pdf.json",
+      "sha256": "f58e40bf656c6b59bba64782f0f919f8680636c8f8ec1c30c7f19562b241d0e8"
+    },
+    {
+      "bytes": 3714040,
+      "path": "data/raw/reference/stage4f_v1/cwc_handbook2017.pdf",
+      "sha256": "0ab47bb635a1296ccc18e5dc3597db0b7384bf4b9d09747d1be9e6fab5b421ce"
+    },
+    {
+      "bytes": 625,
+      "path": "data/raw/reference/stage4f_v1/cwc_handbook2017.pdf.json",
+      "sha256": "5e215c20d9897cd704d0b1a958e94bfa02bf1864767bb89e822ec549b946364f"
+    },
+    {
+      "bytes": 16526368,
+      "path": "data/raw/reference/stage4f_v1/cwc_ho2020.pdf",
+      "sha256": "55864c228729f55b6e466b36ea81a2494968e8204bad949865be60b672eb3f4f"
+    },
+    {
+      "bytes": 646,
+      "path": "data/raw/reference/stage4f_v1/cwc_ho2020.pdf.json",
+      "sha256": "b4ec7ceec55449edd875f21d53fbe0d3701620d00c62cf872d947e523fafb763"
+    },
+    {
+      "bytes": 4390533,
+      "path": "data/raw/reference/stage4f_v1/cwc_network_details.pdf",
+      "sha256": "c064b5fa4828ebda0f3d712a971a0eb3703009746b19b2f2194ba3c5c261cb51"
+    },
+    {
+      "bytes": 643,
+      "path": "data/raw/reference/stage4f_v1/cwc_network_details.pdf.json",
+      "sha256": "164ead6cf096d6c0f5e336de65d64437cf162c0fe972751ad4871431e21d2c5d"
+    },
+    {
+      "bytes": 18977474,
+      "path": "data/raw/reference/stage4f_v1/krishna_basin_complete.pdf",
+      "sha256": "7dff1a5c5b8661adfaffaa3eb3c87dc20b85596d313f440f41fc6134f013a4b3"
+    },
+    {
+      "bytes": 596,
+      "path": "data/raw/reference/stage4f_v1/krishna_basin_complete.pdf.json",
+      "sha256": "5b13b2e09910e751a2483f0cc1fa044fd0ec3740c74aacca41305f2b211fa5ba"
+    },
+    {
+      "bytes": 50158,
+      "path": "data/raw/reference/stage4f_v1/nwdp_api_help.html",
+      "sha256": "79b5495aa143840d2c3cc2f5d83e6b1105c85e69a3640040debb44acf0490645"
+    },
+    {
+      "bytes": 599,
+      "path": "data/raw/reference/stage4f_v1/nwdp_api_help.html.json",
+      "sha256": "d894bee51c3d26ae776a5b37caa5391149aff6365cac1eab54c51f8d6b55314f"
+    },
+    {
+      "bytes": 84267,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_catalogue.json",
+      "sha256": "b0f89d716a25da8b667f79aae881d97081b32dd5671db11b4ad597cf20326e26"
+    },
+    {
+      "bytes": 705,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_catalogue.json.json",
+      "sha256": "b1902861916912c050e9f69df7ed0683899c57ac88caccd6932632d7c510a182"
+    },
+    {
+      "bytes": 33615,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_preview.html",
+      "sha256": "aa181bb82df60beda7a99935200e9f1fcc25d631eb7d43f9dff437899ffd3eb0"
+    },
+    {
+      "bytes": 851,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_preview.html.json",
+      "sha256": "d0bd78a932844c5f0ff83e720724a01dfa28e4dd60f03cacd27825e775b8ecac"
+    },
+    {
+      "bytes": 91018,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_resource.html",
+      "sha256": "b2d93ecd1bf2464b50bfff933c2532c1422e0bd88a29f486ada03aade76b1d29"
+    },
+    {
+      "bytes": 767,
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_resource.html.json",
+      "sha256": "f948b3c45d00e47745c5a264dd5a05adb2dd32ea5c5a0205e3822c9d752dde7f"
+    },
+    {
+      "bytes": 3284,
+      "path": "data/raw/reference/stage4f_v1/research_log.json",
+      "sha256": "a99c42d274965d96d2bc8de330528aa336ab80260abaee129d9fea5939271ba9"
+    },
+    {
+      "bytes": 657,
+      "path": "data/raw/reference/stage4f_v1/research_plan.json",
+      "sha256": "30c9b4b2857b53538d226ee56bc1d9aad0482e18ebb77be0b85c572503fc3271"
+    },
+    {
+      "bytes": 5691,
+      "path": "data/raw/reference/stage4f_v1/review_findings.json",
+      "sha256": "67ccacfd6ffa6bff33c130c5c1d45ac38bbb07941a70347007b22da9618dec76"
+    },
+    {
+      "bytes": 21131,
+      "path": "data/working/karnataka_hydrology_closure_v1/gokak_reach_evidence.json",
+      "sha256": "1698b9383d9073bffed9083262c51cac715c3a9c0de88a643d8a5f3bdfef549a"
+    },
+    {
+      "bytes": 794,
+      "path": "data/working/karnataka_hydrology_closure_v1/limitations.json",
+      "sha256": "fb999202de94264eb9022fd707c1543d5be54af8b3d61f5521fac23e2a2ff3d1"
+    },
+    {
+      "bytes": 21338,
+      "path": "data/working/karnataka_hydrology_closure_v1/local_page_notes.json",
+      "sha256": "6b44af2ee9947dfd5f2affb14de39991c36a12eef3e9d51fcfd8d0cdf5df3d9a"
+    },
+    {
+      "bytes": 7031,
+      "path": "data/working/karnataka_hydrology_closure_v1/manifest.json",
+      "sha256": "06490398e99b3cfb432e9c483938958059735d6f24fd6362be7fe8ade23e8680"
+    },
+    {
+      "bytes": 3131,
+      "path": "data/working/karnataka_hydrology_closure_v1/source_documents.json",
+      "sha256": "5f93ff9f1a5f01f28065cf6b6a95b7ffc822c54331b016f6ffff2a133c326d0d"
+    },
+    {
+      "bytes": 2764,
+      "path": "data/working/karnataka_hydrology_closure_v1/static_sources.json",
+      "sha256": "dfa1f51aa68dacd85def2a2125839bd40bd7d606804154db3f25385ad76b9a97"
+    },
+    {
+      "bytes": 693,
+      "path": "data/working/karnataka_hydrology_closure_v1/summary.json",
+      "sha256": "71f50dca17d83b8a80b272eda013783b995635324b380e1da687ef29e9748f3b"
+    },
+    {
+      "bytes": 28294,
+      "path": "data/working/karnataka_hydrology_closure_v1/temporal_evidence.json",
+      "sha256": "7b1faf7cf60b6cdc5f27079a2d6efe566121dc1056e6f6672424239a554a22ae"
+    },
+    {
+      "bytes": 906,
+      "path": "data/working/karnataka_hydrology_closure_v1/unresolved_questions.json",
+      "sha256": "1f42133c8e9ecd3b8c72ae63b4cc774c590caf9f8b39674d287c60153291ce5c"
+    },
+    {
+      "bytes": 8336,
+      "path": "data/working/karnataka_hydrology_semantics_v1/clarification_package.json",
+      "sha256": "67b78983ce174f53efcda34b5d97fd60b8456b1b880436c9e242636825737fb5"
+    },
+    {
+      "bytes": 27512,
+      "path": "scripts/close_hydrology_semantics.py",
+      "sha256": "dbc21e7bb07b8e89459f95960838f7c6ec68a8b165e525598825cc5dbc21336c"
+    }
+  ],
+  "local_manifest_sha256": "d1f1262d2b0e8d85c2698fa5a668c05bc67641ac22f84e6f6645866f8db7ea21",
+  "processing_code": {
+    "bytes": 20103,
+    "path": "scripts/close_external_hydrology.py",
+    "sha256": "50c075161b78cf1dbd7458d03ddb14178b2b11a26c4fb97fac5962d7318e5320"
+  },
+  "publication": "Own code, source references/checksums and aggregate statuses only; detailed evidence and source binaries local",
+  "sources": [
+    {
+      "bytes": 18977474,
+      "classification": "documentary_broad_spatial_context",
+      "path": "data/raw/reference/stage4f_v1/krishna_basin_complete.pdf",
+      "publisher": "CWC and NRSC/ISRO, India-WRIS",
+      "retrieved_at": "2026-10-07T17:41:06.284315+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "PDF20 river description; PDF66/printed58 section5.1; PDF68/printed60 Map20; PDF162/printed154 AnnexureV:A",
+      "sha256": "7dff1a5c5b8661adfaffaa3eb3c87dc20b85596d313f440f41fc6134f013a4b3",
+      "title": "Krishna Basin, Version 2.0",
+      "url": "https://indiawris.gov.in/downloads/Krishna%20Basin.pdf",
+      "version": "Version2.0; publication date not stated in inspected cover"
+    },
+    {
+      "bytes": 16526368,
+      "classification": "authoritative_station_metadata_not_reach_anchor",
+      "path": "data/raw/reference/stage4f_v1/cwc_ho2020.pdf",
+      "publisher": "CWC",
+      "retrieved_at": "2026-10-07T17:41:16.024645+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "PDF196/printed186 Karnataka Krishna Gokak row; introductory reference date",
+      "sha256": "55864c228729f55b6e466b36ea81a2494968e8204bad949865be60b672eb3f4f",
+      "title": "Hydrological Observation Stations under Central Water Commission",
+      "url": "https://cwc.gov.in/sites/default/files/ho-book-2020compressed-edited-latest.pdf",
+      "version": "Administrative reference30September2020"
+    },
+    {
+      "bytes": 4390533,
+      "classification": "historical_station_context_not_canonical_crosswalk",
+      "path": "data/raw/reference/stage4f_v1/cwc_network_details.pdf",
+      "publisher": "CWC",
+      "retrieved_at": "2026-10-07T17:43:12.703748+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "PDF88/printed54 Karnataka Krishna Gokak row",
+      "sha256": "c064b5fa4828ebda0f3d712a971a0eb3703009746b19b2f2194ba3c5c261cb51",
+      "title": "Details of Hydrological Observation Stations",
+      "url": "https://cwc.gov.in/sites/default/files/hydrological-network-details-of-cwc.pdf",
+      "version": "As on1June2012"
+    },
+    {
+      "bytes": 3714040,
+      "classification": "authoritative_general_procedure_not_exact_csv_dictionary",
+      "path": "data/raw/reference/stage4f_v1/cwc_handbook2017.pdf",
+      "publisher": "CWC",
+      "retrieved_at": "2026-10-07T17:43:06.059297+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "PDF45/printed43 section4.6; cover",
+      "sha256": "0ab47bb635a1296ccc18e5dc3597db0b7384bf4b9d09747d1be9e6fab5b421ce",
+      "title": "Handbook for Hydrometeorological Observations",
+      "url": "https://cwc.gov.in/sites/default/files/final-hm-handbook-jan-2017.pdf",
+      "version": "January2017"
+    },
+    {
+      "bytes": 91018,
+      "classification": "exact_resource_metadata_semantics_insufficient",
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_resource.html",
+      "publisher": "NWIC/NWDP;producerCWC",
+      "retrieved_at": "2026-10-07T17:41:20.642687+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "Exact resource description/download metadata",
+      "sha256": "b2d93ecd1bf2464b50bfff933c2532c1422e0bd88a29f486ada03aade76b1d29",
+      "title": "River Discharge CWC Karnataka (2001 - 2025) Manual Daily",
+      "url": "https://nwdp.nwic.gov.in/dataset/river-discharge-manual-dailly-central-water-commission-cwc/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+      "version": "Resource data last_modified2026-01-24T23:36:31.332749;metadata_modified2026-01-25T03:26:18.320179"
+    },
+    {
+      "bytes": 33615,
+      "classification": "exact_field_names_not_definitions",
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_preview.html",
+      "publisher": "NWIC/NWDP;producerCWC",
+      "retrieved_at": "2026-10-07T17:41:22.407630+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "gdataDict field schema and preview labels",
+      "sha256": "aa181bb82df60beda7a99935200e9f1fcc25d631eb7d43f9dff437899ffd3eb0",
+      "title": "NWDP exact CWC Karnataka discharge CSV Preview",
+      "url": "https://nwdp.nwic.gov.in/dataset/river-discharge-manual-dailly-central-water-commission-cwc/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3/view/07571d52-694c-4582-a1ac-ef4329ed6243",
+      "version": "Preview retrieved2026-10-07"
+    },
+    {
+      "bytes": 84267,
+      "classification": "catalogue_verified_dictionary_not_supplied",
+      "path": "data/raw/reference/stage4f_v1/nwdp_discharge_catalogue.json",
+      "publisher": "NWIC/NWDP;producerCWC",
+      "retrieved_at": "2026-10-07T17:41:25.765802+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "result.results[0];target resourcef95150ea-c8fc-4740-8815-d9c34c9d53a3",
+      "sha256": "b0f89d716a25da8b667f79aae881d97081b32dd5671db11b4ad597cf20326e26",
+      "title": "NWDP published catalogue API package_search",
+      "url": "https://www.nwdp.nwic.gov.in/api/3/action/package_search?q=id:08fa3fd0-7861-471d-a295-27c1b239d1fa&rows=1",
+      "version": "Dataset/resource metadata retrieved2026-10-07"
+    },
+    {
+      "bytes": 50158,
+      "classification": "generic_api_help_not_exact_semantics",
+      "path": "data/raw/reference/stage4f_v1/nwdp_api_help.html",
+      "publisher": "NWIC/NWDP",
+      "retrieved_at": "2026-10-07T17:41:26.428402+00:00",
+      "reuse": "source binary/field detail local; redistribution unresolved",
+      "section": "Public API help visible description",
+      "sha256": "79b5495aa143840d2c3cc2f5d83e6b1105c85e69a3640040debb44acf0490645",
+      "title": "NWDP Data dissemination API help",
+      "url": "https://nwdp.nwic.gov.in/en/dataset_api/home_api_page",
+      "version": "Retrieved2026-10-07;document version not stated"
+    }
+  ],
+  "stage5_usage": [
+    {
+      "conditions": "Supported Stage4D cell only; native24hUTC interval; model version/calibration uncertainty; prediction-time availability must be assessed in Stage5",
+      "permission": "allowed_with_conditions",
+      "source_type": "modelled_glofas",
+      "use": "sadalga_modelled_discharge"
+    },
+    {
+      "conditions": "Supported Stage4D cell with coordinate caveat; preserve model identity, grid/time and calibration uncertainty; no claim of measured truth",
+      "permission": "allowed_with_conditions",
+      "source_type": "modelled_glofas",
+      "use": "huvinhedgi_modelled_discharge"
+    },
+    {
+      "conditions": "Only dates strictly before anchor; native grid/masks; geography vintage and historical availability explicit",
+      "permission": "allowed_with_conditions",
+      "source_type": "CHIRPS",
+      "use": "rainfall_antecedent"
+    },
+    {
+      "conditions": "Source-specific coverage, date, projected metric methods, licence and geometry uncertainty retained",
+      "permission": "allowed_with_conditions",
+      "source_type": "independently_verified_static",
+      "use": "validated_spatial_static_context"
+    },
+    {
+      "conditions": "Ambiguous gauge-to-model-junction identity; preserve both candidates locally",
+      "permission": "not_allowed",
+      "source_type": "modelled_glofas",
+      "use": "gokak_canonical_discharge"
+    },
+    {
+      "conditions": "Exact NWDP statistic/timezone/timestamp/bounds unverified",
+      "permission": "not_allowed",
+      "source_type": "measured_cwc_nwdp + modelled_glofas",
+      "use": "time_aligned_measured_modelled_pairs"
+    },
+    {
+      "conditions": "Unknown alignment, limited quality-caveated sample, calibration relationship unresolved",
+      "permission": "not_allowed",
+      "source_type": "measured_cwc_nwdp + modelled_glofas",
+      "use": "model_skill_metrics_or_calibration_claims"
+    },
+    {
+      "conditions": "Absolute datum compatibility unresolved",
+      "permission": "not_allowed",
+      "source_type": "measured_cwc_nwdp",
+      "use": "water_level_threshold_features"
+    },
+    {
+      "conditions": "Requires separate interval/quality/identity/availability method review; not approved automatically",
+      "permission": "not_allowed",
+      "source_type": "measured_cwc_nwdp",
+      "use": "within_station_water_level_change"
+    },
+    {
+      "conditions": "Missing observations are unknown, never verified negatives",
+      "permission": "not_allowed",
+      "source_type": "any",
+      "use": "missing_observation_as_flood_negative"
+    },
+    {
+      "conditions": "Independent source class; never fill measured gaps",
+      "permission": "not_allowed",
+      "source_type": "modelled_glofas",
+      "use": "modelled_replacement_of_measured_values"
+    },
+    {
+      "conditions": "Observation time is not publication availability; latency unverified",
+      "permission": "not_allowed",
+      "source_type": "any",
+      "use": "instant_historical_prediction_availability"
+    }
+  ],
+  "summary": {
+    "authenticated_requests": 0,
+    "features_created": 0,
+    "gokak_status": "gokak_reach_externally_unresolved",
+    "labels_created": 0,
+    "messages_sent": 0,
+    "new_retained_sources": 8,
+    "nwdp_attributes": {
+      "aggregation_window": "unresolved",
+      "timestamp_meaning": "unresolved",
+      "timezone": "unresolved",
+      "value_semantics": "unresolved",
+      "yearbook_equivalence": "unresolved"
+    },
+    "nwdp_status": "nwdp_temporal_semantics_externally_unresolved",
+    "performance_metrics": 0,
+    "preserved_comparison_cases": 81,
+    "preserved_disagreements": 33,
+    "preserved_eligible_rows": 14,
+    "preserved_measured_rows": 1697,
+    "public_search_closed": true,
+    "quantitative_comparisons": 0,
+    "search_queries": 24,
+    "selected_gokak_cell": null,
+    "stage": "4F",
+    "station_coordinate_status": "coordinate_conflict_unresolved",
+    "status": "external_hydrology_closure_complete_with_unresolved_items"
+  },
+  "version": "karnataka_external_hydrology_closure_v1"
+}
