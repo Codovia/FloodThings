@@ -993,3 +993,70 @@ Verification:25new tests;216combined checkpoint/4A/4B/4C/4C2 tests;875full backe
 **Product/reuse:** the live EWDS download schema groups v5 as pre-operational and v4 as operational, while overview text calls v5 operational. That discrepancy is retained; this pilot is testing/evaluation, not a production-warning product. Static maps carry CC BY 4.0; historical output has separate CEMS-FLOODS terms. No account-acceptance assertion or change to conservative CWC/SOI handling. Original binaries and detailed station/model/CWC-derived tables remain local; only code/tests/methodology/source references/checksums/aggregate provenance are published. Current-LGD reconciliation and SOI/CWC publication issues remain unresolved.
 
 **Verification:** 30 new Stage 4D tests; 246 combined checkpoint/hydrology tests; 905 full backend tests passed (one existing Starlette deprecation warning). Normal frontend suite 14 passed, browser regressions 4 passed, production build passed; no frontend modifications or fallback test edits. All prior dataset validators and new full read-only Stage 4D reproduction passed. All **1,552 starting protected files** retain SHA-256/size/nanosecond mtime. Annual CHIRPS 11,315/365/31 and original checksum, GFD 33/23/2/329, measured hydrology 1,697/81/14 and all 33 source disagreements remain unchanged. Next: obtain authoritative Gokak coordinate/reach and CWC temporal-aggregation clarification before quantitative comparison or features. No statewide GloFAS collection or training.
+
+## Stage 4E — hydrology semantic closure (7 October 2026)
+
+**Status: `hydrology_semantics_ready_limited`.** Separate local evidence version
+`data/working/karnataka_hydrology_closure_v1/` (9 files, 86,082 bytes); permitted
+source/checksum/aggregate provenance in `data/reference/karnataka_hydrology_closure_v1/manifest.json`
+(13,379 bytes). Method: `docs/HYDROLOGY_CLOSURE_METHOD.md`. No source observation,
+station coordinate, prior manifest or Stage 4D model series was changed.
+
+**Gokak:** reused the original verified v5-compatible upstream-area/channel/LDD
+grids, no binary downloads. Native ±2-cell union contains 30 cells; four official
+coordinate variants give eight candidate distances. West (16.175, 74.775;
+2,811.724288 km²) drains into east (16.175, 74.825; 3,907.502592 km²). Both are
+positive channels; east has three immediate channel predecessors. Paths were
+traced for at most eight steps within this window. Additional model inflows
+explain why area agreement differs, but grids have no named river/gauge
+crosswalk and CWC Ghataprabha evidence does not establish the gauge's position
+relative to this model junction. **station_grid_match_ambiguous**, no selection;
+station coordinate conflict remains separately unresolved. No discharge
+magnitude/timing, nearest-cell preference or area agreement alone was used to
+select a cell. Static release attribution remains JRC/CC BY 4.0; exact original
+URLs, timestamps (including unknown manual transfer time), hashes and compatible
+README/changelog evidence are retained.
+
+**CWC semantics:** [Krishna Water Year Book Volume I 2019–20](https://cwc.gov.in/sites/default/files/stage-dischargecompressed.pdf),
+March 2021, PDF21–23/printed x–xii, §§1.4.2/1.4.3/1.5.1, describes once-daily
+measurement commencing about 08:00 and rating-curve estimates against 08:00 gauge;
+values correspond to measurement sessions, not a demonstrated 24-hour mean.
+[CWC handbook](https://cwc.gov.in/sites/default/files/hand-book-hydro-meteorological-observations._1.pdf),
+June 2020, PDF23/57/139/188–189, distinguishes gauge/session averages from discharge
+and ADCP transect averages; its 08:30 ADCP procedure is not automatically applied
+to every 2019 record. Reviewed notes do not establish measurement timezone.
+
+The exact [NWDP discharge resource](https://nwdp.nwic.gov.in/dataset/river-discharge-manual-dailly-central-water-commission-cwc/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3),
+dataset08fa3fd0-7861-471d-a295-27c1b239d1fa/resourcef95150ea-c8fc-4740-8815-d9c34c9d53a3,
+has data update2026-01-24T23:36:31.332749 and metadata update2026-01-25T03:26:18.320179.
+Advertised catalogue/Preview give exact field names and daily frequency/m³/s but
+no definition of Data Acquisition Time, timezone or averaging window. Portal
+update UTC is not observation UTC. Identical NWDP/Year Book semantics or revision
+snapshot remain unestablished; Other(Open) does not override unresolved reuse.
+Bounded official research establishes no exact dictionary or gauge crosswalk;
+this is not proof they do not exist. Five public metadata responses, HTTP200,
+30-second/2-MiB limits, retained with sidecars/research plan: 11 files/908,946 bytes.
+No new observation CSV, authenticated EWDS request or credential read.
+
+**GloFAS:** [ECMWF model-output documentation](https://confluence.ecmwf.int/spaces/CEMS/pages/242067364/Model+Output)
+supports preceding-24-hour mean with period-end timestamp. Actual file CF-1.7
+valid_time units omit a timezone; [CF-1.7 §4.4](https://cfconventions.org/Data/cf-conventions/cf-conventions-1.7/cf-conventions.html)
+defaults it to UTC. All 62 original clocks, 2019-07-02–2019-09-01 at00:00, are
+preserved; separately documented intervals span July1–August31. Explicit file
+bounds remain absent. **temporal_semantics_partially_resolved**; exact NWDP
+semantics remain unknown, so **zero** quantitative aligned comparisons. No
+metrics, datum conversion, features, labels or automatic source preference.
+
+**Verification:**54 new offline tests,300 combined hydrology tests,959 full backend
+tests passed (one existing Starlette warning); normal frontend14, browser4 and
+production build passed unchanged. All existing validators and new read-only
+source-to-product reproduction passed. Independent scalar verification checked
+30 static cells, eight distances and62 original model clocks. All1,600 starting
+protected files match SHA-256/size/nanosecondmtime. Annual11,315/365/31 and original
+SHA b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819;
+GFD33/23/2/329; hydrology1,697/81/14 and all33disagreements remain unchanged.
+Detailed sources/coordinates/topology/PDF notes stay local; only own code/tests,
+paraphrased method, references/checksums/aggregate provenance are published.
+Next obtain official Gokak gauge-to-reach evidence and NWDP exact daily field,
+timezone/aggregation clarification using the unsent local questions. Limited
+semantic closure does not authorize feature engineering or ML.
