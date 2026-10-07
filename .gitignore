@@ -27,6 +27,12 @@ exports/
 *.zip
 
 # Cloud credentials and private keys must never be staged.
+.cdsapirc
+.ecmwfapirc
+.ewds*
+.bash_history
+.zsh_history
+cookies*.txt
 .config/earthengine/
 .aws/
 .gcloud/
