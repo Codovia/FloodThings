@@ -16,7 +16,7 @@ it('displays all seven actual dates in order, supported conditions and explicit 
   expect(within(rows[0]).getByText('0 mm')).toBeTruthy()
   expect(within(rows[0]).getByText('20 °C')).toBeTruthy()
   expect(within(rows[6]).getByText('Heavy thunderstorm')).toBeTruthy()
-  expect(screen.getByText(/calendar days, starting today/)).toBeTruthy()
+  expect(screen.getByText(/calendar days beginning on 2026-10-08/)).toBeTruthy()
   expect(screen.getByText(/not a seven-day flood prediction/)).toBeTruthy()
   expect(screen.queryByRole('status')).toBeNull()
 })

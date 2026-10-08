@@ -20,7 +20,7 @@ export default function DailyForecast({ days, coverage }) {
   const validDays = coverage?.valid_days ?? days.filter(day => [day.temperature_min_c, day.temperature_max_c, day.precipitation_mm, day.weather_code].some(value => value != null)).length
   return <section className="daily-forecast" aria-labelledby="daily-forecast-title">
     <h3 id="daily-forecast-title">Seven-day weather forecast</h3>
-    <p className="muted">Asia/Kolkata calendar days, starting today; today includes elapsed hours. Daily precipitation totals (mm), temperature ranges (°C) and the most severe daily weather condition.</p>
+    <p className="muted">Asia/Kolkata calendar days beginning on {coverage?.start_date || days[0]?.date || 'the retrieval date'}; the first day includes hours elapsed before retrieval. Forecast dates stay tied to this response when retained. Daily precipitation totals (mm), temperature ranges (°C) and the most severe daily weather condition.</p>
     {validDays < 7 && <p className="notice" role="status">Incomplete forecast coverage: {validDays} of 7 days have data. Missing days have not been filled.</p>}
     {coverage?.missing_dates?.length > 0 && <p className="muted">Dates without forecast data: {coverage.missing_dates.join(', ')}.</p>}
     {days.length === 0 ? <p className="notice">Daily forecast unavailable. Current model estimates may still be available.</p> :

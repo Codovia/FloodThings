@@ -84,7 +84,7 @@ test('seven-day forecasts retain order after GPS, map, manual selection and refr
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 
-test('short and empty forecast coverage is explicit without invented dates, then provider failure clears cards', async ({ page }) => {
+test('short and empty forecast coverage is explicit without invented dates, then failed refresh retains explicitly stale information', async ({ page }) => {
   await page.route('**/api/weather*', route => {
     const body = weather(null); body.forecast = body.forecast.slice(0, 3)
     body.forecast_coverage = { valid_days: 3, missing_dates: ['2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14'] }
@@ -105,5 +105,6 @@ test('short and empty forecast coverage is explicit without invented dates, then
   await page.route('**/api/weather*', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable', message: 'Controlled outage' }) }))
   await page.getByRole('button', { name: 'Refresh weather' }).click()
   await expect(page.getByText(/Controlled outage/)).toBeVisible()
-  await expect(page.getByText('27 °C', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('27 °C', { exact: true })).toHaveCount(1)
+  await expect(page.getByRole('status', { name: 'Weather data freshness' })).toContainText('Stale — previously retrieved information')
 })
