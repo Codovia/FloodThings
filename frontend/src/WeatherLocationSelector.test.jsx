@@ -10,9 +10,7 @@ vi.mock('./HistoricalFloodMap.jsx', () => ({ default: () => <div>Historical evid
 vi.mock('./DrainageResearchLayers.jsx', () => ({ default: () => <div>Drainage evidence unchanged</div> }))
 const weather = (point = null, temperature = 27) => ({ status: 'partial', message: 'Some values are unavailable.',
   location: point, current: { temperature_c: temperature, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: '2026-10-08T00:00:00Z', stale: false },
-  forecast: [{ date: '2026-10-08', precipitation_mm: 1, temperature_min_c: 20, temperature_max_c: 30 },
-    { date: '2026-10-09', precipitation_mm: null, temperature_min_c: 21, temperature_max_c: 31 },
-    { date: '2026-10-10', precipitation_mm: 3, temperature_min_c: 21, temperature_max_c: 30 }],
+  forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(8 + i).padStart(2, '0')}`, weather_code: 61, precipitation_mm: i === 1 ? null : i + 1, temperature_min_c: 20, temperature_max_c: 30 })),
   grid_location: { latitude: 13.35, longitude: 74.75 }, retrieved_at: '2026-10-08T00:01:00Z' })
 const reply = body => ({ ok: true, json: async () => body })
 
@@ -43,6 +41,7 @@ it('keeps Bengaluru default and replaces weather with selected coordinates, pres
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74'))
   await screen.findByText('Entered coordinates')
   expect(screen.getByText(/Requested point: 13.34/)).toBeTruthy()
+  expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
   expect(screen.getByText(/district\/locality identity not verified/)).toBeTruthy()
   expect(screen.getByText('0 mm')).toBeTruthy()
   expect(screen.getAllByText('Unavailable').length).toBeGreaterThan(0)
@@ -156,4 +155,23 @@ it('repeated reset to the same reference reloads weather instead of leaving a cl
   await waitFor(() => expect(fetch.mock.calls.length).toBe(count + 1))
   await screen.findByText('27 °C')
   expect(screen.getByRole('button', { name: 'Refresh weather' }).disabled).toBe(false)
+})
+
+
+it('refresh and changing a selected point replace the seven-day series', async () => {
+  render(<App />); await screen.findByText('27 °C')
+  coordinates(); await screen.findByText('Entered coordinates')
+  await waitFor(() => expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7))
+  fetch.mockImplementation(async url => {
+    const params = new URL(url, 'http://localhost').searchParams
+    const body = weather({ latitude: Number(params.get('latitude')), longitude: Number(params.get('longitude')) })
+    body.forecast.forEach(day => { day.precipitation_mm = 17 })
+    return reply(body)
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Refresh weather' }))
+  await screen.findAllByText('17 mm')
+  expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74')
+  coordinates('14', '75'); await screen.findAllByText('17 mm')
+  expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=14&longitude=75')
+  expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
 })

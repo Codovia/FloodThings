@@ -1,4 +1,5 @@
 """Read-only Open-Meteo adapter: no database, archive writes or fallback values."""
+import asyncio
 from datetime import date, datetime, timedelta, timezone
 from math import isfinite
 
@@ -24,9 +25,9 @@ PARAMS = {
     "latitude": LOCATION["latitude"],
     "longitude": LOCATION["longitude"],
     "current": "temperature_2m,relative_humidity_2m,precipitation",
-    "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min",
+    "daily": "precipitation_sum,temperature_2m_max,temperature_2m_min,weather_code",
     "timezone": "Asia/Kolkata",
-    "forecast_days": 3,
+    "forecast_days": 7,
     "temperature_unit": "celsius",
     "precipitation_unit": "mm",
 }
@@ -85,38 +86,55 @@ def parse_weather(payload: dict, retrieved_at: datetime) -> dict:
         "precipitation_mm": number(current["precipitation"], minimum=0),
     }
     days = daily["time"]
-    if not isinstance(days, list) or len(days) != 3:
-        raise ValueError("Expected three forecast days")
+    if not isinstance(days, list) or len(days) > 7:
+        raise ValueError("Expected at most seven forecast days")
     for field in ("precipitation_sum", "temperature_2m_max", "temperature_2m_min"):
         if not isinstance(daily[field], list) or len(daily[field]) != len(days):
             raise ValueError("Mismatched forecast arrays")
     dates = [date.fromisoformat(day) for day in days]
-    if dates != [dates[0] + timedelta(days=i) for i in range(3)]:
-        raise ValueError("Forecast dates are not consecutive")
-    if dates[0] != retrieved_at.astimezone(IST).date():
-        raise ValueError("Forecast does not start today")
+    start = retrieved_at.astimezone(IST).date()
+    expected_dates = [start + timedelta(days=i) for i in range(7)]
+    if any(raw != day.isoformat() for raw, day in zip(days, dates)) or dates != sorted(set(dates)) or any(day not in expected_dates for day in dates):
+        raise ValueError("Forecast dates must be unique, ordered and within the requested local week")
+    codes = daily.get("weather_code", [None] * len(days))
+    if not isinstance(codes, list) or len(codes) != len(days):
+        raise ValueError("Mismatched weather-code array")
+    if "weather_code" in daily and daily_units.get("weather_code") != "wmo code":
+        raise ValueError("Unexpected weather-code units")
     forecast = []
     for i, day in enumerate(days):
         low = number(daily["temperature_2m_min"][i])
         high = number(daily["temperature_2m_max"][i])
         if low is not None and high is not None and low > high:
             raise ValueError("Inverted temperature range")
+        code = number(codes[i], minimum=0, maximum=99)
+        if code is not None and int(code) != code:
+            raise ValueError("Weather code must be an integer")
         forecast.append({
-            "date": day,
+            "date": day, "weather_code": code,
             "precipitation_mm": number(daily["precipitation_sum"][i], minimum=0),
             "temperature_min_c": low, "temperature_max_c": high,
         })
     readings = list(values.values()) + [v for day in forecast for k, v in day.items() if k != "date"]
     if all(v is None for v in readings):
         raise ValueError("No weather values available")
+    valid_dates = {day["date"] for day in forecast if any(v is not None for k, v in day.items() if k != "date")}
+    missing_dates = [day.isoformat() for day in expected_dates if day.isoformat() not in valid_dates]
+    partial = bool(missing_dates) or any(v is None for v in readings)
+    grid = {"latitude": number(payload["latitude"], minimum=-90, maximum=90),
+            "longitude": number(payload["longitude"], minimum=-180, maximum=180)}
+    if any(value is None for value in grid.values()):
+        raise ValueError("Provider grid coordinates unavailable")
     return {
-        "status": "partial" if any(v is None for v in readings) else "available",
-        "message": "Some values are unavailable." if any(v is None for v in readings) else None,
+        "status": "partial" if partial else "available",
+        "message": "Forecast coverage or some values are unavailable." if partial else None,
+        "forecast_coverage": {"requested_days": 7, "returned_days": len(forecast), "valid_days": len(valid_dates),
+                              "missing_dates": missing_dates, "complete": not missing_dates,
+                              "start_date": start.isoformat(), "end_date": expected_dates[-1].isoformat(),
+                              "timezone": "Asia/Kolkata", "day_definition": "local_calendar_day"},
+        "forecast_units": {"precipitation_mm": "mm", "temperature_min_c": "°C", "temperature_max_c": "°C", "weather_code": "wmo code"},
         "location": LOCATION, "source": SOURCE,
-        "grid_location": {
-            "latitude": number(payload["latitude"], minimum=-90, maximum=90),
-            "longitude": number(payload["longitude"], minimum=-180, maximum=180),
-        },
+        "grid_location": grid,
         "timezone": "Asia/Kolkata",
         "retrieved_at": retrieved_at.isoformat(),
         "observation_time": None,
@@ -135,10 +153,11 @@ class OpenMeteoAdapter:
 
     async def fetch(self) -> dict:
         try:
-            response = await self.client.get(API_URL, params=PARAMS)
+            async with asyncio.timeout(10):
+                response = await self.client.get(API_URL, params=PARAMS)
             response.raise_for_status()
             return parse_weather(response.json(), datetime.now(timezone.utc))
-        except httpx.HTTPError as exc:
+        except (httpx.HTTPError, TimeoutError) as exc:
             raise WeatherUnavailable("Weather provider could not be reached. Try again later.") from exc
         except (ValueError, KeyError, TypeError, OverflowError) as exc:
             raise WeatherUnavailable("Weather provider returned incomplete or invalid data.") from exc

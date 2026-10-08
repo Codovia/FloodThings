@@ -1,4 +1,4 @@
-"""Read-only point weather using the existing validated three-day weather contract.
+"""Read-only point weather using the existing validated seven-day weather contract.
 
 User coordinates are not district identities. No persistence, geocoding, risk
 classification or scientific dataset writes occur here.

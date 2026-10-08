@@ -1,6 +1,6 @@
 # FloodPulse — weather, historical flood evidence and GIS research
 
-A React + Vite dashboard → FastAPI → Open-Meteo weather slice for one Bengaluru reference point, plus a Leaflet map of two verified historical satellite flood events in Udupi. Historical data come from bounded real Earth Engine queries. `QandA.md` is preserved as historical product context; its old implementation and accuracy claims do not describe this rebuild.
+A React + Vite dashboard → FastAPI → Open-Meteo seven-day weather dashboard with manual coordinates, Leaflet point selection and user-requested GPS (Bengaluru by default), plus a Leaflet map of two verified historical satellite flood events in Udupi. Historical data come from bounded real Earth Engine queries. `QandA.md` is preserved as historical product context; its old implementation and accuracy claims do not describe this rebuild.
 
 The optional **Drainage Research Layers** panel reads `data/processed/udupi_drainage_gis_v1/`: a 3 km × 3 km study window around a verified Udupi OSM city point, not an official municipal boundary. Select surface elevation, derived slope or 2021 land cover. The bounded OSM query returned no drain/ditch ways; unmapped infrastructure remains unknown. Terrain is a 30 m surface model including buildings and vegetation, suitable for exploratory surface research with those limitations. These layers do not provide drainage-risk scores or live waterlogging information.
 
@@ -33,7 +33,7 @@ npm ci
 npm run dev -- --host 127.0.0.1
 ```
 
-Open http://127.0.0.1:5173. Vite proxies `/api` to FastAPI; the browser never calls the weather provider directly. API docs: http://127.0.0.1:8000/docs. `GET /api/health` checks the application process only, not upstream availability. `GET /api/weather` performs one request with a 10-second HTTP timeout and no retries. Refresh is manual. The browser times out after 15 seconds and clears previous readings while refreshing.
+Open http://127.0.0.1:5173. Vite proxies `/api` to FastAPI; the browser never calls the weather provider directly. API docs: http://127.0.0.1:8000/docs. `GET /api/health` checks the application process only, not upstream availability. `GET /api/weather` performs one request with a 10-second HTTP timeout and no retries. The default request uses Bengaluru; paired `latitude` and `longitude` query parameters select any valid WGS84 point without assigning a district/locality identity. Invalid pairs return 422. Refresh is manual. The browser times out after 15 seconds and clears previous readings while refreshing.
 
 The historical panel lets users select event **2728** (14–30 September 2005) or **3551** (25 September–12 October 2009). `GET /api/historical-floods` provides the catalogue and genuine Udupi boundary; `GET /api/historical-floods/{event_id}` provides the event's verified GeoJSON. FastAPI reads `data/processed/udupi_flood_spatial_v1/` locally, verifies checksums and serves explicit unavailable states if it is absent or invalid. Application startup needs no Earth Engine credentials. Basemap tiles require internet access; the district and flood polygons still display if tiles fail.
 
@@ -60,11 +60,11 @@ If port 8000 is occupied, start Uvicorn with `--port 18000` and start Vite with 
 
 ## Data meaning and sources
 
-- [Open-Meteo documented Forecast API](https://open-meteo.com/en/docs): current temperature, relative humidity and precipitation, plus three daily precipitation totals and min/max temperatures. Current conditions are **weather model estimates**, not observed station measurements. Precipitation covers the preceding provider interval; daily totals use Asia/Kolkata calendar days.
+- [Open-Meteo documented Forecast API](https://open-meteo.com/en/docs): current temperature, relative humidity and precipitation, plus up to seven daily precipitation totals, min/max temperatures and provider weather condition codes. Current conditions are **weather model estimates**, not observed station measurements. Precipitation covers the preceding provider interval; daily totals use Asia/Kolkata calendar days.
 - [Bengaluru reference coordinates from OpenStreetMap Wiki](https://wiki.openstreetmap.org/wiki/Bengaluru): 12.9767936, 77.5900820. The provider's returned grid coordinates are shown separately. One reference point is not statewide or neighbourhood-level coverage.
 - Weather attribution: Open-Meteo, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). The public API is for non-commercial use under [provider terms](https://open-meteo.com/en/terms).
-- `current.valid_at` is the current model estimate's valid time; forecast rows have local validity dates. `retrieved_at` is the backend's UTC retrieval time, displayed in IST. Station observation time and forecast issue time are explicitly unavailable: this endpoint does not supply them. Retrieval time is not forecast issue time.
-- Null values remain null and display **Unavailable**. Partially missing readings are marked partial. HTTP failures or invalid/empty provider payloads return HTTP 503 with attribution and no weather values. Estimates older than 90 minutes are flagged stale (an application display policy).
+- `current.valid_at` is the current model estimate's valid time; forecast rows have local validity dates. `retrieved_at` is the backend's UTC retrieval time, displayed in IST. Forecast dates are Asia/Kolkata calendar days beginning today, not rolling 24-hour periods; today includes elapsed hours. Daily weather codes describe the most severe condition for that day. `forecast_coverage` records requested/returned/valid day counts and missing dates; omitted days are never fabricated. `forecast_units` identifies mm, °C and WMO codes. A valid day has at least one non-null daily value; coverage `complete` concerns dates, while missing individual fields still produce partial status. Station observation time and forecast issue time are explicitly unavailable: this endpoint does not supply them. Retrieval time is not forecast issue time.
+- Null values remain null and display **Unavailable**. Fewer returned days display incomplete coverage; an empty daily array can still show valid current conditions with a daily-forecast unavailable notice. Partially missing readings are marked partial. HTTP failures or invalid/empty provider payloads return HTTP 503 with attribution and no weather values. Estimates older than 90 minutes are flagged stale (an application display policy).
 
 ## Verify safely
 
@@ -102,3 +102,5 @@ curl --max-time 15 --fail-with-body http://127.0.0.1:8000/api/weather
 `npm run preview -- --host 127.0.0.1` serves the built dashboard with the same local API proxy. Production hosting will need a reverse proxy for `/api`; Vite preview is a local verification server.
 
 PostgreSQL + PostGIS persistence, Python ML, drainage analysis, Telegram alerts and shelter routing remain deferred. No flood prediction or risk claims are made.
+
+The frozen Stage 5/5A reviews record the older README and three-day weather source as historical inputs. To reproduce those reviews, validate with the exact recorded input bytes from Git, whose checksums must match their immutable manifests, rather than substituting the current application version. Run `scripts/.venv/bin/python -B scripts/validate_frozen_app_reviews.py` for this read-only reproduction; it verifies original input hashes before using a temporary replay workspace. Their scientific outputs and original checksums remain unchanged.

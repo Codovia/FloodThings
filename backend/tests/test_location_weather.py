@@ -32,7 +32,7 @@ def test_point_query_and_requested_vs_model_grid_positions(provider):
         calls.append(request)
         assert request.url.params['latitude'] == '13.34'
         assert request.url.params['longitude'] == '74.74'
-        assert request.url.params['forecast_days'] == '3'
+        assert request.url.params['forecast_days'] == '7'
         return httpx.Response(200, json=provider)
     async def run():
         async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:

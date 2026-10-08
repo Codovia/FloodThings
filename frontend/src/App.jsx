@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import DailyForecast from './DailyForecast.jsx'
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
@@ -30,7 +31,8 @@ export default function App() {
       if (!response.ok || !['available', 'partial'].includes(body.status)) {
         throw new Error(body.message || (typeof body.detail === 'string' ? body.detail : 'Weather is unavailable. Try again later.'))
       }
-      if (!body.current || !Array.isArray(body.forecast) || !body.grid_location ||
+      if (!body.current || !Array.isArray(body.forecast) || body.forecast.length > 7 ||
+          body.forecast.some((day, i) => !/^\d{4}-\d{2}-\d{2}$/.test(day.date) || !Number.isFinite(Date.parse(day.date + 'T00:00:00+05:30')) || (i > 0 && day.date <= body.forecast[i - 1].date)) || !body.grid_location ||
           (selectedPoint && (body.location?.latitude !== selectedPoint.latitude || body.location?.longitude !== selectedPoint.longitude))) {
         throw new Error('Weather response does not match the selected location.')
       }
@@ -62,7 +64,7 @@ export default function App() {
     <section className="intro">
       <p className="eyebrow">ENVIRONMENTAL CONDITIONS</p>
       <h1>A clearer view of the weather.</h1>
-      <p>Current model estimates and a three-day forecast for your selected point.</p>
+      <p>Current model estimates and a seven-day weather forecast for your selected point.</p>
     </section>
     <WeatherLocationSelector point={point} onSelect={choosePoint} />
     <section className="panel" aria-labelledby="location-title">
@@ -85,12 +87,7 @@ export default function App() {
             <article><p>Relative humidity</p><strong>{value(data.current.humidity_percent, '%')}</strong><small>At 2 metres</small></article>
             <article><p>Precipitation</p><strong>{value(data.current.precipitation_mm, 'mm')}</strong><small>Preceding {data.current.interval_seconds / 60} minutes</small></article>
           </div>
-          <h3>Three-day forecast</h3>
-          <p className="muted">Daily totals and temperature ranges · Asia/Kolkata</p>
-          <div className="table-wrap"><table>
-            <thead><tr><th scope="col">Forecast date (IST)</th><th scope="col">Precipitation</th><th scope="col">Min temperature</th><th scope="col">Max temperature</th></tr></thead>
-            <tbody>{data.forecast.map(day => <tr key={day.date}><th scope="row">{day.date}</th><td>{value(day.precipitation_mm, 'mm')}</td><td>{value(day.temperature_min_c, '°C')}</td><td>{value(day.temperature_max_c, '°C')}</td></tr>)}</tbody>
-          </table></div>
+          <DailyForecast days={data.forecast} coverage={data.forecast_coverage} />
           <dl className="metadata">
             <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
             <div><dt>Station observation time</dt><dd>Unavailable — model data</dd></div>
