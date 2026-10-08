@@ -1,10 +1,11 @@
 from contextlib import asynccontextmanager
 
 import httpx
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from .weather import OpenMeteoAdapter, WeatherUnavailable, unavailable
+from .location_weather import fetch_point_weather, selected_location
 from .historical import router as historical_router
 from .drainage import router as drainage_router
 
@@ -32,8 +33,19 @@ def health():
 
 
 @app.get("/api/weather")
-async def weather(adapter: OpenMeteoAdapter = Depends(get_weather)):
+async def weather(
+    latitude: float | None = Query(None, ge=-90, le=90, allow_inf_nan=False),
+    longitude: float | None = Query(None, ge=-180, le=180, allow_inf_nan=False),
+    adapter: OpenMeteoAdapter = Depends(get_weather),
+):
+    if (latitude is None) != (longitude is None):
+        raise HTTPException(status_code=422, detail="Supply both latitude and longitude.")
     try:
-        return await adapter.fetch()
+        if latitude is None:
+            return await adapter.fetch()
+        return await fetch_point_weather(adapter.client, latitude, longitude)
     except WeatherUnavailable as exc:
-        return JSONResponse(status_code=503, content=unavailable(str(exc)))
+        body = unavailable(str(exc))
+        if latitude is not None:
+            body.update(location=selected_location(latitude, longitude), prediction_status="not_available")
+        return JSONResponse(status_code=503, content=body)
