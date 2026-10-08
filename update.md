@@ -878,3 +878,111 @@ The [official public NRSC GeoServer landing page](https://bhuvan-gp1.nrsc.gov.in
 **GitHub delivery:** reviewed six-file methodology checkpoint for `research: define prediction-time feature methodology`; source metadata/code/tests/methodology/checksums and this chronological append only. Inspect staged content for secrets, binary/raw/source/geometry/value tables and unrelated changes. Use index-only HEAD-plus-task-append update.md to preserve earlier independent whitespace unstaged. Push feature/karnataka-data-foundation and independently compare fresh git ls-remote with the resulting local commit before reporting success. Exact new hash/push result reported after delivery and recorded next task, without a self-hash-only commit.
 
 **Exact next stage:** Stage5A bounded operational-source and issuance-preserving archive validation with an explicit occurrence/impact target, geographic aggregation, risk classes and primary issue/valid horizon protocol. Develop independently time-resolved positive/comparison evidence in a compatible forecast archive period; include relevant upstream catchments beyond Karnataka. Do not fit ML or construct a training matrix until source availability/parity, labels, reuse and sample-size gates pass. External Gokak/CWC questions stay formally unresolved rather than repeatedly searched.
+
+
+## 2026-10-08 — Stage 5A: target definition and issuance archive validation
+
+**Objective/completion:** bounded review completed as **target_and_archive_validation_ready_limited**;
+ML remains **ml_training_still_not_ready**. No primary target/horizon, risk thresholds,
+negative labels, training matrix or model adopted/created. Previous independently
+verified remote **ecc617e8ba2da7c2207fab43af7a05d3104ea991**, branch
+`feature/karnataka-data-foundation`, origin `git@github.com:Codovia/FloodThings.git`.
+
+**Product/target findings:** original specification mixes district/locality occurrence,
+severity, impact, proxy scores/probabilities and general risk. Seven forecast days
+and six-hour refresh are intent, not exact observation targets. 271 exact matching
+requirement blocks retained locally with source roles/sections/line ranges; old
+synthetic/proxy thresholds and Done claims rejected. Missing referenced master/change
+documents recorded. Observation target is qualified non-permanent mapped GFD water
+at least once in an event window; model target, user risk mapping and alert policy
+remain distinct/unset. No daily/six-hour/district-wide state inferred.
+
+**Risk/issuance:** CWC April2025 SOP Annex3.2/PDF82 and KSDMA2021 Tables5/6 PDF75/78
+rendered and inspected; station threshold/village hazard classes do not define
+FloodPulse Low/Medium/High. No invented probability cutoffs. `exact_issuance_schedule_unspecified`;
+forecast_day_1..7 boundaries unknown (rolling24h vs ISTcalendar vs providerday).
+Require separate issue/init/firstavailability/retrieval/validinterval clocks with
+timezones, run/member/version/units/spatialvintage. Event rain/outcomes/future
+observations remain prohibited; existing delayed CHIRPSFinal guard unchanged.
+
+**Official archives:**21/22 new documentation downloads succeeded, one TIGGE licence
+URL DNS timeout curl28/HTTP000, one attempt. Full terms unresolved, no authenticated
+ECMWF/EWDS request. Exact source URLs/version/section/retrieval/SHA recorded.
+IFS Single Runs early2024–2026 series are explicitly49R1 hindcasts;50R1 starts
+2026-05-12T06UTC. Pinned run initialization != original delivery. Fixed-lead archives,
+stitched history/reanalysis and rolling Open Data remain separate. ECMWF ECDS
+`tigge-forecasts` operational ensemble archive beginsOctober2006, public48h delay,
+6h steps, model/centre/date/version-dependent coverage. Original accumulated
+tp kg/m2 parameter228228 must be differenced only within same run/member in a
+future extraction. Operational weather parity remains unvalidated.
+
+**Bounded technical check:** one Bengaluru referencepoint,2026-10-01T00IFSrun,
+24hourlytimes,23finiteprecipitation/1null and24temperature, UTC/mm/degC;
+1000bytes, SHA d005edd589969bffda47c243b4e2c30c202857db93b77c8760f53cca133e46f0.
+Missing value preserved; run/version/publication clock not echoed/verified.
+Advertised Berlin temperature example inspected through documentation link too,
+original bytes not retained. No large forecast download or historical-event run
+retrieval; no features/statistical inference from samples.
+
+**GloFAS/overlap:** forecast starts2019-11-05, zero of four GFD-positive windows
+overlap. Reforecast nominal2003–2022 covers allfour years but was generated later;
+consolidated v5 historical remains retrospective. Forecast/archive/version/network
+parity is not established; historical supported Sadalga/Huvinhedgi cells are not
+assumed equivalent in earlier operational systems. Gokak excluded, NWDP semantics
+and datum unresolved, quantitative CWC/GloFAS comparisons remain zero/prohibited.
+TIGGE catalogue overlap only for3551Udupi2009 and3652Chitradurga2010; no overlap
+for2728/2758 in2005. Specific historic runs not yet queried. Static vintage,
+geometry and permissions remain gates; existing Belagavi SRTM acquisitionFeb2000
+is not proof of as-of release/availability at other scopes.
+
+**Negative/readiness:** qualified event-window positives retained33/23/2/329.
+2698Bijapur/3107Raichur remain observed-zero maps, not verified non-flood labels.
+Future observed non-inundation needs exact spatial/time unit, adequate coverage,
+valid masks, sensitivity/false-negative audit and independent monitored reference,
+with predeclared selection/parity; no absence-of-record or random-day negatives.
+TARGET_DEFINITION/WEATHER_PARITY/HYDROLOGY_PARITY/RISK_CLASS_MAPPING=UNRESOLVED;
+POSITIVE_LABEL_READINESS/FORECAST_ARCHIVE_READINESS=LIMITED;
+NEGATIVE_LABEL_READINESS/TEMPORAL_ALIGNMENT/SAMPLE_SIZE=NOT_READY.
+Primary target not adopted; training remains prohibited.
+
+**Files/data:** added scripts/review_target_archives.py, backend/tests/test_target_archives.py,
+docs/TARGET_ARCHIVE_METHOD.md and permitted data/reference/karnataka_target_archive_review_v1/manifest.json;
+appended source register and this progress entry only. Local review17files/344814bytes,
+raw sources/receipts47files/3509787bytes, public metadata113609bytes.
+Local manifest SHA bf989aead273f00bde2cd6975431d336cfdc99a5e3f60a916ecedfe9561df06b. Original QandA quotes, HTML/PDFs,
+raw sample, restricted geometry and detailed observations stay local. All existing
+scientific datasets remain unchanged; no new label or training observations.
+
+**Tests/validation:**58new focused tests;461combined hydrology/methodology;
+438relevant rainfall/satellite/static tests;1120full backend passed, one existing
+Starlette deprecation warning. Backend TestClient groups used established
+outside-sandbox workaround, temporary fixtures/network/database guards retained.
+Normal frontend14passed; normal unchanged configured browser4passed(one worker
+in existing config, no fallback); production buildpassed. All46 read-only dataset
+and metadata validator checkpoints passed. Two temporary wrapper invocations used
+incorrect raw-log parameters; corrected to verified original directories by hash,
+no dataset mutation. Completed validators reused against unchanged files.
+
+**Protection/publication:**1733/1733 starting protected files exactbytes/SHA/size/
+nanosecondmtime, zero exceptions. Annual11315rows/365dates/31identifiers and
+b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819 unchanged;
+GFD33/23/2/329 and measured1697/comparisons81/eligible14/disagreements33 unchanged.
+Original source/register/log prefixes preserved. QandA.md stays untracked;
+independent preexisting update.md whitespace excluded from index. No frontend
+changes, credentials, raw binaries, restricted geometry or observation tables staged.
+
+**GitHub delivery:** prior remote checkpoint independently confirmed. This entry
+is included before the reviewed Stage5A commit; the new commit/push verification
+will be reported after delivery and its hash recorded in the following task,
+without an extra status-only commit or claiming success before verification.
+
+**Exact next task:** Stage5B gated Time-Resolved Label Development & Issuance Dataset
+Pilot in existing Belagavi scope/official Hulagabali,Halyal,Sankaratti context,
+24–30July2021. First obtain legitimate categorical/georeferenced reference,
+acquisition intervals and reuse, not viewport-as-flood polygons. Then validate
+small `tigge-forecasts` ECMWF(ecmf) candidate2021-07-23T00/12UTC runs, required
+48–168h steps, terms/account/version/exactrun availability and public delivery
+before prediction T. These runs are proposed, not retrieved. No hydrology until
+forecast-network/time parity; no Gokak. If gates fail retain findings and consider
+bounded prospective pinned-run capture plus monitored outcomes in existing Udupi
+window. Do not begin training, daily label expansion or production risk classes.

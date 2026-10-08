@@ -1246,3 +1246,89 @@ and production build passed, no fallback or frontend changes. All existing/new
 read-only dataset validators passed. Protected1667/1667 exact SHA-256/size/nanosecond
 mtime, annual11315/365/31 and original SHA unchanged, GFD33/23/2/329 and
 hydrology1697/81/14/33 preserved. QandA.md and independent log whitespace excluded.
+
+
+## 2026-10-08 — Stage 5A: targets and issuance-preserving forecast archives
+
+**Status:** target_and_archive_validation_ready_limited; ML remains prohibited.
+No primary model target/horizon, exact issuance clock, forecast-day boundaries,
+Low/Medium/High mapping or negative labels adopted. The local requirement inventory
+retains 271 exact matching blocks with source roles/sections/line ranges; obsolete
+QandA proxy/synthetic labels and arbitrary cutoffs are rejected. Four separate
+concepts: observed qualified event-window mapped water; model target unset;
+user-facing risk mapping unset; alert policy unset. See
+[methodology](TARGET_ARCHIVE_METHOD.md) and permitted
+`data/reference/karnataka_target_archive_review_v1/manifest.json`.
+
+**New official evidence:** 21/22 original public documentation responses retrieved;
+one bounded TIGGE licence URL attempt failed DNS resolution (curl28, HTTP000,
+5-second resolve limit inside30-second deadline). Licence identifier documented,
+full reuse terms unresolved; no repeated probing/authenticated retrieval.
+Two retained CWC/KSDMA PDFs visually inspected. Exact URLs, retrieval clocks,
+publication/version/section details and hashes in source register metadata.
+CWC April2025 SOP Annex3.2/PDF82 defines station warning/danger/HFL classes;
+KSDMA2021 Tables5/6 PDF75/78 list village hazard classes. Neither supplies the
+project's Low/Medium/High forecast mapping. Their original SHA-256 values are
+3d13601ef577c24f3e2d8688977f3d92447f349ffc45abcd1b04adb76d9ab5f4 and
+23a1e4a9a5ca87075878d74dc1bd682cb2c914c389664bc240e8738916eb7251.
+
+**Weather:** Open-Meteo IFS Single Runs starts2024-03-14, but earlier series are
+explicit Cycle49R1 hindcasts. Cycle50R1 starts2026-05-12T06UTC; initialization does
+not establish original public delivery. Previous-run fixed leads and stitched
+history/reanalysis are distinct. One public Bengaluru point/day pinned to
+2026-10-01T00 returned24times,23finite precipitation/1null and24finite temperatures,
+mm/degC with UTC offset0. Original1000bytes SHA
+`d005edd589969bffda47c243b4e2c30c202857db93b77c8760f53cca133e46f0`;
+null preserved; no server run/version/publication echo. Documentation's advertised
+Berlin temperature example also inspected via web, original bytes not retained.
+No event forecasts or large archives downloaded.
+
+**New archive candidate:** ECMWF `tigge-forecasts` contains operational ensemble
+forecasts sinceOctober2006; public48-hour delay,6h steps and model/version/centre
+coverage/terms are gates. Precipitation kg/m2 accumulated fromstep0, parameter228228;
+future interval extraction must preserve same run/member and missingness.
+Catalogue overlap with3551Udupi(2009) and3652Chitradurga(2010), none for2728/2758(2005).
+Actual selected historical runs remain unqueried. Current ECMWF rolling Open Data
+has latest12runs/about2–3days, not an old-event archive through that route.
+
+**Hydrology:** GloFAS forecast catalogue starts2019-11-05, none of four positives
+overlap. Nominal2003–2022 reforecast years overlap allfour but are later hindcasts,
+not historically issued forecasts. Consolidated v5 history stays retrospective.
+No version/network parity assumed with operational forecast; Gokak excluded;
+Sadalga/Huvinhedgi supported historical cells do not automatically map to earlier
+forecast networks. NWDP temporal semantics, datum compatibility and CWC/model
+comparison prohibitions unchanged. No EWDS authentication/retrieval in this stage.
+
+**Labels/readiness:** four mapped-positive scopes remain33/23/2/329; event maxima
+are not daily/six-hour/district-wide/locality-wide labels. 2698/3107 remain
+observed-zero comparison evidence, not negatives. Future non-inundation needs
+explicit space/time, valid observation coverage, sensitivity/false-negative audit,
+independent reference/monitoring and a predeclared selection/as-of protocol.
+Target/risk/parityUNRESOLVED; positives/archiveLIMITED; negatives/alignment/sample
+NOT_READY. Existing SRTM February2000 terrain is real Belagavi research context;
+acquisition is not release. SOI2025/current identity and publication restrictions
+remain; no later static vintage assumed available for older events.
+
+**Reproducibility/publication:** local review17JSONfiles/344814bytes, original
+public sources/receipts47files/3509787bytes. Local manifest SHA `bf989aead273f00bde2cd6975431d336cfdc99a5e3f60a916ecedfe9561df06b`.
+Public own decision/provenance metadata113609bytes; QandA excerpts/sourceHTML/PDFs,
+raw sample, detailed observations and restricted geometry remain local.
+Create-only builder, read-only reproduction and original input/code/output hashes.
+No training rows, negatives, matrices, fitted artifacts or hydrology metrics.
+
+**Verification:**58Stage5A,461combined hydrology/methodology,438relevant data and
+1120full backend tests passed(one existing Starlette warning). Normal frontend14,
+unchanged configured browser4 and production build passed. All46 dataset/review
+validator checkpoints passed. Two temporary validator-wrapper calls selected the
+wrong raw-log directory; corrected using manifest/source-log hashes, without
+source changes; successfully validated partitions were reused read-only.
+Protected1733/1733 exactbytes/SHA/size/nanosecondmtime; annual11315/365/31 and original
+SHA preserved, GFD33/23/2/329 and hydrology1697/81/14/33 unchanged.
+
+**Next:** Stage5B gated time-resolved Belagavi24–30July2021 official reference and
+small TIGGE issuance pilot. First verify categorical georeferenced reference,
+acquisition intervals and reuse; viewport is not flood geometry. Proposed
+2021-07-23T00/12UTC runs and48–168h steps require exact access/terms/version/delivery
+validation; actual T must honor public48h delay. Omit hydrology until parity is
+established. If gates fail, preserve findings and consider prospective capture in
+existing Udupi window. No training or production target adoption.
