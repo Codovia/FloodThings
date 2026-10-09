@@ -13,7 +13,12 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'backend'))
-from app.locations import LocationStore, VERSION, validate_directory
+from app.locations import LocationStore, validate_directory as validate_current_directory
+
+VERSION = 'karnataka_location_directory_v1'
+
+def validate_directory(data):
+    return validate_current_directory(data, VERSION)
 
 OUTPUT = ROOT / 'data/reference' / VERSION
 RAW = ROOT / 'data/raw/reference/mvp_sprint4_live_v1'

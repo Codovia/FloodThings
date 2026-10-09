@@ -1,0 +1,125 @@
+{
+  "version": "karnataka_location_directory_v2",
+  "created_at": "2026-10-09T13:24:08.341886+00:00",
+  "previous_version": "karnataka_location_directory_v1",
+  "district_count": 31,
+  "locality_count": 6,
+  "selectable_locality_count": 5,
+  "districts_with_selectable_localities": 2,
+  "current_lgd_independently_verified": false,
+  "soi_used": false,
+  "inputs": [
+    {
+      "path": "data/reference/karnataka_location_directory_v1/directory.json",
+      "sha256": "991026f0ef8f6d7370984609f84466b532d27b529e4cf3362e1c401e2cb5e274",
+      "bytes": 19601
+    },
+    {
+      "path": "data/reference/karnataka_location_directory_v1/manifest.json",
+      "sha256": "8a8de4ede1667513b68f86ba019f4e35648e870edd660ffc2c81d77a4ad0724e",
+      "bytes": 6327
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/dk-municipal.html",
+      "sha256": "d72cc86a161ee5d9e5c0a7305c14386cb89b891f42c07a41d45da5e50000f813",
+      "bytes": 116200
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/dk-policy.html",
+      "sha256": "c2557adc2cb619de9d45e0832e2477c64267f5c8579c7b5c7b170c32d9e115c5",
+      "bytes": 117308
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-actual.provenance.json",
+      "sha256": "0f81dfb9a3f68532b36ff7e5ad9f033701216fcfb07665ff4e7227b2f17e7faa",
+      "bytes": 407
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-adm2-actual.geojson",
+      "sha256": "d68db39cd3e2d0892af268e2b0454166368ce3b5b8a78fcda63069ec92a641db",
+      "bytes": 7979916
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-adm2-simplified.geojson",
+      "sha256": "9dd73863a55e195b6adc4123c41f5995fecb3af8cbbea3eb7cccfec1bc12cbff",
+      "bytes": 132
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-metadata.json",
+      "sha256": "facae06e1656838ebcbd6fc9198cdba8dd568ca2aec19d69759b3263a1511962",
+      "bytes": 1767
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-metadata.provenance.json",
+      "sha256": "736e7446ba76d98557d97df43d31645a3d2258d5823e068763b121726be39b5f",
+      "bytes": 242
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/gbopen-verified-metadata.json",
+      "sha256": "facae06e1656838ebcbd6fc9198cdba8dd568ca2aec19d69759b3263a1511962",
+      "bytes": 1767
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/kundapur-node.json",
+      "sha256": "57769225225eb1dcd48cb6db1e1d02e461c30178d5f21ea5a20a78d7831ccdc2",
+      "bytes": 753
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/mangaluru-node.json",
+      "sha256": "52120e6d77be373293a29d92d31e1682e74d38f5b8fdf22fdb28a6f6b14a8e37",
+      "bytes": 1297
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/osm-copyright.html",
+      "sha256": "1f3cba55782d4242b99afa23cbed82a52ba277d1d994d7b9c02d034c84c142fb",
+      "bytes": 21314
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/retrieval.json",
+      "sha256": "f57a2122eed31c5d26586454538bcfb8c078b2a201fd3f0a9a5f27529a8c714e",
+      "bytes": 2257
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/saligrama-node.json",
+      "sha256": "806cb4f512cbccc1e76a0a45fdf1ce9a7c0a0edea7a6a1861910454d2d498fbe",
+      "bytes": 567
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/udupi-municipal.html",
+      "sha256": "35d4c8908a09c45df7ff865e8381e67dfc057214241d86022089ed621eba3672",
+      "bytes": 123224
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint5_live_v1/udupi-voters.html",
+      "sha256": "5c97eb956e6431d02eab5916ce28715bb874327cea2897e7c40d82df85505546",
+      "bytes": 123047
+    }
+  ],
+  "licensing": {
+    "coordinates": "© OpenStreetMap contributors; ODbL 1.0. Extracted point database offered under ODbL 1.0 with attribution and share-alike.",
+    "license_url": "https://opendatacommons.org/licenses/odbl/1.0/",
+    "udupi_navigation": "Existing geoBoundaries CGAZ CC BY 4.0; unchanged.",
+    "dakshina_kannada_navigation": "geoBoundaries gbOpen IND ADM2; Pathways Data Pvt. Ltd., lgdirectory.gov.in; ODbL 1.0. Only factual navigation bounds published.",
+    "government_evidence": "Small factual identities/links only. Original website material requires permission and remains local.",
+    "policy_urls": [
+      "https://udupi.nic.in/en/website-policies/",
+      "https://dk.nic.in/en/website-policies/",
+      "https://www.openstreetmap.org/copyright"
+    ]
+  },
+  "method": "Independent official municipal identity and district association, original OSM settlement-node coordinates, actual public polygon containment; no centroid or geocoder substitution.",
+  "limitations": [
+    "Current LGD unresolved; historical public navigation polygons are not authoritative current municipal/district boundaries.",
+    "Saligrama OSM place=village is preserved; municipal status from official evidence is separate from mapped point type.",
+    "Kundapur and Kundapura are independently linked by official municipality and voters-list records; stable v1 ID retained, OSM node ID is an alias.",
+    "Kaup remains disabled. Remaining 29 districts have no reviewed points. All weather is point-specific, not district/locality-wide.",
+    "Initial boundary download was an LFS pointer, preserved; actual geometry verified against its exact declared SHA-256 and byte size.",
+    "Runtime has no external geocoder. No SOI geometry, restricted derivatives or personal OSM contributor fields published."
+  ],
+  "files": {
+    "directory.json": {
+      "sha256": "567eaee63192b25d487491bb7f1b88e63e7082987ede259b2e0a1cf93792163b",
+      "bytes": 24785
+    }
+  }
+}

@@ -4,6 +4,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import userEvent from '@testing-library/user-event'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 import App from './App.jsx'
+import expandedDirectory from '../../data/reference/karnataka_location_directory_v2/directory.json'
 
 const mapState = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: mapState }))
@@ -135,4 +136,38 @@ it('restricted coordinate provenance cannot trigger weather even if a malformed 
   const button = await screen.findByRole('button', { name: /Duplicate fixture/ })
   expect(button.disabled).toBe(true); fireEvent.click(button)
   expect(choose).not.toHaveBeenCalled()
+})
+
+function expandedResponses() {
+  const data = expandedDirectory
+  fetch.mockImplementation(async url => {
+    const parsed = new URL(url, 'http://localhost')
+    if (parsed.pathname === '/api/locations/districts') return { ok: true, json: async () => ({ status: 'available', items: data.districts, total: 31, coverage: data.coverage, dataset_version: data.version }) }
+    if (parsed.pathname === '/api/locations/localities') return response(data.localities.filter(r => r.district_id === parsed.searchParams.get('district_id')))
+    return { ok: true, json: async () => weather(parsed.searchParams.has('latitude') ? { latitude: +parsed.searchParams.get('latitude'), longitude: +parsed.searchParams.get('longitude') } : null) }
+  })
+  return data
+}
+
+it('expanded source directory displays actual coverage, enables Kundapur and explains disabled Kaup', async () => {
+  expandedResponses(); const choose = vi.fn()
+  render(<LocationDirectorySelector onChoose={choose} onDistrict={vi.fn()} />); open(); await district()
+  expect(screen.getByText(/5 selectable mapped localities across 2 districts/)).toBeTruthy()
+  const kundapur = await screen.findByRole('button', { name: /^Kundapur —/ })
+  fireEvent.click(kundapur)
+  expect(choose.mock.calls[0][0]).toMatchObject({locality_id:'udupi-admin:municipality:kundapur',latitude:13.6250993,longitude:74.6915722})
+  const unavailable = screen.getByRole('button', { name: /^Kaup —/ })
+  expect(unavailable.disabled).toBe(true)
+  expect(document.getElementById(unavailable.getAttribute('aria-describedby')).textContent).toContain('not reviewed')
+})
+
+it('Mangaluru selection uses its retained point and association, preserving seven days and map recentering', async () => {
+  expandedResponses(); render(<App />); await screen.findByText('27 °C'); open(); await district('nic:dk.nic.in')
+  fireEvent.click(await screen.findByRole('button',{name:/^Mangaluru — Dakshina Kannada/}))
+  await screen.findByRole('heading',{name:'Mangaluru, Dakshina Kannada'})
+  await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=12.8698101&longitude=74.8430082')).toBe(true))
+  expect(mapState.map.mock.results[0].value.setView).toHaveBeenLastCalledWith([12.8698101,74.8430082],12,{animate:false})
+  expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7)
+  expect(screen.getByRole('status',{name:'Weather data freshness'}).textContent).toContain('Fresh')
+  expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
 })

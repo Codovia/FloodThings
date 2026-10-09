@@ -64,12 +64,14 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
       locality_id: row.id, district_id: parent.id, district_name: parent.name, coordinate_source_url: row.coordinate_source.url,
       association_source_url: row.association_source_url })
   }
-  function localityButton(row) {
+  function localityButton(row, scope = 'district') {
     const parent = districts.data?.items.find(d => d.id === row.district_id)
     const usable = canChoose(row)
+    const descriptionId = `unavailable-${scope}-${row.id}`
     const label = `${row.name} — ${parent?.name || row.district_id} · ${usable ? `Mapped locality point (${row.coordinates.latitude}°, ${row.coordinates.longitude}°)` : 'Coordinates unavailable'}`
-    return <button type="button" key={row.id} disabled={!usable} aria-label={label}
+    return <><button type="button" disabled={!usable} aria-label={label} aria-describedby={!usable && row.unavailable_reason ? descriptionId : undefined}
       onClick={() => chooseLocality(row)}>{row.name} — {parent?.name || row.district_id} · {usable ? 'Mapped locality point' : 'Coordinates unavailable'}</button>
+      {!usable && row.unavailable_reason && <span id={descriptionId} className="muted"> {row.unavailable_reason}</span>}</>
   }
   const error = districts.error || search.error || localities.error
   const loading = districts.loading || search.loading || localities.loading
@@ -77,13 +79,13 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
     <button type="button" aria-expanded={open} aria-controls="location-directory-content" onClick={() => setOpen(v => !v)}>{open ? 'Close place search' : 'Search districts and localities'}</button>
     {open && <div id="location-directory-content">
       <h3>Find a Karnataka place</h3>
-      <p className="muted">31 NIC-listed district names. Current LGD identities remain unresolved. Selectable mapped localities: Udupi and Karkala in Udupi district. Kundapur is name-only with coordinates unavailable.</p>
+      <p className="muted">{districts.data?.coverage ? `${districts.data.coverage.district_names} NIC-listed district names; ${districts.data.coverage.selectable_localities} selectable mapped localities across ${districts.data.coverage.districts_with_selectable_localities} districts; ${districts.data.coverage.name_only_localities} name-only records.` : 'Coverage is limited to reviewed place records.'} Current LGD identities remain unresolved. Unreviewed coordinates are never substituted. {districts.data?.dataset_version && `Directory: ${districts.data.dataset_version}.`}</p>
       <label htmlFor="place-search">Search districts or localities</label>
       <input id="place-search" type="search" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} placeholder="For example: Udupi or Karkala" />
       {q && search.data && <>
         <p role="status" aria-label="Place search results">{search.data.total ? `${search.data.total} matching places; showing ${search.data.items.length}.` : 'No matching places in the verified directory. Try another name or enter coordinates.'}</p>
         <ul aria-label="Place search results">{search.data.items.map(row => <li key={row.id}>{row.kind === 'district'
-          ? <button type="button" onClick={() => chooseDistrict(row)}>{row.name} — District · filter localities</button> : localityButton(row)}</li>)}</ul>
+          ? <button type="button" onClick={() => chooseDistrict(row)}>{row.name} — District · filter localities</button> : localityButton(row, 'search')}</li>)}</ul>
       </>}
       <label htmlFor="district-choice">Karnataka district</label>
       <select id="district-choice" value={districtId} disabled={!districts.data} onChange={e => chooseDistrict(districts.data?.items.find(d => d.id === e.target.value))}>
@@ -101,7 +103,7 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
       </>}
       <p role="status" aria-label="Location directory status" aria-live="polite" aria-busy={loading}>{loading ? 'Loading location directory…' : 'Location search ready.'}</p>
       {error && <div role="alert" aria-label="Location directory error"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>Retry location search</button></div>}
-      <p className="muted">Names: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC government directory</a>. Locality association: <a href="https://udupi.nic.in/en/municipal-administration/">Udupi District Administration</a>. Place coordinates: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors · ODbL 1.0</a>. Points are mapped settlements, not municipal boundaries, gauges or shelters.</p>
+      <p className="muted">Names: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC government directory</a>. {district && <>Locality association: <a href={district.source_website}>{district.name} District Administration</a>. </>}Place coordinates: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors · ODbL 1.0</a>. Navigation: <a href="https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/">geoBoundaries / Pathways Data Pvt. Ltd. / lgdirectory.gov.in · ODbL 1.0</a>; existing Udupi CGAZ extent: CC BY 4.0. Points are mapped settlements, not municipal boundaries, gauges or shelters.</p>
     </div>}
   </div>
 }
