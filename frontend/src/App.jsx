@@ -3,6 +3,7 @@ import useWeatherSession, { FRESHNESS_MS, retrievalTime } from './useWeatherSess
 import './WeatherFreshness.css'
 import DailyForecast from './DailyForecast.jsx'
 import RainfallOutlook from './RainfallOutlook.jsx'
+import PublicShelters from './PublicShelters.jsx'
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
@@ -70,12 +71,14 @@ export default function App() {
       </div>
     </section>
     <RainfallOutlook point={point} weather={data} freshness={freshness} />
+    <PublicShelters point={point} />
     <HistoricalFloodMap />
     <DrainageResearchLayers />
     <footer>
+      <p><a href="/admin">Shelter administrator login</a></p>
       <p>Weather data by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="https://open-meteo.com/en/docs">API documentation</a></p>
       <p>Weather model output; no station observations are supplied in this slice. Weather represents the selected model grid point, not a district-wide or locality-wide measurement.</p>
-      <p>Flood prediction, drainage assessment, alerts and shelter navigation are planned. This dashboard provides weather information, historical satellite flood evidence and optional GIS research layers.</p>
+      <p>Validated flood prediction, drainage assessment and emergency alerts remain unavailable. This dashboard provides weather, experimental rainfall outlooks, historical evidence, GIS research layers and manually verified shelter destinations.</p>
     </footer>
   </main>
 }

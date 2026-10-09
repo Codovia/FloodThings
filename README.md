@@ -44,7 +44,7 @@ The `fetch` command makes at most one bounded official request per missing sourc
 
 ## Shelter navigation verification status
 
-Task 7 stopped at the source-verification gate on 4 October 2026. Karnataka government records identify **Thekkatte MPCS** and **Padu-Kapu MPCS**, but neither facility's coordinates or entrance could be verified sufficiently for navigation. Current opening, accessibility, occupancy and capacity remain unknown. No shelter directory, database schema, search endpoint or routing feature has been published; the existing application remains the weather, historical-evidence and drainage-research views described above.
+Task 7 stopped at the source-verification gate on 4 October 2026. Karnataka government records identify **Thekkatte MPCS** and **Padu-Kapu MPCS**, but neither facility's coordinates or entrance could be verified sufficiently for navigation. Current opening, accessibility, occupancy and capacity remain unknown. Those historical listings remain unverified and unactivated. Sprint 8 now provides a separate administrator-controlled directory and external entrance directions, described below; it does not import these historical facilities.
 
 The [source register](docs/DATA_SOURCE_REGISTER.md#task-7--shelter-discovery-evidence-gap-4-october-2026) records the official documents, exact pages, bounded map checks and remaining evidence gap. To proceed, a facility-specific authoritative coordinate record or independently corroborated building/entrance location is needed. No openrouteservice key or database URL was configured during verification, and no live route was requested.
 
@@ -143,7 +143,7 @@ curl --max-time 15 --fail-with-body http://127.0.0.1:8000/api/weather
 
 `npm run preview -- --host 127.0.0.1` serves the built dashboard with the same local API proxy. Production hosting will need a reverse proxy for `/api`; Vite preview is a local verification server.
 
-PostgreSQL/PostGIS location-directory persistence is implemented as described below. Python ML, predictive drainage analysis, Telegram alerts and shelter routing remain deferred. No flood prediction or risk claims are made.
+PostgreSQL/PostGIS location-directory persistence, experimental rainfall ML inference and administrator-controlled shelter assignments are implemented as described here. Predictive drainage analysis, Telegram alerts and validated flood prediction remain unavailable. External shelter directions are not verified flood-safe.
 
 The frozen Stage 5/5A reviews record the older README and three-day weather source as historical inputs. To reproduce those reviews, validate with the exact recorded input bytes from Git, whose checksums must match their immutable manifests, rather than substituting the current application version. Run `scripts/.venv/bin/python -B scripts/validate_frozen_app_reviews.py` for this read-only reproduction; it verifies original input hashes before using a temporary replay workspace. Their scientific outputs and original checksums remain unchanged.
 
@@ -202,3 +202,49 @@ Normal tests remain offline. Explicit integration tests require a maintenance UR
 ```
 
 Without that explicit configuration they are skipped, not reported as verified PostgreSQL tests. Run frontend Playwright with the reader environment to verify the same selector against PostgreSQL. Browser weather regressions use isolated fixtures; a live Open-Meteo demonstration is a separate bounded integration operation.
+
+## Administrator-controlled emergency shelters
+
+Open `/admin` to manage manually assigned facilities. This is a project prototype, without affiliation with a disaster-management authority. There is **no public registration, default administrator password or imported operational shelter listing**. The citizen dashboard's **Find open shelters** control queries this separate directory; manual/GPS/map weather selection remains independent. Existing historical shelter references are not imported or activated.
+
+Revision `0002_emergency_shelters`, following the existing location-directory migration, creates `shelter_admins`, `shelter_sessions`, `shelter_login_limits`, `emergency_shelters` and `shelter_audit`. It uses the same PostgreSQL/PostGIS database and preserves location tables. Entrance geometry is WGS84 `POINT`, **X=longitude / Y=latitude**, checked against stored numeric coordinates. Database constraints enforce capacity, occupancy, coordinate pairs, verification and status consistency. Updates use revision checks and transactions that also insert audit snapshots; a failed audit insert rolls back the assignment. Downgrade removes only these shelter tables; back up operational data before any downgrade.
+
+Run `alembic upgrade head` through the existing authorized maintenance environment. Provision a designated administrator privately; the command prompts twice without echoing or saving the password:
+
+```bash
+cd backend
+.venv/bin/python -B -m app.provision_shelter_admin --username YOUR_ADMIN_USERNAME
+# Explicit password rotation also revokes all existing sessions:
+.venv/bin/python -B -m app.provision_shelter_admin --username YOUR_ADMIN_USERNAME --reset-password
+```
+
+The maintenance process alone receives `LOCATION_DIRECTORY_ADMIN_URL`. Passwords must contain 16–128 characters and are salted using scrypt (`N=131072, r=8, p=1`), the [OWASP documented fallback when Argon2id is unavailable](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). No administrator password file is supported. Do not pass the maintenance URL to the API or reuse the directory's read-only role for writes. Configure a distinct, privately provisioned `floodpulse_shelter_app` login with only these privileges in the intended database:
+
+```sql
+GRANT CONNECT ON DATABASE floodpulse_directory TO floodpulse_shelter_app;
+GRANT USAGE ON SCHEMA public TO floodpulse_shelter_app;
+GRANT SELECT ON location_directory_districts, location_directory_active,
+  shelter_admins TO floodpulse_shelter_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON shelter_sessions, shelter_login_limits
+  TO floodpulse_shelter_app;
+GRANT SELECT, INSERT, UPDATE ON emergency_shelters TO floodpulse_shelter_app;
+GRANT SELECT, INSERT ON shelter_audit TO floodpulse_shelter_app;
+```
+
+The login must not own tables, create schema objects, alter administrator accounts, delete shelters or update/delete audit history. Supply its private same-database `SHELTER_DATABASE_URL` to the API. Keep the existing directory reader `DATABASE_URL` and `LOCATION_DIRECTORY_BACKEND=postgres` unchanged. Also set:
+
+- `SHELTER_PUBLIC_ORIGIN`: exact browser origin, without a trailing slash, e.g. `https://floodpulse.example.org`.
+- `SHELTER_COOKIE_SECURE=true`: production default; HTTPS is required.
+- `SHELTER_DIRECTORY_MODE=live`: production default; demonstration assignments are excluded.
+
+Explicit loopback development may use `http://127.0.0.1:5173` (or the actual local frontend port) with `SHELTER_COOKIE_SECURE=false`; non-loopback insecure cookie configurations fail closed. Vite proxies `/api` to the existing FastAPI target. Deployments must preserve `Origin`, serve the frontend/API under the configured same origin, and apply the frame-denial/nosniff headers to static frontend responses as the included Vite dev/preview servers do. Configure TLS at deployment; this sprint does not publish a hosted emergency service.
+
+Authentication uses random opaque HttpOnly/SameSite=Strict cookies with only token hashes stored in PostgreSQL, an eight-hour absolute/30-minute idle lifetime, server-side logout revocation, exact-Origin checks and a per-session CSRF header for writes. Login requires a same-origin JSON request and custom header. Persisted 15-minute limits apply per account and direct client address; forwarded addresses are deliberately not trusted. Reverse-proxy deployments may share the peer limit unless a separately reviewed trusted-proxy policy is introduced. Responses never cache administrator or shelter availability data. Passwords, session cookies and CSRF tokens must not be logged; the React CSRF token remains in memory.
+
+Create a **Pending verification** assignment first. Enter its facility/address, NIC district association, verified entrance (map selection or coordinates), capacity/occupancy, facilities, accessibility and restrictions. A marker is only a proposed entrance; it does not verify a facility. To save **Open** or **Full**, independently confirm **authorization, exact entrance, current usability and capacity**, and record verification evidence. All four confirmations reset in the form and are required on every Open/Full update. Open requires spare capacity; Full requires occupancy equal to capacity. Closed preserves the previous verification timestamp as history but is not available. Pending clears active verification. Contact details are public only with explicit disclosure approval; internal notes/evidence/administrator identities stay private.
+
+Public `GET /api/shelters` returns only Open assignments with spare capacity and verification less than **24 hours** old. This expiry is an application policy, not an official emergency-service standard; it is not an occupancy reservation or assurance of access. Optional latitude/longitude computes approximate **straight-line** PostGIS distance, not road distance. Google Maps URLs use the exact stored entrance and optional selected origin, following the [official Maps URLs directions format](https://developers.google.com/maps/documentation/urls/get-started). External directions are **not verified flood-safe**. Refresh and confirm access with local authorities before travel. Full, Closed, Pending, expired and demonstration records never become live destinations. An empty directory explicitly states: “No currently verified open shelters are available in this directory.” No weather/AI output creates assignments or alerts.
+
+Protected APIs: login/session/logout, `GET/POST /api/admin/shelters`, `PUT /api/admin/shelters/{id}` and `GET /api/admin/shelters/{id}/audit`. Public endpoints are read-only. Administrative lists are paginated in bounded pages of 100; audit retrieval currently shows up to 100 stored events. Database failures return explicit 503 errors, unauthorized access 401, CSRF/origin failure 403, revision conflict 409 and invalid input 422.
+
+Normal unit tests are offline. The existing explicit PostgreSQL integration harness creates/drops only UUID-named test databases and verifies real PostGIS, migrations, constraints, permissions, authentication and rollback. A labelled isolated browser demonstration exercised Pending → Open → Full → Closed → Open, exact directions, five audit events, logout, mobile layout and real existing weather. Its fixture database is removed afterwards. The live directory remains empty until designated staff provision an account and genuinely verify facilities; no demonstration passwords or assignments are retained in the live database. No historical or restricted geographic data are imported.

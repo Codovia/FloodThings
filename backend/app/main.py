@@ -3,12 +3,15 @@ from contextlib import asynccontextmanager
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
 
 from .weather import OpenMeteoAdapter, WeatherUnavailable, unavailable
 from .location_weather import fetch_point_weather, selected_location
 from .historical import router as historical_router
 from .drainage import router as drainage_router
 from .locations import router as locations_router
+from .shelters import router as shelters_router, dispose_shelter_engine
 
 
 @asynccontextmanager
@@ -21,12 +24,33 @@ async def lifespan(app: FastAPI):
         finally:
             from .location_database import dispose_engine
             dispose_engine()
+            dispose_shelter_engine()
 
 
 app = FastAPI(title="FloodPulse", version="0.1.0", lifespan=lifespan)
 app.include_router(historical_router)
 app.include_router(drainage_router)
 app.include_router(locations_router)
+app.include_router(shelters_router)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_without_admin_secrets(request: Request, exc):
+    if request.url.path.startswith('/api/admin/'):
+        return JSONResponse(status_code=422, content={'detail': 'Invalid administrator request; check fields and verification requirements'})
+    return await request_validation_exception_handler(request, exc)
+
+
+@app.middleware("http")
+async def shelter_response_security(request: Request, call_next):
+    response = await call_next(request)
+    if request.url.path.startswith('/api/admin/') or request.url.path == '/api/shelters':
+        response.headers['Cache-Control'] = 'no-store'
+        response.headers['Pragma'] = 'no-cache'
+        response.headers['X-Content-Type-Options'] = 'nosniff'
+        response.headers['X-Frame-Options'] = 'DENY'
+        response.headers['Referrer-Policy'] = 'same-origin'
+    return response
 
 
 def get_weather(request: Request) -> OpenMeteoAdapter:

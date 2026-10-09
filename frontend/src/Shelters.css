@@ -1,0 +1,12 @@
+.shelter-map { height: 300px; width: 100%; border-radius: 8px; margin-block: 12px; }
+.shelter-list { list-style: none; padding: 0; }
+.shelter-list > li { border-top: 1px solid #bad2d0; padding: 16px 0; overflow-wrap: anywhere; }
+.shelter-list button { margin-right: 8px; }
+.admin-shell { max-width: 960px; margin: 28px auto; padding: 0 20px; }
+.shelter-form { display: grid; gap: 16px; }
+.shelter-form label { display: grid; gap: 6px; font-weight: 600; }
+.shelter-form input, .shelter-form textarea, .shelter-form select { min-width: 0; width: 100%; box-sizing: border-box; padding: 10px; font: inherit; border: 1px solid #688681; border-radius: 5px; }
+.shelter-form input[type=checkbox] { width: auto; margin-right: 8px; }
+.shelter-form label:has(input[type=checkbox]) { display: block; }
+.shelter-form fieldset { display: grid; gap: 12px; min-width: 0; border: 1px solid #688681; }
+.shelter-form :focus-visible, .admin-shell button:focus-visible, .shelter-list a:focus-visible { outline: 3px solid #286fba; outline-offset: 3px; }
