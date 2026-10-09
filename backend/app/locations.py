@@ -86,7 +86,17 @@ router = APIRouter(prefix='/api/locations', tags=['locations'])
 
 
 def get_store():
-    return LocationStore()
+    import os
+    backend = os.environ.get('LOCATION_DIRECTORY_BACKEND', 'file')
+    if backend == 'file':
+        return LocationStore()
+    if backend == 'postgres':
+        from .location_database import DatabaseLocationStore
+        return DatabaseLocationStore()
+    class InvalidStore:
+        def load(self):
+            raise LocationsUnavailable('Invalid location directory backend configuration')
+    return InvalidStore()
 
 
 def load(store):

@@ -16,7 +16,11 @@ async def lifespan(app: FastAPI):
     # Bounded upstream requests, with no retries, persistence or background jobs.
     async with httpx.AsyncClient(timeout=httpx.Timeout(10.0), follow_redirects=False) as client:
         app.state.weather = OpenMeteoAdapter(client)
-        yield
+        try:
+            yield
+        finally:
+            from .location_database import dispose_engine
+            dispose_engine()
 
 
 app = FastAPI(title="FloodPulse", version="0.1.0", lifespan=lifespan)

@@ -12,11 +12,11 @@ The active public directory, `data/reference/karnataka_location_directory_v2/`, 
 
 Kundapur retains `udupi-admin:municipality:kundapur`; lookup by `osm:node:245623778` resolves the same record. Official district records independently link Kundapur/Kundapura town names. Its genuine OSM `place=town` point is used; railway and taluk-centre results remain excluded. Saligrama's original OSM `place=village` classification is preserved separately from its official town-panchayat identity. Mangaluru also supports the source alias Mangalore. All points represent mapped settlements, not surveyed municipal centres, gauges or shelters.
 
-Read-only APIs: `GET /api/locations/districts?q=...`, `GET /api/locations/localities?district_id=nic:udupi.nic.in&q=...`, `GET /api/locations/search?q=...`, and `GET /api/locations/localities/{locality_id}`. Search ordering is deterministic; `limit` is bounded to 50 and `offset` supports pagination. Unknown identifiers return 404, invalid parameters 422, and missing/corrupt directory data 503. Local search makes no external geocoder requests and needs no database server. Backend checks provenance, coordinate availability and directory checksums before serving records.
+Read-only APIs: `GET /api/locations/districts?q=...`, `GET /api/locations/localities?district_id=nic:udupi.nic.in&q=...`, `GET /api/locations/search?q=...`, and `GET /api/locations/localities/{locality_id}`. Search ordering is deterministic; `limit` is bounded to 50 and `offset` supports pagination. Unknown identifiers return 404, invalid parameters 422, and missing/corrupt directory data 503. Local search makes no external geocoder requests; the explicitly selected backend may use the public file snapshot or PostgreSQL. Backend checks provenance, coordinate availability and directory checksums before serving records.
 
 Coordinates: © OpenStreetMap contributors, **ODbL 1.0**; the extracted place-point database is offered under that licence with attribution/share-alike conditions. Udupi navigation bounds: existing geoBoundaries CGAZ **CC BY 4.0**. Dakshina Kannada navigation bounds: geoBoundaries gbOpen IND ADM2, Pathways Data Pvt. Ltd./lgdirectory.gov.in, **ODbL 1.0**, represented year 2021; these are navigation context, not current official district-boundary certification. Government URLs cross-check small factual names/associations; no government HTML/text or SOI geometry is republished. The [source register](docs/DATA_SOURCE_REGISTER.md) and directory manifest retain source versions, original checksums and limitations. The weather API still identifies any requested coordinates as a point; directory provenance is displayed separately, without claiming that Open-Meteo verifies administrative identity or supplies district-wide conditions.
 
-Reproduce the public directory offline with `backend/.venv/bin/python -B scripts/expand_location_directory.py validate` using the retained source files. `build` refuses an existing version. The original v1 validation command remains `backend/.venv/bin/python -B scripts/build_location_directory.py validate`. Runtime search reads the committed public directory only and makes no geocoder requests.
+Reproduce the public directory offline with `backend/.venv/bin/python -B scripts/expand_location_directory.py validate` using the retained source files. `build` refuses an existing version. The original v1 validation command remains `backend/.venv/bin/python -B scripts/build_location_directory.py validate`. Runtime search reads either the explicit file backend or the active imported PostgreSQL version and makes no geocoder requests.
 
 A fresh clone can serve the permitted directory snapshot without raw verification documents; offline source reproduction requires the retained originals locally. Both validators check source hashes, original node coordinates, actual public polygon containment and deterministic outputs without writes or network. Original SOI data and derived research tables remain local.
 
@@ -99,7 +99,7 @@ npm test
 npm run test:map
 ```
 
-Tests use `httpx.MockTransport`, temporary working directories and a socket guard that rejects network/database connections. Mocked weather values exist only in tests. Neither runtime nor tests write weather archives or access a database.
+Tests use `httpx.MockTransport`, temporary working directories and a socket guard that rejects network/database connections. Mocked weather values exist only in tests. Neither runtime nor tests write weather archives. Location persistence is separate from weather; ordinary unit tests forbid database access.
 
 Frontend unit tests mock fetch/Leaflet in isolation. Browser map tests require Chromium (`npx playwright install chromium`) and the saved spatial dataset; they start local backend/frontend servers, block external tile/weather requests and compare API responses/rendered Leaflet cell counts with exported GeoJSON. Their artifacts go to the system temporary directory.
 
@@ -121,6 +121,62 @@ curl --max-time 15 --fail-with-body http://127.0.0.1:8000/api/weather
 
 `npm run preview -- --host 127.0.0.1` serves the built dashboard with the same local API proxy. Production hosting will need a reverse proxy for `/api`; Vite preview is a local verification server.
 
-PostgreSQL + PostGIS persistence, Python ML, drainage analysis, Telegram alerts and shelter routing remain deferred. No flood prediction or risk claims are made.
+PostgreSQL/PostGIS location-directory persistence is implemented as described below. Python ML, predictive drainage analysis, Telegram alerts and shelter routing remain deferred. No flood prediction or risk claims are made.
 
 The frozen Stage 5/5A reviews record the older README and three-day weather source as historical inputs. To reproduce those reviews, validate with the exact recorded input bytes from Git, whose checksums must match their immutable manifests, rather than substituting the current application version. Run `scripts/.venv/bin/python -B scripts/validate_frozen_app_reviews.py` for this read-only reproduction; it verifies original input hashes before using a temporary replay workspace. Their scientific outputs and original checksums remain unchanged.
+
+### PostgreSQL/PostGIS location directory
+
+The location API now supports an explicit database backend. `LOCATION_DIRECTORY_BACKEND=file` (default) serves the reviewed immutable snapshot for offline/migration use. `LOCATION_DIRECTORY_BACKEND=postgres` reads only the active imported PostgreSQL version. Missing configuration, unavailable database, missing migration/import or failed integrity checks return HTTP 503; there is **no automatic file fallback**. Weather/manual coordinates/GPS/map requests remain independent of the directory database. These settings do not change flood-prediction availability.
+
+Use the existing deployment's PostgreSQL/PostGIS service where authorized. This checkout had no configured database URL, models or Alembic history. Sprint 6 verified a separate persistent Docker database, PostgreSQL **16.4 / PostGIS 3.4.3**, using an already cached `postgis/postgis:16-3.4` image. The inaccessible native PostgreSQL 18.6 service was left untouched. The cached image is verification infrastructure, **not a current security-patch recommendation**: deploy with a reviewed, patched compatible PostgreSQL/PostGIS image and normal backup/TLS/secret management.
+
+For a new PostgreSQL 16 development instance, use a private password file outside Git and a dedicated persistent volume. For example, with `FLOODPULSE_POSTGIS_IMAGE` set to a reviewed image and `FLOODPULSE_DB_PASSWORD_FILE` to an existing private file:
+
+```bash
+docker run -d --name floodpulse-location-db \
+  -p 127.0.0.1:55432:5432 \
+  -v floodpulse_directory_data:/var/lib/postgresql/data \
+  --mount type=bind,src="$FLOODPULSE_DB_PASSWORD_FILE",dst=/run/secrets/db-password,readonly \
+  -e POSTGRES_PASSWORD_FILE=/run/secrets/db-password \
+  -e POSTGRES_DB=floodpulse_directory "$FLOODPULSE_POSTGIS_IMAGE"
+```
+
+The volume path above applies to PostgreSQL 16; follow the image's documentation for other major versions. Do not point tests at an existing production database. Enable PostGIS through an authorized administrator if it is not already present (`CREATE EXTENSION postgis` in the intended database). The migration checks for it and fails explicitly; it does not install extensions or modify system services.
+
+Install backend requirements into its virtual environment. Supply maintenance credentials only through `LOCATION_DIRECTORY_ADMIN_URL` (or `DATABASE_URL` for the dedicated maintenance process), using the `postgresql+psycopg://` scheme with URL-encoded password characters. `.env.example` documents variable names; the application does not automatically load `.env` files. Never commit actual credentials.
+
+```bash
+cd backend
+.venv/bin/alembic upgrade head
+.venv/bin/python -B -m app.import_locations
+# A second import reports already_imported; no duplicate rows/timestamp reset.
+# Import a retained version without changing the active pointer:
+.venv/bin/python -B -m app.import_locations --directory ../data/reference/karnataka_location_directory_v1 --no-activate
+```
+
+Revision `0001_location_directory` creates five `location_directory_*` tables for versions/provenance, districts, localities, lookup identifiers and the active-version pointer, plus indexes and constraints. Verified geometry is `POINT`, EPSG:4326, **X=longitude / Y=latitude**; disabled Kaup has no geometry. Import validates source checksums and records first, serializes concurrent imports, then imports and activates in one transaction. Conflicting content under an existing version fails; no partially imported version is activated. JSONB stores original public records/manifest; both original-byte and canonical-content checksums are retained. V1 source files remain immutable. Downgrade removes only these new tables and retains PostGIS/unrelated schema; do not downgrade a live directory without a backup.
+
+Use a distinct read-only application login, granting `CONNECT` on the intended database, `USAGE` on the intended schema and `SELECT` only on:
+
+```sql
+GRANT SELECT ON location_directory_versions, location_directory_districts,
+  location_directory_localities, location_directory_identifiers,
+  location_directory_active TO floodpulse_location_reader;
+```
+
+An administrator should create/configure this login with private credentials through their normal secret-management process. Do not grant it table ownership, schema CREATE or data-write privileges. Run the public API with only its reader `DATABASE_URL` and `LOCATION_DIRECTORY_BACKEND=postgres`, removing the maintenance URL from that process:
+
+```bash
+.venv/bin/python -B -m uvicorn app.main:app --host 127.0.0.1 --port 18040
+```
+
+Existing location routes and response contracts remain unchanged. Each read uses a bounded, read-only repeatable-read transaction and closes the connection; pools are disposed at application shutdown. The dataset remains five selectable points across two districts and 31 NIC names with unresolved current-LGD identity, with OSM/geoBoundaries attribution and reuse conditions preserved. No SOI geometry or scientific observation tables are imported.
+
+Normal tests remain offline. Explicit integration tests require a maintenance URL with permission to create a **new isolated test database** and enable PostGIS. They create/drop only a UUID-named `floodpulse_sprint6_test_*` database, never the configured application's database:
+
+```bash
+.venv/bin/python -B -m pytest integration_tests -q
+```
+
+Without that explicit configuration they are skipped, not reported as verified PostgreSQL tests. Run frontend Playwright with the reader environment to verify the same selector against PostgreSQL. Browser weather regressions use isolated fixtures; a live Open-Meteo demonstration is a separate bounded integration operation.

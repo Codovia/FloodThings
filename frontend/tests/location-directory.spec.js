@@ -139,3 +139,16 @@ test('late locality weather cannot overwrite newer locality during point switchi
   release(); await expect(page.getByText('99 °C',{exact:true})).toHaveCount(0)
   await expect(page.getByText(/Requested point: 13.3419169/)).toBeVisible()
 })
+
+test('database directory outage leaves manual point weather and seven-day freshness independent', async ({ page }) => {
+  await page.route('**/api/locations/**', route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Location database is unavailable or invalid; no file fallback was used'})}))
+  await page.goto('/'); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Location database is unavailable')
+  await page.getByLabel('Weather latitude').fill('14'); await page.getByLabel('Weather longitude').fill('75')
+  const request=page.waitForRequest(r=>r.url().includes('latitude=14&longitude=75'))
+  await page.getByRole('button',{name:'Get point weather'}).click(); await request
+  await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
+  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
+  await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
+  await expect(page.getByRole('alert',{name:'Location directory error'})).toBeVisible()
+})
