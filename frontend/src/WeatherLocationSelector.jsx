@@ -2,10 +2,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './WeatherLocationSelector.css'
+import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 
 export const DEFAULT_POINT = { name: 'Bengaluru, Karnataka', latitude: 12.9767936, longitude: 77.5900820 }
 
-function WeatherPointMap({ point, onSelect }) {
+function WeatherPointMap({ point, onSelect, navigationBounds }) {
   const container = useRef(null)
   const map = useRef(null)
   const marker = useRef(null)
@@ -34,7 +35,12 @@ function WeatherPointMap({ point, onSelect }) {
     marker.current = L.circleMarker([point.latitude, point.longitude], {
       radius: 7, color: '#1b625d', fillOpacity: 0.8,
     }).addTo(map.current)
+    if (point.locality_id) map.current.setView([point.latitude, point.longitude], 12, { animate: false })
   }, [point])
+
+  useEffect(() => {
+    if (navigationBounds && map.current) map.current.fitBounds(navigationBounds, { animate: false })
+  }, [navigationBounds])
 
   return <>
     <div ref={container} className="weather-location-map" role="region" aria-label="Weather location selection map" />
@@ -51,6 +57,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   const [latitude, setLatitude] = useState(String(point.latitude))
   const [longitude, setLongitude] = useState(String(point.longitude))
   const [showMap, setShowMap] = useState(false)
+  const [navigationBounds, setNavigationBounds] = useState(null)
   const [error, setError] = useState(null)
   const [locating, setLocating] = useState(false)
   const selection = useRef(0)
@@ -60,6 +67,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
 
   function choose(next) {
     selection.current++; setLocating(false); setError(null)
+    setNavigationBounds(null)
     onSelect(next)
   }
 
@@ -96,6 +104,11 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     <p className="eyebrow">EXPLORE WEATHER</p>
     <h2 id="weather-location-title">Choose a weather location</h2>
     <p>Start from Karnataka, select a map point or enter WGS84 coordinates. Point weather does not verify administrative boundaries.</p>
+    <LocationDirectorySelector onChoose={next => { setShowMap(true); choose(next) }} onDistrict={district => {
+      selection.current++; setLocating(false); setError(null)
+      setNavigationBounds(district?.navigation_bounds || null)
+      if (district?.navigation_bounds) setShowMap(true)
+    }} />
     <form onSubmit={submit} className="weather-coordinate-form">
       <label>Latitude<input aria-label="Weather latitude" type="number" step="any" min="-90" max="90" required value={latitude} onChange={e => setLatitude(e.target.value)} /></label>
       <label>Longitude<input aria-label="Weather longitude" type="number" step="any" min="-180" max="180" required value={longitude} onChange={e => setLongitude(e.target.value)} /></label>
@@ -109,6 +122,6 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     <p className="muted">GPS is requested only when you choose it. Coordinates are sent through FloodPulse to Open-Meteo for this weather request.</p>
     {error && <p className="notice error" role="alert">{error}</p>}
     {point.accuracy_m != null && <p className="muted">Device-reported location accuracy: approximately {Math.round(point.accuracy_m)} metres.</p>}
-    {showMap && <WeatherPointMap point={point} onSelect={choose} />}
+    {showMap && <WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds} />}
   </section>
 }

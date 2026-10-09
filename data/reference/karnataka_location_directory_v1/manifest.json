@@ -1,0 +1,148 @@
+{
+  "version": "karnataka_location_directory_v1",
+  "created_at": "2026-10-08T17:38:13.462700+00:00",
+  "district_count": 31,
+  "locality_count": 3,
+  "selectable_locality_count": 2,
+  "current_lgd_independently_verified": false,
+  "soi_used": false,
+  "inputs": [
+    {
+      "path": "data/reference/karnataka_nic_provisional_v1/district_names.json",
+      "sha256": "419fad46ef9eb4369809c4d9710f417089138792e9669fb1781e41c451fafcbc",
+      "bytes": 31265
+    },
+    {
+      "path": "data/reference/karnataka_nic_provisional_v1/manifest.json",
+      "sha256": "da6e029a0000879a8687d08a29980ef7a8099abdaff696000a9527981cb1bfbf",
+      "bytes": 2780
+    },
+    {
+      "path": "data/processed/udupi_drainage_gis_v1/place_query.json",
+      "sha256": "05fbf11aa4057f5f99bae37e55b4175fe54bff3b9fce466b0358903bfebfd268",
+      "bytes": 4618
+    },
+    {
+      "path": "data/processed/udupi_flood_spatial_v1/udupi_boundary.geojson",
+      "sha256": "4f977a68cce0c55ceedad9c2d30c2d774a79ba10243816d14069ea84ea4a43df",
+      "bytes": 15156
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/municipal.html",
+      "sha256": "ab4c28cd5bb297d0b689bcc712c83a441aaa48307b0e073f5ab10e016eb9abd0",
+      "bytes": 123224
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/policy.html",
+      "sha256": "ee53159acf73b9741f95e40ef6c1f48dab9ee03af49fd359db27eb8d4cd85587",
+      "bytes": 126121
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/karkala-node.json",
+      "sha256": "3d0c88580be611d2e80ce62c2c3d689cd08b2a7ec37bdef51c143a33497f11dd",
+      "bytes": 696
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/karkala-node.provenance.json",
+      "sha256": "1fb3acfd4decad09a9d0b8f2ba8e734c51c9853cda19e9c7237edece68cd7b5d",
+      "bytes": 223
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/nominatim-provenance.json",
+      "sha256": "788e6efc96535932dbced4f71cd79855883d2680eb3c2087190ee62ce36ca90c",
+      "bytes": 794
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/Kundapura.json",
+      "sha256": "2ab76808a07a3ea1bfb055bda679e58558d8b17405ed42121212468da45bc84d",
+      "bytes": 1332
+    },
+    {
+      "path": "data/raw/reference/mvp_sprint4_live_v1/Karkala.json",
+      "sha256": "70c90a5eebfba92beed07bcb0aec472b77dff51c554c176e5f75bb7655e39a3a",
+      "bytes": 624
+    }
+  ],
+  "retrievals": [
+    {
+      "file": "municipal.html",
+      "url": "https://udupi.nic.in/en/municipal-administration/",
+      "parameters": null,
+      "retrieved_at": "2026-10-08T17:31:09.759590+00:00",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 123224,
+      "sha256": "ab4c28cd5bb297d0b689bcc712c83a441aaa48307b0e073f5ab10e016eb9abd0"
+    },
+    {
+      "file": "policy.html",
+      "url": "https://udupi.nic.in/en/website-policies/",
+      "parameters": null,
+      "retrieved_at": "2026-10-08T17:31:20.709749+00:00",
+      "http_status": 200,
+      "content_type": "text/html; charset=UTF-8",
+      "bytes": 126121,
+      "sha256": "ee53159acf73b9741f95e40ef6c1f48dab9ee03af49fd359db27eb8d4cd85587"
+    },
+    {
+      "file": "places.json",
+      "url": "https://overpass-api.de/api/interpreter",
+      "error": "HTTPError: 504 Server Error: Gateway Timeout for url: https://overpass-api.de/api/interpreter?data=%5Bout%3Ajson%5D%5Btimeout%3A15%5D%3Bnode%5B%22place%22~%22%5E%28city%7Ctown%29%24%22%5D%5B%22name%22~%22%5E%28Udupi%7CKundapura%7CKundapur%7CKarkala%29%24%22%5D%2813.1%2C74.6%2C13.8%2C75.1%29%3Bout+meta%3B",
+      "retrieved_at": "2026-10-08T17:31:49.201144+00:00"
+    },
+    {
+      "file": "Karkala.json",
+      "url": "https://nominatim.openstreetmap.org/search",
+      "parameters": {
+        "q": "Karkala, Udupi, Karnataka, India",
+        "format": "jsonv2",
+        "limit": 2,
+        "addressdetails": 1
+      },
+      "retrieved_at": "2026-10-08T17:35:36.689805+00:00",
+      "bytes": 624,
+      "sha256": "70c90a5eebfba92beed07bcb0aec472b77dff51c554c176e5f75bb7655e39a3a"
+    },
+    {
+      "file": "Kundapura.json",
+      "url": "https://nominatim.openstreetmap.org/search",
+      "parameters": {
+        "q": "Kundapura, Udupi, Karnataka, India",
+        "format": "jsonv2",
+        "limit": 2,
+        "addressdetails": 1
+      },
+      "retrieved_at": "2026-10-08T17:35:43.765521+00:00",
+      "bytes": 1332,
+      "sha256": "2ab76808a07a3ea1bfb055bda679e58558d8b17405ed42121212468da45bc84d"
+    },
+    {
+      "url": "https://api.openstreetmap.org/api/0.6/node/245619070.json",
+      "retrieved_at": "2026-10-08T17:36:15.509449+00:00",
+      "bytes": 696,
+      "sha256": "3d0c88580be611d2e80ce62c2c3d689cd08b2a7ec37bdef51c143a33497f11dd"
+    }
+  ],
+  "licensing": {
+    "coordinates": "ODbL 1.0; © OpenStreetMap contributors. This small extracted place-point database is offered under ODbL 1.0; share-alike and attribution apply.",
+    "district_navigation": "geoBoundaries CC BY 4.0; bounds only for navigation, not a representative weather point.",
+    "official_names": "Small factual name/URL/association inventory; no original government page text, maps or HTML redistributed. No blanket document reuse licence asserted.",
+    "udupi_document_policy_url": "https://udupi.nic.in/en/website-policies/",
+    "udupi_document_policy": "The policy requires permission for reproduction of website material; original documents remain local. Only factual identities cross-checked here.",
+    "osm_license_url": "https://opendatacommons.org/licenses/odbl/1.0/",
+    "nominatim_usage_policy": "https://operations.osmfoundation.org/policies/nominatim/"
+  },
+  "limitations": [
+    "31 source names; current LGD codes unresolved. No SOI source identifiers or geometry used.",
+    "Only Udupi has reviewed public navigation geometry. No district representative weather points.",
+    "Udupi and Karkala coordinates are volunteer-mapped settlement points, not surveyed municipal boundaries or weather gauges.",
+    "Kundapur is name-only. Remaining 30 districts have no verified localities in this version.",
+    "Runtime searches only retained local data; no live geocoder or external directory dependency."
+  ],
+  "files": {
+    "directory.json": {
+      "sha256": "991026f0ef8f6d7370984609f84466b532d27b529e4cf3362e1c401e2cb5e274",
+      "bytes": 19601
+    }
+  }
+}

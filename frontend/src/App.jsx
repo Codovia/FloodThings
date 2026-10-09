@@ -33,7 +33,7 @@ export default function App() {
         <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">{point.name}</h2></div>
         <button onClick={() => load()} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
       </div>
-      <p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p>
+      <p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {point.locality_id ? <><a href={point.coordinate_source_url}>Mapped locality point · OpenStreetMap</a> · <a href={point.association_source_url}>{point.district_name} district association</a>. Point weather, not locality-wide or district-wide conditions.</> : selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p>
       <p className="notice">Flood prediction is not available. Prediction target and label methodology are not yet validated.</p>
       <div className="weather-freshness" data-freshness={freshness} role="status" aria-label="Weather data freshness">
         <strong>{freshness === 'fresh' ? 'Fresh' : freshness === 'stale' ? 'Stale — previously retrieved information' : freshness === 'refreshing' ? 'Refreshing weather' : 'No weather data available'}</strong>
