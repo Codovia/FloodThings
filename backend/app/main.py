@@ -55,3 +55,20 @@ async def weather(
         if latitude is not None:
             body.update(location=selected_location(latitude, longitude), prediction_status="not_available")
         return JSONResponse(status_code=503, content=body)
+
+
+@app.get("/api/ai/rainfall-outlook")
+async def ai_rainfall_outlook(
+    latitude: float = Query(..., ge=-90, le=90, allow_inf_nan=False),
+    longitude: float = Query(..., ge=-180, le=180, allow_inf_nan=False),
+    adapter: OpenMeteoAdapter = Depends(get_weather),
+):
+    from .rainfall_outlook import rainfall_outlook
+    from .rainfall_features import RainfallUnavailable
+    try:
+        return await rainfall_outlook(adapter.client, latitude, longitude)
+    except RainfallUnavailable as exc:
+        return JSONResponse(status_code=503, content={"status": "unavailable", "experimental": True,
+            "message": str(exc), "location": {"latitude": latitude, "longitude": longitude},
+            "prediction": None, "probability": None, "model_version": "rainfall_logistic_v1",
+            "flood_prediction_status": "not_available"})

@@ -20,6 +20,28 @@ Reproduce the public directory offline with `backend/.venv/bin/python -B scripts
 
 A fresh clone can serve the permitted directory snapshot without raw verification documents; offline source reproduction requires the retained originals locally. Both validators check source hashes, original node coordinates, actual public polygon containment and deterministic outputs without writes or network. Original SOI data and derived research tables remain local.
 
+## Experimental AI Rainfall Outlook
+
+Select **Kundapur** or **Mangaluru** through the existing PostgreSQL/file-backed place selector, wait for real weather, then choose **Run experimental rainfall model**. The saved `rainfall_logistic_v1` StandardScaler + Logistic Regression model receives verified past-hourly Open-Meteo inputs and returns a binary experimental rainfall outlook. Switching locations clears old results; once opened, the panel refreshes after a new successful weather receipt. Its separate bounded hourly request supplies features absent from the seven-day weather response; it does not repeat that weather request. Model/provider failures show unavailable, with manual retry and no replacement prediction. Other points retain normal weather but are outside this model's supported scope.
+
+`GET /api/ai/rainfall-outlook?latitude=13.6250993&longitude=74.6915722` returns the actual model result, version/checksum, requested point and provider grid, input features/units, successful UTC retrieval, feature-valid time and exact 24-hour horizon. Invalid coordinates return 422; missing/incompatible model or hourly inputs, unsupported points and provider failures return 503. The horizon begins at the next complete UTC hour, within one hour after retrieval. The backend consumes only past-hourly values ending before that start, never future observations. No calibrated probability is exposed.
+
+Target: **at least 64.5 mm precipitation over 24 hours**, using the amount boundary in [IMD's heavy-rainfall definition](https://www.imdpune.gov.in/hazardatlas/extr_rainfallnew_p2001_2010.html). It includes heavier amounts. This is a **model-grid rainfall proxy** in a rolling UTC window, not an IMD station measurement/reporting day, flood occurrence, district-wide forecast or official warning. Below threshold does not mean dry or safe. Flood prediction remains unavailable and no alerts are triggered.
+
+Training uses two bounded real [Open-Meteo ERA5 reanalysis](https://open-meteo.com/en/docs/historical-weather-api) responses, 28 December 2022–1 January 2026, with six-hour example cutoffs during 2023–2025. Eight features: 24/72-hour precipitation totals, maximum hourly precipitation in the past 24 hours, 24-hour mean temperature/humidity/surface pressure, and seasonal sine/cosine. Complete sources have no snowfall. Missing windows are excluded explicitly, never filled. Train: **5,842 examples (113 at/above threshold)**; chronological 2025 holdout after a four-day embargo: **2,888 examples (96 at/above threshold)**. Confusion matrix `[[2273, 519], [8, 88]]` (TN/FP, FN/TP); precision **0.1450**, recall **0.9167**, F1 **0.2504**. Low precision and 519 false positives prevent warning use. Overlapping windows/nearby coastal grids mean these are not independent event counts.
+
+Historical ERA5 (0.25° delayed reanalysis) and live best-match weather model output differ in grids, models and publication semantics. Matching variables, units and transformations are verified; **training/serving parity remains a proxy requiring validation**. Past valid-time boundaries do not establish historical availability as issued or operational forecast skill. Do not interpret the held-out reanalysis metrics as live station accuracy.
+
+The committed portable JSON artifact includes the fitted scaler and learned coefficients, checksummed and verified against scikit-learn across the entire holdout. Startup/inference needs no training data or credential. Raw responses and the detailed example table remain local. Model metadata retain exact parameters, original source checksums and actual metrics. Open-Meteo data: CC BY 4.0; its free service has non-commercial terms. Place coordinates: © OpenStreetMap contributors, ODbL 1.0. No restricted SOI-derived values enter this model.
+
+Offline source-to-dataset reproduction and exact retraining, when the retained originals are present:
+
+```bash
+backend/.venv/bin/python -B scripts/train_rainfall_outlook.py validate
+```
+
+The `fetch` command makes at most one bounded official request per missing source and verifies cached originals; `train` refuses the existing immutable model/dataset version. Reproduction into a new version requires explicitly changing version/output paths rather than overwriting this one. No model fitting happens in the application or ordinary API requests.
+
 ## Shelter navigation verification status
 
 Task 7 stopped at the source-verification gate on 4 October 2026. Karnataka government records identify **Thekkatte MPCS** and **Padu-Kapu MPCS**, but neither facility's coordinates or entrance could be verified sufficiently for navigation. Current opening, accessibility, occupancy and capacity remain unknown. No shelter directory, database schema, search endpoint or routing feature has been published; the existing application remains the weather, historical-evidence and drainage-research views described above.

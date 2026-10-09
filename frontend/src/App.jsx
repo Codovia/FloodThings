@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import useWeatherSession, { FRESHNESS_MS, retrievalTime } from './useWeatherSession.js'
 import './WeatherFreshness.css'
 import DailyForecast from './DailyForecast.jsx'
+import RainfallOutlook from './RainfallOutlook.jsx'
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
@@ -68,6 +69,7 @@ export default function App() {
         </>}
       </div>
     </section>
+    <RainfallOutlook point={point} weather={data} freshness={freshness} />
     <HistoricalFloodMap />
     <DrainageResearchLayers />
     <footer>

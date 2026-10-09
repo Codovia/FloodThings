@@ -1,0 +1,169 @@
+{
+  "algorithm": "StandardScaler + scikit-learn LogisticRegression; C=1, balanced class weights, lbfgs, random_state=7; no holdout tuning",
+  "always_below_threshold_baseline": {
+    "confusion_matrix_tn_fp_fn_tp": [
+      [
+        2792,
+        0
+      ],
+      [
+        96,
+        0
+      ]
+    ],
+    "f1": 0.0,
+    "precision": 0.0,
+    "recall": 0.0
+  },
+  "dataset": {
+    "path": "data/working/rainfall_outlook_training_v1/training_examples.csv",
+    "rows": 8768,
+    "sha256": "a793a5f64ce81214a0df6fd73935b5510d0faee3d9b80278d9111b37579efaa8"
+  },
+  "deployment_scope": "Only the two exact retained Kundapur/Mangaluru points. No statewide extrapolation, station accuracy, calibrated probability, flood predictions or emergency alerts.",
+  "excluded_split_examples": 38,
+  "features": {
+    "humidity_mean_24h_percent": "%",
+    "max_hourly_rain_24h_mm": "mm",
+    "pressure_mean_24h_hpa": "hPa",
+    "rain_24h_mm": "mm",
+    "rain_72h_mm": "mm",
+    "season_cos": "dimensionless",
+    "season_sin": "dimensionless",
+    "temperature_mean_24h_c": "°C"
+  },
+  "historical_availability": "Retrospective ERA5 values were not proven available at historical issuance; only valid-time feature boundaries are leakage-free. No as-issued forecast skill claim.",
+  "holdout_metrics": {
+    "confusion_matrix_tn_fp_fn_tp": [
+      [
+        2273,
+        519
+      ],
+      [
+        8,
+        88
+      ]
+    ],
+    "f1": 0.2503556187766714,
+    "precision": 0.14497528830313014,
+    "recall": 0.9166666666666666
+  },
+  "locations": [
+    {
+      "crs": "EPSG:4326",
+      "id": "udupi-admin:municipality:kundapur",
+      "latitude": 13.6250993,
+      "longitude": 74.6915722,
+      "name": "Kundapur"
+    },
+    {
+      "crs": "EPSG:4326",
+      "id": "osm:node:245612641",
+      "latitude": 12.8698101,
+      "longitude": 74.8430082,
+      "name": "Mangaluru"
+    }
+  ],
+  "missing_examples": [],
+  "model_sha256": "f3fa9b53d7047746f9d26cba8556705fb3fd2328128a236cb4f423575acf4316",
+  "publication": "Open-Meteo CC BY 4.0, free API non-commercial terms; place metadata © OpenStreetMap contributors ODbL 1.0. Raw responses/detailed training table local; model/metadata public.",
+  "sample_dependence": "Six-hour cutoffs have overlapping 24-hour targets and nearby coast grids. Rows are not independent events; metrics are descriptive, not operational or station skill.",
+  "sklearn_version": "1.8.0",
+  "source_directory_sha256": "567eaee63192b25d487491bb7f1b88e63e7082987ede259b2e0a1cf93792163b",
+  "sources": [
+    {
+      "bytes": 1163098,
+      "content_type": "application/json; charset=utf-8",
+      "documentation": "https://open-meteo.com/en/docs/historical-weather-api",
+      "license": "CC BY 4.0",
+      "parameters": {
+        "end_date": "2026-01-01",
+        "hourly": "precipitation,temperature_2m,relative_humidity_2m,surface_pressure,snowfall",
+        "latitude": 13.6250993,
+        "longitude": 74.6915722,
+        "models": "era5",
+        "precipitation_unit": "mm",
+        "start_date": "2022-12-28",
+        "temperature_unit": "celsius",
+        "timezone": "UTC"
+      },
+      "provider_grid": {
+        "elevation": 15.0,
+        "latitude": 13.75,
+        "longitude": 74.75
+      },
+      "requested_point": {
+        "crs": "EPSG:4326",
+        "id": "udupi-admin:municipality:kundapur",
+        "latitude": 13.6250993,
+        "longitude": 74.6915722,
+        "name": "Kundapur"
+      },
+      "retrieved_at": "2026-10-09T14:38:43.653049+00:00",
+      "sha256": "bc72dc7e5c7c8495d1fe968d48a59fddecb61a64d429f2bef90fcac6b6bd3271",
+      "source_type": "ERA5 reanalysis, not station observations",
+      "status_code": 200,
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=13.6250993&longitude=74.6915722&start_date=2022-12-28&end_date=2026-01-01&models=era5&hourly=precipitation%2Ctemperature_2m%2Crelative_humidity_2m%2Csurface_pressure%2Csnowfall&timezone=UTC&precipitation_unit=mm&temperature_unit=celsius"
+    },
+    {
+      "bytes": 1162683,
+      "content_type": "application/json; charset=utf-8",
+      "documentation": "https://open-meteo.com/en/docs/historical-weather-api",
+      "license": "CC BY 4.0",
+      "parameters": {
+        "end_date": "2026-01-01",
+        "hourly": "precipitation,temperature_2m,relative_humidity_2m,surface_pressure,snowfall",
+        "latitude": 12.8698101,
+        "longitude": 74.8430082,
+        "models": "era5",
+        "precipitation_unit": "mm",
+        "start_date": "2022-12-28",
+        "temperature_unit": "celsius",
+        "timezone": "UTC"
+      },
+      "provider_grid": {
+        "elevation": 42.0,
+        "latitude": 13.0,
+        "longitude": 74.75
+      },
+      "requested_point": {
+        "crs": "EPSG:4326",
+        "id": "osm:node:245612641",
+        "latitude": 12.8698101,
+        "longitude": 74.8430082,
+        "name": "Mangaluru"
+      },
+      "retrieved_at": "2026-10-09T14:38:48.163897+00:00",
+      "sha256": "c2426fe9e72936af91e4b69f2496cf33edf2d56271efdd011c5c7fc18ff93de3",
+      "source_type": "ERA5 reanalysis, not station observations",
+      "status_code": 200,
+      "url": "https://archive-api.open-meteo.com/v1/archive?latitude=12.8698101&longitude=74.8430082&start_date=2022-12-28&end_date=2026-01-01&models=era5&hourly=precipitation%2Ctemperature_2m%2Crelative_humidity_2m%2Csurface_pressure%2Csnowfall&timezone=UTC&precipitation_unit=mm&temperature_unit=celsius"
+    }
+  ],
+  "target": {
+    "definition": "At least IMD heavy-rainfall amount, including very/extremely heavy. Applied to 24-hour model-grid precipitation, not station observations or flood labels.",
+    "definition_url": "https://www.imdpune.gov.in/hazardatlas/extr_rainfallnew_p2001_2010.html",
+    "horizon_hours": 24,
+    "name": "at_least_heavy_rainfall_grid_proxy",
+    "threshold_mm": 64.5,
+    "timing": "Target sums precipitation at cutoff+1h through cutoff+24h. Precipitation is preceding-hour accumulation. This rolling UTC window differs from IMD 08:30 IST reporting day."
+  },
+  "temporal_split": "Train labels end <=2025-01-01T00:00Z; holdout cutoff >=2025-01-05T00:00Z, four-day embargo; no shuffled/same-event temporal split.",
+  "testing": {
+    "first_cutoff": "2025-01-05T00:00:00+00:00",
+    "last_cutoff": "2025-12-31T18:00:00+00:00",
+    "negative": 2792,
+    "positive": 96,
+    "samples": 2888
+  },
+  "trained_at": "2026-10-09T14:41:15.875203+00:00",
+  "training": {
+    "first_cutoff": "2023-01-01T00:00:00+00:00",
+    "last_cutoff": "2024-12-31T00:00:00+00:00",
+    "negative": 5729,
+    "positive": 113,
+    "samples": 5842
+  },
+  "training_serving_parity": "PROXY_REQUIRES_VALIDATION: historical ERA5 0.25-degree delayed reanalysis vs live Open-Meteo best-match forecast/model past-hours. Same units/feature algorithm; different products, grids and publication semantics. Live cutoffs may be at other UTC hours.",
+  "version": "rainfall_logistic_v1"
+}
