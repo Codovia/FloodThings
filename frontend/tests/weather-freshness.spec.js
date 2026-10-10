@@ -1,3 +1,4 @@
+import {selectPoint} from './pointSelection.js'
 import { expect, test } from '@playwright/test'
 
 // Browser-only fixtures and deterministic clocks; no provider calls or files.
@@ -95,10 +96,10 @@ test('offline expiry becomes stale, reconnect refreshes selected Udupi and mobil
   const state = await setup(page)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.getByLabel('Weather latitude').fill('13.34'); await page.getByLabel('Weather longitude').fill('74.74')
-  await page.getByRole('button', { name: 'Get point weather' }).click()
+
+  await selectPoint(page,13.34,74.74)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await expect(page.getByRole('heading', { name: 'Entered coordinates', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
   await expect.poll(() => state.requests.length).toBe(2)
   await context.setOffline(true)
   await page.clock.fastForward(SIX_HOURS)
@@ -133,13 +134,13 @@ test('switching location during an automatic refresh never renders the old locat
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'refreshing')
   await expect.poll(() => state.requests.length).toBe(2)
   state.hold = null
-  await page.getByLabel('Weather latitude').fill('13.34'); await page.getByLabel('Weather longitude').fill('74.74')
-  await page.getByRole('button', { name: 'Get point weather' }).click()
+
+  await selectPoint(page,13.34,74.74)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
   await expect(page.getByText(/Requested point: 13.34° latitude, 74.74° longitude/)).toBeVisible()
   release()
   await page.evaluate(() => new Promise(resolve => queueMicrotask(resolve)))
-  await expect(page.getByRole('heading', { name: 'Entered coordinates', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Refresh weather' }).click()
   await expect.poll(() => state.requests.length).toBe(4)
   expect(state.requests.slice(-2)).toEqual(['/api/weather?latitude=13.34&longitude=74.74', '/api/weather?latitude=13.34&longitude=74.74'])

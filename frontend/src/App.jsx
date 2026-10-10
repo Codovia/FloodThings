@@ -18,6 +18,7 @@ const pageInfo={
 export default function App() {
  const {path,navigate,heading}=usePage()
  const [selectedPoint,setSelectedPoint]=useState(null)
+ const [districtId,setDistrictId]=useState('')
  const [weatherEnabled,setWeatherEnabled]=useState(path!=='/admin')
  useEffect(()=>{if(path!=='/admin')setWeatherEnabled(true)},[path])
  const session=useWeatherSession(selectedPoint, weatherEnabled)
@@ -26,7 +27,7 @@ export default function App() {
  const weatherPage=path==='/' || path==='/weather'
  const sheltersPage=path==='/' || path==='/shelters'
  const info=pageInfo[path]
- function choosePoint(next){if(next.latitude===point.latitude && next.longitude===point.longitude) session.refresh(next);setSelectedPoint({...next})}
+ function choosePoint(next){if(next.district_id)setDistrictId(next.district_id);if(next.latitude===point.latitude && next.longitude===point.longitude) session.refresh(next);setSelectedPoint({...next})}
  return <>
   <AppHeader path={path} navigate={navigate} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
@@ -42,7 +43,7 @@ export default function App() {
    <div className="dashboard-content">
    <div className="location-side">
    <div hidden={!publicPage || path==='/flood-map'} className="location-context">
-    <WeatherLocationSelector point={point} onSelect={choosePoint} compact overview={path==='/'} />
+    <WeatherLocationSelector point={point} onSelect={choosePoint} compact overview={path==='/'} onDistrict={district=>setDistrictId(district?.id||'')} />
     {!weatherPage && <p className="selection-summary">Selected point: <strong>{point.name}</strong> · {point.latitude}°, {point.longitude}°. Point selection does not imply a district-wide condition.</p>}
    </div>
    <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/' || path==='/shelters'} overview={path==='/'} /></div>
@@ -51,7 +52,7 @@ export default function App() {
     <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={path==='/'} />
     <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={path==='/'} />
    </div>
-   {path==='/flood-map' && <FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} />}
+   {path==='/flood-map' && <FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={setDistrictId} />}
    </div>
    {path==='/admin' && <AdminShelters embedded onHome={()=>navigate('/')} />}
    {!info && <PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}

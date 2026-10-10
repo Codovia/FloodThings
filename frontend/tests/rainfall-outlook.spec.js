@@ -1,3 +1,4 @@
+import {selectPoint} from './pointSelection.js'
 import {expect,test} from '@playwright/test'
 import {readFileSync} from 'node:fs'
 const model=JSON.parse(readFileSync(new URL('../../backend/models/rainfall_logistic_v1/model.json',import.meta.url)))
@@ -60,7 +61,7 @@ test('provider/model outage clears predictions without affecting weather and mob
  await expect(page.getByRole('alert',{name:'AI rainfall outlook error'})).toContainText('Controlled model input outage')
  await expect(page.getByText(/64.5 mm predicted by the experimental model/)).toHaveCount(0)
  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
- await page.getByLabel('Weather latitude').fill('14');await page.getByLabel('Weather longitude').fill('75');await page.getByRole('button',{name:'Get point weather'}).click()
- await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
+ await selectPoint(page,14,75)
+ await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
 })

@@ -48,14 +48,12 @@ function WeatherPointMap({ point, onSelect, navigationBounds }) {
       <button type="button" onClick={() => map.current?.setView([15.1, 76.1], 6)}>Show Karnataka view</button>
       <button type="button" onClick={() => map.current?.setView([point.latitude, point.longitude], 12)}>Show selected point</button>
     </div>
-    <p className="muted">Click the map to choose weather coordinates. The marker identifies a point; no flood-risk zones or district identities are assigned.</p>
+    <p className="muted">Click the map to select a point for weather. The marker identifies a point; no flood-risk zones or district identities are assigned.</p>
     {tileError && <p className="notice">{BASEMAP_NOTICE}</p>}
   </>
 }
 
-export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false }) {
-  const [latitude, setLatitude] = useState(String(point.latitude))
-  const [longitude, setLongitude] = useState(String(point.longitude))
+export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false, onDistrict = () => {} }) {
   const [editorOpen,setEditorOpen]=useState(false)
   const [showMap, setShowMap] = useState(mapInitiallyOpen)
   const [navigationBounds, setNavigationBounds] = useState(null)
@@ -64,7 +62,6 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   const selection = useRef(0)
 
   useEffect(() => { if (mapInitiallyOpen) setShowMap(true) }, [mapInitiallyOpen])
-  useEffect(() => { setLatitude(String(point.latitude)); setLongitude(String(point.longitude)) }, [point])
   useEffect(() => () => { selection.current++ }, [])
 
   function choose(next) {
@@ -73,46 +70,32 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     onSelect(next)
   }
 
-  function submit(event) {
-    event.preventDefault()
-    const lat = latitude.trim() === '' ? NaN : Number(latitude)
-    const lon = longitude.trim() === '' ? NaN : Number(longitude)
-    if (!Number.isFinite(lat) || lat < -90 || lat > 90 || !Number.isFinite(lon) || lon < -180 || lon > 180) {
-      setError('Enter latitude from −90 to 90 and longitude from −180 to 180.'); return
-    }
-    choose({ name: 'Entered coordinates', latitude: lat, longitude: lon })
-  }
-
   function locate() {
-    if (!navigator.geolocation) { setError('GPS is unavailable in this browser. Enter coordinates or select the map.'); return }
+    if (!navigator.geolocation) { setError('GPS is unavailable in this browser. Select a verified place or the map.'); return }
     const request = ++selection.current
     setError(null); setLocating(true)
     navigator.geolocation.getCurrentPosition(position => {
       if (selection.current !== request) return
       const { latitude: lat, longitude: lon, accuracy } = position.coords
       if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
-        setLocating(false); setError('GPS returned invalid coordinates. Use the map or coordinate entry.'); return
+        setLocating(false); setError('GPS returned invalid coordinates. Use verified place search or the map.'); return
       }
       choose({ name: 'GPS-selected point', latitude: lat, longitude: lon,
         accuracy_m: Number.isFinite(accuracy) && accuracy >= 0 ? accuracy : null })
     }, failure => {
       if (selection.current !== request) return
       setLocating(false)
-      setError(failure.code === 1 ? 'Location permission denied. Use the map or coordinate entry.' : 'GPS could not determine your location. Use the map or coordinate entry.')
+      setError(failure.code === 1 ? 'Location permission denied. Use verified place search or the map.' : 'GPS could not determine your location. Use verified place search or the map.')
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 })
   }
 
   const controls = <>
     <LocationDirectorySelector onChoose={next => { setShowMap(true); choose(next) }} onDistrict={district => {
       selection.current++; setLocating(false); setError(null)
+      onDistrict(district)
       setNavigationBounds(district?.navigation_bounds || null)
       if (district?.navigation_bounds) setShowMap(true)
     }} />
-    <form onSubmit={submit} className="weather-coordinate-form">
-      <label>Latitude<input aria-label="Weather latitude" type="number" step="any" min="-90" max="90" required value={latitude} onChange={e => setLatitude(e.target.value)} /></label>
-      <label>Longitude<input aria-label="Weather longitude" type="number" step="any" min="-180" max="180" required value={longitude} onChange={e => setLongitude(e.target.value)} /></label>
-      <button type="submit">Get point weather</button>
-    </form>
     <div className="weather-map-actions">
       {!compact&&<button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>}
       <button type="button" onClick={locate} disabled={locating}>{locating ? 'Locating…' : 'Use my GPS location'}</button>
@@ -126,7 +109,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   return <section className={'panel weather-location-selector'+(compact?' compact-location':'')} aria-labelledby="weather-location-title">
     <div className="location-bar"><div><p className="eyebrow">{overview?'KARNATAKA · SELECTED POINT':'SELECTED POINT'}</p><h2 id="weather-location-title">{compact?'Location & map':'Choose a weather location'}</h2><p className="selected-point-name">{point.name} · {point.latitude}°, {point.longitude}°</p></div>
     {compact&&!overview&&<button type="button" aria-expanded={showMap} onClick={()=>setShowMap(value=>!value)}>{showMap?'Hide weather map':'Open weather map'}</button>}</div>
-    {compact?<details className="location-editor" open={editorOpen}><summary aria-expanded={editorOpen} onClick={e=>{e.preventDefault();setEditorOpen(value=>!value)}}>Change location</summary><div hidden={!editorOpen}><p>Search verified places, enter coordinates or request GPS. Point selection does not establish district-wide conditions.</p>{controls}</div></details>:<>{controls}</>}
+    {compact?<details className="location-editor" open={editorOpen}><summary aria-expanded={editorOpen} onClick={e=>{e.preventDefault();setEditorOpen(value=>!value)}}>Change location</summary><div hidden={!editorOpen}><p>Search verified places or request GPS. Point selection does not establish district-wide conditions.</p>{controls}</div></details>:<>{controls}</>}
     {mapVisible&&<div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds}/></div>}
   </section>
 }

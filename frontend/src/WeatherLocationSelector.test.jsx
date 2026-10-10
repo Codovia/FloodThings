@@ -30,10 +30,9 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 function coordinates(lat = '13.34', lon = '74.74') {
-  const editor=screen.queryByText('Change location')?.closest('details'); if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'))
-  fireEvent.change(screen.getByLabelText('Weather latitude'), { target: { value: lat } })
-  fireEvent.change(screen.getByLabelText('Weather longitude'), { target: { value: lon } })
-  fireEvent.click(screen.getByRole('button', { name: 'Get point weather' }))
+  const editor=screen.queryByText('Change location')?.closest('details');if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'))
+  if (!screen.queryByRole('region', {name:'Weather location selection map'})) fireEvent.click(screen.getByRole('button',{name:'Open weather map'}))
+  act(()=>state.events.click({latlng:{lat:Number(lat),lng:Number(lon)}}))
 }
 
 it('keeps Bengaluru default and replaces weather with selected coordinates, preserving nulls and provenance', async () => {
@@ -41,7 +40,7 @@ it('keeps Bengaluru default and replaces weather with selected coordinates, pres
   expect(fetch.mock.calls[0][0]).toBe('/api/weather')
   coordinates()
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74'))
-  await screen.findByText('Entered coordinates')
+  await screen.findByText('Selected map point')
   expect(screen.getByText(/Requested point: 13.34/)).toBeTruthy()
   expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
   expect(screen.getByText(/district\/locality identity not verified/)).toBeTruthy()
@@ -62,7 +61,7 @@ it('clicking Leaflet selects an exact point and clears old marker on another sel
   expect(screen.getByText(/Background tiles are unavailable/)).toBeTruthy()
 })
 
-it('GPS is requested only after a click and has permission-denied/manual fallback', () => {
+it('GPS is requested only after a click and has permission-denied/map fallback', () => {
   const gps = vi.fn((success, failure) => failure({ code: 1 }))
   vi.stubGlobal('navigator', { geolocation: { getCurrentPosition: gps } })
   const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
@@ -70,10 +69,10 @@ it('GPS is requested only after a click and has permission-denied/manual fallbac
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   expect(screen.getByRole('alert').textContent).toContain('Location permission denied')
   expect(selected).not.toHaveBeenCalled()
-  coordinates(); expect(selected).toHaveBeenCalledWith({ name: 'Entered coordinates', latitude: 13.34, longitude: 74.74 })
+  coordinates(); expect(selected).toHaveBeenCalledWith({ name: 'Selected map point', latitude: 13.34, longitude: 74.74 })
 })
 
-it('GPS preserves device uncertainty and ignores callbacks after a newer manual selection', () => {
+it('GPS preserves device uncertainty and ignores callbacks after a newer map selection', () => {
   let success
   vi.stubGlobal('navigator', { geolocation: { getCurrentPosition: vi.fn(fn => { success = fn }) } })
   const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
@@ -83,15 +82,15 @@ it('GPS preserves device uncertainty and ignores callbacks after a newer manual 
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   coordinates('14', '75')
   act(() => success({ coords: { latitude: 13, longitude: 74, accuracy: 50 } }))
-  expect(selected).toHaveBeenLastCalledWith({ name: 'Entered coordinates', latitude: 14, longitude: 75 })
+  expect(selected).toHaveBeenLastCalledWith({ name: 'Selected map point', latitude: 14, longitude: 75 })
 })
 
-it('coordinate validation rejects blank values and zero remains a real coordinate', () => {
-  const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
-  fireEvent.change(screen.getByLabelText('Weather latitude'), { target: { value: '' } })
-  fireEvent.submit(screen.getByRole('button', { name: 'Get point weather' }).closest('form'))
-  expect(screen.getByRole('alert')).toBeTruthy(); expect(selected).not.toHaveBeenCalled()
-  coordinates('0', '0'); expect(selected).toHaveBeenLastCalledWith({ name: 'Entered coordinates', latitude: 0, longitude: 0 })
+it('public coordinate fields are absent and invalid GPS is rejected while zero is valid',()=>{
+ let success;vi.stubGlobal('navigator',{geolocation:{getCurrentPosition:vi.fn(fn=>{success=fn})}})
+ const selected=vi.fn();render(<WeatherLocationSelector onSelect={selected}/>);
+ expect(screen.queryByLabelText('Weather latitude')).toBeNull();expect(screen.queryByLabelText('Weather longitude')).toBeNull()
+ fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:91,longitude:75}}));expect(screen.getByRole('alert')).toBeTruthy();expect(selected).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:0,longitude:0,accuracy:50}}));expect(selected).toHaveBeenCalledWith({name:'GPS-selected point',latitude:0,longitude:0,accuracy_m:50})
 })
 
 it('failed point request clears old readings and refresh retains the requested point', async () => {
@@ -124,7 +123,7 @@ it('late old response cannot overwrite a newer selected point', async () => {
 
 it('reset restores Bengaluru coordinates through the same API flow', async () => {
   render(<App />); await screen.findByText('27 °C'); coordinates()
-  await screen.findByText('Entered coordinates')
+  await screen.findByText('Selected map point')
   fireEvent.click(screen.getByRole('button', { name: 'Reset to Bengaluru' }))
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toContain('latitude=12.9767936&longitude=77.590082'))
 })
@@ -162,7 +161,7 @@ it('repeated reset to the same reference reloads weather instead of leaving a cl
 
 it('refresh and changing a selected point replace the seven-day series', async () => {
   render(<App />); await screen.findByText('27 °C')
-  coordinates(); await screen.findByText('Entered coordinates')
+  coordinates(); await screen.findByText('Selected map point')
   await waitFor(() => expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7))
   fetch.mockImplementation(async url => {
     const params = new URL(url, 'http://localhost').searchParams
@@ -178,11 +177,11 @@ it('refresh and changing a selected point replace the seven-day series', async (
   expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
 })
 
-it('compact controls start collapsed and keyboard-equivalent disclosure preserves manual selection',()=>{
+it('compact name controls start collapsed and point selection uses the map',()=>{
  const selected=vi.fn();render(<WeatherLocationSelector compact onSelect={selected}/>);
  expect(screen.getByText('Change location').closest('details').open).toBe(false)
  expect(screen.queryByRole('button',{name:'Get point weather'})).toBeNull()
- coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Entered coordinates',latitude:14,longitude:75})
+ fireEvent.click(screen.getByText('Change location'));coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Selected map point',latitude:14,longitude:75})
  expect(screen.getByText('Change location').closest('details').open).toBe(true)
 })
 it('home preview shows the real selectable point map without showing coordinate controls',()=>{

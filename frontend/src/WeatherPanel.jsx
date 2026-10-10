@@ -23,7 +23,7 @@ export default function WeatherPanel({point, selectedPoint, session, overview=fa
         {offline && <span>Browser is offline. Automatic requests are paused.</span>}
         {retryAt && <span>Automatic retry no earlier than {formatTime(new Date(retryAt).toISOString())}. Manual refresh is available.</span>}
         {paused && <span>Automatic retries paused after three failed attempts. Refresh manually to try again.</span>}
-        <small>Six-hour browser-session refresh cadence; paused while hidden or offline. No refresh while this application is closed. Retrieval is not forecast issuance or a guarantee of forecast accuracy.</small>
+        <details className="freshness-explanation"><summary>Refresh cadence & timestamp meaning</summary><small>Six-hour browser-session refresh cadence; paused while hidden or offline. No refresh while this application is closed. Retrieval is not forecast issuance or a guarantee of forecast accuracy.</small></details>
       </div>
       <div aria-live="polite" aria-busy={loading}>
         {loading && <p className="notice">Fetching weather through FloodPulse…</p>}

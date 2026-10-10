@@ -1,3 +1,4 @@
+import {selectPoint} from './pointSelection.js'
 import {test,expect} from '@playwright/test'
 const stamp='2026-10-10T06:00:00Z'
 async function setup(page){
@@ -17,12 +18,12 @@ const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 
 test('five routes, direct URLs, back/forward, persistent location and one freshness lifecycle',async({page})=>{
  const requests=await setup(page);await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click();await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
- await page.getByLabel('Weather latitude').fill('13.34');await page.getByLabel('Weather longitude').fill('74.74');await page.getByRole('button',{name:'Get point weather'}).click();await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible();expect(requests()).toBe(2)
+ await selectPoint(page,13.34,74.74);await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
  await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByText(/56 eligible historical cells/)).toBeVisible();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.goBack();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await page.goForward();await expect(page).toHaveURL(/\/shelters$/)
- await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Weather location selection map'})).toBeVisible();await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible();expect(requests()).toBe(2)
+ await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Weather location selection map'})).toBeVisible();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
  await page.clock.fastForward(6*3600000);await expect.poll(requests).toBe(3)
  await nav(page).getByRole('link',{name:'Weather & AI',exact:true}).click();await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(3)
  await nav(page).getByRole('link',{name:'Admin',exact:true}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible();await expect(nav(page).getByRole('link',{name:'Admin',exact:true})).toHaveAttribute('aria-current','page')

@@ -1,5 +1,5 @@
 import React,{useEffect,useState} from 'react'
-import ShelterMap from './ShelterMap.jsx'
+import AdminEntranceMap from './AdminEntranceMap.jsx'
 import AdminNotifications from './AdminNotifications.jsx'
 import './Shelters.css'
 const blank=()=>({name:'',address:'',district_id:'',latitude:'',longitude:'',capacity:'',occupancy:'',water:'unknown',toilets:'unknown',accessibility:'',contact:'',publish_contact:false,status:'pending',notes:'',restrictions:'',revision:null,verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})
@@ -7,6 +7,7 @@ const clock=value=>value?new Date(value).toLocaleString('en-IN',{timeZone:'Asia/
 export default function AdminShelters({embedded=false,onHome=null}){
   const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[error,setError]=useState(null),[notice,setNotice]=useState(null),[busy,setBusy]=useState(false)
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[offset,setOffset]=useState(0),[districts,setDistricts]=useState([]),[form,setForm]=useState(blank),[editing,setEditing]=useState(null),[history,setHistory]=useState(null)
+  const [adminTab,setAdminTab]=useState('shelters')
   const [username,setUsername]=useState(''),[password,setPassword]=useState('')
   async function request(path,options={},auth=session){
     const response=await fetch(path,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(auth?.csrf_token?{'X-CSRF-Token':auth.csrf_token}:{}),...options.headers}})
@@ -44,13 +45,16 @@ export default function AdminShelters({embedded=false,onHome=null}){
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
       <p>Signed in as {session.user.username}. Session expires after 30 idle minutes or eight hours.</p><button disabled={busy} onClick={()=>operation(async()=>{await request('/api/admin/logout',{method:'POST'});setSession(null);setRows([]);setForm(blank());setEditing(null);setNotice('Signed out')})}>Sign out</button>
-      <AdminNotifications session={session} request={request} />
-      <section className="panel"><h2>Shelter assignments</h2><button disabled={busy} onClick={()=>operation(()=>load())}>Refresh assignments</button><button disabled={busy} onClick={()=>{setEditing(null);setForm(blank());setHistory(null)}}>Create new shelter</button>
+      <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button><button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button></nav>
+      <div hidden={adminTab!=='notifications'} className="admin-notifications"><AdminNotifications session={session} request={request} /></div>
+      <div className="admin-management" hidden={adminTab!=='shelters'}>
+      <section className="panel admin-assignments"><h2>Shelter assignments</h2><button disabled={busy} onClick={()=>operation(()=>load())}>Refresh assignments</button><button disabled={busy} onClick={()=>{setEditing(null);setForm(blank());setHistory(null)}}>Create new shelter</button>
         {!rows.length&&<p>No assignments in this directory.</p>}<p>{rows.length} of {total} assignments shown.</p>
         <ul aria-label="Administrator shelter assignments" className="shelter-list">{rows.map(row=><li key={row.id}><strong>{row.name}</strong><p>{row.district_name} · {row.status} · {row.occupancy}/{row.capacity} occupants · {row.publicly_available?'Publicly available':'Unavailable to public'}</p><p>Verified: {clock(row.verified_at)}. Updated: {clock(row.updated_at)}.</p><button disabled={busy} onClick={()=>edit(row)}>Edit {row.name}</button><button disabled={busy} onClick={()=>operation(async()=>{setHistory(await request('/api/admin/shelters/'+row.id+'/audit'))})}>Audit {row.name}</button></li>)}</ul>
         <button disabled={busy||offset===0} onClick={()=>setOffset(n=>Math.max(0,n-100))}>Previous assignments</button><button disabled={busy||offset+100>=total} onClick={()=>setOffset(n=>n+100)}>Next assignments</button>
         {history&&<div aria-label="Shelter audit history"><h3>Audit history</h3><ul>{history.events.map(event=><li key={event.id}>{clock(event.at)} · {event.action} by {event.admin_id} · {event.before?.status||'new'} → {event.after.status} · occupancy {event.before?.occupancy??'none'} → {event.after.occupancy}; capacity {event.before?.capacity??'none'} → {event.after.capacity}</li>)}</ul></div>}
       </section>
+      <AdminEntranceMap entrance={entrance} onSelect={point=>setForm(f=>({...f,latitude:String(point.latitude),longitude:String(point.longitude),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}}))} />
       <form className="panel shelter-form" onSubmit={save} aria-label="Shelter assignment form"><h2>{editing?'Edit shelter assignment':'Create Pending shelter assignment'}</h2>
         <label>Facility name<input required maxLength={200} value={form.name} onChange={e=>field('name',e.target.value)} /></label>
         <label>Facility address<textarea required maxLength={1000} value={form.address} onChange={e=>field('address',e.target.value)} /></label>
@@ -59,7 +63,6 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <label>Entrance latitude<input type="number" step="any" min={-90} max={90} value={form.latitude} onChange={e=>field('latitude',e.target.value)} /></label>
         <label>Entrance longitude<input type="number" step="any" min={-180} max={180} value={form.longitude} onChange={e=>field('longitude',e.target.value)} /></label>
         <p>Enter a verified entrance or choose a point on the map. Placing a marker does not verify a facility. Leave both blank while Pending if unknown.</p>
-        <ShelterMap points={entrance} label="Administrator entrance selection map" onSelect={point=>setForm(f=>({...f,latitude:String(point.latitude),longitude:String(point.longitude)}))} />
         <label>Maximum capacity<input required type="number" min={1} max={100000} step={1} value={form.capacity} onChange={e=>field('capacity',e.target.value)} /></label>
         <label>Current occupancy<input required type="number" min={0} max={Number(form.capacity)||100000} step={1} value={form.occupancy} onChange={e=>field('occupancy',e.target.value)} /></label>
         {['water','toilets'].map(key=><div key={key}><label htmlFor={'shelter-'+key}>{key==='water'?'Water availability':'Toilets'}</label><select id={'shelter-'+key} value={form[key]} onChange={e=>field(key,e.target.value)}><option value="unknown">Unknown</option><option value="yes">Yes</option><option value="no">No</option></select></div>)}
@@ -71,6 +74,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <p>Open requires spare capacity and all four confirmations. Verification expires after 24 hours; recheck actual conditions before renewal. Full, Closed, Pending and expired assignments are excluded from public destinations. Weather/AI predictions never assign shelters.</p>
         <button disabled={busy||!districts.length}>{busy?'Saving…':'Save shelter assignment'}</button>
       </form>
+      </div>
     </>}
   </Container>
 }

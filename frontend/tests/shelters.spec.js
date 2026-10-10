@@ -1,3 +1,4 @@
+import {selectPoint} from './pointSelection.js'
 import {expect,test} from '@playwright/test'
 const weather=point=>({status:'available',retrieved_at:new Date().toISOString(),location:point,grid_location:point,current:{temperature_c:27,humidity_percent:80,precipitation_mm:0,interval_seconds:900,valid_at:new Date().toISOString()},prediction_status:'not_available',forecast:Array.from({length:7},(_,i)=>({date:`2026-10-${String(9+i).padStart(2,'0')}`,temperature_min_c:22,temperature_max_c:30,precipitation_mm:i,weather_code:61}))})
 test.beforeEach(async({page})=>{
@@ -14,8 +15,8 @@ test('actual PostgreSQL public directory is empty, read-only and leaves weather/
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  const response=await page.request.post('/api/shelters',{data:{name:'Must not write'}});expect(response.status()).toBe(405)
  const unauthorized=await page.request.post('/api/admin/shelters',{data:{name:'TEST ONLY',address:'Not a shelter',district_id:'nic:udupi.nic.in',capacity:10,occupancy:0}});expect(unauthorized.status()).toBe(401)
- await page.getByText('Change location',{exact:true}).click();await page.getByLabel('Weather latitude').fill('13.6');await page.getByLabel('Weather longitude').fill('74.8');await page.getByRole('button',{name:'Get point weather'}).click()
- await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
+ await page.getByText('Change location',{exact:true}).click();await selectPoint(page,13.6,74.8)
+ await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
 })
@@ -62,6 +63,9 @@ test('isolated authenticated admin form uses the real district contract and requ
  await page.setViewportSize({width:390,height:844});await page.goto('/admin')
  await page.getByLabel('Username',{exact:true}).fill('isolated-admin');await page.getByLabel('Password',{exact:true}).fill('ISOLATED TEST PASSWORD');await page.getByRole('button',{name:'Sign in'}).click()
  await expect(page.getByText(/DEMONSTRATION ONLY — isolated database/)).toBeVisible()
+ await expect(page.getByRole('option',{name:'Satellite imagery',exact:true})).toBeDisabled();await expect(page.getByRole('option',{name:'Satellite Hybrid',exact:true})).toBeDisabled();await expect(page.getByLabel('Search place or building name')).toBeDisabled()
+ await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Udupi —/}).click();await expect(page.getByLabel('Entrance latitude',{exact:true})).toHaveValue('');await expect(page.getByLabel('Entrance longitude',{exact:true})).toHaveValue('');await expect(page.getByText(/This point is not a verified entrance/)).toBeVisible()
+ await page.getByRole('region',{name:'Administrator entrance selection map'}).click({position:{x:110,y:140}});await expect(page.getByLabel('Entrance latitude',{exact:true})).not.toHaveValue('');await expect(page.getByLabel('Entrance longitude',{exact:true})).not.toHaveValue('');await expect(page.getByRole('checkbox',{name:'This exact entrance has been independently verified'})).not.toBeChecked()
  await page.getByLabel('Facility name',{exact:true}).fill('DEMONSTRATION ONLY — fixture')
  await page.getByLabel('Facility address',{exact:true}).fill('Not an actual emergency shelter')
  await page.getByLabel('Shelter district',{exact:true}).selectOption('nic:udupi.nic.in')
@@ -76,5 +80,6 @@ test('isolated authenticated admin form uses the real district contract and requ
  await expect(page.getByLabel('Facility is authorized for shelter use',{exact:true})).not.toBeChecked()
  await expect(page.getByLabel('Shelter status',{exact:true})).toHaveValue('open')
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+ for(const size of [{width:1366,height:768},{width:1920,height:1080},{width:390,height:844}]){await page.setViewportSize(size);await page.getByRole('heading',{name:'Inspect facility & select entrance'}).scrollIntoViewIfNeeded();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:`../data/recovery/fullscreen_ui_v1/after/admin-isolated-${size.width}.png`,fullPage:true})}
  await page.getByRole('button',{name:'Sign out'}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
 })

@@ -1,3 +1,4 @@
+import {selectPoint} from './pointSelection.js'
 import { expect, test } from '@playwright/test'
 
 // Directory endpoints and map geography are genuine retained public records.
@@ -125,8 +126,8 @@ test('directory unavailable and locality provider failure preserve manual recove
   await page.route('**/api/weather?**',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({status:'unavailable',message:'Controlled provider failure'})}))
   await choose(page,'Karkala'); await expect(page.getByText(/Controlled provider failure/)).toBeVisible()
   await expect(page.getByRole('heading',{name:'Karkala, Udupi'})).toBeVisible(); await expect(page.getByText('27 °C',{exact:true})).toHaveCount(0)
-  await page.getByLabel('Weather latitude').fill('14'); await page.getByLabel('Weather longitude').fill('75')
-  await page.getByRole('button',{name:'Get point weather'}).click(); await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
+
+  await selectPoint(page,14,75); await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
 })
 
 test('late locality weather cannot overwrite newer locality during point switching', async ({ page }) => {
@@ -144,10 +145,10 @@ test('database directory outage leaves manual point weather and seven-day freshn
   await page.route('**/api/locations/**', route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Location database is unavailable or invalid; no file fallback was used'})}))
   await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Location database is unavailable')
-  await page.getByLabel('Weather latitude').fill('14'); await page.getByLabel('Weather longitude').fill('75')
+
   const request=page.waitForRequest(r=>r.url().includes('latitude=14&longitude=75'))
-  await page.getByRole('button',{name:'Get point weather'}).click(); await request
-  await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
+  await selectPoint(page,14,75); await request
+  await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
   await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
   await expect(page.getByRole('alert',{name:'Location directory error'})).toBeVisible()

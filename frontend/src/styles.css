@@ -542,3 +542,111 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 .page-shelters .compact-location {margin-bottom:18px}
 @media(max-width:1000px){.page-home .dashboard-content {grid-template-columns:1fr}.page-home .weather-sections,.page-home .location-side {grid-column:auto;grid-row:auto}}
 @media(max-width:700px){.page-home .home-hero {display:block;padding:22px}.location-bar {flex-wrap:wrap;gap:10px}.page-home .weather-sections .panel {padding:20px 16px}.page-home .weather-location-map,.compact-location .weather-location-map {height:300px}.compact-location {padding:16px}.forecast-preview .forecast-days {grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Desktop application workspaces; every detailed panel remains scrollable. */
+.admin-tabs {display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.admin-tabs [aria-pressed=true] {background:#075a67}
+.admin-entrance-panel label {display:block;font-weight:600;margin:10px 0 5px}
+.admin-entrance-panel :is(input,select) {width:100%;min-width:0;padding:9px;font:inherit;border:1px solid #7897a5;border-radius:6px}
+.admin-entrance-panel button {margin:6px 0}
+.admin-entrance-panel :focus-visible {outline:3px solid #286fba;outline-offset:3px}
+.intelligence-layout>* {min-width:0}
+.place-provenance summary {cursor:pointer;font-weight:600}
+@media(min-width:1100px) and (min-height:740px) {
+ #root {height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+ .app-header {flex-shrink:0}
+ main.app-content {flex:1;min-height:0;overflow:auto;width:100%;max-width:none;margin:0;padding:12px 24px;display:flex;flex-direction:column}
+ .page-intro,.page-home .home-hero {margin:0 0 10px;padding:10px 16px;flex-shrink:0;gap:12px}
+ .page-intro h1,.page-home .home-hero h1 {font-size:26px;margin:0 0 4px}
+ .page-intro p,.page-home .hero-subtitle {margin:3px 0;font-size:12px;line-height:1.35}
+ .page-home .home-hero {display:block}
+ .hero-art,.page-home .hero-actions,.page-home .overview-links {display:none}
+ .app-footer {flex-shrink:0;padding:5px 24px;gap:20px;font-size:10px;grid-template-columns:1fr 3fr}
+ .app-footer strong {font-size:12px}.app-footer p {margin:2px 0}
+ .dashboard-content {flex:1;min-height:0}
+ .panel {margin:0;padding:16px;border-radius:12px;min-width:0}
+ .panel h2 {font-size:18px}.panel p {font-size:12px;line-height:1.45;margin:8px 0}
+ .panel-heading {gap:8px;margin-bottom:8px}
+ .panel-heading button {font-size:12px;padding:9px 12px}
+ .page-home .dashboard-content {align-items:stretch;grid-template-rows:minmax(0,1fr);gap:12px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+ .page-home .location-side,.page-home .weather-sections {display:grid;grid-template-rows:minmax(0,2.4fr) minmax(0,1fr);gap:12px;min-height:0}
+ .page-home :is(.location-context,.shelter-sections) {min-height:0;overflow:auto}
+ .page-home .location-context>.panel {height:100%;display:flex;flex-direction:column;overflow:auto}
+ .page-home .weather-sections>.panel,.page-home .shelter-sections>.panel {height:100%;overflow:auto;padding:16px}
+ .page-home .point-map {min-height:130px;flex:1;display:flex;flex-direction:column}
+ .page-home .weather-location-map {height:auto;min-height:130px;flex:1}
+ .page-home .point-map>.muted {font-size:10px;margin:4px 0}
+ .page-home .weather-map-actions {margin-top:5px;gap:6px}.page-home .weather-map-actions button {font-size:11px;padding:7px}
+ .page-home .location-bar .eyebrow {display:none}
+ .page-home .compact-location {padding:12px 16px}
+ .page-home .location-editor {margin-top:4px;padding-top:4px}
+ .page-home .weather-sections p {font-size:11px}
+ .page-home .weather-overview {display:flex;flex-direction:column}
+ .page-home .weather-overview>.weather-freshness {order:1}
+ .page-home .weather-overview>div[aria-live] {order:2}
+ .page-home .weather-overview>p {order:3}
+ .page-home .weather-freshness {margin:8px 0;padding:8px;gap:2px;font-size:11px}
+ .page-home .weather-freshness span {font-size:11px}
+ .page-home .weather-sections h3 {font-size:15px;margin:10px 0 4px}
+ .page-home .metrics small {font-size:9px}
+ .page-home .shelters-overview {display:flex;flex-direction:column}
+ .page-home .shelters-overview>p {order:2}
+ .page-home .shelters-overview>div[aria-live] {order:1}
+ .page-home .shelter-empty {padding:12px;font-size:12px}
+ .page-home .metrics article {padding:8px}.page-home .metrics article strong {font-size:20px}
+ .page-home .forecast-days {grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+ .page-home .forecast-days article {padding:8px 5px}.page-home .forecast-days h4 {font-size:10px}.page-home .forecast-days p {font-size:10px}
+ .page-weather .dashboard-content {display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px}
+ .page-weather .location-side {max-height:200px;overflow:auto}
+ .page-weather .location-context>.panel {padding:10px 16px}
+ .page-weather .location-bar .eyebrow {display:none}
+ .page-weather .location-editor {margin-top:6px;padding-top:6px}
+ .page-weather .weather-freshness {padding:8px 12px;margin:8px 0;gap:3px;font-size:11px}
+ .page-weather .weather-freshness small {font-size:10px}
+ .page-weather .weather-sections h3 {margin:10px 0 4px;font-size:16px}
+ .page-weather .weather-sections .metrics article {padding:8px}
+ .page-weather .weather-sections .metrics strong {font-size:22px}
+ .page-weather .weather-sections {display:grid;grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr);gap:12px;min-height:0}
+ .page-weather .weather-sections>.panel {min-height:0;overflow:auto}
+ .page-weather .metrics {gap:10px}.page-weather .metrics article {padding:12px}
+ .page-weather .forecast-days {grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+ .page-weather .forecast-days article {padding:8px}.page-weather .forecast-days h4 {font-size:11px}
+ .page-weather .forecast-days dl div {display:block}.page-weather .forecast-days dd {margin:3px 0}
+ .page-shelters .dashboard-content,.page-shelters .location-side {display:flex;flex-direction:column;gap:12px;min-height:0}
+ .page-shelters .location-side {flex:1}.page-shelters .location-context {flex-shrink:0;max-height:200px;overflow:auto}
+ .page-shelters .shelter-sections {flex:1;min-height:0;overflow:auto}
+ .page-shelters .selection-summary {display:none}.page-shelters .compact-location {margin:0}
+ .location-editor[open] {max-height:190px;overflow:auto}
+ .location-directory {margin:8px 0}.location-directory p {font-size:11px}
+ #location-directory-content {display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+ #location-directory-content>h3,#location-directory-content>p,#location-directory-content>ul,#location-directory-content>details,#location-directory-content>div {grid-column:1}
+ #location-directory-content>label {margin:3px 0}.location-directory ul {max-height:130px;overflow:auto;margin:4px 0}
+ .page-flood-map .location-side {display:none}
+ .intelligence-workspace {height:100%;min-height:0;display:flex;flex-direction:column}
+ .intelligence-workspace>h2 {font-size:16px;margin:0 0 6px}
+ .intelligence-toolbar {padding:8px 12px;gap:8px;flex-shrink:0;margin-bottom:10px}
+ .intelligence-toolbar fieldset {flex-basis:auto;flex:1;gap:10px;padding:0}.intelligence-toolbar legend {font-size:11px}
+ .intelligence-toolbar fieldset label {font-size:11px}.intelligence-toolbar select {padding:6px;font-size:12px;min-height:36px}
+ .intelligence-toolbar>label:first-child {font-size:12px}
+ .intelligence-toolbar>button {font-size:11px;padding:8px}
+ .intelligence-layout {display:grid;grid-template-columns:minmax(0,2.5fr) minmax(460px,1fr);gap:12px;flex:1;min-height:0}
+ .intelligence-map-stage {display:flex;flex-direction:column;min-height:0}
+ .page-flood-map .intelligence-map {height:auto;flex:1;min-height:180px}
+ .intelligence-map-stage>.map-legend {font-size:11px;margin:6px 0;line-height:1.35}
+ .intelligence-map-stage>.notice {font-size:11px;margin:5px 0;padding:7px;line-height:1.35}
+ .intelligence-map-stage>.map-actions {margin:0 0 8px;gap:8px}
+ .intelligence-map-stage>.map-actions button {font-size:11px;padding:8px;min-height:36px}
+ .intelligence-sidebar {overflow:auto;min-height:0;background:white;border:1px solid #dce6f1;border-radius:12px;padding:14px;font-size:12px}
+ .intelligence-sidebar p {font-size:12px;line-height:1.5}.intelligence-sidebar .panel {padding:12px}
+ .intelligence-sidebar .intelligence-detail dl {display:block}.intelligence-sidebar .intelligence-detail dd {margin:4px 0 12px}
+ .page-admin .dashboard-content {display:none}
+ .page-admin .admin-shell {flex:1;min-height:0;overflow:auto;width:100%;max-width:none;margin:0;padding:0}
+ .admin-shell>h2 {font-size:18px;margin:8px 0}.admin-shell>p {font-size:12px;margin:6px 0}
+ .admin-management {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:150px minmax(0,1fr);gap:12px;height:calc(100% - 145px);min-height:280px}
+ .admin-assignments {grid-column:1;grid-row:1;overflow:auto}
+ .admin-entrance-panel {grid-column:1;grid-row:2;overflow:auto;min-height:0}
+ .admin-management>.shelter-form {grid-column:2;grid-row:1/3;overflow:auto;min-height:0;align-content:start;grid-template-columns:1fr 1fr;gap:12px}
+ .admin-management>.shelter-form>:is(h2,p,fieldset,.shelter-map,button) {grid-column:1/-1}
+ .admin-notifications {height:calc(100% - 145px);overflow:auto}
+ .admin-shell .shelter-form:not([aria-label]) {margin:24px auto}
+}

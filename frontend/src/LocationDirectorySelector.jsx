@@ -18,7 +18,7 @@ function useDirectory(url, retry) {
         if (data.status !== 'available' || !Array.isArray(data.items) || !Number.isInteger(data.total)) throw new Error('Location directory response is invalid.')
         if (active) setState({ data, error: null, loading: false })
       } catch (error) {
-        if (active) setState({ data: null, error: timedOut ? 'Location search timed out. Retry or use coordinates.' : error.message, loading: false })
+        if (active) setState({ data: null, error: timedOut ? 'Location search timed out. Retry or use the map or GPS.' : error.message, loading: false })
       } finally { clearTimeout(timer) }
     })()
     return () => { active = false; clearTimeout(timer); controller.abort() }
@@ -83,7 +83,7 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
       <label htmlFor="place-search">Search districts or localities</label>
       <input id="place-search" type="search" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} placeholder="For example: Udupi or Karkala" />
       {q && search.data && <>
-        <p role="status" aria-label="Place search results">{search.data.total ? `${search.data.total} matching places; showing ${search.data.items.length}.` : 'No matching places in the verified directory. Try another name or enter coordinates.'}</p>
+        <p role="status" aria-label="Place search results">{search.data.total ? `${search.data.total} matching places; showing ${search.data.items.length}.` : 'No matching places in the verified directory. Try another name or select the map.'}</p>
         <ul aria-label="Place search results">{search.data.items.map(row => <li key={row.id}>{row.kind === 'district'
           ? <button type="button" onClick={() => chooseDistrict(row)}>{row.name} — District · filter localities</button> : localityButton(row, 'search')}</li>)}</ul>
       </>}
@@ -97,13 +97,13 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
         <label htmlFor="locality-search">Search localities in {district.name}</label>
         <input id="locality-search" type="search" maxLength={100} value={localQuery} onChange={e => setLocalQuery(e.target.value)} />
         {localities.data && <>
-          <p role="status" aria-label="District locality results">{localities.data.total ? `${localities.data.total} locality records; showing ${localities.data.items.length}.` : 'No verified localities match this district and search. Coverage is incomplete; use coordinates, map or GPS.'}</p>
+          <p role="status" aria-label="District locality results">{localities.data.total ? `${localities.data.total} locality records; showing ${localities.data.items.length}.` : 'No verified localities match this district and search. Coverage is incomplete; use the map or GPS.'}</p>
           <ul aria-label="District localities">{localities.data.items.map(row => <li key={row.id}>{localityButton(row)}</li>)}</ul>
         </>}
       </>}
       <p role="status" aria-label="Location directory status" aria-live="polite" aria-busy={loading}>{loading ? 'Loading location directory…' : 'Location search ready.'}</p>
       {error && <div role="alert" aria-label="Location directory error"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>Retry location search</button></div>}
-      <p className="muted">Names: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC government directory</a>. {district && <>Locality association: <a href={district.source_website}>{district.name} District Administration</a>. </>}Place coordinates: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors · ODbL 1.0</a>. Navigation: <a href="https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/">geoBoundaries / Pathways Data Pvt. Ltd. / lgdirectory.gov.in · ODbL 1.0</a>; existing Udupi CGAZ extent: CC BY 4.0. Points are mapped settlements, not municipal boundaries, gauges or shelters.</p>
+      <details className="place-provenance"><summary>Place coverage and provenance</summary><p className="muted">Names: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC government directory</a>. {district && <>Locality association: <a href={district.source_website}>{district.name} District Administration</a>. </>}Place coordinates: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors · ODbL 1.0</a>. Navigation: <a href="https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/">geoBoundaries / Pathways Data Pvt. Ltd. / lgdirectory.gov.in · ODbL 1.0</a>; existing Udupi CGAZ extent: CC BY 4.0. Points are mapped settlements, not municipal boundaries, gauges or shelters.</p></details>
     </div>}
   </div>
 }

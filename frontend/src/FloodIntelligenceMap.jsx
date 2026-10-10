@@ -88,8 +88,9 @@ function FeatureDetails({data,onClose,navigate}){
  </section>
 }
 
-export default function FloodIntelligenceMap({point,onPoint,navigate}){
+export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDistrictId,onDistrictChange}){
  const [districtId,setDistrictId]=useState(''),[eventId,setEventId]=useState(''),[featureId,setFeatureId]=useState(null),[retry,setRetry]=useState(0)
+ useEffect(()=>{if(selectedDistrictId!==undefined){setDistrictId(selectedDistrictId);setFeatureId(null)}},[selectedDistrictId])
  const [layers,setLayers]=useState({history:true,hazards:false,drainage:false,shelters:false})
  const directory=useEvidence('/api/flood-map/districts',retry)
  const query=new URLSearchParams(districtId?{district_id:districtId}:{})
@@ -108,14 +109,15 @@ export default function FloodIntelligenceMap({point,onPoint,navigate}){
  const safeHistory=history.data?.status==='available'&&history.data.geojson?.type==='FeatureCollection'?history.data:null
  return <section className="intelligence-workspace" aria-labelledby="intelligence-title">
   <h2 id="intelligence-title">Karnataka Flood Intelligence</h2>
-  <p className="historical-notice">Historical event-window maximum satellite observations. This is not current flooding, predicted risk, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>
   <div className="panel intelligence-toolbar">
-   <label htmlFor="intelligence-district">Flood Map district</label><select id="intelligence-district" value={districtId} disabled={!directory.data} onChange={e=>{setDistrictId(e.target.value);setFeatureId(null)}}><option value="">Karnataka — statewide evidence</option>{directory.data?.items.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
-   <button onClick={()=>{setDistrictId('');setFeatureId(null)}}>Return to statewide view</button>
+   <label htmlFor="intelligence-district">Flood Map district</label><select id="intelligence-district" value={districtId} disabled={!directory.data} onChange={e=>{setDistrictId(e.target.value);onDistrictChange?.(e.target.value);setFeatureId(null)}}><option value="">Karnataka — statewide evidence</option>{directory.data?.items.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
+   <button onClick={()=>{setDistrictId('');onDistrictChange?.('');setFeatureId(null)}}>Return to statewide view</button>
    <fieldset><legend>Evidence layers</legend>{[['history','Historical Flood Locations'],['hazards','Potential Flood-Prone Zones'],['drainage','Drainage / waterways'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}</fieldset>
    {layers.history&&<label>Recorded event<select aria-label="Recorded event" value={eventId} onChange={e=>{setEventId(e.target.value);setFeatureId(null)}}><option value="">All reviewed public spatial events</option>{(safeHistory?.events||[]).map(e=><option key={e.event_id} value={e.event_id}>Event {e.event_id} · {e.start_date} – {e.end_date_inclusive}</option>)}</select></label>}
   </div>
-  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
+  <div className="intelligence-layout"><div className="intelligence-map-stage">  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={setFeatureId}/>
+  <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
+</div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <p className="historical-notice">Historical event-window maximum satellite observations. This is not current flooding, predicted risk, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
    {loading&&<p role="status">Loading selected map evidence…</p>}
    {!!failures.length&&<p role="alert" className="notice error">{failures.map(s=>s.error).join(' · ')} No substitute geometry is shown. <button onClick={()=>setRetry(n=>n+1)}>Retry map evidence</button></p>}
    <p><strong>{district?.name||'Karnataka statewide view'}</strong> · {directory.data?.total??'Unavailable'} district names; current LGD reconciliation unresolved. Statewide selection does not imply statewide hazard coverage.</p>
@@ -127,13 +129,11 @@ export default function FloodIntelligenceMap({point,onPoint,navigate}){
    {layers.shelters&&shownShelters&&<p>{shownShelters.mode==='demonstration'?'DEMONSTRATION ONLY — not actual destinations. ':''}{shownShelters.shelters.length?'Only currently verified Open entrances with spare capacity are shown.':'No currently verified open shelters are available in this directory.'} Directions are not verified flood-safe.</p>}
    {layers.shelters&&shelters.data&&!shownShelters&&<p role="alert">Shelter availability could not be verified. No substitute destinations are shown.</p>}
   </div>
-  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={setFeatureId}/>
-  <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
   <p className="muted">Click a historical polygon or choose a cell below for details. Clicking the background selects a weather point; it does not establish district identity or flood risk. <PageLink to="/weather" navigate={navigate}>View selected-point weather</PageLink>.</p>
   {safeHistory?.geojson?.features?.length>0&&<div className="intelligence-cell-selector"><label htmlFor="evidence-cell">Historical evidence cell (keyboard alternative)</label><select id="evidence-cell" value={featureId||''} onChange={e=>setFeatureId(e.target.value||null)}><option value="">Choose an observed cell</option>{safeHistory.geojson.features.map(f=><option key={f.id} value={f.id}>Udupi · GFD {f.properties.event_id} · row {f.properties.grid_row}, column {f.properties.grid_col}</option>)}</select></div>}
   {details.data?.feature&&<FeatureDetails data={details.data} navigate={navigate} onClose={()=>setFeatureId(null)}/>}
   {layers.history&&<details className="intelligence-events"><summary>Event sources and observation limitations</summary>{(safeHistory?.events||[]).map(e=><p key={e.event_id}>GFD {e.event_id}: {e.qualified_pixel_count} qualifying cells · Source image: {e.image_id}</p>)}<p>Two public Udupi event products. Other reviewed GFD positives, observed-zero comparisons and insufficient-observation scopes retain their research statuses; no unreviewed geometry or flood-negative labels are published.</p></details>}
   <p className="muted">Satellite evidence: <a href="https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1">Global Flood Database V1</a> · Tellman et al. (2021) · <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>, attribution and non-commercial use required. Modern Udupi outline: geoBoundaries v6 · CC BY 4.0, not a verified historical boundary. SOI geometry remains local.</p>
-  {layers.drainage&&<section className="panel"><h2>Drainage context</h2><p>Mapped drainage feature — overflow risk not established.</p>{drainage.data?.status==='available'?<><p>{drainage.data.coverage_notice}</p><p>OSM snapshot: {drainage.data.osm.osm_base_timestamp}; retrieved {drainage.data.osm.retrieved_at}. {drainage.data.osm.feature_count} mapped drain/ditch ways. Capacity, condition, blockage and flow direction are unknown.</p><DrainageResearchLayers/></>:<p>{drainage.data?.message||'Drainage context is not available yet.'} Absence of mapped data does not establish absence of drainage.</p>}</section>}
+  {layers.drainage&&<section className="panel"><h2>Drainage context</h2><p>Mapped drainage feature — overflow risk not established.</p>{drainage.data?.status==='available'?<><p>{drainage.data.coverage_notice}</p><p>OSM snapshot: {drainage.data.osm.osm_base_timestamp}; retrieved {drainage.data.osm.retrieved_at}. {drainage.data.osm.feature_count} mapped drain/ditch ways. Capacity, condition, blockage and flow direction are unknown.</p><DrainageResearchLayers/></>:<p>{drainage.data?.message||'Drainage context is not available yet.'} Absence of mapped data does not establish absence of drainage.</p>}</section>}</aside></div>
  </section>
 }

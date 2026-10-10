@@ -123,7 +123,7 @@ headers; Vite preview is only the local demonstration server.
 ## Citizen demonstration
 
 1. Use the shared navigation to open **Weather & AI** (`/weather`). Open
-   **Search districts and localities**, select Udupi then **Kundapur**.
+   **Change location → Search districts and localities**, select Udupi then **Kundapur**.
    The settlement point must be 13.6250993, 74.6915722.
 2. Wait for seven provider-supplied daily forecast cards and **Fresh**. Show
    requested versus provider-grid coordinates, UTC retrieval rendered in IST,
@@ -146,7 +146,7 @@ headers; Vite preview is only the local demonstration server.
 7. Use a 390-pixel mobile viewport and the collapsible **Menu**; inspect readable
    controls, map and cards. Check direct URLs and browser back/forward. The selected
    location and six-hour weather session persist during in-app navigation.
-   Manual coordinates, map/GPS selection and manual refresh remain available.
+   Name-based locality search, map/GPS selection and manual refresh remain available. Public coordinate entry is removed; requested/provider-grid coordinates remain source metadata.
 
 Weather is real Open-Meteo model output, not station observations. The AI uses
 a separate bounded past-hourly request because the daily forecast response lacks
@@ -223,7 +223,7 @@ archive/restore semantics. Only restore trusted backups.
 Provider failure: show unavailable or explicitly stale last-known weather;
 retry manually after checking connectivity. Never substitute fixtures. Missing
 models/unsupported points: show AI unavailable; do not run training to repair a
-demo. Database failure: show directory/admin errors, keep manual weather usable
+demo. Database failure: show directory/admin errors, keep independent map/GPS weather usable
 where possible, and check service/roles/migrations. Telegram uncertainty: inspect
 history and destination; do not resend an uncertain attempt automatically.
 
@@ -262,3 +262,15 @@ ML retraining or Stage 5B is delivered by this release.
 ## Sprint 11 — district-wise evidence map
 
 Use the [Karnataka Flood Intelligence Map demonstration](FLOOD_INTELLIGENCE_MAP.md#demonstration). All 31 district names filter eligible public evidence; statewide reset preserves layer choices. Udupi has 56 original GFD raster-cell polygons across two events; potential-hazard polygons are unavailable. Select Udupi, zoom to mapped water and inspect a cell with mouse or keyboard. Switch to Kolar to demonstrate honest no-public-geometry coverage and unavailable zoom, then return statewide. Independently toggle hazards, bounded drainage context and verified shelters. Keep mechanisms Unknown, no-drain results unknown, and operational shelter empty state intact. Weather/AI remain on `/weather`; map cells are not model-supported settlements. Research products and the trained model are unchanged.
+
+## Full-screen dashboard and satellite-assisted entrance review
+
+Use all five direct routes (`/`, `/weather`, `/flood-map`, `/shelters`, `/admin`) at 1920×1080, 1366×768 and 390×844. Desktop cards/evidence panels scroll internally; small screens scroll naturally. Home is an overview, Weather & AI has an optional point map, and Flood Map remains the main GIS workspace. Scroll detail panels to review complete forecasts, source timestamps and limitations; keyboard controls remain available. Navigate between pages to confirm the selected locality and freshness lifecycle persist.
+
+There are 31 district names and five selectable locality points, not statewide locality coverage. Select an unsupported district to demonstrate the explicit coverage message and Flood Map filter without fabricated weather coordinates. Select Kundapur/Mangaluru by name for the saved-model demonstration. Public latitude/longitude form fields are absent.
+
+The current database has zero active administrators. In a separate authorized maintenance shell with private `LOCATION_DIRECTORY_ADMIN_URL`, use the existing provisioning command above, choose your own username and supply the password only at its two private prompts. Then start `./start.sh` and sign in at `http://127.0.0.1:14180/admin`. No default credentials exist. Real successful admin login remains a manual prerequisite; isolated browser fixtures do not establish that an operational account exists.
+
+In Shelter workspace, use verified directory names to navigate the street map. Directory or building-reference selection **must not populate the entrance**. Inspect the facility and click its actual verified entrance; review the admin-only coordinate fields and independently confirm facility name/address, authorization, usability and capacity. Moving the entrance clears previous verification confirmations. Keep an unverified assignment Pending. Switch to Telegram notifications to demonstrate exact preview and explicit approval without sending a message. Never create an operational shelter from a demonstration fixture.
+
+Optional Satellite/Hybrid and building search require operator-authorized MapTiler terms/account/key configuration; see [ADMIN_SATELLITE_MAP.md](ADMIN_SATELLITE_MAP.md) for the provider comparison and exact non-secret settings. No account creation or charges are performed by the app. Verify real image tiles and attribution in independent Chrome only after configuration; this delivery remains **configuration-blocked** for live satellite/hybrid. Satellite imagery does not establish occupancy, safety, access or permission.

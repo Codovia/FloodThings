@@ -25,6 +25,7 @@ async function isolatedAdmin(page,configured=true){
   await route.fulfill({status,contentType:'application/json',body:JSON.stringify(data)})
  })
  await page.goto('/admin');await page.getByLabel('Username',{exact:true}).fill('isolated-admin');await page.getByLabel('Password',{exact:true}).fill('ISOLATED TEST PASSWORD');await page.getByRole('button',{name:'Sign in'}).click()
+ await page.getByRole('button',{name:'Telegram notifications',exact:true}).click()
  await expect(page.getByRole('heading',{name:'Alerts — administrator-controlled Telegram notices'})).toBeVisible()
  return ()=>sends
 }
@@ -40,6 +41,7 @@ test('keyboard-accessible exact review, explicit confirmation and one simulated 
  await expect(page.getByLabel('Notification preview').getByText(/Telegram accepted the message/)).toBeVisible();expect(sends()).toBe(1)
  await expect(page.getByText(/Recipient reading is not confirmed/).first()).toBeVisible()
  await page.getByRole('button',{name:'Refresh notification history'}).click();expect(sends()).toBe(1)
+ await page.getByRole('button',{name:'Shelter workspace',exact:true}).click()
  await expect(page.getByRole('heading',{name:'Shelter assignments'})).toBeVisible()
  await page.getByRole('button',{name:'Sign out'}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
 })
@@ -47,6 +49,7 @@ test('keyboard-accessible exact review, explicit confirmation and one simulated 
 test('mobile missing-configuration state preserves shelter management and sends nothing',async({page})=>{
  await page.setViewportSize({width:390,height:844});const sends=await isolatedAdmin(page,false)
  await expect(page.getByText(/Telegram credentials not configured/)).toBeVisible();await expect(page.getByRole('button',{name:'Review exact notification'})).toBeDisabled()
+ await page.getByRole('button',{name:'Shelter workspace',exact:true}).click()
  await expect(page.getByRole('button',{name:'Save shelter assignment'})).toBeVisible();expect(sends()).toBe(0)
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
 })

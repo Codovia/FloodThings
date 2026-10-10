@@ -172,17 +172,16 @@ it('Mangaluru selection uses its retained point and association, preserving seve
   expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
 })
 
-it('database-specific outage preserves independent manual weather and seven-day forecasts', async () => {
+it('database-specific outage preserves independent GPS weather and seven-day forecasts', async () => {
   const normal = fetch.getMockImplementation()
   fetch.mockImplementation(url => url.startsWith('/api/locations/')
     ? Promise.resolve({ok:false,json:async()=>({detail:'Location database is unavailable or invalid; no file fallback was used'})})
     : normal(url))
   render(<App />); await screen.findByText('27 °C'); open()
   expect((await screen.findByRole('alert',{name:'Location directory error'})).textContent).toContain('Location database is unavailable')
-  fireEvent.change(screen.getByLabelText('Weather latitude'),{target:{value:'14'}})
-  fireEvent.change(screen.getByLabelText('Weather longitude'),{target:{value:'75'}})
-  fireEvent.click(screen.getByRole('button',{name:'Get point weather'}))
-  await screen.findByRole('heading',{name:'Entered coordinates'})
+  vi.stubGlobal('navigator',{geolocation:{getCurrentPosition:success=>success({coords:{latitude:14,longitude:75,accuracy:40}})}})
+  fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}))
+  await screen.findByRole('heading',{name:'GPS-selected point'})
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=14&longitude=75')).toBe(true))
   expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7)
 })
