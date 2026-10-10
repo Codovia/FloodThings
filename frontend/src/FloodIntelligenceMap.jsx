@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
 import useMapResize from './useMapResize.js'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import { validShelterDirectory } from './PublicShelters.jsx'
@@ -69,9 +70,9 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
   const marker=L.circleMarker([point.latitude,point.longitude],{radius:5,color:'#344b68',fillOpacity:.6}).addTo(map.current)
   return()=>{if(map.current)map.current.removeLayer(marker)}
  },[point])
- function zoomWater(){if(history?.geojson.features.length){const bounds=L.geoJSON(history.geojson).getBounds();map.current?.fitBounds(bounds,{padding:[30,30],maxZoom:14})}}
+ function zoomWater(){if(history?.geojson?.features?.length){const bounds=L.geoJSON(history.geojson).getBounds();map.current?.fitBounds(bounds,{padding:[30,30],maxZoom:14})}}
  return <>
-  <div className="map-actions"><button onClick={()=>district?.navigation_bounds?map.current?.fitBounds(district.navigation_bounds):map.current?.setView([15.1,76.1],6)} disabled={!!district&&!district.navigation_bounds}>Show district</button><button onClick={zoomWater} disabled={!history?.geojson.features.length}>Zoom to mapped water</button></div>
+  <div className="map-actions"><button onClick={()=>district?.navigation_bounds?map.current?.fitBounds(district.navigation_bounds):map.current?.setView([15.1,76.1],6)} disabled={!!district&&!district.navigation_bounds}>Show district</button><button onClick={zoomWater} disabled={!history?.geojson?.features?.length}>Zoom to mapped water</button></div>
   <div ref={element} className="historical-map intelligence-map" role="region" aria-label="Historical satellite floodwater and Karnataka evidence map"/>
   {tileError&&<p className="notice">Some background map tiles are unavailable. Local evidence remains visible; missing background tiles do not establish flood absence.</p>}
  </>
@@ -128,7 +129,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate}){
   <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={setFeatureId}/>
   <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
   <p className="muted">Click a historical polygon or choose a cell below for details. Clicking the background selects a weather point; it does not establish district identity or flood risk. <PageLink to="/weather" navigate={navigate}>View selected-point weather</PageLink>.</p>
-  {safeHistory?.geojson.features.length>0&&<div className="intelligence-cell-selector"><label htmlFor="evidence-cell">Historical evidence cell (keyboard alternative)</label><select id="evidence-cell" value={featureId||''} onChange={e=>setFeatureId(e.target.value||null)}><option value="">Choose an observed cell</option>{safeHistory.geojson.features.map(f=><option key={f.id} value={f.id}>Udupi · GFD {f.properties.event_id} · row {f.properties.grid_row}, column {f.properties.grid_col}</option>)}</select></div>}
+  {safeHistory?.geojson?.features?.length>0&&<div className="intelligence-cell-selector"><label htmlFor="evidence-cell">Historical evidence cell (keyboard alternative)</label><select id="evidence-cell" value={featureId||''} onChange={e=>setFeatureId(e.target.value||null)}><option value="">Choose an observed cell</option>{safeHistory.geojson.features.map(f=><option key={f.id} value={f.id}>Udupi · GFD {f.properties.event_id} · row {f.properties.grid_row}, column {f.properties.grid_col}</option>)}</select></div>}
   {details.data?.feature&&<FeatureDetails data={details.data} navigate={navigate} onClose={()=>setFeatureId(null)}/>}
   {layers.history&&<details className="intelligence-events"><summary>Event sources and observation limitations</summary>{(safeHistory?.events||[]).map(e=><p key={e.event_id}>GFD {e.event_id}: {e.qualified_pixel_count} qualifying cells · Source image: {e.image_id}</p>)}<p>Two public Udupi event products. Other reviewed GFD positives, observed-zero comparisons and insufficient-observation scopes retain their research statuses; no unreviewed geometry or flood-negative labels are published.</p></details>}
   <p className="muted">Satellite evidence: <a href="https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1">Global Flood Database V1</a> · Tellman et al. (2021) · <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>, attribution and non-commercial use required. Modern Udupi outline: geoBoundaries v6 · CC BY 4.0, not a verified historical boundary. SOI geometry remains local.</p>

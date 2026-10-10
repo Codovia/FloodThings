@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import useMapResize from './useMapResize.js'
 
 const DEM = 'COPERNICUS/DEM/GLO30_2024_1'
 const LAND = 'ESA/WorldCover/v200'
@@ -10,6 +11,7 @@ function ResearchMap({ data, selected, onFailure }) {
   const element = useRef(null)
   const map = useRef(null)
   const overlays = useRef({})
+  useMapResize(map)
   useEffect(() => {
     const instance = L.map(element.current, { scrollWheelZoom: false })
     map.current = instance

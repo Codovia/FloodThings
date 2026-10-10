@@ -421,6 +421,7 @@ Protected Udupi events **2728 / 3551**, **33 / 23 qualifying cells at 250 m**, a
 
 ## 2026-10-06 — Stage 3E: bounded Sentinel-1 feasibility pilot; scientific interpretation blocked
 
+
 **Objective/status:** assess reproducible Sentinel-1 before/event evidence for a few documented Karnataka IFI events. Bounded execution and provenance completed for five metadata candidates, with two raster analyses. **Flood interpretation remains blocked:** original JRC masks leave no auxiliary-qualified pixels in either analysis window. No supported/promoted positives, binary/daily labels, statewide maps, background samples, rainfall extraction, training or application change.
 
 **Previous delivery/branch:** independently verified Stage 3D **`90e395a36e6098b3faad4de4c1bffd8aea925d4f`**; branch `feature/karnataka-data-foundation`, origin `git@github.com:Codovia/FloodThings.git`. Starting tree contained only untracked QandA.md; it stays excluded. All source versions were inspected, existing Stage 3C/3D validation and annual checksum passed before new extraction. Persistent starting snapshot: 1,028 files; register/log are the only authorized existing-file changes.
@@ -460,7 +461,6 @@ Protected Udupi events **2728 / 3551**, **33 / 23 qualifying cells at 250 m**, a
 **GitHub delivery:** six reviewed permitted artifacts prepared for commit/push/independent remote confirmation; pending at entry-writing time. No QandA.md, credential, .env, restricted geometry, raw raster, detailed dataset or unrelated change staged. Final report will provide the confirmed full hash; record it in the next task, not an extra self-hash commit.
 
 **Scientific conclusion/exact next task:** reproducible same-orbit processing exists for two of five scopes, but this pilot does **not** establish additional positive flood evidence, threshold stability, manageable SAR artefacts or readiness for broad Sentinel-1 evidence expansion. Next: separately review genuine event-specific spatial locality/corroboration and JRC valid-observation mask semantics, then predeclare another small calibration pilot. Do not silently unmask unknown cells as dry land, broaden windows to find positives, label negatives or train a model.
-
 
 ## 2026-10-06 — Stage 3E2: JRC semantics corrected; event calibration corroboration remains weak
 
@@ -1344,3 +1344,45 @@ Retained official NIC inventory retrieved 4 October 2026 supplies names/URLs. Ud
 **Limitations/next task:** statewide names do not mean statewide validated hazard coverage; 29 districts lack reviewed navigation bounds, all mechanisms remain Unknown, potential zones are unavailable, drainage context is bounded and operational shelter inventory empty. Experimental AI still predicts heavy rainfall only, with precision14.50%/recall91.67%; validated flood prediction, risk classes, negative labels and automated warnings remain unavailable. Exact recommended next task: presentation rehearsal of the district/layer/details workflow and legitimate administrator shelter verification where appropriate. Broader historical/hazard geometry requires a separate evidence/licence review; do not start ML retraining, Stage 5B or multiday data acquisition automatically.
 
 **Running application:** restarted only the identified existing development launcher through its own cleanup and relaunched `./start.sh` to load the new backend routes. Initial preflight attempts stopped before startup; isolated dependency/model/port checks passed and the final normal launch completed all five checks. PostgreSQL remained running; no migrations/imports or unrelated service changes. Active frontend-proxied APIs returned HTTP 200 with 31 district names and 56 original historical polygons.
+
+## 2026-10-10: UI Rendering Investigation & Repair — Five Pages & Multi-Viewport Audit
+
+**Role & Objective:** Conducted a comprehensive frontend visual inspection, reproduction, and repair of UI rendering defects across the five FloodPulse pages (`/`, `/weather`, `/flood-map`, `/shelters`, `/admin`) at five specified viewports (Desktop 1920×1080, Laptop 1366×768, Tablet 768×1024, Mobile 390×844, and Small Mobile 360×740). Maintained strict separation between actual rendering defects and legitimate unavailable data (e.g. 0 verified hazard polygons, unverified navigation bounds for Kodagu, and empty operational shelter directories).
+
+**Phase 1 & 2 — Diagnosis & Automated Audit Harness:**
+- Inspected running processes: FastAPI backend on port 18050, Vite dev server on port 14180, PostgreSQL directory container on port 55436.
+- Implemented an automated Playwright audit harness (`data/tmp/ui-evidence/audit.mjs`, stored in git-ignored directory) capturing full-page and viewport screenshots and measuring horizontal overflow, clipped interactive elements, Leaflet tile loading, and console errors across all 5 routes and 5 target viewports.
+- Baseline ("before") run captured 30+ screenshots (`data/tmp/ui-evidence/before/`) and uncovered specific visual flaws:
+  1. *Weather coordinate form and point selector layout:* On `/weather`, the coordinate inputs and submit button were unconstrained and stretched in a single row without a 2-column grid; the map rendered below rather than side-by-side. On `/` and `/shelters`, toggling "Hide weather map" left a blank 63% whitespace column due to unconditional 2-column grid styling on `.point-selector-body`.
+  2. *Map legend swatch floating on mobile:* On narrow mobile viewports (390×844 and 360×740), multi-line legend text wrapped across 4–5 lines while `.map-legend` used `align-items: center`, causing the historical water swatch to float vertically in the middle of the text block rather than aligning with the top line.
+  3. *Desktop Admin Login Form Over-Stretching:* On wide desktop viewports (1920×1080 and 1366×768), `.admin-shell` had `max-width: none` without capping the login card width, causing the username and password inputs to span 1200+ px.
+  4. *Mobile navigation menu dismissal:* Clicking the currently active route or link inside the expanded mobile header menu failed to close the menu because `PageLink` did not invoke passed `onClick` handlers.
+  5. *Leaflet CSS import & container resilience:* `FloodIntelligenceMap.jsx` lacked an explicit import of `leaflet/dist/leaflet.css`, and `DrainageResearchLayers.jsx` did not integrate the `useMapResize` hook for window resize recalculation. In addition, `history?.geojson.features.length` lacked optional chaining.
+
+**Phase 3 — Targeted Repairs Applied:**
+- `frontend/src/styles.css`:
+  - Scoped 2-column point-selector layout to `.point-selector-body:has(.point-map)` so that collapsing the weather map gracefully collapses the container to single-column width without orphaned whitespace.
+  - Made `.weather-coordinate-form` globally styled as a 2-column grid (`repeat(2, minmax(0, 1fr))`) with button spanning full width (`grid-column: 1 / -1`), collapsing to single-column below 500px across all routes.
+  - Updated `.map-legend` to `align-items: flex-start` with `.water-swatch` given `margin-top: 4px` and `flex-shrink: 0`, keeping swatches crisply aligned to the first line of wrapped text.
+  - Added `.admin-shell .shelter-form:not([aria-label]) { max-width: 560px; }` to constrain unauthenticated login cards on desktop.
+- `frontend/src/AppNavigation.jsx`:
+  - Updated `PageLink` to preserve and trigger `props.onClick` on link clicks.
+  - Added `onClick={() => setExpanded(false)}` to navigation links in `AppHeader` to dismiss the mobile menu upon navigation.
+- `frontend/src/FloodIntelligenceMap.jsx`:
+  - Added explicit `import 'leaflet/dist/leaflet.css'`.
+  - Added safe optional chaining (`history?.geojson?.features?.length`) for historical geometry feature checks.
+- `frontend/src/DrainageResearchLayers.jsx`:
+  - Imported and called `useMapResize(map)` hook in `ResearchMap` to guarantee Leaflet tile invalidation upon layout or container resizing.
+- `frontend/playwright.config.js`:
+  - Preserved `...process.env` while configuring test-isolated `SHELTER_PUBLIC_ORIGIN` and `SHELTER_COOKIE_SECURE` for clean test execution.
+
+**Phase 4 — Verification & Evidence:**
+- Re-ran the audit harness (`data/tmp/ui-evidence/audit.mjs after`), capturing 30+ after screenshots (`data/tmp/ui-evidence/after/`) and report metrics:
+  - Horizontal overflow: `overflowX = false` across all 5 viewports and all 5 routes (document width matches viewport width exactly).
+  - Leaflet navigation: In-app routing, district switching (Udupi, Dakshina Kannada, Kodagu, statewide), and browser back/forward history transitions verified cleanly with full tile rendering and 0 console errors.
+  - Visual inspection: Confirmed balanced weather coordinate layout, constrained desktop admin login card, top-aligned mobile legend swatch, and responsive mobile menu dismissal.
+- Full automated test suite passes:
+  - Vitest: 14 test files, 135/135 tests passing (`npm test`).
+  - Playwright: 35/35 integration tests passing with private launcher environment (`npx playwright test`).
+  - Pytest: 1,354/1,354 backend tests passing (`pytest backend/tests`).
+  - Vite production build: 48 modules cleanly bundled with zero errors (`npm run build`).

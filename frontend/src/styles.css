@@ -244,13 +244,14 @@ footer {
 }
 .map-legend {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 .water-swatch {
   display: inline-block;
   width: 14px;
   height: 14px;
+  margin-top: 4px;
   background: #dc6047;
   border: 1px solid #9c3627;
   flex-shrink: 0;
@@ -434,6 +435,7 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 .admin-shell { margin: 0; max-width: none; padding: 0; }
 .admin-shell > h2 { margin-top: 20px; }
 .admin-shell > button { margin-bottom: 24px; }
+.admin-shell .shelter-form:not([aria-label]) { max-width: 560px; }
 .shelter-form input, .shelter-form textarea, .shelter-form select { border-color: #9bb4d0; border-radius: 8px; }
 .shelter-form fieldset { border-color: #9bb4d0; border-radius: 12px; padding: 20px; }
 .app-footer { margin: 0; padding: 28px max(32px,calc((100vw - 1276px)/2)); background: #e9f0f9; border-top: 1px solid #d4e1ef; display: grid; grid-template-columns: 1fr 2fr; gap: 40px; font-size: 12px; color: #435d79; }
@@ -476,12 +478,13 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 }
 @media (max-width: 360px) { .app-brand small { max-width: 155px; } .brand-mark { display: none; } }
 .point-selector-body > * { min-width: 0; }
-:is(.page-home, .page-flood-map, .page-shelters) .point-selector-body { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.7fr); gap: 24px; }
-:is(.page-home, .page-flood-map, .page-shelters) .weather-coordinate-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); }
-:is(.page-home, .page-flood-map, .page-shelters) .weather-coordinate-form label { min-width: 0; }
-:is(.page-home, .page-flood-map, .page-shelters) .weather-coordinate-form button { grid-column: 1/-1; }
+.point-selector-body:has(.point-map) { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.7fr); gap: 24px; }
+.weather-coordinate-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.weather-coordinate-form label { min-width: 0; }
+.weather-coordinate-form button { grid-column: 1/-1; }
 .shelter-empty { background: #f0f7fb; border: 1px dashed #9fbfd8; padding: 32px 24px; border-radius: 14px; text-align: center; color: #355777; font-weight: 600; }
-@media (max-width: 900px) { :is(.page-home, .page-flood-map, .page-shelters) .point-selector-body { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 900px) { .point-selector-body:has(.point-map) { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 500px) { .weather-coordinate-form { grid-template-columns: 1fr; } }
 
 /* Sprint 11: primary evidence map before compact, separate context panels. */
 .intelligence-toolbar {display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:20px}
