@@ -91,7 +91,7 @@ test('mobile alias search selects real Mangaluru and disabled Kaup explains unav
   await expect(page.getByRole('heading',{name:'Mangaluru, Dakshina Kannada',exact:true})).toBeVisible()
   await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   const disabled=page.getByRole('button',{name:/^Kaup —/})
-  await expect(disabled).toBeDisabled(); await expect(disabled).toHaveAttribute('aria-describedby','unavailable-district-udupi-admin:municipality:kaup')
+  await expect(disabled).toBeDisabled(); await expect(disabled).toHaveAttribute('aria-describedby',/unavailable-district-udupi-admin:municipality:kaup$/);const description=await disabled.getAttribute('aria-describedby');await expect(page.locator('[id='+JSON.stringify(description)+']')).toContainText('settlement-node coordinate was not reviewed')
   await expect(page.getByText(/settlement-node coordinate was not reviewed/)).toBeVisible()
   await page.getByLabel('Search localities in Udupi').fill('A very long unlisted settlement name');await page.clock.fastForward(250)
   await expect(page.getByRole('status',{name:'District locality results'})).toContainText('No verified localities')

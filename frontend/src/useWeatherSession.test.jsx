@@ -184,3 +184,17 @@ it('clock changes are checked on activation without scheduling a duplicate reque
   vi.setSystemTime(new Date(BASE.getTime() + FRESHNESS_MS)); event('focus'); await flush()
   expect(fetch).toHaveBeenCalledTimes(2); expect(result.current.freshness).toBe('fresh')
 })
+
+it('pauses background timers on an inactive route and reuses a still-fresh receipt',async()=>{
+ const {result,rerender}=renderHook(({enabled})=>useWeatherSession(null,enabled),{initialProps:{enabled:true}})
+ await flush();const receipt=result.current.data.retrieved_at
+ rerender({enabled:false});expect(vi.getTimerCount()).toBe(0)
+ await advance(60*60*1000);event('focus');expect(fetch).toHaveBeenCalledTimes(1)
+ rerender({enabled:true});await flush()
+ expect(fetch).toHaveBeenCalledTimes(1);expect(result.current.data.retrieved_at).toBe(receipt);expect(result.current.freshness).toBe('fresh')
+})
+it('an expired receipt is refreshed once upon route reactivation, never while inactive',async()=>{
+ const {result,rerender}=renderHook(({enabled})=>useWeatherSession(null,enabled),{initialProps:{enabled:true}})
+ await flush();rerender({enabled:false});await advance(FRESHNESS_MS);expect(fetch).toHaveBeenCalledTimes(1)
+ rerender({enabled:true});await flush();expect(fetch).toHaveBeenCalledTimes(2);expect(result.current.freshness).toBe('fresh')
+})

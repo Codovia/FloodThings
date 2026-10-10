@@ -13,8 +13,7 @@ export default function WeatherPanel({point, selectedPoint, session, overview=fa
         <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">{point.name}</h2></div>
         <button onClick={() => load()} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
       </div>
-      <p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {point.locality_id ? <><a href={point.coordinate_source_url}>Mapped locality point · OpenStreetMap</a> · <a href={point.association_source_url}>{point.district_name} district association</a>. Point weather, not locality-wide or district-wide conditions.</> : selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p>
-      <p className="notice">Flood prediction is not available. Prediction target and label methodology are not yet validated.</p>
+      <p className="muted">Point weather · Flood prediction is not available.</p>
       <div className="weather-freshness" data-freshness={freshness} role="status" aria-label="Weather data freshness">
         <strong>{freshness === 'fresh' ? 'Fresh' : freshness === 'stale' ? 'Stale — previously retrieved information' : freshness === 'refreshing' ? 'Refreshing weather' : 'No weather data available'}</strong>
         {data && <span>Last successful retrieval: {retrievalTime(data.retrieved_at, now) === null ? 'Unavailable — freshness cannot be verified' : formatTime(data.retrieved_at)}</span>}
@@ -40,7 +39,8 @@ export default function WeatherPanel({point, selectedPoint, session, overview=fa
           </div>
           <DailyForecast days={data.forecast} coverage={data.forecast_coverage} compact={overview} />
           {!overview&&<RainfallChart days={data.forecast} />}
-          <details open={!overview} className="weather-source-details"><summary>Weather source & timestamp details</summary><dl className="metadata">
+          <details open={!overview} className="weather-source-details"><summary>Weather source & timestamp details</summary>
+          <p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {point.locality_id ? <><a href={point.coordinate_source_url}>Mapped locality point · OpenStreetMap</a> · <a href={point.association_source_url}>{point.district_name} district association</a>. Point weather, not locality-wide or district-wide conditions.</> : selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p><dl className="metadata">
             <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
             <div><dt>Station observation time</dt><dd>Unavailable — model data</dd></div>
             <div><dt>Forecast issue time</dt><dd>Unavailable — provider does not supply it here</dd></div>

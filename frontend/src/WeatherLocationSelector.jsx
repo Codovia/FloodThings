@@ -8,7 +8,7 @@ import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 
 export const DEFAULT_POINT = { name: 'Bengaluru, Karnataka', latitude: 12.9767936, longitude: 77.5900820 }
 
-function WeatherPointMap({ point, onSelect, navigationBounds }) {
+export function WeatherPointMap({ point, onSelect, navigationBounds, historical = null }) {
   const container = useRef(null)
   const map = useRef(null)
   const marker = useRef(null)
@@ -41,6 +41,15 @@ function WeatherPointMap({ point, onSelect, navigationBounds }) {
     if (navigationBounds && map.current) map.current.fitBounds(navigationBounds, { animate: false })
   }, [navigationBounds])
 
+  useEffect(() => {
+    if (!map.current || !historical) return
+    // Historical context is never used to select a weather point or infer risk.
+    const layers = []
+    if (historical.boundary) layers.push(L.geoJSON(historical.boundary, {style:{color:'#50736e',weight:2,fillOpacity:0.025}}).addTo(map.current))
+    if (historical.geojson) layers.push(L.geoJSON(historical.geojson, {bubblingMouseEvents:false,style:{color:'#9c3627',weight:1.5,fillColor:'#dc6047',fillOpacity:0.75}}).addTo(map.current))
+    return () => { if (map.current) layers.forEach(layer => map.current.removeLayer(layer)) }
+  }, [historical])
+
   useMapResize(map)
   return <>
     <div ref={container} className="weather-location-map" role="region" aria-label="Weather location selection map" />
@@ -53,7 +62,7 @@ function WeatherPointMap({ point, onSelect, navigationBounds }) {
   </>
 }
 
-export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false, onDistrict = () => {} }) {
+export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false, onDistrict = () => {}, selectedDistrictId, active = true, externalMap = false }) {
   const [editorOpen,setEditorOpen]=useState(false)
   const [showMap, setShowMap] = useState(mapInitiallyOpen)
   const [navigationBounds, setNavigationBounds] = useState(null)
@@ -90,14 +99,14 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   }
 
   const controls = <>
-    <LocationDirectorySelector onChoose={next => { setShowMap(true); choose(next) }} onDistrict={district => {
+    <LocationDirectorySelector active={active} selectedDistrictId={selectedDistrictId} onChoose={next => { setShowMap(true); choose(next) }} onDistrict={district => {
       selection.current++; setLocating(false); setError(null)
       onDistrict(district)
       setNavigationBounds(district?.navigation_bounds || null)
       if (district?.navigation_bounds) setShowMap(true)
     }} />
     <div className="weather-map-actions">
-      {!compact&&<button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>}
+      {!compact&&!externalMap&&<button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>}
       <button type="button" onClick={locate} disabled={locating}>{locating ? 'Locating…' : 'Use my GPS location'}</button>
       <button type="button" onClick={() => choose(DEFAULT_POINT)}>Reset to Bengaluru</button>
     </div>
@@ -108,8 +117,8 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   const mapVisible = overview || showMap
   return <section className={'panel weather-location-selector'+(compact?' compact-location':'')} aria-labelledby="weather-location-title">
     <div className="location-bar"><div><p className="eyebrow">{overview?'KARNATAKA · SELECTED POINT':'SELECTED POINT'}</p><h2 id="weather-location-title">{compact?'Location & map':'Choose a weather location'}</h2><p className="selected-point-name">{point.name} · {point.latitude}°, {point.longitude}°</p></div>
-    {compact&&!overview&&<button type="button" aria-expanded={showMap} onClick={()=>setShowMap(value=>!value)}>{showMap?'Hide weather map':'Open weather map'}</button>}</div>
+    {compact&&!overview&&!externalMap&&<button type="button" aria-expanded={showMap} onClick={()=>setShowMap(value=>!value)}>{showMap?'Hide weather map':'Open weather map'}</button>}</div>
     {compact?<details className="location-editor" open={editorOpen}><summary aria-expanded={editorOpen} onClick={e=>{e.preventDefault();setEditorOpen(value=>!value)}}>Change location</summary><div hidden={!editorOpen}><p>Search verified places or request GPS. Point selection does not establish district-wide conditions.</p>{controls}</div></details>:<>{controls}</>}
-    {mapVisible&&<div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds}/></div>}
+    {mapVisible&&!externalMap&&<div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds}/></div>}
   </section>
 }

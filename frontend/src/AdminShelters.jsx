@@ -10,9 +10,10 @@ export default function AdminShelters({embedded=false,onHome=null}){
   const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[error,setError]=useState(null),[notice,setNotice]=useState(null),[busy,setBusy]=useState(false)
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[offset,setOffset]=useState(0),[districts,setDistricts]=useState([]),[form,setForm]=useState(blank),[editing,setEditing]=useState(null),[history,setHistory]=useState(null)
   const [adminTab,setAdminTab]=useState('shelters')
+  const [workspaceDistrict,setWorkspaceDistrict]=useState('')
   const [username,setUsername]=useState(''),[password,setPassword]=useState('')
   const busyRef=useRef(false),loadSequence=useRef(0),operationSequence=useRef(0)
-  function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setUsername('');setPassword('');setNotice(null);setAdminTab('shelters')}
+  function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setWorkspaceDistrict('');setUsername('');setPassword('');setNotice(null);setAdminTab('shelters')}
   const requests=useAdminRequests(clearPrivate)
   async function request(path,options={},auth=session){
     return requests.request(path,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(auth?.csrf_token?{'X-CSRF-Token':auth.csrf_token}:{}),...options.headers}})
@@ -42,24 +43,27 @@ export default function AdminShelters({embedded=false,onHome=null}){
     edit(row);setNotice('Assignment saved. Public availability depends on status, verification expiry and capacity.');await load()
   })}
   const entrance=useMemo(()=>form.latitude!==''&&form.longitude!==''&&Number.isFinite(Number(form.latitude))&&Number.isFinite(Number(form.longitude))&&Math.abs(Number(form.latitude))<=90&&Math.abs(Number(form.longitude))<=180?[{name:'Unconfirmed entrance selection',latitude:Number(form.latitude),longitude:Number(form.longitude)}]:[],[form.latitude,form.longitude])
+  const shownRows=rows.filter(row=>!workspaceDistrict||row.district_id===workspaceDistrict)
+  const workspace=districts.find(row=>row.id===workspaceDistrict)
   const Container=embedded?'div':'main'
-  return <Container className="admin-shell"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome()}:undefined}>Return to citizen dashboard</a><h2>Shelter administrator</h2><p>Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration.</p>
+  return <Container className="admin-shell"><div className="admin-identity-bar"><div className="admin-identity-title"><h2>Shelter administrator</h2><a href="/" onClick={onHome?e=>{e.preventDefault();onHome()}:undefined}>Return to citizen dashboard</a></div>{session&&<div><span>Signed in as {session.user.username}</span> <button onClick={signOut}>Sign out</button></div>}</div><p className="admin-access-note">Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration. {session&&'Session expires after 30 idle minutes or eight hours.'}</p>
     {checking&&<p role="status">Checking administrator session…</p>}
     {error&&<p role="alert" className="notice error">{error}</p>}{notice&&<p role="status">{notice}</p>}
     {!checking&&!session&&<form className="panel shelter-form" onSubmit={login}><h2>Administrator login</h2><label>Username<input autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e=>setPassword(e.target.value)} /></label><button disabled={busy}>Sign in</button></form>}
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
-      <p>Signed in as {session.user.username}. Session expires after 30 idle minutes or eight hours.</p><button onClick={signOut}>Sign out</button>
       <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button><button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button></nav>
       <div hidden={adminTab!=='notifications'} className="admin-notifications"><AdminNotifications session={session} request={request} /></div>
       <div className="admin-management" hidden={adminTab!=='shelters'}>
+      <div className="admin-information">
       <section className="panel admin-assignments"><h2>Shelter assignments</h2><button disabled={busy} onClick={()=>operation(()=>load())}>Refresh assignments</button><button disabled={busy} onClick={()=>{setEditing(null);setForm(blank());setHistory(null)}}>Create new shelter</button>
+        <label htmlFor="admin-district-filter">Assignment district filter</label><select id="admin-district-filter" value={workspaceDistrict} onChange={e=>setWorkspaceDistrict(e.target.value)}><option value="">All districts</option>{districts.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
         {!rows.length&&<p>No assignments in this directory.</p>}<p>{rows.length} of {total} assignments shown.</p>
-        <ul aria-label="Administrator shelter assignments" className="shelter-list">{rows.map(row=><li key={row.id}><strong>{row.name}</strong><p>{row.district_name} · {row.status} · {row.occupancy}/{row.capacity} occupants · {row.publicly_available?'Publicly available':'Unavailable to public'}</p><p>Verified: {clock(row.verified_at)}. Updated: {clock(row.updated_at)}.</p><button disabled={busy} onClick={()=>edit(row)}>Edit {row.name}</button><button disabled={busy} onClick={()=>operation(async()=>{setHistory(await request('/api/admin/shelters/'+row.id+'/audit'))})}>Audit {row.name}</button></li>)}</ul>
+        {workspaceDistrict&&<p role="status">{shownRows.length} {workspace?.name} assignments on this page. Filtering applies to the loaded page; use pagination to inspect other assignments. {!workspace?.navigation_bounds&&'Public navigation bounds unavailable.'}</p>}
+        <ul aria-label="Administrator shelter assignments" className="shelter-list">{shownRows.map(row=><li key={row.id}><strong>{row.name}</strong><p>{row.district_name} · {row.status} · {row.occupancy}/{row.capacity} occupants · {row.publicly_available?'Publicly available':'Unavailable to public'}</p><p>Verified: {clock(row.verified_at)}. Updated: {clock(row.updated_at)}.</p><button disabled={busy} onClick={()=>edit(row)}>Edit {row.name}</button><button disabled={busy} onClick={()=>operation(async()=>{setHistory(await request('/api/admin/shelters/'+row.id+'/audit'))})}>Audit {row.name}</button></li>)}</ul>
         <button disabled={busy||offset===0} onClick={()=>setOffset(n=>Math.max(0,n-100))}>Previous assignments</button><button disabled={busy||offset+100>=total} onClick={()=>setOffset(n=>n+100)}>Next assignments</button>
         {history&&<div aria-label="Shelter audit history"><h3>Audit history</h3><ul>{history.events.map(event=><li key={event.id}>{clock(event.at)} · {event.action} by {event.admin_id} · {event.before?.status||'new'} → {event.after.status} · occupancy {event.before?.occupancy??'none'} → {event.after.occupancy}; capacity {event.before?.capacity??'none'} → {event.after.capacity}</li>)}</ul></div>}
       </section>
-      <AdminEntranceMap entrance={entrance} onSelect={point=>setForm(f=>({...f,latitude:String(point.latitude),longitude:String(point.longitude),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}}))} />
       <form className="panel shelter-form" onSubmit={save} aria-label="Shelter assignment form"><h2>{editing?'Edit shelter assignment':'Create Pending shelter assignment'}</h2>
         <label>Facility name<input required maxLength={200} value={form.name} onChange={e=>field('name',e.target.value)} /></label>
         <label>Facility address<textarea required maxLength={1000} value={form.address} onChange={e=>field('address',e.target.value)} /></label>
@@ -80,6 +84,8 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <p>Open requires spare capacity and all four confirmations. Verification expires after 24 hours; recheck actual conditions before renewal. Full, Closed, Pending and expired assignments are excluded from public destinations. Weather/AI predictions never assign shelters.</p>
         <button disabled={busy||!districts.length}>{busy?'Saving…':'Save shelter assignment'}</button>
       </form>
+      </div>
+      <AdminEntranceMap entrance={entrance} selectedDistrictId={workspaceDistrict} onDistrict={row=>setWorkspaceDistrict(row?.id||'')} navigationBounds={workspace?.navigation_bounds} onSelect={point=>setForm(f=>({...f,latitude:String(point.latitude),longitude:String(point.longitude),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}}))} />
       </div>
     </>}
   </Container>

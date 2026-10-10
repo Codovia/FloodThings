@@ -3,14 +3,18 @@ import React, { useEffect, useState } from 'react'
 const keyOf = point => `${point.latitude}:${point.longitude}`
 const time = value => new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}).format(new Date(value))+' IST'
 
-export default function RainfallOutlook({ point, weather, freshness, overview=false }) {
+// Exact verified training points; district names and nearby map clicks do not
+// establish model eligibility. The backend independently enforces this scope.
+export const supportsRainfallModel = point => [[13.6250993,74.6915722],[12.8698101,74.8430082]].some(([lat,lon])=>point.latitude===lat&&point.longitude===lon)
+export default function RainfallOutlook({ point, weather, freshness, overview=false, active=true }) {
   const [open,setOpen] = useState(false)
   const [attempt,setAttempt] = useState(0)
   const key=keyOf(point)
+  const eligible=supportsRainfallModel(point)
   const [view,setView] = useState({key:null,data:null,error:null,loading:false})
   const receipt=weather?.retrieved_at || null
   useEffect(()=>{
-    if (!open || !receipt) return
+    if (!active || !eligible || !open || !receipt) return
     const controller=new AbortController();let stopped=false
     const timer=setTimeout(()=>controller.abort(),15000)
     setView({key,data:null,error:null,loading:true})
@@ -34,13 +38,14 @@ export default function RainfallOutlook({ point, weather, freshness, overview=fa
       } finally { clearTimeout(timer) }
     })()
     return ()=>{stopped=true;clearTimeout(timer);controller.abort()}
-  },[key,receipt,open,attempt])
-  const current=view.key===key?view:{data:null,error:null,loading:open&&!!receipt}
+  },[key,receipt,open,attempt,active,eligible])
+  const current=eligible&&view.key===key?view:{data:null,error:null,loading:active&&eligible&&open&&!!receipt}
   const validation=current.data?.validation
   const metricsAvailable=validation?.model_type==='Logistic Regression' && Number.isFinite(validation.precision) && validation.precision>=0 && validation.precision<=1 && Number.isFinite(validation.recall) && validation.recall>=0 && validation.recall<=1 && Number.isInteger(validation.samples) && validation.samples>0
   return <section className={overview?"panel ai-overview":"panel"} aria-labelledby="rainfall-outlook-title">
     <div className="panel-heading"><div><p className="eyebrow">EXPERIMENTAL MACHINE LEARNING</p><h2 id="rainfall-outlook-title">AI Rainfall Outlook</h2></div>
-      <button type="button" onClick={()=>open?setAttempt(n=>n+1):setOpen(true)} disabled={current.loading}>{current.loading?'Running rainfall model…':open?'Retry rainfall outlook':'Run experimental rainfall model'}</button></div>
+      <button type="button" onClick={()=>open?setAttempt(n=>n+1):setOpen(true)} disabled={!active||!eligible||current.loading}>{current.loading?'Running rainfall model…':open?'Retry rainfall outlook':'Run experimental rainfall model'}</button></div>
+    {!eligible&&<p role="status">Model unavailable for this selected point. Choose the verified Kundapur or Mangaluru locality; no inference request is made for unsupported locations.</p>}
     <p>{point.name} · next 24 complete hours beginning at the next full UTC hour.</p>
     <p>Target: heavy rainfall ≥64.5 mm in 24 hours at the model grid point. Model type: Logistic Regression.</p>
     <p className="notice">Experimental rainfall model, not flood probability or an official warning. Supports only the verified Kundapur and Mangaluru points. Flood prediction remains unavailable.</p>

@@ -24,6 +24,7 @@ export default function useWeatherSession(selectedPoint, enabled = true) {
   const point = selectedPoint || DEFAULT_POINT
   const key = keyOf(point)
   const session = useRef(null)
+  const cached = useRef(null)
   const [view, setView] = useState({ key, data: null, loading: true, error: null, now: Date.now(), retryAt: null, paused: false, offline: false })
   const refresh = useRef(() => {})
 
@@ -31,7 +32,8 @@ export default function useWeatherSession(selectedPoint, enabled = true) {
     if (!enabled) return
     // One session per exact coordinate pair. Render-only changes to a location
     // name cannot schedule another request. A new location discards old data.
-    const state = { key, data: null, error: null, active: null, timer: null, failures: 0, nextAt: null, stopped: false, offline: navigator.onLine === false }
+    const previous = cached.current?.key === key ? cached.current : null
+    const state = { key, data: previous?.data || null, error: previous?.error || null, active: null, timer: null, failures: previous?.failures || 0, nextAt: previous?.nextAt ?? null, stopped: false, offline: navigator.onLine === false }
     session.current = state
     function publish() {
       if (!state.stopped) setView({ key, data: state.data, loading: !!state.active, error: state.error, now: Date.now(), retryAt: state.failures ? state.nextAt : null, paused: state.failures >= 3, offline: state.offline })
@@ -110,8 +112,10 @@ export default function useWeatherSession(selectedPoint, enabled = true) {
     window.addEventListener('online', activate)
     window.addEventListener('offline', offline)
     refresh.current = override => load(true, override)
-    void load(false)
+    if (state.data) check()
+    else void load(false)
     return () => {
+      cached.current = { key, data: state.data, error: state.error, failures: state.failures, nextAt: state.nextAt }
       state.stopped = true
       clearSchedule()
       if (state.active) { clearTimeout(state.active.timeout); state.active.controller.abort() }

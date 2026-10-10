@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 import './LocationDirectorySelector.css'
 
 // Abort on replacement/unmount; late directory responses cannot replace a newer query.
@@ -38,17 +38,19 @@ function canChoose(row) {
     && point && Number.isFinite(point.latitude) && Number.isFinite(point.longitude) && Math.abs(point.latitude) <= 90 && Math.abs(point.longitude) <= 180
 }
 
-export default function LocationDirectorySelector({ onChoose, onDistrict }) {
+export default function LocationDirectorySelector({ onChoose, onDistrict, selectedDistrictId, active = true, collapseOnChoose = false }) {
+  const uid = useId()
   const [open, setOpen] = useState(false)
   const [districtId, setDistrictId] = useState('')
+  const effectiveDistrictId = selectedDistrictId ?? districtId
   const [query, setQuery] = useState('')
   const [localQuery, setLocalQuery] = useState('')
   const [retry, setRetry] = useState(0)
   const q = useDebounced(query), localQ = useDebounced(localQuery)
-  const districts = useDirectory(open ? '/api/locations/districts' : null, retry)
-  const search = useDirectory(open && q ? `/api/locations/search?q=${encodeURIComponent(q)}&limit=20` : null, retry)
-  const localities = useDirectory(open && districtId ? `/api/locations/localities?district_id=${encodeURIComponent(districtId)}&q=${encodeURIComponent(localQ)}` : null, retry)
-  const district = districts.data?.items.find(r => r.id === districtId)
+  const districts = useDirectory(active && open ? '/api/locations/districts' : null, retry)
+  const search = useDirectory(active && open && q ? `/api/locations/search?q=${encodeURIComponent(q)}&limit=20` : null, retry)
+  const localities = useDirectory(active && open && effectiveDistrictId ? `/api/locations/localities?district_id=${encodeURIComponent(effectiveDistrictId)}&q=${encodeURIComponent(localQ)}` : null, retry)
+  const district = districts.data?.items.find(r => r.id === effectiveDistrictId)
 
   function chooseDistrict(row) {
     setDistrictId(row?.id || ''); setLocalQuery(''); setQuery('')
@@ -59,15 +61,16 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
     if (!canChoose(row)) return
     const parent = districts.data?.items.find(d => d.id === row.district_id)
     if (!parent) return
-    setDistrictId(parent.id); setQuery(''); setLocalQuery('')
+    setDistrictId(parent.id); setQuery(''); setLocalQuery(''); onDistrict(parent)
     onChoose({ name: `${row.name}, ${parent.name}`, latitude: row.coordinates.latitude, longitude: row.coordinates.longitude,
       locality_id: row.id, district_id: parent.id, district_name: parent.name, coordinate_source_url: row.coordinate_source.url,
       association_source_url: row.association_source_url })
+    if (collapseOnChoose) setOpen(false)
   }
   function localityButton(row, scope = 'district') {
     const parent = districts.data?.items.find(d => d.id === row.district_id)
     const usable = canChoose(row)
-    const descriptionId = `unavailable-${scope}-${row.id}`
+    const descriptionId = `${uid}-unavailable-${scope}-${row.id}`
     const label = `${row.name} — ${parent?.name || row.district_id} · ${usable ? `Mapped locality point (${row.coordinates.latitude}°, ${row.coordinates.longitude}°)` : 'Coordinates unavailable'}`
     return <><button type="button" disabled={!usable} aria-label={label} aria-describedby={!usable && row.unavailable_reason ? descriptionId : undefined}
       onClick={() => chooseLocality(row)}>{row.name} — {parent?.name || row.district_id} · {usable ? 'Mapped locality point' : 'Coordinates unavailable'}</button>
@@ -76,26 +79,26 @@ export default function LocationDirectorySelector({ onChoose, onDistrict }) {
   const error = districts.error || search.error || localities.error
   const loading = districts.loading || search.loading || localities.loading
   return <div className="location-directory">
-    <button type="button" aria-expanded={open} aria-controls="location-directory-content" onClick={() => setOpen(v => !v)}>{open ? 'Close place search' : 'Search districts and localities'}</button>
-    {open && <div id="location-directory-content">
+    <button type="button" aria-expanded={open} aria-controls={uid+'-content'} onClick={() => setOpen(v => !v)}>{open ? 'Close place search' : 'Search districts and localities'}</button>
+    {open && <div id={uid+'-content'} className="directory-content">
       <h3>Find a Karnataka place</h3>
       <p className="muted">{districts.data?.coverage ? `${districts.data.coverage.district_names} NIC-listed district names; ${districts.data.coverage.selectable_localities} selectable mapped localities across ${districts.data.coverage.districts_with_selectable_localities} districts; ${districts.data.coverage.name_only_localities} name-only records.` : 'Coverage is limited to reviewed place records.'} Current LGD identities remain unresolved. Unreviewed coordinates are never substituted. {districts.data?.dataset_version && `Directory: ${districts.data.dataset_version}.`}</p>
-      <label htmlFor="place-search">Search districts or localities</label>
-      <input id="place-search" type="search" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} placeholder="For example: Udupi or Karkala" />
+      <label htmlFor={uid+'-search'}>Search districts or localities</label>
+      <input id={uid+'-search'} type="search" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} placeholder="For example: Udupi or Karkala" />
       {q && search.data && <>
         <p role="status" aria-label="Place search results">{search.data.total ? `${search.data.total} matching places; showing ${search.data.items.length}.` : 'No matching places in the verified directory. Try another name or select the map.'}</p>
         <ul aria-label="Place search results">{search.data.items.map(row => <li key={row.id}>{row.kind === 'district'
           ? <button type="button" onClick={() => chooseDistrict(row)}>{row.name} — District · filter localities</button> : localityButton(row, 'search')}</li>)}</ul>
       </>}
-      <label htmlFor="district-choice">Karnataka district</label>
-      <select id="district-choice" value={districtId} disabled={!districts.data} onChange={e => chooseDistrict(districts.data?.items.find(d => d.id === e.target.value))}>
+      <label htmlFor={uid+'-district'}>Karnataka district</label>
+      <select id={uid+'-district'} value={effectiveDistrictId} disabled={!districts.data} onChange={e => chooseDistrict(districts.data?.items.find(d => d.id === e.target.value))}>
         <option value="">Select a district</option>
         {districts.data?.items.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}
       </select>
       {district && <>
         <p className="notice">{district.name}: district selection filters localities; it does not request district-wide weather. {district.navigation_bounds ? 'Map navigation uses the public geoBoundaries district extent.' : 'Verified public navigation geometry and a representative point are unavailable.'}</p>
-        <label htmlFor="locality-search">Search localities in {district.name}</label>
-        <input id="locality-search" type="search" maxLength={100} value={localQuery} onChange={e => setLocalQuery(e.target.value)} />
+        <label htmlFor={uid+'-locality'}>Search localities in {district.name}</label>
+        <input id={uid+'-locality'} type="search" maxLength={100} value={localQuery} onChange={e => setLocalQuery(e.target.value)} />
         {localities.data && <>
           <p role="status" aria-label="District locality results">{localities.data.total ? `${localities.data.total} locality records; showing ${localities.data.items.length}.` : 'No verified localities match this district and search. Coverage is incomplete; use the map or GPS.'}</p>
           <ul aria-label="District localities">{localities.data.items.map(row => <li key={row.id}>{localityButton(row)}</li>)}</ul>

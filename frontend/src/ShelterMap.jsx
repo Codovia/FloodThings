@@ -5,15 +5,16 @@ import {tileMetadataURL,validatedTileMetadata} from './adminMapProvider.js'
 import useMapResize from './useMapResize.js'
 import 'leaflet/dist/leaflet.css'
 
-export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false}) {
+export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null}) {
   const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect)
+  const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
   choose.current=onSelect
   useEffect(()=>{
     const view=L.map(container.current,{scrollWheelZoom:false}).setView([15.1,76.1],6)
     map.current=view;layers.current=L.layerGroup().addTo(view)
     view.on('click',e=>choose.current?.({latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
-    return ()=>{view.remove();map.current=null;layers.current=null}
+    return ()=>{view.remove();map.current=null;layers.current=null;lastGeometry.current=null}
   },[])
   useEffect(()=>{
     if(!map.current)return
@@ -39,9 +40,14 @@ export default function ShelterMap({points=[],origin=null,onSelect=null,label='S
       const text=document.createElement('span');text.textContent=point.name
       L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'}).bindTooltip(text).addTo(layers.current);bounds.push([point.latitude,point.longitude])
     }
-    if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):13,{animate:false})
-    else if(bounds.length)map.current.fitBounds(bounds,{padding:[20,20],maxZoom:inspection?18:14,animate:false})
+    const geometry=JSON.stringify([bounds,inspection])
+    if(geometry!==lastGeometry.current){
+      lastGeometry.current=geometry
+      if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):13,{animate:false})
+      else if(bounds.length)map.current.fitBounds(bounds,{padding:[20,20],maxZoom:inspection?18:14,animate:false})
+    }
   },[points,origin,inspection])
+  useEffect(()=>{if(navigationBounds&&map.current)map.current.fitBounds(navigationBounds,{padding:[20,20],animate:false})},[navigationBounds])
   useMapResize(map)
   return <><div ref={container} className="shelter-map" role="region" aria-label={label} />{tileError&&<p className="notice" role="status">{BASEMAP_NOTICE}</p>}</>
 }

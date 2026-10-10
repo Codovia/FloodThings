@@ -52,7 +52,7 @@ it('keeps Bengaluru default and replaces weather with selected coordinates, pres
 
 it('clicking Leaflet selects an exact point and clears old marker on another selection', async () => {
   render(<App />); await screen.findByText('27 °C')
-  fireEvent.click(screen.getByRole('button', { name: 'Open weather map' }))
+  expect(screen.getByRole('region', {name:'Weather location selection map'})).toBeTruthy()
   act(() => state.events.click({ latlng: { lat: 13.34, lng: 74.74 } }))
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toContain('latitude=13.34&longitude=74.74'))
   expect(state.circleMarker.mock.calls.at(-1)[0]).toEqual([13.34, 74.74])
@@ -140,7 +140,7 @@ it('weather timeout ends loading and keeps prediction unavailable', async () => 
 
 it('wrapped basemap longitude becomes the same valid WGS84 point, without a guessed locality', async () => {
   render(<App />); await screen.findByText('27 °C')
-  fireEvent.click(screen.getByRole('button', { name: 'Open weather map' }))
+  expect(screen.getByRole('region', {name:'Weather location selection map'})).toBeTruthy()
   act(() => state.events.click({ latlng: { lat: 13, lng: 435 } }))
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toContain('latitude=13&longitude=75'))
   expect(state.circleMarker.mock.calls.at(-1)[0]).toEqual([13, 75])

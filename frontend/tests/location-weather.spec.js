@@ -30,7 +30,7 @@ test('coordinate and Leaflet selection drive weather requests, and source masks/
   await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByText('Unavailable', { exact: true })).toBeVisible()
   await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
-  await page.getByRole('button', { name: 'Open weather map' }).click()
+  await expect(page.getByRole('region', {name:'Weather location selection map'})).toBeVisible()
   const map = page.getByRole('region', { name: 'Weather location selection map' })
   await expect(map.locator('path.leaflet-interactive')).toHaveCount(1)
   const clickedRequest = page.waitForRequest(r => r.url().includes('/api/weather?latitude='))
@@ -69,7 +69,7 @@ test('seven-day forecasts retain order after GPS, map, manual selection and refr
   await page.getByRole('button', { name: 'Use my GPS location' }).click(); await gps
   await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
   await expect(cards).toHaveCount(7)
-  await page.getByRole('button', { name: 'Open weather map' }).click()
+  await expect(page.getByRole('region', {name:'Weather location selection map'})).toBeVisible()
   const clicked = page.waitForRequest(r => r.url().includes('/api/weather?latitude='))
   await page.getByRole('region', { name: 'Weather location selection map' }).click({ position: { x: 100, y: 150 } }); await clicked
   await expect(page.getByRole('heading', { name: 'Selected map point', exact: true })).toBeVisible()

@@ -185,3 +185,27 @@ it('database-specific outage preserves independent GPS weather and seven-day for
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=14&longitude=75')).toBe(true))
   expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7)
 })
+
+it('external district filter is reflected without inventing point weather',async()=>{
+ const choose=vi.fn(),changed=vi.fn()
+ const {rerender}=render(<LocationDirectorySelector onChoose={choose} onDistrict={changed} selectedDistrictId={districts[0].id}/>);open()
+ await screen.findByRole('option',{name:'Udupi'});await screen.findByRole('list',{name:'District localities'})
+ expect(screen.getByLabelText('Karnataka district').value).toBe(districts[0].id)
+ rerender(<LocationDirectorySelector onChoose={choose} onDistrict={changed} selectedDistrictId={districts[1].id}/>)
+ await screen.findByText(/No verified localities match/)
+ expect(screen.getByLabelText('Karnataka district').value).toBe(districts[1].id)
+ expect(choose).not.toHaveBeenCalled()
+})
+it('inactive place search cancels work and ignores directory responses after page change',async()=>{
+ const {rerender}=render(<LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()}/>);open()
+ await screen.findByRole('option',{name:'Udupi'});const signal=fetch.mock.calls[0][1].signal,count=fetch.mock.calls.length
+ rerender(<LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()} active={false}/>)
+ expect(signal.aborted).toBe(true);expect(fetch.mock.calls.length).toBe(count)
+})
+it('public and private selector controls have unique accessible IDs',async()=>{
+ render(<><LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()}/><LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()}/></>)
+ for(const button of screen.getAllByRole('button',{name:'Search districts and localities'}))fireEvent.click(button)
+ await waitFor(()=>expect(screen.getAllByLabelText('Karnataka district').every(select=>!select.disabled)).toBe(true))
+ const ids=Array.from(document.querySelectorAll('[id]'),node=>node.id)
+ expect(new Set(ids).size).toBe(ids.length)
+})

@@ -71,7 +71,7 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
   const marker=L.circleMarker([point.latitude,point.longitude],{radius:5,color:'#344b68',fillOpacity:.6}).addTo(map.current)
   return()=>{if(map.current)map.current.removeLayer(marker)}
  },[point])
- function zoomWater(){if(history?.geojson?.features?.length){const bounds=L.geoJSON(history.geojson).getBounds();map.current?.fitBounds(bounds,{padding:[30,30],maxZoom:14})}}
+ function zoomWater(){if(history?.geojson?.features?.length){const bounds=L.geoJSON(history.geojson).getBounds();map.current?.fitBounds(bounds,{padding:[30,30],maxZoom:14,animate:false})}}
  return <>
   <div className="map-actions"><button onClick={()=>district?.navigation_bounds?map.current?.fitBounds(district.navigation_bounds):map.current?.setView([15.1,76.1],6)} disabled={!!district&&!district.navigation_bounds}>Show district</button><button onClick={zoomWater} disabled={!history?.geojson?.features?.length}>Zoom to mapped water</button></div>
   <div ref={element} className="historical-map intelligence-map" role="region" aria-label="Historical satellite floodwater and Karnataka evidence map"/>
@@ -88,9 +88,11 @@ function FeatureDetails({data,onClose,navigate}){
  </section>
 }
 
-export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDistrictId,onDistrictChange}){
+export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDistrictId,onDistrictChange,selectedFeatureId,onFeatureChange}){
  const [districtId,setDistrictId]=useState(''),[eventId,setEventId]=useState(''),[featureId,setFeatureId]=useState(null),[retry,setRetry]=useState(0)
  useEffect(()=>{if(selectedDistrictId!==undefined){setDistrictId(selectedDistrictId);setFeatureId(null)}},[selectedDistrictId])
+ useEffect(()=>{if(selectedFeatureId!==undefined)setFeatureId(selectedFeatureId)},[selectedFeatureId])
+ function chooseFeature(id){setFeatureId(id);onFeatureChange?.(id)}
  const [layers,setLayers]=useState({history:true,hazards:false,drainage:false,shelters:false})
  const directory=useEvidence('/api/flood-map/districts',retry)
  const query=new URLSearchParams(districtId?{district_id:districtId}:{})
@@ -102,19 +104,19 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  const details=useEvidence(featureId?'/api/flood-map/features/'+encodeURIComponent(featureId):null,retry)
  const district=directory.data?.items.find(d=>d.id===districtId)||null
  const shownShelters=shelters.data&&validShelterDirectory(shelters.data)?{...shelters.data,shelters:shelters.data.shelters.filter(s=>!districtId||s.district_id===districtId)}:null
- function toggle(key){setLayers(current=>({...current,[key]:!current[key]}));if(key==='history')setFeatureId(null)}
+ function toggle(key){setLayers(current=>({...current,[key]:!current[key]}));if(key==='history')chooseFeature(null)}
  const failures=[directory,history,hazard,drainage,shelters,details].filter(s=>s.error)
  const loading=[directory,history,hazard,drainage,shelters,details].some(s=>s.loading)
  const safeHistory=history.data?.status==='available'&&history.data.geojson?.type==='FeatureCollection'?history.data:null
  return <section className="intelligence-workspace" aria-labelledby="intelligence-title">
   <h2 id="intelligence-title">Karnataka Flood Intelligence</h2>
   <div className="panel intelligence-toolbar">
-   <label htmlFor="intelligence-district">Flood Map district</label><select id="intelligence-district" value={districtId} disabled={!directory.data} onChange={e=>{setDistrictId(e.target.value);onDistrictChange?.(e.target.value);setFeatureId(null)}}><option value="">Karnataka — statewide evidence</option>{directory.data?.items.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
-   <button onClick={()=>{setDistrictId('');onDistrictChange?.('');setFeatureId(null)}}>Return to statewide view</button>
+   <label htmlFor="intelligence-district">Flood Map district</label><select id="intelligence-district" value={districtId} disabled={!directory.data} onChange={e=>{setDistrictId(e.target.value);onDistrictChange?.(e.target.value,directory.data?.items.find(d=>d.id===e.target.value));chooseFeature(null)}}><option value="">Karnataka — statewide evidence</option>{directory.data?.items.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
+   <button onClick={()=>{setDistrictId('');onDistrictChange?.('',null);chooseFeature(null)}}>Return to statewide view</button>
    <fieldset><legend>Evidence layers</legend>{[['history','Historical Flood Locations'],['hazards','Potential Flood-Prone Zones'],['drainage','Drainage / waterways'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}</fieldset>
-   {layers.history&&<label>Recorded event<select aria-label="Recorded event" value={eventId} onChange={e=>{setEventId(e.target.value);setFeatureId(null)}}><option value="">All reviewed public spatial events</option>{(safeHistory?.events||[]).map(e=><option key={e.event_id} value={e.event_id}>Event {e.event_id} · {e.start_date} – {e.end_date_inclusive}</option>)}</select></label>}
+   {layers.history&&<label>Recorded event<select aria-label="Recorded event" value={eventId} onChange={e=>{setEventId(e.target.value);chooseFeature(null)}}><option value="">All reviewed public spatial events</option>{(safeHistory?.events||[]).map(e=><option key={e.event_id} value={e.event_id}>Event {e.event_id} · {e.start_date} – {e.end_date_inclusive}</option>)}</select></label>}
   </div>
-  <div className="intelligence-layout"><div className="intelligence-map-stage">  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={setFeatureId}/>
+  <div className="intelligence-layout"><div className="intelligence-map-stage">  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={chooseFeature}/>
   <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
 </div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <p className="historical-notice">Historical event-window maximum satellite observations. This is not current flooding, predicted risk, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
    {loading&&<p role="status">Loading selected map evidence…</p>}
@@ -130,8 +132,8 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
    {layers.shelters&&shelters.data&&!shownShelters&&<p role="alert">Shelter availability could not be verified. No substitute destinations are shown.</p>}
   </div>
   <p className="muted">Click a historical polygon or choose a cell below for details. Clicking the background selects a weather point; it does not establish district identity or flood risk. <PageLink to="/weather" navigate={navigate}>View selected-point weather</PageLink>.</p>
-  {safeHistory?.geojson?.features?.length>0&&<div className="intelligence-cell-selector"><label htmlFor="evidence-cell">Historical evidence cell (keyboard alternative)</label><select id="evidence-cell" value={featureId||''} onChange={e=>setFeatureId(e.target.value||null)}><option value="">Choose an observed cell</option>{safeHistory.geojson.features.map(f=><option key={f.id} value={f.id}>Udupi · GFD {f.properties.event_id} · row {f.properties.grid_row}, column {f.properties.grid_col}</option>)}</select></div>}
-  {details.data?.feature&&<FeatureDetails data={details.data} navigate={navigate} onClose={()=>setFeatureId(null)}/>}
+  {safeHistory?.geojson?.features?.length>0&&<div className="intelligence-cell-selector"><label htmlFor="evidence-cell">Historical evidence cell (keyboard alternative)</label><select id="evidence-cell" value={featureId||''} onChange={e=>chooseFeature(e.target.value||null)}><option value="">Choose an observed cell</option>{safeHistory.geojson.features.map(f=><option key={f.id} value={f.id}>Udupi · GFD {f.properties.event_id} · row {f.properties.grid_row}, column {f.properties.grid_col}</option>)}</select></div>}
+  {details.data?.feature&&<FeatureDetails data={details.data} navigate={navigate} onClose={()=>chooseFeature(null)}/>}
   {layers.history&&<details className="intelligence-events"><summary>Event sources and observation limitations</summary>{(safeHistory?.events||[]).map(e=><p key={e.event_id}>GFD {e.event_id}: {e.qualified_pixel_count} qualifying cells · Source image: {e.image_id}</p>)}<p>Two public Udupi event products. Other reviewed GFD positives, observed-zero comparisons and insufficient-observation scopes retain their research statuses; no unreviewed geometry or flood-negative labels are published.</p></details>}
   <p className="muted">Satellite evidence: <a href="https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1">Global Flood Database V1</a> · Tellman et al. (2021) · <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>, attribution and non-commercial use required. Modern Udupi outline: geoBoundaries v6 · CC BY 4.0, not a verified historical boundary. SOI geometry remains local.</p>
   {layers.drainage&&<section className="panel"><h2>Drainage context</h2><p>Mapped drainage feature — overflow risk not established.</p>{drainage.data?.status==='available'?<><p>{drainage.data.coverage_notice}</p><p>OSM snapshot: {drainage.data.osm.osm_base_timestamp}; retrieved {drainage.data.osm.retrieved_at}. {drainage.data.osm.feature_count} mapped drain/ditch ways. Capacity, condition, blockage and flow direction are unknown.</p><DrainageResearchLayers/></>:<p>{drainage.data?.message||'Drainage context is not available yet.'} Absence of mapped data does not establish absence of drainage.</p>}</section>}</aside></div>

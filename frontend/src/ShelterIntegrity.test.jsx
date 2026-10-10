@@ -98,3 +98,15 @@ it('logout hides private information immediately even if the server response is 
  fireEvent.click(screen.getByRole('button',{name:'Sign out'}));expect(screen.queryByLabelText('Facility name')).toBeNull()
  await screen.findByText('Controlled network outage');expect(screen.queryByText(/Signed in as/)).toBeNull();expect(screen.getByLabelText('Password').value).toBe('')
 })
+
+it('split directory and map share one fresh response and district filtering cannot fabricate destinations',async()=>{
+ const target=document.createElement('section');target.setAttribute('aria-label','ISOLATED map panel');document.body.append(target)
+ const {rerender,unmount}=render(<PublicShelters point={point} active mapTarget={target} districtId="nic:udupi.nic.in"/>)
+ await screen.findByText('DEMONSTRATION ONLY fixture')
+ expect(target.querySelector('[role=region]')).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(1)
+ expect(map.mock.calls.at(-1)[0].points).toHaveLength(1)
+ rerender(<PublicShelters point={point} active mapTarget={target} districtId="nic:dk.nic.in"/>)
+ expect(screen.queryByText('DEMONSTRATION ONLY fixture')).toBeNull()
+ expect(map.mock.calls.at(-1)[0].points).toHaveLength(0);expect(fetch).toHaveBeenCalledTimes(1)
+ unmount();target.remove()
+})

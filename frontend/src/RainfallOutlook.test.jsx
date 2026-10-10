@@ -104,3 +104,26 @@ it('timeout/unmount cleans up the request without rapid retry loops',async()=>{
  await act(async()=>{await vi.advanceTimersByTimeAsync(60000)})
  expect(fetch).toHaveBeenCalledTimes(1);unmount();expect(vi.getTimerCount()).toBe(0)
 })
+
+it('unsupported points are declared ineligible before any model request',()=>{
+ render(<RainfallOutlook point={{name:'Udupi',latitude:13.34,longitude:74.74}} weather={weather} freshness="fresh"/>)
+ expect(screen.getByRole('button',{name:'Run experimental rainfall model'}).disabled).toBe(true)
+ expect(screen.getByText(/Model unavailable for this selected point/)).toBeTruthy();expect(fetch).not.toHaveBeenCalled()
+})
+it('inactive pages abort model requests and reject late inference results',async()=>{
+ let complete;fetch.mockImplementation(()=>new Promise(resolve=>{complete=resolve}))
+ const {rerender}=render(<RainfallOutlook point={kundapur} weather={weather} freshness="fresh"/>);run()
+ const signal=fetch.mock.calls[0][1].signal
+ rerender(<RainfallOutlook point={kundapur} weather={weather} freshness="fresh" active={false}/>)
+ expect(signal.aborted).toBe(true)
+ await act(async()=>complete({ok:true,json:async()=>result(kundapur)}))
+ expect(screen.queryByText('Below 64.5 mm predicted by the experimental model')).toBeNull()
+ expect(fetch).toHaveBeenCalledTimes(1)
+})
+it('switching from a supported point to an unsupported point clears output without an inference fallback',async()=>{
+ const {rerender}=render(<RainfallOutlook point={kundapur} weather={weather} freshness="fresh"/>);run()
+ await screen.findByText('Below 64.5 mm predicted by the experimental model')
+ rerender(<RainfallOutlook point={{name:'Map point',latitude:14,longitude:75}} weather={weather} freshness="fresh"/>)
+ expect(screen.queryByText('Below 64.5 mm predicted by the experimental model')).toBeNull()
+ expect(fetch).toHaveBeenCalledTimes(1)
+})

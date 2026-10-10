@@ -101,13 +101,12 @@ SHA-256/size validation for every file. Keep original archives and reproduction
 manifests separate and unchanged; reject missing/mismatched assets. Do not include
 restricted boundary-derived products or expand the existing polygons' hazard meaning.
 
-## Pending design work
+## Wireframe-based public and administrative workspaces
 
-The five handwritten wireframes were absent from accessible attachments and the
-repository. Map-centred layout implementation, further shared-location consolidation
-and the future GPS/photo-reporting design await those actual references. No public
-reporting submissions are enabled. Reports must remain unverified pending an approved
-privacy, moderation and administrator-verification workflow.
+The five original JPGs are available in `docs/design/floodpulse_wireframes/`, with a byte/hash manifest and interpretation guide. Home follows sketch 01 (district/emergency evidence left, Karnataka context right); Weather follows 02 (point weather/forecast/experimental AI left, synchronized geography right); Shelters follows 03 (fresh directory left, verified-entrance map right); authenticated administration follows 04 (district-focused assignments/editor left, facility inspection right). The dedicated Flood Map retains 56 historical polygons and independently controlled honest zero-hazard coverage.
 
-Statewide hazard coverage, flood probability/risk classes, drainage-overflow
-prediction and automated emergency/evacuation alerts remain unavailable.
+One public selected-district filter is shared across routes. It is distinct from the selected weather point and selected historical evidence feature. A name-only district never generates a weather coordinate. The shared name search has unique accessible control IDs and cancels work when inactive. The weather session pauses on Flood Map, Shelters and Admin, retains the last selected-point receipt, and checks six-hour freshness on return. Unsupported AI points are declared ineligible before calling inference. Public coordinate-entry forms remain absent.
+
+The shelter page uses one freshness-checked directory response for its list and map, including an empty map context when no destinations exist. Existing one-minute freshness, verification expiry and explicit directions revalidation remain enforced. Admin filtering is over the loaded bounded assignment page, with pagination and an explicit limitation; it is not a claim of a complete district count. Admin district context never shares private state with public selection.
+
+Sketch 05 is a future moderated workflow, documented in [Experimental Flood Reporting Design](EXPERIMENTAL_FLOOD_REPORTING_DESIGN.md). No report route or upload is active. See [implementation and verification mapping](WIREFRAME_IMPLEMENTATION.md). Satellite/building services remain configuration-blocked without authorized MapTiler settings; no warning feed, hazard geometry, new shelters, Telegram delivery or flood prediction is fabricated.
