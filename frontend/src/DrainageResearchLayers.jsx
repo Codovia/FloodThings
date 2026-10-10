@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
 import useMapResize from './useMapResize.js'
 
@@ -15,10 +16,7 @@ function ResearchMap({ data, selected, onFailure }) {
   useEffect(() => {
     const instance = L.map(element.current, { scrollWheelZoom: false })
     map.current = instance
-    const base = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>',
-    }).addTo(instance)
-    base.on('tileerror', () => onFailure('Basemap tiles unavailable. Local research layers remain available.'))
+    addBasemap(L, instance, () => onFailure(BASEMAP_NOTICE))
     const boundary = L.geoJSON(data.study_area, { style: { color: '#405f69', weight: 2, fillOpacity: 0 } }).addTo(instance)
     instance.fitBounds(boundary.getBounds(), { padding: [15, 15] })
     for (const [key, item] of Object.entries(data.layers)) {

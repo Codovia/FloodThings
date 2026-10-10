@@ -17,7 +17,7 @@ const missing = { id: 'missing', name: 'Name only', district_id: districts[0].id
 const response = (items) => ({ ok: true, json: async () => ({ status: 'available', items, total: items.length }) })
 const weather = point => ({ status: 'available', location: point, retrieved_at: new Date().toISOString(), current: { temperature_c: 27, valid_at: new Date().toISOString(), interval_seconds: 900 },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(i+8).padStart(2,'0')}`, temperature_max_c: 30, temperature_min_c: 20, precipitation_mm: 1 })), grid_location: { latitude: 13.21, longitude: 74.51 } })
-const open = () => fireEvent.click(screen.getByRole('button', { name: 'Search districts and localities' }))
+const open = () => {const editor=screen.queryByText('Change location')?.closest('details');if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'));fireEvent.click(screen.getByRole('button', { name: 'Search districts and localities' }))}
 const district = async (id = districts[0].id) => { await waitFor(() => expect(screen.getByLabelText('Karnataka district').disabled).toBe(false)); fireEvent.change(screen.getByLabelText('Karnataka district'), { target: { value: id } }) }
 
 beforeEach(() => {

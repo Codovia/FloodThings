@@ -39,16 +39,20 @@ export default function App() {
    </section>
    {path==='/' && <nav className="overview-links" aria-label="Explore FloodPulse"><PageLink to="/weather" navigate={navigate}><strong>Weather & AI</strong><span>Seven-day point forecasts and experimental rainfall inference</span></PageLink><PageLink to="/flood-map" navigate={navigate}><strong>Historical flood maps</strong><span>Reviewed satellite evidence and source-labelled GIS layers</span></PageLink><PageLink to="/shelters" navigate={navigate}><strong>Verified shelters</strong><span>Manually approved availability, capacity and entrance directions</span></PageLink></nav>}
    {/* Shared public session stays mounted across routes: one location and freshness lifecycle. */}
+   <div className="dashboard-content">
+   <div className="location-side">
    <div hidden={!publicPage || path==='/flood-map'} className="location-context">
-    <WeatherLocationSelector point={point} onSelect={choosePoint} mapInitiallyOpen={path==='/' || path==='/flood-map' || path==='/shelters'} />
+    <WeatherLocationSelector point={point} onSelect={choosePoint} compact overview={path==='/'} />
     {!weatherPage && <p className="selection-summary">Selected point: <strong>{point.name}</strong> · {point.latitude}°, {point.longitude}°. Point selection does not imply a district-wide condition.</p>}
    </div>
+   <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/' || path==='/shelters'} overview={path==='/'} /></div>
+   </div>
    <div hidden={!weatherPage} className="weather-sections">
-    <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} />
-    <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} />
+    <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={path==='/'} />
+    <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={path==='/'} />
    </div>
    {path==='/flood-map' && <FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} />}
-   <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/shelters'} /></div>
+   </div>
    {path==='/admin' && <AdminShelters embedded onHome={()=>navigate('/')} />}
    {!info && <PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
   </main>

@@ -16,7 +16,7 @@ async function setup(page){
 const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 
 test('five routes, direct URLs, back/forward, persistent location and one freshness lifecycle',async({page})=>{
- const requests=await setup(page);await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
+ const requests=await setup(page);await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click();await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
  await page.getByLabel('Weather latitude').fill('13.34');await page.getByLabel('Weather longitude').fill('74.74');await page.getByRole('button',{name:'Get point weather'}).click();await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible();expect(requests()).toBe(2)
  await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByText(/56 eligible historical cells/)).toBeVisible();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
@@ -42,7 +42,7 @@ test('mobile menu, keyboard, layer toggles and maps remain usable after routing'
 
 test('missing data, unknown routes and shelter errors do not invent readings or destinations',async({page})=>{
  await setup(page);await page.route('**/api/weather*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Controlled weather outage'})}));await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled directory outage'})}))
- await page.goto('/weather');await expect(page.getByText(/Controlled weather outage/)).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
+ await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click();await expect(page.getByText(/Controlled weather outage/)).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText(/Controlled directory outage/)).toBeVisible();await expect(page.getByRole('link',{name:'Open external entrance directions'})).toHaveCount(0)
  await page.goto('/missing');await expect(page.getByRole('heading',{name:'This page is unavailable'})).toBeVisible();await page.getByRole('link',{name:'Return Home'}).click();await expect(page).toHaveURL(/\/$/)
 })

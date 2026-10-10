@@ -10,11 +10,11 @@ test.beforeEach(async({page})=>{
 
 test('actual PostgreSQL public directory is empty, read-only and leaves weather/manual workflows usable',async({page})=>{
  await page.goto('/');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
- await page.getByRole('button',{name:'Find open shelters'}).click()
+ await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  const response=await page.request.post('/api/shelters',{data:{name:'Must not write'}});expect(response.status()).toBe(405)
  const unauthorized=await page.request.post('/api/admin/shelters',{data:{name:'TEST ONLY',address:'Not a shelter',district_id:'nic:udupi.nic.in',capacity:10,occupancy:0}});expect(unauthorized.status()).toBe(401)
- await page.getByLabel('Weather latitude').fill('13.6');await page.getByLabel('Weather longitude').fill('74.8');await page.getByRole('button',{name:'Get point weather'}).click()
+ await page.getByText('Change location',{exact:true}).click();await page.getByLabel('Weather latitude').fill('13.6');await page.getByLabel('Weather longitude').fill('74.8');await page.getByRole('button',{name:'Get point weather'}).click()
  await expect(page.getByRole('heading',{name:'Entered coordinates'})).toBeVisible()
  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
@@ -23,7 +23,7 @@ test('actual PostgreSQL public directory is empty, read-only and leaves weather/
 test('explicit demonstration fixtures render exact entrance, mobile map and no unsafe replacement after failure',async({page})=>{
  const stamp=new Date().toISOString();const data={status:'available',mode:'demonstration',total:1,verification_valid_hours:24,shelters:[{id:'isolated-fixture',name:'DEMONSTRATION ONLY — not a shelter',address:'Isolated fixture',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'TEST ONLY',status:'open',verified_at:stamp,updated_at:stamp,verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12,restrictions:'DO NOT TRAVEL',contact:null}]}
  await page.route('**/api/shelters?**',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)}))
- await page.setViewportSize({width:390,height:844});await page.goto('/');await page.getByRole('button',{name:'Find open shelters'}).click()
+ await page.setViewportSize({width:390,height:844});await page.goto('/');await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
  await expect(page.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeVisible();await expect(page.getByRole('region',{name:'Verified open shelter entrances'})).toBeVisible()
  const link=page.getByRole('link',{name:'Inspect demonstration directions (not for travel)'});const url=new URL(await link.getAttribute('href'));expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('api')).toBe('1')
  await expect(page.getByText(/not verified flood-safe/)).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)

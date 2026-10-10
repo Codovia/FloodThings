@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
 import useMapResize from './useMapResize.js'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
@@ -34,7 +35,7 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
  select.current=onPoint;detail.current=onFeature
  useEffect(()=>{
   const view=L.map(element.current,{scrollWheelZoom:false}).setView([15.1,76.1],6);map.current=view
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>'}).addTo(view).on('tileerror',()=>setTileError(true))
+  addBasemap(L, view, () => setTileError(true))
   view.on('click',e=>select.current?.({name:'Selected map point',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
   return()=>{view.remove();map.current=null}
  },[])
@@ -74,7 +75,7 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
  return <>
   <div className="map-actions"><button onClick={()=>district?.navigation_bounds?map.current?.fitBounds(district.navigation_bounds):map.current?.setView([15.1,76.1],6)} disabled={!!district&&!district.navigation_bounds}>Show district</button><button onClick={zoomWater} disabled={!history?.geojson?.features?.length}>Zoom to mapped water</button></div>
   <div ref={element} className="historical-map intelligence-map" role="region" aria-label="Historical satellite floodwater and Karnataka evidence map"/>
-  {tileError&&<p className="notice">Some background map tiles are unavailable. Local evidence remains visible; missing background tiles do not establish flood absence.</p>}
+  {tileError&&<p className="notice">{BASEMAP_NOTICE}</p>}
  </>
 }
 

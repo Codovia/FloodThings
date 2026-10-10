@@ -12,7 +12,7 @@ The optional **Drainage Research Layers** panel reads `data/processed/udupi_drai
 
 ## Karnataka place selection
 
-Choose **Search districts and localities**, search a name or select a district, then choose a mapped locality. The map immediately centers on its retained WGS84 settlement point and the existing point-weather endpoint retrieves seven provider-supplied forecast days. Manual coordinates, map clicks, GPS and six-hour browser-session refresh remain available. Selecting a district filters places and navigates where reviewed public bounds exist; it never requests district-wide weather or changes the previously selected weather point.
+Expand **Change location**, choose **Search districts and localities**, search a name or select a district, then choose a mapped locality. The map immediately centers on its retained WGS84 settlement point and the existing point-weather endpoint retrieves seven provider-supplied forecast days. Manual coordinates, map clicks, GPS and six-hour browser-session refresh remain available. Selecting a district filters places and navigates where reviewed public bounds exist; it never requests district-wide weather or changes the previously selected weather point.
 
 The active public directory, `data/reference/karnataka_location_directory_v2/`, contains **31 NIC-listed district names**, with independent current-LGD reconciliation still unresolved. Stable application IDs use the NIC website namespace, not guessed LGD codes. **Five selectable mapped settlements** are verified: Udupi, Karkala, Kundapur and Saligrama in Udupi district, plus Mangaluru in Dakshina Kannada. Both districts have reviewed public geoBoundaries navigation bounds. **Kaup** has an official municipal identity but remains disabled because its settlement coordinate has not been reviewed. The other 29 districts show incomplete-coverage messages and preserve manual/GPS selection. The original v1 directory remains unchanged and readable.
 
@@ -40,6 +40,14 @@ The shared header provides five pages. Location selection and the weather freshn
 | Admin | `/admin` | Existing protected login, shelter verification/audit and explicitly approved Telegram notifications |
 
 On mobile, use **Menu** to reveal navigation; Escape closes it. All pages use the same blue/teal design and retain keyboard focus indicators, loading/error announcements and source attribution. The rainfall chart uses real daily forecast totals only: missing values remain gaps. Weather is point-specific; historical floodwater is not live flooding, and experimental heavy-rainfall inference is not a calibrated flood probability. The public operational shelter directory is not seeded with demonstration facilities.
+
+Home pairs a prominent Karnataka point map and the current shelter summary with compact weather/AI cards. **Change location** expands the shared district/locality, manual-coordinate and GPS controls. Weather & AI keeps the full seven-day cards, rainfall chart and source timestamps; its point map is optional. Shelters starts with the verified directory and a compact location bar, rather than a repeated weather form. Navigation retains the same location and six-hour weather session without a new weather request.
+
+### Background maps
+
+The default is the standard OpenStreetMap tile service, with visible © OpenStreetMap contributors attribution. Tile images send only the real application origin as their referrer; the global privacy header is preserved. Browser caching is honored, with no bulk download, proxy, identity spoofing or automatic provider switching. On a tile error the background layer stops and a notice appears, while geographic overlays and point selection remain usable. This does not establish flood absence.
+
+To intentionally use the application without background tile requests, set `VITE_MAP_BASEMAP=none` in the ignored `frontend/.env.local`, then restart Vite (or rebuild the production frontend). `osm` is the default; unknown settings also request no tiles. This does not download or cache an offline basemap. Do not put private keys in Vite variables. See [the map policy diagnosis and browser verification](docs/MAP_TILE_POLICY.md) for limitations and independently observed results.
 
 Use the existing `./start.sh` workflow below. Vite serves these direct URLs; a production static host must serve the application entry for frontend routes while preserving the separate FastAPI `/api` routing. No backend, database, credential or model migration is required for this UI change.
 

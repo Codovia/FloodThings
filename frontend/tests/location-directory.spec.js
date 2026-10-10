@@ -26,7 +26,7 @@ test.beforeEach(async ({ page }) => {
 test('real district/locality directory selects exact OSM points, recenters Leaflet, preserves seven days and six-hour refresh', async ({ page }) => {
   const errors = []; page.on('pageerror',e=>errors.push(e.message)); let calls=0
   page.on('request',r=>{ if(new URL(r.url()).pathname==='/api/weather') calls++ })
-  await page.goto('/weather'); await expect(page.getByText('27 °C',{exact:true})).toBeVisible(); await open(page)
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await expect(page.getByText('27 °C',{exact:true})).toBeVisible(); await open(page)
   await expect(page.getByLabel('Karnataka district').locator('option')).toHaveCount(32)
   await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   await expect(page.getByRole('list',{name:'District localities'}).getByRole('button')).toHaveCount(5)
@@ -57,7 +57,7 @@ test('real district/locality directory selects exact OSM points, recenters Leafl
 
 test('v2 settlement expansion preserves stable Kundapur identity and cross-district weather freshness', async ({ page }) => {
   const requests=[]; page.on('request',r=>{if(new URL(r.url()).pathname==='/api/weather') requests.push(r.url())})
-  await page.goto('/weather'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   await expect(page.getByText(/5 selectable mapped localities across 2 districts/)).toBeVisible()
   await choose(page,'Kundapur')
   await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible()
@@ -83,7 +83,7 @@ test('v2 settlement expansion preserves stable Kundapur identity and cross-distr
 })
 
 test('mobile alias search selects real Mangaluru and disabled Kaup explains unavailable point', async ({ page }) => {
-  await page.setViewportSize({width:390,height:844}); await page.goto('/weather'); await open(page)
+  await page.setViewportSize({width:390,height:844}); await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await open(page)
   await page.getByLabel('Search districts or localities').fill('Mangalore'); await page.clock.fastForward(250)
   const result=page.getByRole('list',{name:'Place search results'}).getByRole('button',{name:/^Mangaluru — Dakshina Kannada/})
   await expect(result).toBeVisible(); await result.focus(); await page.keyboard.press('Enter')
@@ -98,7 +98,7 @@ test('mobile alias search selects real Mangaluru and disabled Kaup explains unav
 })
 
 test('keyboard global search, district filtering, empty states and mobile focus remain usable', async ({ page }) => {
-  await page.setViewportSize({width:390,height:844}); await page.goto('/weather')
+  await page.setViewportSize({width:390,height:844}); await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
   const button = page.getByRole('button',{name:'Search districts and localities'})
   await button.focus(); await page.keyboard.press('Enter')
   await expect(page.getByLabel('Karnataka district')).toBeEnabled()
@@ -118,7 +118,7 @@ test('keyboard global search, district filtering, empty states and mobile focus 
 
 test('directory unavailable and locality provider failure preserve manual recovery without fabricated weather', async ({ page }) => {
   await page.route('**/api/locations/districts',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled directory outage'})}))
-  await page.goto('/weather'); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Controlled directory outage')
   await page.unroute('**/api/locations/districts'); await page.getByRole('button',{name:'Retry location search'}).click()
   await expect(page.getByLabel('Karnataka district')).toBeEnabled(); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
@@ -132,7 +132,7 @@ test('directory unavailable and locality provider failure preserve manual recove
 test('late locality weather cannot overwrite newer locality during point switching', async ({ page }) => {
   let release
   await page.route('**/api/weather?latitude=13.2145414&longitude=74.9951861',async route=>{ await new Promise(resolve=>{release=resolve}); try { await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...body({latitude:13.2145414,longitude:74.9951861},'2026-10-08T06:00:00Z'),current:{temperature_c:99}})}) } catch {} })
-  await page.goto('/weather'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   const old=page.waitForRequest(r=>r.url().includes('latitude=13.2145414'))
   await choose(page,'Karkala'); await old; await choose(page,'Udupi')
   await expect(page.getByRole('heading',{name:'Udupi, Udupi'})).toBeVisible(); await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
@@ -142,7 +142,7 @@ test('late locality weather cannot overwrite newer locality during point switchi
 
 test('database directory outage leaves manual point weather and seven-day freshness independent', async ({ page }) => {
   await page.route('**/api/locations/**', route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Location database is unavailable or invalid; no file fallback was used'})}))
-  await page.goto('/weather'); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Location database is unavailable')
   await page.getByLabel('Weather latitude').fill('14'); await page.getByLabel('Weather longitude').fill('75')
   const request=page.waitForRequest(r=>r.url().includes('latitude=14&longitude=75'))

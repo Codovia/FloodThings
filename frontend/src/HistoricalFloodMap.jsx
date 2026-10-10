@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
+import { addBasemap } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
 
 const SOURCE_URL = 'https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1'
@@ -24,10 +25,7 @@ export function FloodGeography({ boundary, floodwater }) {
   useEffect(() => {
     const view = L.map(container.current, { scrollWheelZoom: false })
     map.current = view
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(view)
-    tiles.on('tileerror', () => setTileError(true))
+    addBasemap(L, view, () => setTileError(true))
     districtLayer.current = L.geoJSON(boundary, { style: { color: '#50736e', weight: 1.5, fillOpacity: 0.035 } }).addTo(view)
     view.fitBounds(districtLayer.current.getBounds(), { padding: [16, 16] })
     return () => { view.remove(); map.current = null; districtLayer.current = null; waterLayer.current = null }

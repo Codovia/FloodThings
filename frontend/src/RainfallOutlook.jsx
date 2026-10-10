@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 const keyOf = point => `${point.latitude}:${point.longitude}`
 const time = value => new Intl.DateTimeFormat('en-IN',{timeZone:'Asia/Kolkata',dateStyle:'medium',timeStyle:'short'}).format(new Date(value))+' IST'
 
-export default function RainfallOutlook({ point, weather, freshness }) {
+export default function RainfallOutlook({ point, weather, freshness, overview=false }) {
   const [open,setOpen] = useState(false)
   const [attempt,setAttempt] = useState(0)
   const key=keyOf(point)
@@ -38,13 +38,14 @@ export default function RainfallOutlook({ point, weather, freshness }) {
   const current=view.key===key?view:{data:null,error:null,loading:open&&!!receipt}
   const validation=current.data?.validation
   const metricsAvailable=validation?.model_type==='Logistic Regression' && Number.isFinite(validation.precision) && validation.precision>=0 && validation.precision<=1 && Number.isFinite(validation.recall) && validation.recall>=0 && validation.recall<=1 && Number.isInteger(validation.samples) && validation.samples>0
-  return <section className="panel" aria-labelledby="rainfall-outlook-title">
+  return <section className={overview?"panel ai-overview":"panel"} aria-labelledby="rainfall-outlook-title">
     <div className="panel-heading"><div><p className="eyebrow">EXPERIMENTAL MACHINE LEARNING</p><h2 id="rainfall-outlook-title">AI Rainfall Outlook</h2></div>
       <button type="button" onClick={()=>open?setAttempt(n=>n+1):setOpen(true)} disabled={current.loading}>{current.loading?'Running rainfall model…':open?'Retry rainfall outlook':'Run experimental rainfall model'}</button></div>
     <p>{point.name} · next 24 complete hours beginning at the next full UTC hour.</p>
     <p>Target: heavy rainfall ≥64.5 mm in 24 hours at the model grid point. Model type: Logistic Regression.</p>
     <p className="notice">Experimental rainfall model, not flood probability or an official warning. Supports only the verified Kundapur and Mangaluru points. Flood prediction remains unavailable.</p>
-    {!open && <p className="muted">Run the saved trained Logistic Regression model using a separate bounded past-hourly Open-Meteo request. No seven-day forecast request is duplicated.</p>}
+    {overview&&<p className="muted">Saved model: rainfall_logistic_v1. View full weather charts and source details on Weather & AI.</p>}
+    {!open && !overview && <p className="muted">Run the saved trained Logistic Regression model using a separate bounded past-hourly Open-Meteo request. No seven-day forecast request is duplicated.</p>}
     {open && !receipt && <p role="status">Usable weather retrieval is required before running the rainfall model.</p>}
     <div aria-live="polite" aria-busy={current.loading}>
       {current.loading && <p role="status">Fetching past-hourly model inputs and running the trained model…</p>}

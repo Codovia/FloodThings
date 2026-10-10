@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
 import useMapResize from './useMapResize.js'
+import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
 import './WeatherLocationSelector.css'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
@@ -18,10 +19,7 @@ function WeatherPointMap({ point, onSelect, navigationBounds }) {
   useEffect(() => {
     const view = L.map(container.current, { scrollWheelZoom: false }).setView([15.1, 76.1], 6)
     map.current = view
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18, attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-    }).addTo(view)
-    tiles.on('tileerror', () => setTileError(true))
+    addBasemap(L, view, () => setTileError(true))
     view.on('click', event => {
       const { lat, lng } = event.latlng
       const longitude = lng < -180 || lng > 180 ? ((lng + 180) % 360 + 360) % 360 - 180 : lng
@@ -51,13 +49,14 @@ function WeatherPointMap({ point, onSelect, navigationBounds }) {
       <button type="button" onClick={() => map.current?.setView([point.latitude, point.longitude], 12)}>Show selected point</button>
     </div>
     <p className="muted">Click the map to choose weather coordinates. The marker identifies a point; no flood-risk zones or district identities are assigned.</p>
-    {tileError && <p className="notice">Background tiles are unavailable. Coordinate entry and the selected-point marker remain usable.</p>}
+    {tileError && <p className="notice">{BASEMAP_NOTICE}</p>}
   </>
 }
 
-export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false }) {
+export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false }) {
   const [latitude, setLatitude] = useState(String(point.latitude))
   const [longitude, setLongitude] = useState(String(point.longitude))
+  const [editorOpen,setEditorOpen]=useState(false)
   const [showMap, setShowMap] = useState(mapInitiallyOpen)
   const [navigationBounds, setNavigationBounds] = useState(null)
   const [error, setError] = useState(null)
@@ -103,11 +102,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 })
   }
 
-  return <section className="panel weather-location-selector" aria-labelledby="weather-location-title">
-    <p className="eyebrow">EXPLORE WEATHER</p>
-    <h2 id="weather-location-title">Choose a weather location</h2>
-    <p>Start from Karnataka, select a map point or enter WGS84 coordinates. Point weather does not verify administrative boundaries.</p>
-    <div className="point-selector-body"><div className="point-controls">
+  const controls = <>
     <LocationDirectorySelector onChoose={next => { setShowMap(true); choose(next) }} onDistrict={district => {
       selection.current++; setLocating(false); setError(null)
       setNavigationBounds(district?.navigation_bounds || null)
@@ -119,13 +114,19 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
       <button type="submit">Get point weather</button>
     </form>
     <div className="weather-map-actions">
-      <button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>
+      {!compact&&<button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>}
       <button type="button" onClick={locate} disabled={locating}>{locating ? 'Locating…' : 'Use my GPS location'}</button>
       <button type="button" onClick={() => choose(DEFAULT_POINT)}>Reset to Bengaluru</button>
     </div>
     <p className="muted">GPS is requested only when you choose it. Coordinates are sent through FloodPulse to Open-Meteo for this weather request.</p>
     {error && <p className="notice error" role="alert">{error}</p>}
     {point.accuracy_m != null && <p className="muted">Device-reported location accuracy: approximately {Math.round(point.accuracy_m)} metres.</p>}
-    </div>{showMap && <div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds} /></div>}</div>
+    </>
+  const mapVisible = overview || showMap
+  return <section className={'panel weather-location-selector'+(compact?' compact-location':'')} aria-labelledby="weather-location-title">
+    <div className="location-bar"><div><p className="eyebrow">{overview?'KARNATAKA · SELECTED POINT':'SELECTED POINT'}</p><h2 id="weather-location-title">{compact?'Location & map':'Choose a weather location'}</h2><p className="selected-point-name">{point.name} · {point.latitude}°, {point.longitude}°</p></div>
+    {compact&&!overview&&<button type="button" aria-expanded={showMap} onClick={()=>setShowMap(value=>!value)}>{showMap?'Hide weather map':'Open weather map'}</button>}</div>
+    {compact?<details className="location-editor" open={editorOpen}><summary aria-expanded={editorOpen} onClick={e=>{e.preventDefault();setEditorOpen(value=>!value)}}>Change location</summary><div hidden={!editorOpen}><p>Search verified places, enter coordinates or request GPS. Point selection does not establish district-wide conditions.</p>{controls}</div></details>:<>{controls}</>}
+    {mapVisible&&<div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds}/></div>}
   </section>
 }

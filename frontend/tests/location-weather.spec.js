@@ -21,7 +21,7 @@ test.beforeEach(async ({ page }) => {
 
 test('coordinate and Leaflet selection drive weather requests, and source masks/unavailable values remain honest', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message))
-  await page.goto('/weather')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
   await expect(page.getByText('27 °C', { exact: true })).toBeVisible()
   await page.getByLabel('Weather latitude').fill('13.3419169')
   await page.getByLabel('Weather longitude').fill('74.7473232')
@@ -46,7 +46,7 @@ test('coordinate and Leaflet selection drive weather requests, and source masks/
 test('mobile GPS permission denial preserves manual point selection and explicit weather failure', async ({ page, context }) => {
   await context.clearPermissions()
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/weather')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
   await page.getByRole('button', { name: 'Use my GPS location' }).click()
   await expect(page.getByText(/Location permission denied/)).toBeVisible()
   await page.route('**/api/weather?**', route => route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable', message: 'Controlled provider outage' }) }))
@@ -61,7 +61,7 @@ test('seven-day forecasts retain order after GPS, map, manual selection and refr
   await page.setViewportSize({ width: 390, height: 844 })
   await context.grantPermissions(['geolocation'])
   await context.setGeolocation({ latitude: 13.34, longitude: 74.74, accuracy: 40 })
-  await page.goto('/weather')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
   const cards = page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')
   await expect(cards).toHaveCount(7)
   expect(await cards.locator('time').evaluateAll(nodes => nodes.map(n => n.dateTime))).toEqual(Array.from({ length: 7 }, (_, i) => `2026-10-${String(8 + i).padStart(2, '0')}`))
@@ -91,7 +91,7 @@ test('short and empty forecast coverage is explicit without invented dates, then
     body.forecast_coverage = { valid_days: 3, missing_dates: ['2026-10-11', '2026-10-12', '2026-10-13', '2026-10-14'] }
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) })
   })
-  await page.goto('/weather')
+  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
   await expect(page.getByRole('status', { name: '' }).filter({ hasText: 'Incomplete forecast coverage' })).toContainText('3 of 7')
   await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(3)
   await expect(page.locator('.daily-forecast time[datetime="2026-10-14"]')).toHaveCount(0)

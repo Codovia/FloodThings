@@ -5,10 +5,10 @@ import RainfallChart from './RainfallChart.jsx'
 import './WeatherFreshness.css'
 const formatTime = time => time && Number.isFinite(Date.parse(time)) ? new Intl.DateTimeFormat('en-IN', {timeZone:'Asia/Kolkata', dateStyle:'medium', timeStyle:'short'}).format(new Date(time))+' IST' : 'Unavailable'
 const value = (reading, unit) => reading == null ? 'Unavailable' : `${reading} ${unit}`
-export default function WeatherPanel({point, selectedPoint, session}) {
+export default function WeatherPanel({point, selectedPoint, session, overview=false}) {
   const {data,loading,error,freshness,now,retryAt,paused,offline,refresh:load}=session
   return (
-    <section className="panel" aria-labelledby="location-title">
+    <section className={overview?"panel weather-overview":"panel"} aria-labelledby="location-title">
       <div className="panel-heading">
         <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">{point.name}</h2></div>
         <button onClick={() => load()} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
@@ -38,14 +38,14 @@ export default function WeatherPanel({point, selectedPoint, session}) {
             <article><p>Relative humidity</p><strong>{value(data.current.humidity_percent, '%')}</strong><small>At 2 metres</small></article>
             <article><p>Precipitation</p><strong>{value(data.current.precipitation_mm, 'mm')}</strong><small>Preceding {data.current.interval_seconds / 60} minutes</small></article>
           </div>
-          <DailyForecast days={data.forecast} coverage={data.forecast_coverage} />
-          <RainfallChart days={data.forecast} />
-          <dl className="metadata">
+          <DailyForecast days={data.forecast} coverage={data.forecast_coverage} compact={overview} />
+          {!overview&&<RainfallChart days={data.forecast} />}
+          <details open={!overview} className="weather-source-details"><summary>Weather source & timestamp details</summary><dl className="metadata">
             <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
             <div><dt>Station observation time</dt><dd>Unavailable — model data</dd></div>
             <div><dt>Forecast issue time</dt><dd>Unavailable — provider does not supply it here</dd></div>
             <div><dt>Provider grid point</dt><dd>Latitude {data.grid_location.latitude}°, longitude {data.grid_location.longitude}°</dd></div>
-          </dl>
+          </dl></details>
         </>}
       </div>
     </section>

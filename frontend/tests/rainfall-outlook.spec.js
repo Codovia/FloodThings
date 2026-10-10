@@ -32,7 +32,7 @@ test.beforeEach(async({page})=>{
 test('PostgreSQL directory, locality switch, model display, seven days and six-hour isolation',async({page})=>{
  let weatherCalls=0,aiCalls=0
  page.on('request',r=>{const p=new URL(r.url()).pathname;if(p==='/api/weather')weatherCalls++;if(p==='/api/ai/rainfall-outlook')aiCalls++})
- await page.goto('/weather');await page.getByRole('button',{name:'Search districts and localities'}).click()
+ await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
  await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await choose(page,'Kundapur')
  await expect(page.getByRole('heading',{name:'Kundapur, Udupi'})).toBeVisible()
  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
@@ -52,7 +52,7 @@ test('PostgreSQL directory, locality switch, model display, seven days and six-h
 })
 
 test('provider/model outage clears predictions without affecting weather and mobile manual selection',async({page})=>{
- await page.setViewportSize({width:390,height:844});await page.goto('/weather')
+ await page.setViewportSize({width:390,height:844});await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
  await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await choose(page,'Kundapur')
  await page.getByRole('button',{name:'Run experimental rainfall model'}).click();await expect(page.getByText(/64.5 mm predicted by the experimental model/)).toBeVisible()
  await page.route('**/api/ai/rainfall-outlook?**',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({status:'unavailable',message:'Controlled model input outage',prediction:null})}))

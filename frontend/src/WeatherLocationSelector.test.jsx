@@ -30,6 +30,7 @@ beforeEach(() => {
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
 function coordinates(lat = '13.34', lon = '74.74') {
+  const editor=screen.queryByText('Change location')?.closest('details'); if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'))
   fireEvent.change(screen.getByLabelText('Weather latitude'), { target: { value: lat } })
   fireEvent.change(screen.getByLabelText('Weather longitude'), { target: { value: lon } })
   fireEvent.click(screen.getByRole('button', { name: 'Get point weather' }))
@@ -148,7 +149,7 @@ it('wrapped basemap longitude becomes the same valid WGS84 point, without a gues
 
 
 it('repeated reset to the same reference reloads weather instead of leaving a cleared loading state', async () => {
-  render(<App />); await screen.findByText('27 °C')
+  render(<App />); await screen.findByText('27 °C'); fireEvent.click(screen.getByText('Change location'))
   fireEvent.click(screen.getByRole('button', { name: 'Reset to Bengaluru' }))
   await screen.findByText('27 °C')
   const count = fetch.mock.calls.length
@@ -175,4 +176,18 @@ it('refresh and changing a selected point replace the seven-day series', async (
   coordinates('14', '75'); await screen.findAllByText('17 mm')
   expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=14&longitude=75')
   expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
+})
+
+it('compact controls start collapsed and keyboard-equivalent disclosure preserves manual selection',()=>{
+ const selected=vi.fn();render(<WeatherLocationSelector compact onSelect={selected}/>);
+ expect(screen.getByText('Change location').closest('details').open).toBe(false)
+ expect(screen.queryByRole('button',{name:'Get point weather'})).toBeNull()
+ coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Entered coordinates',latitude:14,longitude:75})
+ expect(screen.getByText('Change location').closest('details').open).toBe(true)
+})
+it('home preview shows the real selectable point map without showing coordinate controls',()=>{
+ render(<WeatherLocationSelector compact overview onSelect={vi.fn()}/>);
+ expect(screen.getByRole('region',{name:'Weather location selection map'})).toBeTruthy()
+ expect(screen.queryByRole('button',{name:'Get point weather'})).toBeNull()
+ expect(state.tileLayer.mock.calls[0][1].referrerPolicy).toBe('origin')
 })

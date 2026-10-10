@@ -3,7 +3,7 @@ import ShelterMap from './ShelterMap.jsx'
 import './Shelters.css'
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
 export function validShelterDirectory(data){return ['live','demonstration'].includes(data?.mode)&&Array.isArray(data.shelters)&&data.shelters.every(s=>s.status==='open'&&s.available_capacity>0&&Number.isFinite(s.latitude)&&Math.abs(s.latitude)<=90&&Number.isFinite(s.longitude)&&Math.abs(s.longitude)<=180&&Number.isFinite(Date.parse(s.verified_at))&&Date.parse(s.verification_expires_at)>Date.now()&&s.demonstration===(data.mode==='demonstration'))}
-export default function PublicShelters({point=null,active=false}) {
+export default function PublicShelters({point=null,active=false,overview=false}) {
   const [open,setOpen]=useState(false),[refresh,setRefresh]=useState(0),[view,setView]=useState({key:null,data:null,error:null,loading:false})
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
   useEffect(()=>{if(active)setOpen(true)},[active])
@@ -32,7 +32,7 @@ export default function PublicShelters({point=null,active=false}) {
     const timer=setTimeout(()=>setRefresh(n=>n+1),Math.max(0,expiry-Date.now()+25))
     return()=>clearTimeout(timer)
   },[data])
-  return <section className="panel" aria-labelledby="public-shelters-title">
+  return <section className={overview?"panel shelters-overview":"panel"} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">ADMINISTRATOR-REPORTED AVAILABILITY</p><h2 id="public-shelters-title">Emergency shelter directory</h2></div><button onClick={()=>open?setRefresh(n=>n+1):setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':open?'Refresh shelters':'Find open shelters'}</button></div>
     <p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed. This prototype is not affiliated with a disaster-management authority.</p>
     {point?<p>Distances from selected point: {point.name}.</p>:<p>No starting location selected. Directions can ask you to enter an origin.</p>}
