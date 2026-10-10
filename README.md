@@ -143,7 +143,7 @@ curl --max-time 15 --fail-with-body http://127.0.0.1:8000/api/weather
 
 `npm run preview -- --host 127.0.0.1` serves the built dashboard with the same local API proxy. Production hosting will need a reverse proxy for `/api`; Vite preview is a local verification server.
 
-PostgreSQL/PostGIS location-directory persistence, experimental rainfall ML inference and administrator-controlled shelter assignments are implemented as described here. Predictive drainage analysis, Telegram alerts and validated flood prediction remain unavailable. External shelter directions are not verified flood-safe.
+PostgreSQL/PostGIS location-directory persistence, experimental rainfall ML inference, administrator-controlled shelter assignments and manually approved Telegram notices are implemented as described here. Predictive drainage analysis, automatic emergency alerts and validated flood prediction remain unavailable. External shelter directions are not verified flood-safe.
 
 The frozen Stage 5/5A reviews record the older README and three-day weather source as historical inputs. To reproduce those reviews, validate with the exact recorded input bytes from Git, whose checksums must match their immutable manifests, rather than substituting the current application version. Run `scripts/.venv/bin/python -B scripts/validate_frozen_app_reviews.py` for this read-only reproduction; it verifies original input hashes before using a temporary replay workspace. Their scientific outputs and original checksums remain unchanged.
 
@@ -248,3 +248,38 @@ Public `GET /api/shelters` returns only Open assignments with spare capacity and
 Protected APIs: login/session/logout, `GET/POST /api/admin/shelters`, `PUT /api/admin/shelters/{id}` and `GET /api/admin/shelters/{id}/audit`. Public endpoints are read-only. Administrative lists are paginated in bounded pages of 100; audit retrieval currently shows up to 100 stored events. Database failures return explicit 503 errors, unauthorized access 401, CSRF/origin failure 403, revision conflict 409 and invalid input 422.
 
 Normal unit tests are offline. The existing explicit PostgreSQL integration harness creates/drops only UUID-named test databases and verifies real PostGIS, migrations, constraints, permissions, authentication and rollback. A labelled isolated browser demonstration exercised Pending → Open → Full → Closed → Open, exact directions, five audit events, logout, mobile layout and real existing weather. Its fixture database is removed afterwards. The live directory remains empty until designated staff provision an account and genuinely verify facilities; no demonstration passwords or assignments are retained in the live database. No historical or restricted geographic data are imported.
+
+## Administrator-approved Telegram notifications
+
+Sprint 9 adds an **Alerts** section inside the existing authenticated `/admin` portal. It is a prototype messaging tool, not an official disaster warning service. Experimental rainfall predictions never generate or trigger a notification. No bot is configured by default, and no live Telegram delivery was verified in this checkpoint.
+
+Apply the existing Alembic workflow to revision `0003_admin_notifications`; it adds only `admin_notifications` and preserves directory/shelter tables. Give the existing separately provisioned application role the additional table-scoped privilege through the maintenance connection:
+
+```sql
+GRANT SELECT, INSERT, UPDATE ON admin_notifications TO floodpulse_shelter_app;
+```
+
+Do not grant public writes, schema ownership or DELETE. Existing admin provisioning, HTTPS same-origin sessions, idle expiry, login rate limits and CSRF configuration remain required. An actual designated operator still needs private provisioning; the production database contains no test administrator or operational notices.
+
+Privately provision a bot using the [official Telegram bot workflow](https://core.telegram.org/bots/tutorial), arrange permission to send to its intended destination, and configure the **backend process environment**:
+
+- `TELEGRAM_BOT_TOKEN`: the private BotFather token; never put it in Git, browser configuration, URLs in shell commands, screenshots or logs.
+- `TELEGRAM_DESTINATIONS`: a JSON object mapping stable private aliases to `{ "label": "Operator-facing name", "chat_id": "<NUMERIC_CHAT_ID>", "test_only": false }`. Actual chat IDs are server-only; the admin API returns aliases and labels.
+- An optional private test destination is another entry with `test_only: true` and its positive private-chat ID. Demonstration mode permits **only** such entries; it cannot target a configured public broadcast destination. No fixture bot configuration is loaded in production.
+
+The application does not automatically load `.env`. Keep actual configuration outside the repository, restrict its permissions and rotate a leaked token through Telegram. Do not paste credentials into support requests. Missing/invalid configuration disables the composer with a clear reason; it never triggers automatic network requests or substitute delivery results. Egress requires HTTPS to `api.telegram.org`. This client deliberately avoids token-bearing URL logging, redirects, environment proxies and automatic retries; ensure external APM/network tooling also redacts the Bot API credential path.
+
+Operator workflow: sign in → choose an authorized destination → write an informational or emergency notice → optionally select a currently verified Open shelter → **Review exact notification** → verify the complete server-rendered text and destination → check the explicit approval box → **Approve and send once through Telegram**. Do not use experimental ML as evidence for flood claims, shelter availability or evacuation instructions. Review uses plain text, without Markdown/HTML transformations or link previews. Optional shelter details are read from PostgreSQL, omit private notes/contact data, and are checked again before sending. Changed/expired shelter evidence requires a new preview. Preview approval expires after 30 minutes; destination reconfiguration also invalidates it.
+
+Protected API contracts (all require the existing administrator session; POSTs additionally require same-origin and CSRF):
+
+- `GET /api/admin/notifications/options`: configuration readiness, authorized destination labels and currently verified Open shelter choices.
+- `POST /api/admin/notifications`: create/retrieve an idempotent **unsent preview** using a client UUID `request_id`; no Telegram request occurs here.
+- `POST /api/admin/notifications/{id}/send`: explicit boolean `approve: true` and exact reviewed `content_sha256`; only the composing administrator can approve.
+- `GET /api/admin/notifications?limit=50&offset=0`: bounded authenticated history, maximum 100 per page.
+
+The PostgreSQL record includes the composing/confirming administrator, exact message, destination alias/label, UTC creation/approval/attempt/result times and sanitized outcome codes. It contains no bot token or chat ID. Each record is durably claimed **before** the external request, preventing repeated clicks, concurrent requests and retry sends for that record. A token/chat fingerprint prevents destination substitution after preview. Sending uses one TLS-verified POST with 10-second connection/socket timeouts and a bounded response body, following the [official `sendMessage` protocol](https://core.telegram.org/bots/api#sendmessage).
+
+Outcomes are `draft`, `sending`, `accepted`, `rejected` or `delivery_unknown`. **Accepted means Telegram API acceptance, not recipient reading or action.** Network timeouts or unverifiable responses remain uncertain and are never retried automatically. A crash or final database-write failure can leave `sending`; inspect Telegram and the recorded attempt before considering a separate notice. This is at-most-one attempt per notification, not a guarantee of exactly-once delivery. Terminal records cannot be sent again. Refreshing history never sends a message. The component cancels pending reads on exit and removes repeat-send controls as soon as an attempt starts, including after a lost browser response.
+
+Verification uses offline protocol responses, authenticated disposable PostgreSQL tests and visibly labelled browser fixtures. None sends an operational announcement. Live delivery remains **BLOCKED until a legitimate bot and authorized private test chat are configured**. After that, a designated administrator should explicitly approve one clearly non-emergency private test notice, then inspect Telegram acceptance and the matching database record. Do not test on public channels or assume a simulated result verifies delivery.

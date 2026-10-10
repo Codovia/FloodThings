@@ -12,6 +12,7 @@ from .historical import router as historical_router
 from .drainage import router as drainage_router
 from .locations import router as locations_router
 from .shelters import router as shelters_router, dispose_shelter_engine
+from .notifications import router as notifications_router
 
 
 @asynccontextmanager
@@ -32,6 +33,7 @@ app.include_router(historical_router)
 app.include_router(drainage_router)
 app.include_router(locations_router)
 app.include_router(shelters_router)
+app.include_router(notifications_router)
 
 
 @app.exception_handler(RequestValidationError)

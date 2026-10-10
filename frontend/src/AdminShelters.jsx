@@ -1,5 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import ShelterMap from './ShelterMap.jsx'
+import AdminNotifications from './AdminNotifications.jsx'
 import './Shelters.css'
 const blank=()=>({name:'',address:'',district_id:'',latitude:'',longitude:'',capacity:'',occupancy:'',water:'unknown',toilets:'unknown',accessibility:'',contact:'',publish_contact:false,status:'pending',notes:'',restrictions:'',revision:null,verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})
 const clock=value=>value?new Date(value).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+' IST':'Not verified'
@@ -42,6 +43,7 @@ export default function AdminShelters(){
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
       <p>Signed in as {session.user.username}. Session expires after 30 idle minutes or eight hours.</p><button disabled={busy} onClick={()=>operation(async()=>{await request('/api/admin/logout',{method:'POST'});setSession(null);setRows([]);setForm(blank());setEditing(null);setNotice('Signed out')})}>Sign out</button>
+      <AdminNotifications session={session} request={request} />
       <section className="panel"><h2>Shelter assignments</h2><button disabled={busy} onClick={()=>operation(()=>load())}>Refresh assignments</button><button disabled={busy} onClick={()=>{setEditing(null);setForm(blank());setHistory(null)}}>Create new shelter</button>
         {!rows.length&&<p>No assignments in this directory.</p>}<p>{rows.length} of {total} assignments shown.</p>
         <ul aria-label="Administrator shelter assignments" className="shelter-list">{rows.map(row=><li key={row.id}><strong>{row.name}</strong><p>{row.district_name} · {row.status} · {row.occupancy}/{row.capacity} occupants · {row.publicly_available?'Publicly available':'Unavailable to public'}</p><p>Verified: {clock(row.verified_at)}. Updated: {clock(row.updated_at)}.</p><button disabled={busy} onClick={()=>edit(row)}>Edit {row.name}</button><button disabled={busy} onClick={()=>operation(async()=>{setHistory(await request('/api/admin/shelters/'+row.id+'/audit'))})}>Audit {row.name}</button></li>)}</ul>
