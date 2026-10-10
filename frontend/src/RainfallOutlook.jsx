@@ -36,10 +36,13 @@ export default function RainfallOutlook({ point, weather, freshness }) {
     return ()=>{stopped=true;clearTimeout(timer);controller.abort()}
   },[key,receipt,open,attempt])
   const current=view.key===key?view:{data:null,error:null,loading:open&&!!receipt}
+  const validation=current.data?.validation
+  const metricsAvailable=validation?.model_type==='Logistic Regression' && Number.isFinite(validation.precision) && validation.precision>=0 && validation.precision<=1 && Number.isFinite(validation.recall) && validation.recall>=0 && validation.recall<=1 && Number.isInteger(validation.samples) && validation.samples>0
   return <section className="panel" aria-labelledby="rainfall-outlook-title">
     <div className="panel-heading"><div><p className="eyebrow">EXPERIMENTAL MACHINE LEARNING</p><h2 id="rainfall-outlook-title">AI Rainfall Outlook</h2></div>
       <button type="button" onClick={()=>open?setAttempt(n=>n+1):setOpen(true)} disabled={current.loading}>{current.loading?'Running rainfall model…':open?'Retry rainfall outlook':'Run experimental rainfall model'}</button></div>
     <p>{point.name} · next 24 complete hours beginning at the next full UTC hour.</p>
+    <p>Target: heavy rainfall ≥64.5 mm in 24 hours at the model grid point. Model type: Logistic Regression.</p>
     <p className="notice">Experimental rainfall model, not flood probability or an official warning. Supports only the verified Kundapur and Mangaluru points. Flood prediction remains unavailable.</p>
     {!open && <p className="muted">Run the saved trained Logistic Regression model using a separate bounded past-hourly Open-Meteo request. No seven-day forecast request is duplicated.</p>}
     {open && !receipt && <p role="status">Usable weather retrieval is required before running the rainfall model.</p>}
@@ -50,6 +53,7 @@ export default function RainfallOutlook({ point, weather, freshness }) {
         <p><strong>{current.data.prediction_text}</strong></p>
         <p>Window: {time(current.data.horizon.start_utc)} to {time(current.data.horizon.end_utc)}</p>
         <p className="muted">Model {current.data.model_version} · retrieved {time(current.data.retrieved_at)}</p>
+        {metricsAvailable ? <p className="notice">Retrospective held-out precision: {(validation.precision*100).toFixed(2)}% · recall: {(validation.recall*100).toFixed(2)}% ({validation.samples.toLocaleString('en-IN')} examples). Low precision means many predicted heavy-rainfall cases were false positives. Not validated for automatic emergency warnings.</p> : <p className="notice">Held-out metrics unavailable in this response. Not validated for automatic emergency warnings.</p>}
         <p className="muted">Past inputs valid through {time(current.data.feature_valid_through_utc)} · hourly provider grid {current.data.provider_grid.latitude}°, {current.data.provider_grid.longitude}°.</p>
         <p className="notice">ERA5 reanalysis-trained grid-scale proxy; live inputs are weather model output. Training/live parity requires validation. No calibrated probability is displayed. Below the threshold does not mean dry or safe.</p>
         {freshness!=='fresh' && <p className="notice error">Weather is stale or refreshing; this is a previously retrieved rainfall outlook with the window shown above.</p>}

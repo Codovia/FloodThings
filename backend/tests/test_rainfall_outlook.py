@@ -139,6 +139,8 @@ def test_live_api_pipeline_with_mocked_transport_and_actual_saved_model(clock):
     assert result['horizon']['start_utc']==CUTOFF.isoformat() and result['horizon']['end_utc']==(CUTOFF+timedelta(hours=24)).isoformat()
     assert datetime.fromisoformat(result['feature_valid_through_utc'])<NOW
     assert result['provider_issued_at'] is None and result['source']['data_kind'].startswith('past-hourly')
+    assert result['validation']=={'model_type':'Logistic Regression','evaluation':'retrospective chronological holdout, not live forecast skill',
+                                 'precision':88/607,'recall':88/96,'samples':2888}
 
 
 @pytest.mark.parametrize('kind',['http','timeout','missing','units','bad_grid'])

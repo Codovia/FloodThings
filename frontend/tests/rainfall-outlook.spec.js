@@ -14,6 +14,7 @@ const inference=point=>{
  return {status:'available',experimental:true,model_version:metadata.version,model_sha256:metadata.model_sha256,location:point,
  prediction:score>0?'heavy_rainfall_predicted':'below_heavy_threshold_predicted',prediction_text:score>0?'At least 64.5 mm predicted by the experimental model':'Below 64.5 mm predicted by the experimental model',
  probability:null,features,feature_valid_through_utc:'2026-10-09T13:00:00Z',retrieved_at:now,provider_grid:{latitude:13.6,longitude:74.7},target:metadata.target,
+ validation:{model_type:'Logistic Regression',...metadata.holdout_metrics,samples:metadata.testing.samples},
  horizon:{hours:24,start_utc:'2026-10-09T14:00:00Z',end_utc:'2026-10-10T14:00:00Z'}}
 }
 const choose=(page,name)=>page.getByRole('list',{name:'District localities'}).getByRole('button',{name:new RegExp('^'+name+' —')}).click()
@@ -38,6 +39,7 @@ test('PostgreSQL directory, locality switch, model display, seven days and six-h
  await page.getByRole('button',{name:'Run experimental rainfall model'}).click()
  await expect(page.getByText(/64.5 mm predicted by the experimental model/)).toBeVisible();expect(aiCalls).toBe(1)
  await expect(page.getByText(/Model rainfall_logistic_v1/)).toBeVisible()
+ await expect(page.getByText(/precision: 14.50% · recall: 91.67%/)).toBeVisible()
  await page.getByLabel('Karnataka district').selectOption('nic:dk.nic.in');await choose(page,'Mangaluru')
  await expect(page.getByRole('heading',{name:'Mangaluru, Dakshina Kannada'})).toBeVisible()
  await expect.poll(()=>aiCalls).toBe(2)

@@ -1,5 +1,11 @@
 # FloodPulse — weather, historical flood evidence and GIS research
 
+For the verified production-build citizen/admin demonstration, private setup,
+backup/isolated restore and service-failure recovery, see the
+[release demonstration guide](docs/RELEASE_DEMONSTRATION.md). Telegram live
+delivery remains blocked pending a legitimate private test configuration and
+explicit operator approval; validated flood prediction remains unavailable.
+
 A React + Vite dashboard → FastAPI → Open-Meteo seven-day weather dashboard with manual coordinates, Leaflet point selection and user-requested GPS (Bengaluru by default), plus a Leaflet map of two verified historical satellite flood events in Udupi. Historical data come from bounded real Earth Engine queries. `QandA.md` is preserved as historical product context; its old implementation and accuracy claims do not describe this rebuild.
 
 The optional **Drainage Research Layers** panel reads `data/processed/udupi_drainage_gis_v1/`: a 3 km × 3 km study window around a verified Udupi OSM city point, not an official municipal boundary. Select surface elevation, derived slope or 2021 land cover. The bounded OSM query returned no drain/ditch ways; unmapped infrastructure remains unknown. Terrain is a 30 m surface model including buildings and vegetation, suitable for exploratory surface research with those limitations. These layers do not provide drainage-risk scores or live waterlogging information.

@@ -10,7 +10,8 @@ const result=point=>({status:'available',experimental:true,location:point,model_
  prediction:'below_heavy_threshold_predicted',prediction_text:'Below 64.5 mm predicted by the experimental model',probability:null,
  retrieved_at:weather.retrieved_at,feature_valid_through_utc:'2026-10-09T13:00:00Z',provider_grid:{latitude:13.6,longitude:74.7},
  horizon:{hours:24,start_utc:'2026-10-09T14:00:00Z',end_utc:'2026-10-10T14:00:00Z'},
- target:{threshold_mm:64.5,definition_url:'https://www.imdpune.gov.in/hazardatlas/extr_rainfallnew_p2001_2010.html'}})
+ target:{threshold_mm:64.5,definition_url:'https://www.imdpune.gov.in/hazardatlas/extr_rainfallnew_p2001_2010.html'},
+ validation:{model_type:'Logistic Regression',precision:88/607,recall:88/96,samples:2888}})
 const reply=(data,ok=true)=>Promise.resolve({ok,json:async()=>data})
 const run=()=>fireEvent.click(screen.getByRole('button',{name:'Run experimental rainfall model'}))
 beforeEach(()=>{vi.stubGlobal('fetch',vi.fn(url=>reply(result(url.includes('12.8698101')?mangaluru:kundapur))))})
@@ -26,6 +27,17 @@ it('loads on demand, renders trained model/target/window and no probability or f
  expect(screen.getByText(/ERA5 reanalysis-trained/)).toBeTruthy()
  expect(screen.getByText(/Below the threshold does not mean dry or safe/)).toBeTruthy()
  expect(screen.getByText(/not flood probability or an official warning/)).toBeTruthy()
+ expect(screen.getByText(/Target: heavy rainfall ≥64.5 mm in 24 hours/)).toBeTruthy()
+ expect(screen.getByText(/precision: 14.50% · recall: 91.67%/)).toBeTruthy()
+ expect(screen.getByText(/Not validated for automatic emergency warnings/)).toBeTruthy()
+})
+
+it.each([undefined,{model_type:'Logistic Regression',precision:NaN,recall:1,samples:2888}])('does not fabricate missing or invalid validation metrics',async(validation)=>{
+ fetch.mockImplementation(()=>reply({...result(kundapur),validation}))
+ render(<RainfallOutlook point={kundapur} weather={weather} freshness="fresh" />);run()
+ await screen.findByText('Below 64.5 mm predicted by the experimental model')
+ expect(screen.getByText(/Held-out metrics unavailable/)).toBeTruthy()
+ expect(screen.queryByText(/precision: 14.50%/)).toBeNull()
 })
 
 it('stale weather explicitly labels previously retrieved outlook',async()=>{
