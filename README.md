@@ -56,6 +56,57 @@ The [source register](docs/DATA_SOURCE_REGISTER.md#task-7--shelter-discovery-evi
 
 ## Run locally
 
+### One-command Linux demonstration
+
+After the existing dependency/database setup and private configuration, run
+`./start.sh` from the repository root (or invoke its absolute path from another
+directory). It activates **backend/.venv**, checks Python/Node/Vite dependencies,
+starts only the existing **floodpulse-sprint6-db** PostgreSQL/PostGIS container if
+stopped, and verifies database connectivity, required schema/role permissions
+and the active directory without writes. It then starts loopback FastAPI and the
+Vite **development** server, and prints URLs only after readiness succeeds:
+
+- Application: **http://127.0.0.1:14180**
+- Administrator: **http://127.0.0.1:14180/admin**
+- Backend: **http://127.0.0.1:18050**
+
+Privately export `DATABASE_URL` (directory reader) and `SHELTER_DATABASE_URL`
+(restricted shelter service), both pointing at the existing
+`127.0.0.1:55436/floodpulse_directory`. No password is built in or read from
+recovery/test files. The launcher never sources or overwrites `.env`. Defaults
+are `LOCATION_DIRECTORY_BACKEND=postgres`, `SHELTER_DIRECTORY_MODE=live`,
+`SHELTER_COOKIE_SECURE=false` for explicit loopback HTTP, and
+`SHELTER_PUBLIC_ORIGIN=http://127.0.0.1:14180`. If already configured, these
+values must agree with the launcher. Optional `FLOODPULSE_BACKEND_PORT` and
+`FLOODPULSE_FRONTEND_PORT` select other free loopback ports; a configured shelter
+origin must match the frontend port. Maintenance credentials are removed from
+the API environment; database and Telegram secrets are removed from Vite's
+environment. Telegram configuration is optional and no notification is sent.
+
+`./start.sh --check` checks prerequisites **without starting any service**;
+`./start.sh --help` displays usage without requiring configuration. Press
+**Ctrl+C** to stop only the launcher's backend/frontend process groups, including
+their children. PostgreSQL is left running, including when the launcher started
+it. A checkout lock and port checks prevent duplicate/conflicting launches;
+unrelated processes are never terminated.
+
+Prerequisites: Linux Bash and `docker`, `flock`, `setsid`, `timeout`, `curl`, the
+existing Python environment, supported Node/npm and installed frontend packages.
+The container/volume, PostGIS, migrations and directory import must already have
+been provisioned via the documented maintenance workflow. The launcher does
+**not** install packages, create/reset databases or volumes, migrate/import data,
+provision an admin, create shelters, train ML or download datasets.
+
+Errors identify the failed stage. Missing private configuration, dependencies,
+container, schema/import or role grants require the corresponding README setup;
+a stopped database fails `--check` but normal startup can start it. Port/lock
+conflicts require closing your own prior session or choosing free ports, not
+killing arbitrary processes. Private service logs are in
+`data/tmp/launcher/backend.log` and `frontend.log`; they are not printed
+automatically or committed. Failed startup shuts down owned web processes.
+The [demonstration guide](docs/RELEASE_DEMONSTRATION.md) retains the production
+build procedure, safe admin demonstration and recovery steps.
+
 The Git checkpoint includes extraction/validation code, manifests and permitted small CSV/GeoJSON/PNG products. Original rasters (`*.tif`) and the recovery copy stay in this local workspace and are excluded from ordinary Git history. A fresh clone therefore does **not** contain complete historical-spatial or drainage versions: their validators and APIs return explicit unavailable states until the exact original rasters matching the committed manifests are supplied through separate storage. Do not regenerate files inside a completed version or weaken its checksum checks. Browser map tests require the complete local versions. Global Flood Database derivatives remain **CC BY-NC 4.0**, including their non-commercial condition; other sources retain the separate terms recorded in each manifest. This checkpoint does not grant a common licence over all data.
 
 Requires Python 3.12+ and Node.js 22.12+ (or 20.19+).
