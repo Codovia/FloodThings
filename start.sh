@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Loopback demonstration launcher. Configuration is inherited, never sourced.
+# Loopback demonstration launcher. Private configuration is parsed, never sourced.
 set +x
 set -Eeuo pipefail
 umask 077
@@ -7,13 +7,12 @@ ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 cd "$ROOT"
 case "${1:-}" in
   --help|-h)
-    printf 'Usage: ./start.sh [--check|--help]\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nRequires privately exported DATABASE_URL and SHELTER_DATABASE_URL. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
+    printf 'Usage: ./start.sh [--check|--help]\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nUses private DATABASE_URL/SHELTER_DATABASE_URL environment or data/tmp/launcher/config.json references. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
     exit 0 ;;
   ''|--check) [[ $# -le 1 ]] || { printf 'Unexpected arguments. Use --help.\n' >&2; exit 1; } ;;
   *) printf 'Unknown option. Use --help.\n' >&2; exit 1 ;;
 esac
 fail() { printf 'FloodPulse: %s\n' "$1" >&2; exit 1; }
-printf 'FloodPulse — Starting Application\n'
 for command in node npm docker flock setsid timeout curl; do
   command -v "$command" >/dev/null || fail "Missing $command; install project prerequisites separately."
 done
@@ -21,6 +20,10 @@ VENV="$ROOT/backend/.venv"
 [[ -x "$VENV/bin/python" && -r "$VENV/bin/activate" ]] || fail 'Missing backend/.venv; follow README setup before launching.'
 # shellcheck source=/dev/null
 source "$VENV/bin/activate"
+if [[ "${FLOODPULSE_CONFIG_LOADED:-}" != 1 && ( -z "${DATABASE_URL:-}" || -z "${SHELTER_DATABASE_URL:-}" ) && -f "$ROOT/data/tmp/launcher/config.json" ]]; then
+  exec "$VENV/bin/python" -B "$ROOT/scripts/launcher_config.py" "$ROOT" "$@"
+fi
+printf 'FloodPulse — Starting Application\n'
 export PYTHONDONTWRITEBYTECODE=1
 export FLOODPULSE_BACKEND_PORT=${FLOODPULSE_BACKEND_PORT:-18050}
 export FLOODPULSE_FRONTEND_PORT=${FLOODPULSE_FRONTEND_PORT:-14180}
@@ -55,6 +58,9 @@ printf '[1/5] Checking Python, Node and private configuration...\n'
 import importlib, os, socket, sys
 from pathlib import Path
 sys.path.insert(0, str(Path.cwd() / 'backend'))
+for name in ['DATABASE_URL', 'SHELTER_DATABASE_URL']:
+    if not os.environ.get(name):
+        sys.exit(f'Missing {name}. Configure the private launcher profile data/tmp/launcher/config.json or export this variable; activating a virtual environment does not configure database connections. See README.')
 try:
     for name in ['fastapi', 'uvicorn', 'httpx', 'sqlalchemy', 'alembic', 'psycopg', 'geoalchemy2', 'numpy', 'sklearn']:
         importlib.import_module(name)

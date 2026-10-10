@@ -1,5 +1,6 @@
 """Offline Linux process-control tests; no database, provider or model fitting."""
 import os
+import json
 from pathlib import Path
 import signal
 import subprocess
@@ -16,9 +17,12 @@ FAKE = r'''
 import os,sys,time,subprocess
 from pathlib import Path
 root=Path(os.environ['FAKE_ROOT']);kind=Path(sys.argv[0]).name
+if kind=='python' and any(a.endswith('/scripts/launcher_config.py') for a in sys.argv):
+ os.execv(sys.executable,[sys.executable,*sys.argv[2:]])
 with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind=='docker' else '')+'\n')
 if kind=='python' and 'preflight' in sys.argv:
  sys.stdin.read();assert os.environ['VIRTUAL_ENV']==str(root/'backend/.venv')
+ assert os.environ.get('DATABASE_URL') and os.environ.get('SHELTER_DATABASE_URL')
  sys.exit(int(os.environ.get('FAIL_PREFLIGHT','0')))
 if kind=='python' and 'database' in sys.argv:
  sys.stdin.read();sys.exit(int(os.environ.get('FAIL_DATABASE','0')))
@@ -58,6 +62,8 @@ def project(tmp_path):
     script.write_bytes((ROOT / 'start.sh').read_bytes()); script.chmod(0o700)
     envdir = tmp_path / 'backend/.venv/bin'; envdir.mkdir(parents=True)
     (tmp_path / 'frontend').mkdir()
+    scripts = tmp_path / 'scripts'; scripts.mkdir()
+    (scripts / 'launcher_config.py').write_bytes((ROOT / 'scripts/launcher_config.py').read_bytes())
     (envdir / 'activate').write_text(f'export VIRTUAL_ENV={tmp_path}/backend/.venv\n')
     tools = tmp_path / 'bin'; tools.mkdir()
     for name in ['python', 'node', 'npm', 'docker', 'curl', 'sleep']:
@@ -103,6 +109,29 @@ def test_check_from_other_directory_activates_venv_without_starting_services(pro
     events = (project[0] / 'events').read_text()
     assert 'npm' not in events and 'docker start' not in events
     assert not (project[0] / 'pids').exists()
+
+
+def test_launcher_bootstraps_private_profile_with_no_exported_urls(project):
+    root, env = project
+    password = root / 'password'; password.write_text('PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY'); password.chmod(0o600)
+    file = root / 'data/tmp/launcher/config.json'; file.parent.mkdir(parents=True)
+    file.write_text(json.dumps({'database_connections': {
+        name: {'url': 'postgresql+psycopg://service@127.0.0.1:55436/floodpulse_directory', 'password_file': 'password'}
+        for name in ['DATABASE_URL', 'SHELTER_DATABASE_URL']}})); file.chmod(0o600)
+    result = run(project, '--check', DATABASE_URL='', SHELTER_DATABASE_URL='', FLOODPULSE_CONFIG_LOADED='')
+    assert result.returncode == 0 and 'Checks passed' in result.stdout
+    assert not (root / 'pids').exists()
+
+
+@pytest.mark.parametrize('missing', ['DATABASE_URL', 'SHELTER_DATABASE_URL'])
+def test_real_preflight_names_missing_variable_without_printing_other_values(missing):
+    code = (ROOT / 'start.sh').read_text().split('"$VENV/bin/python" - preflight <<\'PY\'\n')[1].split('\nPY\n')[0]
+    env = {**os.environ, 'DATABASE_URL': 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
+           'SHELTER_DATABASE_URL': 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY'}
+    del env[missing]
+    result = subprocess.run([sys.executable, '-B', '-'], input=code, env=env, capture_output=True, text=True, timeout=5)
+    assert result.returncode != 0 and f'Missing {missing}.' in result.stderr
+    assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in result.stdout + result.stderr
 
 
 @pytest.mark.parametrize('setting', ['FAIL_PREFLIGHT', 'FAIL_NODE', 'FAIL_DOCKER', 'FAIL_DATABASE', 'MISSING_CONTAINER'])

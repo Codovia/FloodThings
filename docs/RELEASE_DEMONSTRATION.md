@@ -50,10 +50,17 @@ needed, FastAPI and the **Vite development server**, all on loopback. It activat
 actual API/frontend readiness before reporting success. No package installation,
 migration/import, account/shelter creation, model training or messaging occurs.
 
-Required private environment: `DATABASE_URL` and `SHELTER_DATABASE_URL` for
+Required private configuration: `DATABASE_URL` and `SHELTER_DATABASE_URL` for
 the documented reader/service roles at `127.0.0.1:55436/floodpulse_directory`.
-The script does not source `.env`, copy credentials or read recovery-password
-files. Safe local defaults are PostgreSQL directory backend, live shelter mode,
+Provide exported values or the ignored owner-only
+`data/tmp/launcher/config.json` connection-reference profile documented in README.
+The existing workspace profile references its already provisioned role password
+files. It contains no passwords; explicit environment values take precedence.
+The parser checks ownership/permissions, URL-encodes passwords in memory and
+executes no profile text. Missing variables are named without showing values.
+The script does not source `.env`, copy credentials or provision new ones.
+Prior activation of another virtual environment is unnecessary: the launcher
+selects `backend/.venv`. Safe local defaults are PostgreSQL directory backend, live shelter mode,
 loopback-only non-Secure development cookie and matching origin at port 14180.
 Already configured settings must agree. Vite receives no database/Telegram
 secrets, and the API receives no maintenance URL.

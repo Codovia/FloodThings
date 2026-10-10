@@ -70,10 +70,15 @@ Vite **development** server, and prints URLs only after readiness succeeds:
 - Administrator: **http://127.0.0.1:14180/admin**
 - Backend: **http://127.0.0.1:18050**
 
-Privately export `DATABASE_URL` (directory reader) and `SHELTER_DATABASE_URL`
+Configure `DATABASE_URL` (directory reader) and `SHELTER_DATABASE_URL`
 (restricted shelter service), both pointing at the existing
-`127.0.0.1:55436/floodpulse_directory`. No password is built in or read from
-recovery/test files. The launcher never sources or overwrites `.env`. Defaults
+`127.0.0.1:55436/floodpulse_directory`. Either privately export them, or use the
+ignored local `data/tmp/launcher/config.json` profile below. Environment values
+take precedence. The profile references separately provisioned password files;
+passwords are not embedded/copied into the profile, printed or passed as command
+arguments. Profile/password files must be regular, user-owned and owner-only
+(`chmod 600`); symlinks are rejected. The launcher never sources or overwrites
+`.env`, evaluates shell code or creates credentials. Defaults
 are `LOCATION_DIRECTORY_BACKEND=postgres`, `SHELTER_DIRECTORY_MODE=live`,
 `SHELTER_COOKIE_SECURE=false` for explicit loopback HTTP, and
 `SHELTER_PUBLIC_ORIGIN=http://127.0.0.1:14180`. If already configured, these
@@ -82,6 +87,31 @@ values must agree with the launcher. Optional `FLOODPULSE_BACKEND_PORT` and
 origin must match the frontend port. Maintenance credentials are removed from
 the API environment; database and Telegram secrets are removed from Vite's
 environment. Telegram configuration is optional and no notification is sent.
+
+An example **credential-free** profile structure (use the actual private file
+paths configured by your database administrator):
+
+```json
+{
+  "database_connections": {
+    "DATABASE_URL": {
+      "url": "postgresql+psycopg://floodpulse_location_reader@127.0.0.1:55436/floodpulse_directory",
+      "password_file": "private/directory-password"
+    },
+    "SHELTER_DATABASE_URL": {
+      "url": "postgresql+psycopg://floodpulse_shelter_app@127.0.0.1:55436/floodpulse_directory",
+      "password_file": "private/shelter-password"
+    }
+  }
+}
+```
+
+Relative password paths resolve from the repository root; absolute paths are
+also supported. Keep these files outside Git. This workspace's local profile
+already references its existing restricted-role files. It is deliberately not
+distributed in a clone. Virtual-environment activation only selects Python;
+it does not set database connections. `start.sh` selects `backend/.venv` itself,
+so prior activation of the root `.venv` is unnecessary.
 
 `./start.sh --check` checks prerequisites **without starting any service**;
 `./start.sh --help` displays usage without requiring configuration. Press
