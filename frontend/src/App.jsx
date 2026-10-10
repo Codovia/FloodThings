@@ -4,8 +4,7 @@ import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
 import WeatherPanel from './WeatherPanel.jsx'
 import RainfallOutlook from './RainfallOutlook.jsx'
 import PublicShelters from './PublicShelters.jsx'
-import HistoricalFloodMap from './HistoricalFloodMap.jsx'
-import DrainageResearchLayers from './DrainageResearchLayers.jsx'
+import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
 
@@ -23,10 +22,9 @@ export default function App() {
  useEffect(()=>{if(path!=='/admin')setWeatherEnabled(true)},[path])
  const session=useWeatherSession(selectedPoint, weatherEnabled)
  const point=selectedPoint || DEFAULT_POINT
- const [showHistory,setShowHistory]=useState(true)
  const publicPage=path !== '/admin' && !!pageInfo[path]
  const weatherPage=path==='/' || path==='/weather'
- const sheltersPage=path==='/' || path==='/shelters' || path==='/flood-map'
+ const sheltersPage=path==='/' || path==='/shelters'
  const info=pageInfo[path]
  function choosePoint(next){if(next.latitude===point.latitude && next.longitude===point.longitude) session.refresh(next);setSelectedPoint({...next})}
  return <>
@@ -41,7 +39,7 @@ export default function App() {
    </section>
    {path==='/' && <nav className="overview-links" aria-label="Explore FloodPulse"><PageLink to="/weather" navigate={navigate}><strong>Weather & AI</strong><span>Seven-day point forecasts and experimental rainfall inference</span></PageLink><PageLink to="/flood-map" navigate={navigate}><strong>Historical flood maps</strong><span>Reviewed satellite evidence and source-labelled GIS layers</span></PageLink><PageLink to="/shelters" navigate={navigate}><strong>Verified shelters</strong><span>Manually approved availability, capacity and entrance directions</span></PageLink></nav>}
    {/* Shared public session stays mounted across routes: one location and freshness lifecycle. */}
-   <div hidden={!publicPage} className="location-context">
+   <div hidden={!publicPage || path==='/flood-map'} className="location-context">
     <WeatherLocationSelector point={point} onSelect={choosePoint} mapInitiallyOpen={path==='/' || path==='/flood-map' || path==='/shelters'} />
     {!weatherPage && <p className="selection-summary">Selected point: <strong>{point.name}</strong> · {point.latitude}°, {point.longitude}°. Point selection does not imply a district-wide condition.</p>}
    </div>
@@ -49,12 +47,8 @@ export default function App() {
     <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} />
     <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} />
    </div>
-   {path==='/flood-map' && <div className="gis-sections">
-    <section className="panel map-guide"><h2>Map layers & coverage</h2><p>Point context covers Karnataka. Historical floodwater and drainage layers are reviewed Udupi products; statewide flood-risk polygons are unavailable.</p><label className="layer-control"><input type="checkbox" checked={showHistory} onChange={e=>setShowHistory(e.target.checked)}/>Show historical satellite floodwater</label><p className="muted">Open the drainage layer controls below to choose elevation, slope or land cover. Open shelter entrances appear only after a successful verified-directory lookup.</p></section>
-    {showHistory && <HistoricalFloodMap />}
-    <DrainageResearchLayers />
-   </div>}
-   <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/shelters' || path==='/flood-map'} /></div>
+   {path==='/flood-map' && <FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} />}
+   <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/shelters'} /></div>
    {path==='/admin' && <AdminShelters embedded onHome={()=>navigate('/')} />}
    {!info && <PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
   </main>

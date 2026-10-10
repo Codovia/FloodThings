@@ -22,7 +22,10 @@ test('both event geometries match exported coordinates and Leaflet draws every r
   await page.goto('/weather')
   await expect(page.getByText(/Weather unavailable/)).toBeVisible()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
-  await expect(page.getByRole('heading', { name: 'Udupi flood event maps' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
+  await page.getByLabel('Flood Map district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await page.getByLabel('Recorded event', { exact: true }).selectOption('2728')
+  await page.getByText('Event sources and observation limitations').click()
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
   await expect(page.getByRole('link', { name: 'CC BY-NC 4.0', exact: true })).toBeVisible()
   for (const id of [2728, 3551]) {
@@ -34,6 +37,7 @@ test('both event geometries match exported coordinates and Leaflet draws every r
     expect((await response.json()).floodwater).toEqual(actual)
     // SVG paths must be the exported polygon rings (one path per raster cell), not markers/circles.
     await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(actual.features.length)
+    // All historical event evidence remains original polygon paths, not event markers.
     expect(await page.locator('.historical-map circle, .historical-map .leaflet-marker-icon').count()).toBe(0)
     const map = page.getByRole('region', { name: /Historical satellite floodwater/ })
     await map.scrollIntoViewIfNeeded()
@@ -45,6 +49,9 @@ test('both event geometries match exported coordinates and Leaflet draws every r
 test('district view, mobile layout and historical warning remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/flood-map')
+  await page.getByLabel('Flood Map district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await page.getByLabel('Recorded event', { exact: true }).selectOption('2728')
+  await page.getByText('Event sources and observation limitations').click()
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
   await page.getByRole('button', { name: 'Show district', exact: true }).click()
   await page.getByRole('button', { name: 'Zoom to mapped water', exact: true }).click()

@@ -17,7 +17,11 @@ test.beforeEach(async ({ page }) => {
 test('real local raster previews render within Udupi study geography and toggle correctly', async ({ page }) => {
   const errors = []; page.on('pageerror', error => errors.push(error.message))
   await page.goto('/flood-map')
+  await page.getByLabel('Flood Map district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await page.getByLabel('Recorded event', { exact: true }).selectOption('2728')
+  await page.getByText('Event sources and observation limitations').click()
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
+  await page.getByLabel('Drainage / waterways', { exact: true }).check()
   await page.getByRole('button', { name: 'Show research layers' }).click()
   const map = page.getByRole('region', { name: 'Udupi drainage research geography' })
   await expect(map).toBeVisible()
@@ -56,6 +60,10 @@ test('real local raster previews render within Udupi study geography and toggle 
 test('mobile optional research view remains usable with unavailable tiles and unchanged historical map', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/flood-map')
+  await page.getByLabel('Flood Map district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await page.getByLabel('Recorded event', { exact: true }).selectOption('2728')
+  await page.getByText('Event sources and observation limitations').click()
+  await page.getByLabel('Drainage / waterways', { exact: true }).check()
   await page.getByRole('button', { name: 'Show research layers' }).click()
   await expect(page.getByRole('region', { name: 'Udupi drainage research geography' })).toBeVisible()
   await page.getByLabel('Surface slope', { exact: true }).check()

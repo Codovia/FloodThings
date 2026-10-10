@@ -10,6 +10,7 @@ from .weather import OpenMeteoAdapter, WeatherUnavailable, unavailable
 from .location_weather import fetch_point_weather, selected_location
 from .historical import router as historical_router
 from .drainage import router as drainage_router
+from .flood_map import router as flood_map_router
 from .locations import router as locations_router
 from .shelters import router as shelters_router, dispose_shelter_engine
 from .notifications import router as notifications_router
@@ -31,6 +32,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(title="FloodPulse", version="0.1.0", lifespan=lifespan)
 app.include_router(historical_router)
 app.include_router(drainage_router)
+app.include_router(flood_map_router)
 app.include_router(locations_router)
 app.include_router(shelters_router)
 app.include_router(notifications_router)

@@ -4,6 +4,8 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import App from './App.jsx'
 
+vi.mock('./FloodIntelligenceMap.jsx', async () => ({ default: (await import('./HistoricalFloodMap.jsx')).default }))
+
 const leaflet = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), geoJSON: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: leaflet }))
 

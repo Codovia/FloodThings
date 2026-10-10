@@ -257,3 +257,8 @@ clone lacks excluded original rasters: explicit GIS-unavailable responses are
 expected until exact separately retained files are supplied. No official flood
 service, validated flood probability, automatic alert, new shelter availability,
 ML retraining or Stage 5B is delivered by this release.
+
+
+## Sprint 11 — district-wise evidence map
+
+Use the [Karnataka Flood Intelligence Map demonstration](FLOOD_INTELLIGENCE_MAP.md#demonstration). All 31 district names filter eligible public evidence; statewide reset preserves layer choices. Udupi has 56 original GFD raster-cell polygons across two events; potential-hazard polygons are unavailable. Select Udupi, zoom to mapped water and inspect a cell with mouse or keyboard. Switch to Kolar to demonstrate honest no-public-geometry coverage and unavailable zoom, then return statewide. Independently toggle hazards, bounded drainage context and verified shelters. Keep mechanisms Unknown, no-drain results unknown, and operational shelter empty state intact. Weather/AI remain on `/weather`; map cells are not model-supported settlements. Research products and the trained model are unchanged.

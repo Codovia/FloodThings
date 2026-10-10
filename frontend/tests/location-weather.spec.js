@@ -39,7 +39,7 @@ test('coordinate and Leaflet selection drive weather requests, and source masks/
   await expect(page.getByText('27 °C', { exact: true })).toBeVisible()
   await expect(map.locator('path.leaflet-interactive')).toHaveCount(1)
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
-  await expect(page.getByRole('heading', { name: 'Udupi flood event maps' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
   expect(errors).toEqual([])
 })
 

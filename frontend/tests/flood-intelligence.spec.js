@@ -1,0 +1,26 @@
+import {test,expect} from '@playwright/test'
+import {readFileSync} from 'node:fs'
+const source=new URL('../../data/processed/udupi_flood_spatial_v1/',import.meta.url)
+test.beforeEach(async({page})=>{await page.route('**/*',route=>{const u=new URL(route.request().url());if(!['127.0.0.1','localhost'].includes(u.hostname))return route.abort();if(u.pathname==='/api/weather')return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Weather intentionally isolated in map test'})});return route.continue()})})
+test('31 districts, original GeoJSON, independent layers, details and statewide reset',async({page})=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/flood-map')
+ const select=page.getByLabel('Flood Map district',{exact:true});await expect(select.locator('option')).toHaveCount(32)
+ await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
+ const response=await page.request.get('/api/flood-map/historical');expect(response.ok()).toBe(true);const body=await response.json()
+ for(const id of [2728,3551]){const saved=JSON.parse(readFileSync(new URL(`event_${id}.geojson`,source),'utf8'));expect(body.geojson.features.filter(f=>f.properties.event_id===id).map(f=>f.geometry)).toEqual(saved.features.map(f=>f.geometry))}
+ await select.selectOption('nic:udupi.nic.in');await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
+ await page.getByRole('button',{name:'Zoom to mapped water',exact:true}).click()
+ await page.locator('.intelligence-map path[fill="#dc6047"]').first().click({force:true});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible();await expect(page.getByText(/Unknown — No reviewed source/)).toBeVisible();await expect(page.getByText('Not validated',{exact:true})).toBeVisible()
+ await page.getByRole('button',{name:'Close details'}).click();await expect(page.getByRole('heading',{name:'Flood evidence details'})).toHaveCount(0)
+ await page.getByLabel('Potential Flood-Prone Zones',{exact:true}).check();await expect(page.getByText(/No verified potential flood-prone zone dataset/)).toBeVisible();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
+ await select.selectOption('nic:kolar.nic.in');await expect(page.getByText(/0 eligible historical cells/)).toBeVisible();await expect(page.getByRole('button',{name:'Show district',exact:true})).toBeDisabled();await expect(page.getByText(/navigation bounds are unavailable for Kolar/)).toBeVisible();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(0)
+ await page.getByRole('button',{name:'Return to statewide view'}).click();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56);await expect(page.getByLabel('Potential Flood-Prone Zones')).toBeChecked()
+ await page.getByLabel('Verified shelters',{exact:true}).check();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible();expect(errors).toEqual([])
+})
+test('mobile keyboard selection, drainage context and map layer cleanup',async({page})=>{
+ await page.setViewportSize({width:390,height:844});await page.goto('/flood-map');const districts=page.getByLabel('Flood Map district',{exact:true});await expect(districts.locator('option')).toHaveCount(32);await districts.focus();await districts.selectOption('nic:udupi.nic.in');await page.getByLabel('Drainage / waterways',{exact:true}).check();await expect(page.getByText(/0 mapped drain\/ditch ways/)).toBeVisible();await expect(page.getByText('Mapped drainage feature — overflow risk not established.')).toBeVisible()
+ const cell=page.getByLabel('Historical evidence cell (keyboard alternative)',{exact:true});await cell.focus();const first=await cell.locator('option').nth(1).getAttribute('value');await cell.selectOption(first);await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible();await page.getByLabel('Historical Flood Locations',{exact:true}).uncheck();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByRole('heading',{name:'Flood evidence details'})).toHaveCount(0);await expect(page.getByLabel('Drainage / waterways')).toBeChecked();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+})
+test('unavailable historical geometry clears map and cannot become a negative or hazard',async({page})=>{
+ await page.route('**/api/flood-map/historical*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled historical geometry failure'})}));await page.goto('/flood-map');await expect(page.getByRole('alert').filter({hasText:'Controlled historical geometry failure'})).toBeVisible();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByLabel('Historical evidence cell (keyboard alternative)')).toHaveCount(0);await page.getByLabel('Potential Flood-Prone Zones').check();await expect(page.getByText(/No verified potential flood-prone/)).toBeVisible();await expect(page.getByRole('button',{name:'Retry map evidence'})).toBeVisible()
+})

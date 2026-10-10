@@ -482,3 +482,22 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 :is(.page-home, .page-flood-map, .page-shelters) .weather-coordinate-form button { grid-column: 1/-1; }
 .shelter-empty { background: #f0f7fb; border: 1px dashed #9fbfd8; padding: 32px 24px; border-radius: 14px; text-align: center; color: #355777; font-weight: 600; }
 @media (max-width: 900px) { :is(.page-home, .page-flood-map, .page-shelters) .point-selector-body { grid-template-columns: minmax(0,1fr); } }
+
+/* Sprint 11: primary evidence map before compact, separate context panels. */
+.intelligence-toolbar {display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:20px}
+.intelligence-toolbar>label {display:flex;gap:8px;align-items:center;font-weight:600}
+.intelligence-toolbar select,.intelligence-cell-selector select {padding:10px;border:1px solid #adbfcc;border-radius:8px;background:white;color:#15395f;max-width:100%;min-height:44px}
+.intelligence-toolbar fieldset {flex-basis:100%;display:flex;flex-wrap:wrap;gap:18px;border:0;padding:8px 0;margin:0}
+.intelligence-toolbar legend {font-weight:600;margin-bottom:6px}
+.intelligence-toolbar fieldset label {display:flex;gap:8px;align-items:center;min-height:32px}
+.intelligence-map {height:620px;border:1px solid #b7ccd4;border-radius:12px}
+.intelligence-coverage {font-size:.94rem}
+.intelligence-cell-selector {display:grid;gap:8px;margin:20px 0}
+.intelligence-detail {margin-top:20px}
+.intelligence-detail dl {display:grid;grid-template-columns:180px minmax(0,1fr);gap:12px 18px;overflow-wrap:anywhere}
+.intelligence-detail dt {font-weight:700}.intelligence-detail dd {margin:0}
+.intelligence-events {margin:18px 0}.intelligence-events summary {cursor:pointer;min-height:32px}
+@media(max-width:650px){.intelligence-toolbar>label {display:grid;width:100%}.intelligence-toolbar select {width:100%}.intelligence-toolbar fieldset{display:grid;gap:6px}.intelligence-map{height:440px}.intelligence-detail dl{grid-template-columns:1fr;gap:6px}.intelligence-detail dd{margin-bottom:12px}}
+.intelligence-events p {overflow-wrap:anywhere}
+.intelligence-cell-selector {min-width:0}
+.intelligence-cell-selector select {min-width:0;width:100%}

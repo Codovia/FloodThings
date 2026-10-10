@@ -88,7 +88,7 @@ it('handles missing source pixels without defaulting to a raster', async () => {
   await screen.findByRole('region', { name: 'Udupi drainage research geography' })
   const control = screen.getByLabelText(/Surface elevation/)
   expect(control.disabled).toBe(true); expect(control.checked).toBe(false)
-  expect(leaflet.imageOverlay).toHaveBeenCalledTimes(2)
+  await waitFor(() => expect(leaflet.imageOverlay).toHaveBeenCalledTimes(2))
 })
 
 it('reports unavailable datasets and rejects incorrect identities', async () => {

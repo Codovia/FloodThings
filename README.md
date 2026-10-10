@@ -35,7 +35,7 @@ The shared header provides five pages. Location selection and the weather freshn
 | --- | --- | --- |
 | Home | `/` | Karnataka point map, selected-location weather, forecasts, experimental AI and shelter access |
 | Weather & AI | `/weather` | District/locality search, manual/GPS/map selection, seven-day weather, provider rainfall chart and saved Logistic Regression outlook |
-| Flood Map | `/flood-map` | Point context, reviewed Udupi historical floodwater, optional drainage research layers and verified shelter entrances when available |
+| Flood Map | `/flood-map` | 31-district evidence filter, original Udupi historical polygons and details, separate unavailable hazard layer, optional drainage context and verified shelter entrances |
 | Shelters | `/shelters` | Verified Open destinations with spare capacity, reported facilities, timestamps and external entrance directions; explicit empty/error states |
 | Admin | `/admin` | Existing protected login, shelter verification/audit and explicitly approved Telegram notifications |
 
@@ -388,3 +388,8 @@ The PostgreSQL record includes the composing/confirming administrator, exact mes
 Outcomes are `draft`, `sending`, `accepted`, `rejected` or `delivery_unknown`. **Accepted means Telegram API acceptance, not recipient reading or action.** Network timeouts or unverifiable responses remain uncertain and are never retried automatically. A crash or final database-write failure can leave `sending`; inspect Telegram and the recorded attempt before considering a separate notice. This is at-most-one attempt per notification, not a guarantee of exactly-once delivery. Terminal records cannot be sent again. Refreshing history never sends a message. The component cancels pending reads on exit and removes repeat-send controls as soon as an attempt starts, including after a lost browser response.
 
 Verification uses offline protocol responses, authenticated disposable PostgreSQL tests and visibly labelled browser fixtures. None sends an operational announcement. Live delivery remains **BLOCKED until a legitimate bot and authorized private test chat are configured**. After that, a designated administrator should explicitly approve one clearly non-emergency private test notice, then inspect Telegram acceptance and the matching database record. Do not test on public channels or assume a simulated result verifies delivery.
+
+
+## Karnataka Flood Intelligence Map
+
+Open `/flood-map` and select one of 31 NIC-listed districts, or statewide view. Historical Flood Locations and Potential Flood-Prone Zones have independent controls. The eligible public historical coverage is **56 raster-cell polygons from two Udupi events**; no verified potential-hazard geometry is registered. Other districts remain selectable with explicit coverage limitations. Only Udupi/Dakshina Kannada have reviewed navigation bounds. Click a historical polygon or use the keyboard cell selector to inspect its dates, observation quality, Unknown mechanism, source licence and original geometry checksum. Drainage context is a separate bounded Udupi study with zero returned mapped drain/ditch ways, not an overflow assessment. Shelter markers require current verified Open assignments with spare capacity. See [map methodology and API](docs/FLOOD_INTELLIGENCE_MAP.md) for sources, restrictions and demonstration steps. No new migration or source download is needed; restart the existing application launcher after updating backend code.

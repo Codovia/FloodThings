@@ -3,7 +3,7 @@ import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import App from './App.jsx'
 vi.mock('./WeatherLocationSelector.jsx',()=>({DEFAULT_POINT:{name:'Bengaluru, Karnataka',latitude:12.9767936,longitude:77.590082},default:({point,onSelect})=><section><span>{point.name} location control</span><button onClick={()=>onSelect({name:'Udupi test selection',latitude:13.34,longitude:74.74})}>Select test point</button></section>}))
-vi.mock('./HistoricalFloodMap.jsx',()=>({default:()=> <div>Historical map fixture</div>}))
+vi.mock('./FloodIntelligenceMap.jsx',()=>({default:()=> <div>Historical map fixture</div>}))
 vi.mock('./DrainageResearchLayers.jsx',()=>({default:()=> <div>Drainage fixture</div>}))
 const reply=(body,status=200)=>Promise.resolve({ok:status===200,status,json:async()=>body})
 const weather=point=>({status:'available',location:point,retrieved_at:new Date().toISOString(),current:{temperature_c:27,humidity_percent:80,precipitation_mm:0,valid_at:new Date().toISOString(),interval_seconds:900},grid_location:point,forecast:Array.from({length:7},(_,i)=>({date:`2026-10-${10+i}`,precipitation_mm:i,temperature_min_c:22,temperature_max_c:29,weather_code:61}))})

@@ -2,6 +2,7 @@ import React,{useEffect,useState} from 'react'
 import ShelterMap from './ShelterMap.jsx'
 import './Shelters.css'
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
+export function validShelterDirectory(data){return ['live','demonstration'].includes(data?.mode)&&Array.isArray(data.shelters)&&data.shelters.every(s=>s.status==='open'&&s.available_capacity>0&&Number.isFinite(s.latitude)&&Math.abs(s.latitude)<=90&&Number.isFinite(s.longitude)&&Math.abs(s.longitude)<=180&&Number.isFinite(Date.parse(s.verified_at))&&Date.parse(s.verification_expires_at)>Date.now()&&s.demonstration===(data.mode==='demonstration'))}
 export default function PublicShelters({point=null,active=false}) {
   const [open,setOpen]=useState(false),[refresh,setRefresh]=useState(0),[view,setView]=useState({key:null,data:null,error:null,loading:false})
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
@@ -16,7 +17,7 @@ export default function PublicShelters({point=null,active=false}) {
         const params=point?'?'+new URLSearchParams({latitude:point.latitude,longitude:point.longitude}):''
         const response=await fetch('/api/shelters'+params,{signal:controller.signal}),data=await response.json()
         if(!response.ok||data.status!=='available')throw Error(typeof data.detail==='string'?data.detail:'Shelter directory unavailable')
-        if(!['live','demonstration'].includes(data.mode)||!Array.isArray(data.shelters)||!data.shelters.every(s=>s.status==='open'&&s.available_capacity>0&&Number.isFinite(s.latitude)&&Math.abs(s.latitude)<=90&&Number.isFinite(s.longitude)&&Math.abs(s.longitude)<=180&&Number.isFinite(Date.parse(s.verified_at))&&Date.parse(s.verification_expires_at)>Date.now()&&s.demonstration===(data.mode==='demonstration')))
+        if(!validShelterDirectory(data))
           throw Error('Shelter availability could not be verified')
         if(!stopped)setView({key,data,error:null,loading:false})
       }catch(error){if(!stopped)setView({key,data:null,error:error.name==='AbortError'?'Shelter directory request timed out. Please retry.':error.message,loading:false})}
