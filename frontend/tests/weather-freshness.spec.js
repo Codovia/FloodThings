@@ -24,7 +24,7 @@ async function setup(page) {
     if (state.fail) return route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable', message: 'Controlled provider outage' }) })
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload(point, state.timestampMissing ? null : timestamp)) })
   })
-  await page.goto('/')
+  await page.goto('/weather')
   return state
 }
 const freshness = page => page.getByRole('status', { name: 'Weather data freshness' })

@@ -1,5 +1,5 @@
 import React from 'react'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 
@@ -46,7 +46,7 @@ it('keeps the optional view closed without a request', () => {
 it('draws georeferenced rasters, source legends and unknown infrastructure coverage', async () => {
   render(<DrainageResearchLayers />); open()
   await screen.findByRole('region', { name: 'Udupi drainage research geography' })
-  expect(leaflet.imageOverlay.mock.calls[0].slice(0,2)).toEqual(['/api/drainage-research/layers/elevation.png', [[13.33,74.73],[13.35,74.76]]])
+  await waitFor(() => expect(leaflet.imageOverlay.mock.calls[0]?.slice(0,2)).toEqual(['/api/drainage-research/layers/elevation.png', [[13.33,74.73],[13.35,74.76]]]))
   expect(screen.getByText(/not an official municipal boundary/)).toBeTruthy()
   expect(screen.getByText(/does not mean there are no drains/)).toBeTruthy()
   expect(screen.getByLabelText(/Mapped drains and ditches/).disabled).toBe(true)

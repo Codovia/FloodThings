@@ -26,6 +26,24 @@ Reproduce the public directory offline with `backend/.venv/bin/python -B scripts
 
 A fresh clone can serve the permitted directory snapshot without raw verification documents; offline source reproduction requires the retained originals locally. Both validators check source hashes, original node coordinates, actual public polygon containment and deterministic outputs without writes or network. Original SOI data and derived research tables remain local.
 
+
+## Application navigation
+
+The shared header provides five pages. Location selection and the weather freshness session persist during navigation; browser back/forward and direct URLs work.
+
+| Page | URL | Content |
+| --- | --- | --- |
+| Home | `/` | Karnataka point map, selected-location weather, forecasts, experimental AI and shelter access |
+| Weather & AI | `/weather` | District/locality search, manual/GPS/map selection, seven-day weather, provider rainfall chart and saved Logistic Regression outlook |
+| Flood Map | `/flood-map` | Point context, reviewed Udupi historical floodwater, optional drainage research layers and verified shelter entrances when available |
+| Shelters | `/shelters` | Verified Open destinations with spare capacity, reported facilities, timestamps and external entrance directions; explicit empty/error states |
+| Admin | `/admin` | Existing protected login, shelter verification/audit and explicitly approved Telegram notifications |
+
+On mobile, use **Menu** to reveal navigation; Escape closes it. All pages use the same blue/teal design and retain keyboard focus indicators, loading/error announcements and source attribution. The rainfall chart uses real daily forecast totals only: missing values remain gaps. Weather is point-specific; historical floodwater is not live flooding, and experimental heavy-rainfall inference is not a calibrated flood probability. The public operational shelter directory is not seeded with demonstration facilities.
+
+Use the existing `./start.sh` workflow below. Vite serves these direct URLs; a production static host must serve the application entry for frontend routes while preserving the separate FastAPI `/api` routing. No backend, database, credential or model migration is required for this UI change.
+
+
 ## Experimental AI Rainfall Outlook
 
 Select **Kundapur** or **Mangaluru** through the existing PostgreSQL/file-backed place selector, wait for real weather, then choose **Run experimental rainfall model**. The saved `rainfall_logistic_v1` StandardScaler + Logistic Regression model receives verified past-hourly Open-Meteo inputs and returns a binary experimental rainfall outlook. Switching locations clears old results; once opened, the panel refreshes after a new successful weather receipt. Its separate bounded hourly request supplies features absent from the seven-day weather response; it does not repeat that weather request. Model/provider failures show unavailable, with manual retry and no replacement prediction. Other points retain normal weather but are outside this model's supported scope.

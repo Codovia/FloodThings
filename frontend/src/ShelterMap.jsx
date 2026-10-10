@@ -1,5 +1,6 @@
 import React,{useEffect,useRef} from 'react'
 import L from 'leaflet'
+import useMapResize from './useMapResize.js'
 import 'leaflet/dist/leaflet.css'
 
 export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map'}) {
@@ -23,5 +24,6 @@ export default function ShelterMap({points=[],origin=null,onSelect=null,label='S
     if(bounds.length===1)map.current.setView(bounds[0],13,{animate:false})
     else if(bounds.length)map.current.fitBounds(bounds,{padding:[20,20],maxZoom:14,animate:false})
   },[points,origin])
+  useMapResize(map)
   return <div ref={container} className="shelter-map" role="region" aria-label={label} />
 }

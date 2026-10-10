@@ -4,7 +4,7 @@ import AdminNotifications from './AdminNotifications.jsx'
 import './Shelters.css'
 const blank=()=>({name:'',address:'',district_id:'',latitude:'',longitude:'',capacity:'',occupancy:'',water:'unknown',toilets:'unknown',accessibility:'',contact:'',publish_contact:false,status:'pending',notes:'',restrictions:'',revision:null,verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})
 const clock=value=>value?new Date(value).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+' IST':'Not verified'
-export default function AdminShelters(){
+export default function AdminShelters({embedded=false,onHome=null}){
   const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[error,setError]=useState(null),[notice,setNotice]=useState(null),[busy,setBusy]=useState(false)
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[offset,setOffset]=useState(0),[districts,setDistricts]=useState([]),[form,setForm]=useState(blank),[editing,setEditing]=useState(null),[history,setHistory]=useState(null)
   const [username,setUsername]=useState(''),[password,setPassword]=useState('')
@@ -36,7 +36,8 @@ export default function AdminShelters(){
     edit(row);setNotice('Assignment saved. Public availability depends on status, verification expiry and capacity.');await load()
   })}
   const entrance=form.latitude!==''&&form.longitude!==''&&Number.isFinite(Number(form.latitude))&&Number.isFinite(Number(form.longitude))&&Math.abs(Number(form.latitude))<=90&&Math.abs(Number(form.longitude))<=180?[{name:'Unconfirmed entrance selection',latitude:Number(form.latitude),longitude:Number(form.longitude)}]:[]
-  return <main className="admin-shell"><a href="/">Return to citizen dashboard</a><h1>Shelter administrator</h1><p>Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration.</p>
+  const Container=embedded?'div':'main'
+  return <Container className="admin-shell"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome()}:undefined}>Return to citizen dashboard</a><h2>Shelter administrator</h2><p>Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration.</p>
     {checking&&<p role="status">Checking administrator session…</p>}
     {error&&<p role="alert" className="notice error">{error}</p>}{notice&&<p role="status">{notice}</p>}
     {!checking&&!session&&<form className="panel shelter-form" onSubmit={login}><h2>Administrator login</h2><label>Username<input autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e=>setPassword(e.target.value)} /></label><button disabled={busy}>Sign in</button></form>}
@@ -71,5 +72,5 @@ export default function AdminShelters(){
         <button disabled={busy||!districts.length}>{busy?'Saving…':'Save shelter assignment'}</button>
       </form>
     </>}
-  </main>
+  </Container>
 }

@@ -36,7 +36,7 @@ test('separate admin area has no public registration and rejects an invalid logi
  expect(await page.getByRole('button',{name:/register/i}).count()).toBe(0)
  await page.getByLabel('Username',{exact:true}).fill('not-an-admin');await page.getByLabel('Password',{exact:true}).fill('WRONG ISOLATED TEST PASSWORD')
  await page.getByRole('button',{name:'Sign in'}).click();await expect(page.getByText('Invalid administrator credentials')).toBeVisible();await expect(page.getByLabel('Password',{exact:true})).toHaveValue('')
- await page.getByRole('link',{name:'Return to citizen dashboard'}).click();await expect(page.getByRole('heading',{name:'A clearer view of the weather.'})).toBeVisible()
+ await page.getByRole('link',{name:'Return to citizen dashboard'}).click();await expect(page.getByRole('heading',{name:'FloodPulse',exact:true})).toBeVisible()
 })
 
 test('isolated authenticated admin form uses the real district contract and requires renewed confirmations',async({page})=>{

@@ -18,8 +18,10 @@ test.beforeEach(async ({ page }) => {
 test('both event geometries match exported coordinates and Leaflet draws every retained cell', async ({ page }) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('/')
+  await page.goto('/flood-map')
+  await page.goto('/weather')
   await expect(page.getByText(/Weather unavailable/)).toBeVisible()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
   await expect(page.getByRole('heading', { name: 'Udupi flood event maps' })).toBeVisible()
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
   await expect(page.getByRole('link', { name: 'CC BY-NC 4.0', exact: true })).toBeVisible()
@@ -42,7 +44,7 @@ test('both event geometries match exported coordinates and Leaflet draws every r
 
 test('district view, mobile layout and historical warning remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
+  await page.goto('/flood-map')
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
   await page.getByRole('button', { name: 'Show district', exact: true }).click()
   await page.getByRole('button', { name: 'Zoom to mapped water', exact: true }).click()

@@ -15,6 +15,7 @@ const weather = (point = null, temperature = 27) => ({ status: 'partial', messag
 const reply = body => ({ ok: true, json: async () => body })
 
 beforeEach(() => {
+  window.history.replaceState(null,'','/weather')
   vi.clearAllMocks(); state.events = {}; state.tileEvents = {}
   const view = { setView: vi.fn().mockReturnThis(), remove: vi.fn(), removeLayer: vi.fn(), on: vi.fn((name, fn) => { state.events[name] = fn }) }
   state.map.mockReturnValue(view)

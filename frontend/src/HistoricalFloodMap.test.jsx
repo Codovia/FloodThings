@@ -1,10 +1,10 @@
 import React from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import App from './App.jsx'
 
-const leaflet = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), geoJSON: vi.fn() }))
+const leaflet = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), geoJSON: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: leaflet }))
 
 const boundary = { type: 'Feature', properties: { shapeID: 'controlled-test-boundary' }, geometry: { type: 'Polygon', coordinates: [[[74,13],[75,13],[75,14],[74,13]]] } }
@@ -25,8 +25,10 @@ const fixtureFetch = (url) => {
 }
 
 beforeEach(() => {
+  window.history.replaceState(null,'','/weather')
   vi.clearAllMocks()
-  leaflet.map.mockReturnValue({ fitBounds: vi.fn(), removeLayer: vi.fn(), remove: vi.fn() })
+  leaflet.circleMarker.mockReturnValue({addTo:vi.fn().mockReturnThis()})
+  leaflet.map.mockReturnValue({ setView:vi.fn().mockReturnThis(), on:vi.fn(), fitBounds: vi.fn(), removeLayer: vi.fn(), remove: vi.fn() })
   leaflet.tileLayer.mockReturnValue({ addTo: vi.fn().mockReturnThis(), on: vi.fn() })
   leaflet.geoJSON.mockImplementation(() => ({ addTo: vi.fn().mockReturnThis(), getBounds: vi.fn().mockReturnValue({}) }))
   vi.stubGlobal('fetch', vi.fn(fixtureFetch))
@@ -40,7 +42,7 @@ describe('historical evidence display', () => {
     expect(screen.getByText(/not current flooding/)).toBeTruthy()
     expect(screen.getByRole('link', { name: 'CC BY-NC 4.0' }).href).toContain('creativecommons.org/licenses/by-nc/4.0')
     expect(screen.getByRole('region', { name: /Historical satellite floodwater/ })).toBeTruthy()
-    expect(leaflet.geoJSON.mock.calls.some(([data]) => JSON.stringify(data) === JSON.stringify(geometry(2728)))).toBe(true)
+    await waitFor(() => expect(leaflet.geoJSON.mock.calls.some(([data]) => JSON.stringify(data) === JSON.stringify(geometry(2728)))).toBe(true))
     expect(screen.getByRole('combobox').options).toHaveLength(2)
   })
 
@@ -99,7 +101,10 @@ describe('historical evidence display', () => {
       grid_location: { latitude: 12.97, longitude: 77.59 }, retrieved_at: '2026-10-03T00:00:00Z' }) : fixtureFetch(url))
     render(<App />)
     await screen.findByText('27 °C')
+    fireEvent.click(screen.getByRole('link', {name:'Flood Map',exact:true}))
     await screen.findByText(/Source image: controlled-test-source-2728/)
+    fireEvent.click(screen.getByRole('link', {name:'Weather & AI',exact:true}))
+    expect(screen.getByText('27 °C')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Refresh weather' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Open-Meteo' })).toBeTruthy()
   })

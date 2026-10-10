@@ -2,9 +2,10 @@ import React,{useEffect,useState} from 'react'
 import ShelterMap from './ShelterMap.jsx'
 import './Shelters.css'
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
-export default function PublicShelters({point=null}) {
+export default function PublicShelters({point=null,active=false}) {
   const [open,setOpen]=useState(false),[refresh,setRefresh]=useState(0),[view,setView]=useState({key:null,data:null,error:null,loading:false})
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
+  useEffect(()=>{if(active)setOpen(true)},[active])
   useEffect(()=>{
     if(!open)return
     const controller=new AbortController();let stopped=false
@@ -39,7 +40,7 @@ export default function PublicShelters({point=null}) {
       {current.loading&&<p role="status">Checking shelter directory…</p>}
       {current.error&&<p role="alert">{current.error}. No substitute destinations are shown.</p>}
       {data?.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated test assignments, not actual emergency shelters. Do not travel to these points.</strong></p>}
-      {data&&!data.shelters.length&&<p role="status">No currently verified open shelters are available in this directory.</p>}
+      {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
       {data?.retrieved_at&&<p className="muted">Directory checked {clock(data.retrieved_at)}. Reported conditions may change; refresh and confirm access before travel.</p>}
       {data?.shelters.length>0&&<>
         <p>{data.shelters.length} of {data.total} available assignments shown. Capacity is reported, not a reservation. Verification expires after {data.verification_valid_hours} hours.</p>

@@ -122,7 +122,8 @@ headers; Vite preview is only the local demonstration server.
 
 ## Citizen demonstration
 
-1. Open **Search districts and localities**, select Udupi then **Kundapur**.
+1. Use the shared navigation to open **Weather & AI** (`/weather`). Open
+   **Search districts and localities**, select Udupi then **Kundapur**.
    The settlement point must be 13.6250993, 74.6915722.
 2. Wait for seven provider-supplied daily forecast cards and **Fresh**. Show
    requested versus provider-grid coordinates, UTC retrieval rendered in IST,
@@ -134,13 +135,17 @@ headers; Vite preview is only the local demonstration server.
    result does not mean dry, safe or non-flood.
 4. Select Dakshina Kannada then **Mangaluru**, 12.8698101, 74.8430082. Verify
    weather and opened AI panel switch to this point, not the old location.
-5. Inspect Udupi historical events 2728/3551 (33/23 qualified cells), open
+5. Navigate to **Flood Map** (`/flood-map`). Inspect Udupi historical events
+   2728/3551 (33/23 qualified cells), open
    **Show research layers**, and toggle slope/land cover. These remain Udupi
    historical/research scopes even while weather is selected elsewhere.
-6. Choose **Find open shelters**. An empty live directory must say
+6. Navigate to **Shelters** (`/shelters`); it queries the verified directory
+   automatically. **Refresh shelters** retries the lookup. An empty live directory must say
    “No currently verified open shelters are available in this directory.”
    Do not insert sample facilities into the operational database to fill it.
-7. Use a 390-pixel mobile viewport; inspect readable controls, map and cards.
+7. Use a 390-pixel mobile viewport and the collapsible **Menu**; inspect readable
+   controls, map and cards. Check direct URLs and browser back/forward. The selected
+   location and six-hour weather session persist during in-app navigation.
    Manual coordinates, map/GPS selection and manual refresh remain available.
 
 Weather is real Open-Meteo model output, not station observations. The AI uses

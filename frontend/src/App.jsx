@@ -1,84 +1,63 @@
-import React, { useState } from 'react'
-import useWeatherSession, { FRESHNESS_MS, retrievalTime } from './useWeatherSession.js'
-import './WeatherFreshness.css'
-import DailyForecast from './DailyForecast.jsx'
+import React, { useEffect, useState } from 'react'
+import useWeatherSession from './useWeatherSession.js'
+import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
+import WeatherPanel from './WeatherPanel.jsx'
 import RainfallOutlook from './RainfallOutlook.jsx'
 import PublicShelters from './PublicShelters.jsx'
 import HistoricalFloodMap from './HistoricalFloodMap.jsx'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
+import AdminShelters from './AdminShelters.jsx'
 
-const formatTime = (time) => time && Number.isFinite(Date.parse(time)) ? new Intl.DateTimeFormat('en-IN', {
-  timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short',
-}).format(new Date(time)) + ' IST' : 'Unavailable'
-const value = (reading, unit) => reading == null ? 'Unavailable' : `${reading} ${unit}`
-
+const pageInfo={
+ '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Monitor real weather, explore historical flood information, access experimental AI rainfall outlooks and discover administrator-verified emergency shelters.'],
+ '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather & AI','Real forecasts for your selected point, with an experimental heavy-rainfall outlook.'],
+ '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
+ '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
+ '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Manage verified shelter assignments and explicitly approved Telegram notifications.'],
+}
 export default function App() {
-  const [selectedPoint, setSelectedPoint] = useState(null)
-  const { data, loading, error, freshness, now, retryAt, paused, offline, refresh: load } = useWeatherSession(selectedPoint)
-  const point = selectedPoint || DEFAULT_POINT
-  function choosePoint(next) {
-    if (next.latitude === point.latitude && next.longitude === point.longitude) load(next)
-    setSelectedPoint({ ...next })
-  }
-
-  return <main>
-    <header><a className="brand" href="/">◉ FloodPulse</a><span>KARNATAKA · WEATHER</span></header>
-    <section className="intro">
-      <p className="eyebrow">ENVIRONMENTAL CONDITIONS</p>
-      <h1>A clearer view of the weather.</h1>
-      <p>Current model estimates and a seven-day weather forecast for your selected point.</p>
-    </section>
-    <WeatherLocationSelector point={point} onSelect={choosePoint} />
-    <section className="panel" aria-labelledby="location-title">
-      <div className="panel-heading">
-        <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">{point.name}</h2></div>
-        <button onClick={() => load()} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
-      </div>
-      <p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {point.locality_id ? <><a href={point.coordinate_source_url}>Mapped locality point · OpenStreetMap</a> · <a href={point.association_source_url}>{point.district_name} district association</a>. Point weather, not locality-wide or district-wide conditions.</> : selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p>
-      <p className="notice">Flood prediction is not available. Prediction target and label methodology are not yet validated.</p>
-      <div className="weather-freshness" data-freshness={freshness} role="status" aria-label="Weather data freshness">
-        <strong>{freshness === 'fresh' ? 'Fresh' : freshness === 'stale' ? 'Stale — previously retrieved information' : freshness === 'refreshing' ? 'Refreshing weather' : 'No weather data available'}</strong>
-        {data && <span>Last successful retrieval: {retrievalTime(data.retrieved_at, now) === null ? 'Unavailable — freshness cannot be verified' : formatTime(data.retrieved_at)}</span>}
-        {loading && data && <span>Showing previously retrieved information while refreshing.</span>}
-        {loading && data && (retrievalTime(data.retrieved_at, now) === null || now - retrievalTime(data.retrieved_at, now) >= FRESHNESS_MS) && <span>Displayed information is stale; the refresh has not succeeded yet.</span>}
-        {offline && <span>Browser is offline. Automatic requests are paused.</span>}
-        {retryAt && <span>Automatic retry no earlier than {formatTime(new Date(retryAt).toISOString())}. Manual refresh is available.</span>}
-        {paused && <span>Automatic retries paused after three failed attempts. Refresh manually to try again.</span>}
-        <small>Six-hour browser-session refresh cadence; paused while hidden or offline. No refresh while this application is closed. Retrieval is not forecast issuance or a guarantee of forecast accuracy.</small>
-      </div>
-      <div aria-live="polite" aria-busy={loading}>
-        {loading && <p className="notice">Fetching weather through FloodPulse…</p>}
-        {error && <p className="notice error" role="alert">{data ? 'Weather refresh unavailable.' : 'Weather unavailable.'} {error}</p>}
-        {data && <>
-          {data.message && <p className="notice">{data.message} Missing values are shown as unavailable.</p>}
-          {(data.current.stale || (Number.isFinite(Date.parse(data.current.valid_at)) && now - Date.parse(data.current.valid_at) > 90 * 60 * 1000)) && <p className="notice error">Current model estimate is older than 90 minutes. Check its valid time below.</p>}
-          <h3>Current conditions <span className="tag">MODEL ESTIMATE</span></h3>
-          <p className="muted">Valid at {formatTime(data.current.valid_at)}</p>
-          <div className="metrics">
-            <article><p>Temperature</p><strong>{value(data.current.temperature_c, '°C')}</strong><small>At 2 metres</small></article>
-            <article><p>Relative humidity</p><strong>{value(data.current.humidity_percent, '%')}</strong><small>At 2 metres</small></article>
-            <article><p>Precipitation</p><strong>{value(data.current.precipitation_mm, 'mm')}</strong><small>Preceding {data.current.interval_seconds / 60} minutes</small></article>
-          </div>
-          <DailyForecast days={data.forecast} coverage={data.forecast_coverage} />
-          <dl className="metadata">
-            <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
-            <div><dt>Station observation time</dt><dd>Unavailable — model data</dd></div>
-            <div><dt>Forecast issue time</dt><dd>Unavailable — provider does not supply it here</dd></div>
-            <div><dt>Provider grid point</dt><dd>Latitude {data.grid_location.latitude}°, longitude {data.grid_location.longitude}°</dd></div>
-          </dl>
-        </>}
-      </div>
-    </section>
-    <RainfallOutlook point={point} weather={data} freshness={freshness} />
-    <PublicShelters point={point} />
-    <HistoricalFloodMap />
+ const {path,navigate,heading}=usePage()
+ const [selectedPoint,setSelectedPoint]=useState(null)
+ const [weatherEnabled,setWeatherEnabled]=useState(path!=='/admin')
+ useEffect(()=>{if(path!=='/admin')setWeatherEnabled(true)},[path])
+ const session=useWeatherSession(selectedPoint, weatherEnabled)
+ const point=selectedPoint || DEFAULT_POINT
+ const [showHistory,setShowHistory]=useState(true)
+ const publicPage=path !== '/admin' && !!pageInfo[path]
+ const weatherPage=path==='/' || path==='/weather'
+ const sheltersPage=path==='/' || path==='/shelters' || path==='/flood-map'
+ const info=pageInfo[path]
+ function choosePoint(next){if(next.latitude===point.latitude && next.longitude===point.longitude) session.refresh(next);setSelectedPoint({...next})}
+ return <>
+  <AppHeader path={path} navigate={navigate} />
+  <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
+   <section className={'page-intro '+(path==='/'?'home-hero':'')}>
+    <div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1>
+    {path==='/' && <p className="hero-subtitle">AI Flood Intelligence & Emergency Response</p>}
+    <p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p>
+    {path==='/' && <div className="hero-actions"><PageLink to="/weather" navigate={navigate} className="button-link">Explore weather & AI</PageLink><PageLink to="/shelters" navigate={navigate} className="button-link secondary">Find verified shelters</PageLink></div>}
+    </div>{path==='/' && <div className="hero-art" aria-hidden="true"><svg viewBox="0 0 240 170"><circle cx="170" cy="48" r="27"/><path d="M40 88c-4-28 35-45 54-25 9-42 66-37 69 0 33-6 43 47 10 49H61c-22 0-30-13-21-24Z"/><path d="m80 125-8 16m44-16-8 16m44-16-8 16"/></svg><span>Real data. Clear context.</span></div>}
+   </section>
+   {path==='/' && <nav className="overview-links" aria-label="Explore FloodPulse"><PageLink to="/weather" navigate={navigate}><strong>Weather & AI</strong><span>Seven-day point forecasts and experimental rainfall inference</span></PageLink><PageLink to="/flood-map" navigate={navigate}><strong>Historical flood maps</strong><span>Reviewed satellite evidence and source-labelled GIS layers</span></PageLink><PageLink to="/shelters" navigate={navigate}><strong>Verified shelters</strong><span>Manually approved availability, capacity and entrance directions</span></PageLink></nav>}
+   {/* Shared public session stays mounted across routes: one location and freshness lifecycle. */}
+   <div hidden={!publicPage} className="location-context">
+    <WeatherLocationSelector point={point} onSelect={choosePoint} mapInitiallyOpen={path==='/' || path==='/flood-map' || path==='/shelters'} />
+    {!weatherPage && <p className="selection-summary">Selected point: <strong>{point.name}</strong> · {point.latitude}°, {point.longitude}°. Point selection does not imply a district-wide condition.</p>}
+   </div>
+   <div hidden={!weatherPage} className="weather-sections">
+    <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} />
+    <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} />
+   </div>
+   {path==='/flood-map' && <div className="gis-sections">
+    <section className="panel map-guide"><h2>Map layers & coverage</h2><p>Point context covers Karnataka. Historical floodwater and drainage layers are reviewed Udupi products; statewide flood-risk polygons are unavailable.</p><label className="layer-control"><input type="checkbox" checked={showHistory} onChange={e=>setShowHistory(e.target.checked)}/>Show historical satellite floodwater</label><p className="muted">Open the drainage layer controls below to choose elevation, slope or land cover. Open shelter entrances appear only after a successful verified-directory lookup.</p></section>
+    {showHistory && <HistoricalFloodMap />}
     <DrainageResearchLayers />
-    <footer>
-      <p><a href="/admin">Shelter administrator login</a></p>
-      <p>Weather data by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="https://open-meteo.com/en/docs">API documentation</a></p>
-      <p>Weather model output; no station observations are supplied in this slice. Weather represents the selected model grid point, not a district-wide or locality-wide measurement.</p>
-      <p>Validated flood prediction, drainage assessment and emergency alerts remain unavailable. This dashboard provides weather, experimental rainfall outlooks, historical evidence, GIS research layers and manually verified shelter destinations.</p>
-    </footer>
+   </div>}
+   <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={path==='/shelters' || path==='/flood-map'} /></div>
+   {path==='/admin' && <AdminShelters embedded onHome={()=>navigate('/')} />}
+   {!info && <PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
   </main>
+  <footer className="app-footer"><div><strong>FloodPulse</strong><p>Environmental information and verified response resources.</p></div><div><p>Weather by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p><p>Validated flood prediction is unavailable. Experimental rainfall inference is not a flood probability or an emergency warning.</p></div></footer>
+ </>
 }

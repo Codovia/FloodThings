@@ -20,7 +20,7 @@ export function freshnessOf(data, loading, error, now) {
   return error || time === null || now - time >= FRESHNESS_MS ? 'stale' : 'fresh'
 }
 
-export default function useWeatherSession(selectedPoint) {
+export default function useWeatherSession(selectedPoint, enabled = true) {
   const point = selectedPoint || DEFAULT_POINT
   const key = keyOf(point)
   const session = useRef(null)
@@ -28,6 +28,7 @@ export default function useWeatherSession(selectedPoint) {
   const refresh = useRef(() => {})
 
   useEffect(() => {
+    if (!enabled) return
     // One session per exact coordinate pair. Render-only changes to a location
     // name cannot schedule another request. A new location discards old data.
     const state = { key, data: null, error: null, active: null, timer: null, failures: 0, nextAt: null, stopped: false, offline: navigator.onLine === false }
@@ -120,7 +121,7 @@ export default function useWeatherSession(selectedPoint) {
       window.removeEventListener('offline', offline)
       if (session.current === state) { session.current = null; refresh.current = () => {} }
     }
-  }, [key])
+  }, [key, enabled])
 
   // Do not render another location's response even before effect cleanup runs.
   const current = view.key === key ? view : { data: null, loading: true, error: null, now: Date.now(), retryAt: null, paused: false, offline: false }
