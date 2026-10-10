@@ -4,7 +4,7 @@ import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
 import useMapResize from './useMapResize.js'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
-import { validShelterDirectory } from './PublicShelters.jsx'
+import useShelterDirectory, { validShelterDirectory } from './useShelterDirectory.js'
 import { PageLink } from './AppNavigation.jsx'
 
 const mechanismNames={riverine:'Riverine flooding',pluvial_urban_waterlogging:'Pluvial or urban waterlogging',flash:'Flash flooding',coastal:'Coastal flooding',unknown:'Unknown'}
@@ -98,11 +98,10 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  const history=useEvidence(layers.history?'/api/flood-map/historical?'+historicalQuery:null,retry)
  const hazard=useEvidence(layers.hazards?'/api/flood-map/hazards?'+query:null,retry)
  const drainage=useEvidence(layers.drainage?'/api/flood-map/drainage?'+query:null,retry)
- const shelters=useEvidence(layers.shelters?'/api/shelters':null,retry)
+ const shelters=useShelterDirectory(null,layers.shelters)
  const details=useEvidence(featureId?'/api/flood-map/features/'+encodeURIComponent(featureId):null,retry)
  const district=directory.data?.items.find(d=>d.id===districtId)||null
  const shownShelters=shelters.data&&validShelterDirectory(shelters.data)?{...shelters.data,shelters:shelters.data.shelters.filter(s=>!districtId||s.district_id===districtId)}:null
- useEffect(()=>{if(!shelters.data?.shelters.length)return;const expiry=Math.min(...shelters.data.shelters.map(s=>Date.parse(s.verification_expires_at)));if(!Number.isFinite(expiry))return;const timer=setTimeout(()=>setRetry(n=>n+1),Math.max(0,expiry-Date.now()+25));return()=>clearTimeout(timer)},[shelters.data])
  function toggle(key){setLayers(current=>({...current,[key]:!current[key]}));if(key==='history')setFeatureId(null)}
  const failures=[directory,history,hazard,drainage,shelters,details].filter(s=>s.error)
  const loading=[directory,history,hazard,drainage,shelters,details].some(s=>s.loading)
@@ -119,7 +118,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
   <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
 </div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <p className="historical-notice">Historical event-window maximum satellite observations. This is not current flooding, predicted risk, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
    {loading&&<p role="status">Loading selected map evidence…</p>}
-   {!!failures.length&&<p role="alert" className="notice error">{failures.map(s=>s.error).join(' · ')} No substitute geometry is shown. <button onClick={()=>setRetry(n=>n+1)}>Retry map evidence</button></p>}
+   {!!failures.length&&<p role="alert" className="notice error">{failures.map(s=>s.error).join(' · ')} No substitute geometry is shown. <button onClick={()=>{setRetry(n=>n+1);if(layers.shelters)shelters.refresh()}}>Retry map evidence</button></p>}
    <p><strong>{district?.name||'Karnataka statewide view'}</strong> · {directory.data?.total??'Unavailable'} district names; current LGD reconciliation unresolved. Statewide selection does not imply statewide hazard coverage.</p>
    {district&&!district.navigation_bounds&&<p className="notice">Verified public navigation bounds are unavailable for {district.name}; evidence filtering works, and the map retains its previous view.</p>}
    {district?.navigation_source&&<p className="muted">Navigation source: {district.navigation_source.id} · {district.navigation_source.license}. Bounds are context, not current official boundary certification.</p>}
@@ -127,6 +126,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
    {!layers.history&&<p>Historical layer hidden.</p>}
    {layers.hazards&&<p className="notice">{hazard.data?.message||hazardNotice} Historical events and terrain are not reclassified as potential hazards.</p>}
    {layers.shelters&&shownShelters&&<p>{shownShelters.mode==='demonstration'?'DEMONSTRATION ONLY — not actual destinations. ':''}{shownShelters.shelters.length?'Only currently verified Open entrances with spare capacity are shown.':'No currently verified open shelters are available in this directory.'} Directions are not verified flood-safe.</p>}
+   {layers.shelters&&<p>Directory availability: {shelters.freshness}. Rechecked every minute in an active tab and when returning to the tab; network failures remove shelter markers.</p>}
    {layers.shelters&&shelters.data&&!shownShelters&&<p role="alert">Shelter availability could not be verified. No substitute destinations are shown.</p>}
   </div>
   <p className="muted">Click a historical polygon or choose a cell below for details. Clicking the background selects a weather point; it does not establish district identity or flood risk. <PageLink to="/weather" navigate={navigate}>View selected-point weather</PageLink>.</p>

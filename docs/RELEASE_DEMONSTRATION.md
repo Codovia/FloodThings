@@ -1,5 +1,12 @@
 # FloodPulse release-candidate demonstration
 
+For current coverage and shelter checks, use [CURRENT_CAPABILITIES.md](CURRENT_CAPABILITIES.md).
+In the shelter directory, choose **Recheck availability for directions** before the
+five-second external link is revealed. A failed check removes destinations. Material
+facility/entrance/capacity/usability changes clear prior admin confirmations. Reconfirm
+the latest information before saving Open/Full. Logout immediately hides private state;
+lost write responses require history review rather than automatic retry.
+
 Verified locally on 10 October 2026. This is a non-commercial college-project
 prototype, without affiliation with a disaster-management authority. Weather,
 experimental rainfall classification, historical GIS and administrator-controlled

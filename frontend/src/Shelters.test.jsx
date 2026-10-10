@@ -15,7 +15,9 @@ it('loads on demand and encodes exact entrance while announcing demonstration an
  render(<PublicShelters point={point} />);expect(fetch).not.toHaveBeenCalled();open();await screen.findByText(row.name)
  expect(screen.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeTruthy()
  expect(screen.getByText(/8 available/)).toBeTruthy();expect(screen.getByText(/12.4 km approximate straight-line/)).toBeTruthy()
- const url=new URL(screen.getByRole('link',{name:/Inspect demonstration directions/}).href)
+ expect(screen.queryByRole('link',{name:/Inspect demonstration directions/})).toBeNull()
+ fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}))
+ const url=new URL((await screen.findByRole('link',{name:/Inspect demonstration directions/})).href)
  expect(url.hostname).toBe('www.google.com');expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('origin')).toBe('13.6,74.8');expect(screen.getByText(/not verified flood-safe/)).toBeTruthy()
 })
 it('no-location/no-shelter never invents availability',async()=>{

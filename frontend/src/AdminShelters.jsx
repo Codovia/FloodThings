@@ -1,42 +1,47 @@
-import React,{useEffect,useState} from 'react'
+import React,{useEffect,useMemo,useRef,useState} from 'react'
 import AdminEntranceMap from './AdminEntranceMap.jsx'
 import AdminNotifications from './AdminNotifications.jsx'
+import useAdminRequests from './useAdminRequests.js'
 import './Shelters.css'
 const blank=()=>({name:'',address:'',district_id:'',latitude:'',longitude:'',capacity:'',occupancy:'',water:'unknown',toilets:'unknown',accessibility:'',contact:'',publish_contact:false,status:'pending',notes:'',restrictions:'',revision:null,verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})
 const clock=value=>value?new Date(value).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})+' IST':'Not verified'
+const materialFields=new Set(['name','address','district_id','latitude','longitude','capacity','occupancy','water','toilets','accessibility','restrictions'])
 export default function AdminShelters({embedded=false,onHome=null}){
   const [session,setSession]=useState(null),[checking,setChecking]=useState(true),[error,setError]=useState(null),[notice,setNotice]=useState(null),[busy,setBusy]=useState(false)
   const [rows,setRows]=useState([]),[total,setTotal]=useState(0),[offset,setOffset]=useState(0),[districts,setDistricts]=useState([]),[form,setForm]=useState(blank),[editing,setEditing]=useState(null),[history,setHistory]=useState(null)
   const [adminTab,setAdminTab]=useState('shelters')
   const [username,setUsername]=useState(''),[password,setPassword]=useState('')
+  const busyRef=useRef(false),loadSequence=useRef(0),operationSequence=useRef(0)
+  function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setUsername('');setPassword('');setNotice(null);setAdminTab('shelters')}
+  const requests=useAdminRequests(clearPrivate)
   async function request(path,options={},auth=session){
-    const response=await fetch(path,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(auth?.csrf_token?{'X-CSRF-Token':auth.csrf_token}:{}),...options.headers}})
-    const data=await response.json()
-    if(!response.ok){if(response.status===401)setSession(null);throw Error(typeof data.detail==='string'?data.detail:'Invalid shelter request; check all fields and verification confirmations')}
-    return data
+    return requests.request(path,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(auth?.csrf_token?{'X-CSRF-Token':auth.csrf_token}:{}),...options.headers}})
   }
   useEffect(()=>{
     const controller=new AbortController();let stopped=false
-    fetch('/api/admin/session',{credentials:'same-origin',signal:controller.signal}).then(async r=>{const data=await r.json();if(!stopped){if(r.ok)setSession(data);else if(r.status!==401)setError(typeof data.detail==='string'?data.detail:'Administrator service unavailable')}}).catch(e=>{if(!stopped)setError('Administrator service unavailable')}).finally(()=>{if(!stopped)setChecking(false)})
+    request('/api/admin/session',{signal:controller.signal},null).then(data=>{if(!stopped)setSession(data)}).catch(e=>{if(!stopped&&e.status!==401&&e.name!=='AbortError')setError(e.message)}).finally(()=>{if(!stopped)setChecking(false)})
     return()=>{stopped=true;controller.abort()}
   },[])
   async function load(auth=session,start=offset){
+    const generation=requests.generation(),sequence=++loadSequence.current
     const [directory,list]=await Promise.all([request('/api/locations/districts',{},auth),request('/api/admin/shelters?limit=100&offset='+start,{},auth)])
+    if(!requests.current(generation)||sequence!==loadSequence.current)return
     if(directory.status!=='available'||!Array.isArray(directory.items)||!Array.isArray(list.shelters))throw Error('Location directory or shelter response unavailable')
     setDistricts(directory.items);setRows(list.shelters);setTotal(list.total)
   }
-  useEffect(()=>{if(session)load(session,offset).catch(e=>setError(e.message))},[session,offset])
-  function field(key,value){setForm(f=>({...f,[key]:value}))}
+  useEffect(()=>{const generation=requests.generation();if(session)load(session,offset).catch(e=>{if(requests.current(generation)&&e.name!=='AbortError')setError(e.message)})},[session,offset])
+  function field(key,value){setForm(f=>({...f,[key]:value,...(materialFields.has(key)&&f[key]!==value?{verification:blank().verification}:{})}))}
   function verify(key,value){setForm(f=>({...f,verification:{...f.verification,[key]:value}}))}
   function edit(row){setEditing(row.id);setHistory(null);setNotice(null);setForm({...blank(),...Object.fromEntries(Object.keys(blank()).filter(k=>k!=='verification').map(k=>[k,row[k]??blank()[k]])),latitude:row.latitude??'',longitude:row.longitude??'',capacity:String(row.capacity),occupancy:String(row.occupancy),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})}
-  async function operation(fn){setBusy(true);setError(null);try{await fn()}catch(e){setError(e.message)}finally{setBusy(false)}}
+  async function operation(fn){if(busyRef.current)return;const sequence=++operationSequence.current;busyRef.current=true;setBusy(true);setError(null);try{await fn()}catch(e){if(requests.mounted()&&sequence===operationSequence.current&&e.name!=='AbortError')setError(e.message)}finally{if(sequence===operationSequence.current){busyRef.current=false;if(requests.mounted())setBusy(false)}}}
+  function signOut(){const auth=session;requests.cancel();busyRef.current=false;clearPrivate();void operation(async()=>{await request('/api/admin/logout',{method:'POST'},auth);requests.cancel();setNotice('Signed out')})}
   async function login(e){e.preventDefault();await operation(async()=>{try{const data=await request('/api/admin/login',{method:'POST',headers:{'X-FloodPulse-Login':'1'},body:JSON.stringify({username,password})},null);setSession(data);setNotice('Signed in')}finally{setPassword('')}})}
   async function save(e){e.preventDefault();await operation(async()=>{
     const body={...form,latitude:form.latitude===''?null:Number(form.latitude),longitude:form.longitude===''?null:Number(form.longitude),capacity:Number(form.capacity),occupancy:Number(form.occupancy)}
     const row=await request('/api/admin/shelters'+(editing?'/'+editing:''),{method:editing?'PUT':'POST',body:JSON.stringify(body)})
     edit(row);setNotice('Assignment saved. Public availability depends on status, verification expiry and capacity.');await load()
   })}
-  const entrance=form.latitude!==''&&form.longitude!==''&&Number.isFinite(Number(form.latitude))&&Number.isFinite(Number(form.longitude))&&Math.abs(Number(form.latitude))<=90&&Math.abs(Number(form.longitude))<=180?[{name:'Unconfirmed entrance selection',latitude:Number(form.latitude),longitude:Number(form.longitude)}]:[]
+  const entrance=useMemo(()=>form.latitude!==''&&form.longitude!==''&&Number.isFinite(Number(form.latitude))&&Number.isFinite(Number(form.longitude))&&Math.abs(Number(form.latitude))<=90&&Math.abs(Number(form.longitude))<=180?[{name:'Unconfirmed entrance selection',latitude:Number(form.latitude),longitude:Number(form.longitude)}]:[],[form.latitude,form.longitude])
   const Container=embedded?'div':'main'
   return <Container className="admin-shell"><a href="/" onClick={onHome?e=>{e.preventDefault();onHome()}:undefined}>Return to citizen dashboard</a><h2>Shelter administrator</h2><p>Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration.</p>
     {checking&&<p role="status">Checking administrator session…</p>}
@@ -44,7 +49,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
     {!checking&&!session&&<form className="panel shelter-form" onSubmit={login}><h2>Administrator login</h2><label>Username<input autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e=>setPassword(e.target.value)} /></label><button disabled={busy}>Sign in</button></form>}
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
-      <p>Signed in as {session.user.username}. Session expires after 30 idle minutes or eight hours.</p><button disabled={busy} onClick={()=>operation(async()=>{await request('/api/admin/logout',{method:'POST'});setSession(null);setRows([]);setForm(blank());setEditing(null);setNotice('Signed out')})}>Sign out</button>
+      <p>Signed in as {session.user.username}. Session expires after 30 idle minutes or eight hours.</p><button onClick={signOut}>Sign out</button>
       <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button><button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button></nav>
       <div hidden={adminTab!=='notifications'} className="admin-notifications"><AdminNotifications session={session} request={request} /></div>
       <div className="admin-management" hidden={adminTab!=='shelters'}>
@@ -70,6 +75,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <label>Contact information<input maxLength={200} value={form.contact} onChange={e=>field('contact',e.target.value)} /></label><label><input type="checkbox" checked={form.publish_contact} onChange={e=>field('publish_contact',e.target.checked)} />Approved for public contact disclosure</label>
         <label htmlFor="shelter-status">Shelter status</label><select id="shelter-status" value={form.status} disabled={!editing} onChange={e=>field('status',e.target.value)}><option value="pending">Pending verification</option><option value="open">Open</option><option value="full">Full</option><option value="closed">Closed</option></select>
         <fieldset><legend>Explicit verification — renew all confirmations for each Open/Full save</legend>{[['authorization','Facility is authorized for shelter use'],['entrance','This exact entrance has been independently verified'],['usability','Facility is currently usable'],['capacity','Capacity and current occupancy have been checked']].map(([key,label])=><label key={key}><input type="checkbox" checked={form.verification[key]} onChange={e=>verify(key,e.target.checked)} />{label}</label>)}<label>Verification evidence and method<textarea maxLength={2000} required={['open','full'].includes(form.status)} value={form.verification.evidence} onChange={e=>verify('evidence',e.target.value)} /></label></fieldset>
+        <p>Changing facility identity, entrance, district, capacity, occupancy or usability details clears earlier confirmations and evidence. Review the latest values before confirming again.</p>
         <label>Public operational restrictions<textarea maxLength={2000} value={form.restrictions} onChange={e=>field('restrictions',e.target.value)} /></label><label>Internal notes (not public)<textarea maxLength={2000} value={form.notes} onChange={e=>field('notes',e.target.value)} /></label>
         <p>Open requires spare capacity and all four confirmations. Verification expires after 24 hours; recheck actual conditions before renewal. Full, Closed, Pending and expired assignments are excluded from public destinations. Weather/AI predictions never assign shelters.</p>
         <button disabled={busy||!districts.length}>{busy?'Saving…':'Save shelter assignment'}</button>

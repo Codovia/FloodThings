@@ -1,5 +1,9 @@
 # FloodPulse — weather, historical flood evidence and GIS research
 
+See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
+the current application summary and shelter-freshness policy. The pending
+handwritten-wireframe redesign has not been implemented.
+
 For the verified production-build citizen/admin demonstration, private setup,
 backup/isolated restore and service-failure recovery, see the
 [release demonstration guide](docs/RELEASE_DEMONSTRATION.md). Telegram live
@@ -12,9 +16,9 @@ The optional **Drainage Research Layers** panel reads `data/processed/udupi_drai
 
 ## Karnataka place selection
 
-Expand **Change location**, choose **Search districts and localities**, search a name or select a district, then choose a mapped locality. The map immediately centers on its retained WGS84 settlement point and the existing point-weather endpoint retrieves seven provider-supplied forecast days. Manual coordinates, map clicks, GPS and six-hour browser-session refresh remain available. Selecting a district filters places and navigates where reviewed public bounds exist; it never requests district-wide weather or changes the previously selected weather point.
+Expand **Change location**, choose **Search districts and localities**, search a name or select a district, then choose a mapped locality. The map immediately centers on its retained WGS84 settlement point and the existing point-weather endpoint retrieves seven provider-supplied forecast days. Map clicks, GPS and six-hour browser-session refresh remain available; public coordinate-entry fields have been removed. Selecting a district filters places and navigates where reviewed public bounds exist; it never requests district-wide weather or changes the previously selected weather point.
 
-The active public directory, `data/reference/karnataka_location_directory_v2/`, contains **31 NIC-listed district names**, with independent current-LGD reconciliation still unresolved. Stable application IDs use the NIC website namespace, not guessed LGD codes. **Five selectable mapped settlements** are verified: Udupi, Karkala, Kundapur and Saligrama in Udupi district, plus Mangaluru in Dakshina Kannada. Both districts have reviewed public geoBoundaries navigation bounds. **Kaup** has an official municipal identity but remains disabled because its settlement coordinate has not been reviewed. The other 29 districts show incomplete-coverage messages and preserve manual/GPS selection. The original v1 directory remains unchanged and readable.
+The active public directory, `data/reference/karnataka_location_directory_v2/`, contains **31 NIC-listed district names**, with independent current-LGD reconciliation still unresolved. Stable application IDs use the NIC website namespace, not guessed LGD codes. **Five selectable mapped settlements** are verified: Udupi, Karkala, Kundapur and Saligrama in Udupi district, plus Mangaluru in Dakshina Kannada. Both districts have reviewed public geoBoundaries navigation bounds. **Kaup** has an official municipal identity but remains disabled because its settlement coordinate has not been reviewed. The other 29 districts show incomplete-coverage messages and preserve map/GPS selection. The original v1 directory remains unchanged and readable.
 
 Kundapur retains `udupi-admin:municipality:kundapur`; lookup by `osm:node:245623778` resolves the same record. Official district records independently link Kundapur/Kundapura town names. Its genuine OSM `place=town` point is used; railway and taluk-centre results remain excluded. Saligrama's original OSM `place=village` classification is preserved separately from its official town-panchayat identity. Mangaluru also supports the source alias Mangalore. All points represent mapped settlements, not surveyed municipal centres, gauges or shelters.
 
@@ -34,7 +38,7 @@ The shared header provides five pages. Location selection and the weather freshn
 | Page | URL | Content |
 | --- | --- | --- |
 | Home | `/` | Karnataka point map, selected-location weather, forecasts, experimental AI and shelter access |
-| Weather & AI | `/weather` | District/locality search, manual/GPS/map selection, seven-day weather, provider rainfall chart and saved Logistic Regression outlook |
+| Weather & AI | `/weather` | District/locality search, GPS/map selection, seven-day weather, provider rainfall chart and saved Logistic Regression outlook |
 | Flood Map | `/flood-map` | 31-district evidence filter, original Udupi historical polygons and details, separate unavailable hazard layer, optional drainage context and verified shelter entrances |
 | Shelters | `/shelters` | Verified Open destinations with spare capacity, reported facilities, timestamps and external entrance directions; explicit empty/error states |
 | Admin | `/admin` | Existing protected login, shelter verification/audit and explicitly approved Telegram notifications |
@@ -262,7 +266,7 @@ The frozen Stage 5/5A reviews record the older README and three-day weather sour
 
 ### PostgreSQL/PostGIS location directory
 
-The location API now supports an explicit database backend. `LOCATION_DIRECTORY_BACKEND=file` (default) serves the reviewed immutable snapshot for offline/migration use. `LOCATION_DIRECTORY_BACKEND=postgres` reads only the active imported PostgreSQL version. Missing configuration, unavailable database, missing migration/import or failed integrity checks return HTTP 503; there is **no automatic file fallback**. Weather/manual coordinates/GPS/map requests remain independent of the directory database. These settings do not change flood-prediction availability.
+The location API supports an explicit database backend. `LOCATION_DIRECTORY_BACKEND=file` (API default) serves the reviewed immutable snapshot for offline/migration use; the documented launcher explicitly selects `postgres`. `LOCATION_DIRECTORY_BACKEND=postgres` reads only the active imported PostgreSQL version. Missing configuration, unavailable database, missing migration/import or failed integrity checks return HTTP 503; there is **no automatic file fallback**. Weather/GPS/map requests remain independent of the directory database. These settings do not change flood-prediction availability.
 
 Use the existing deployment's PostgreSQL/PostGIS service where authorized. This checkout had no configured database URL, models or Alembic history. Sprint 6 verified a separate persistent Docker database, PostgreSQL **16.4 / PostGIS 3.4.3**, using an already cached `postgis/postgis:16-3.4` image. The inaccessible native PostgreSQL 18.6 service was left untouched. The cached image is verification infrastructure, **not a current security-patch recommendation**: deploy with a reviewed, patched compatible PostgreSQL/PostGIS image and normal backup/TLS/secret management.
 
