@@ -1,0 +1,78 @@
+{
+  "archive_and_native_registers_git_ignored": true,
+  "backend_tests": {
+    "command": "backend/.venv/bin/python -B -m pytest -q backend/tests -k 'not real_training_reproduction' -o faulthandler_timeout=120",
+    "deselected": 1,
+    "excluded": "real_training_reproduction",
+    "passed": 1353,
+    "warning": "Existing Starlette/httpx deprecation",
+    "warnings": 1
+  },
+  "combined_gauge_and_phase12f_scientific_tests": {
+    "passed": 84
+  },
+  "diff_check": "PASSED",
+  "focused_native_gauge_tests": {
+    "file": "tests/test_river_gauge_verification.py",
+    "passed": 31
+  },
+  "messages_sent": 0,
+  "models_fitted": 0,
+  "new_downloads": 0,
+  "phase": "12G",
+  "protected_file_verification": {
+    "allowed_changed_files": [
+      "README.md",
+      "update.md"
+    ],
+    "environment_and_QandA_exact": true,
+    "preserved_prefix_bytes": 500964,
+    "protected_files": 3123,
+    "unchanged_files": 3121,
+    "unexpected_changes": [],
+    "update_original_prefix_preserved": true
+  },
+  "public_outputs": "Authored documentation/code/tests and aggregate metadata only; no source values, coordinates or restricted geometry",
+  "root_research_tests": {
+    "command": "PYTHONPATH=data/working/groundsource_runtime_v1 backend/.venv/bin/python -B -m pytest -q tests",
+    "passed": 348
+  },
+  "source_checks": {
+    "alternative": "Preserved aggregate count agreement plus original source fingerprints; focused two-resource extraction completeness replay",
+    "existing_read_only_checks": [
+      "ifi",
+      "gfd_v2",
+      "gfd_v3",
+      "gfd_v4",
+      "hydro_reconciled",
+      "hydro_semantics",
+      "hydro_closure",
+      "external_closure",
+      "glofas",
+      "incidence",
+      "sar_calibration",
+      "sar_pilot",
+      "udupi_history",
+      "saved_rainfall",
+      "foundation",
+      "feasibility",
+      "soi",
+      "phase12c",
+      "phase12d",
+      "phase12e_metadata",
+      "phase12e_observation_replay",
+      "phase12f_metadata",
+      "phase12f_forecast_replay"
+    ],
+    "full_four_resource_inventory_repeated": false,
+    "new_gauge_replay": {
+      "eligible_pairs": 0,
+      "original_sources_fingerprinted": 2,
+      "private_registers": 2,
+      "products": 8,
+      "raw_extraction_replayed": true,
+      "status": "VALIDATED"
+    },
+    "passed": 24
+  }
+}

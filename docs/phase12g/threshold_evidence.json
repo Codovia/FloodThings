@@ -1,0 +1,36 @@
+[
+  {
+    "gauge_datum_compatibility": "datum_unresolved",
+    "historical_effective_dates": "UNKNOWN",
+    "official_document_has_warning_and_danger": true,
+    "official_status": "monitoring_only",
+    "source_ordinal": "431",
+    "source_pdf_page": 38,
+    "source_station_code_in_threshold_row": false,
+    "source_table_reference": "flood season2025",
+    "source_url": "https://cwc.gov.in/sites/default/files/sopapril2025.pdf",
+    "station_id_candidate": "CW1KRU000083",
+    "threshold_values_published_here": false,
+    "units": "m",
+    "usable_flood_thresholds": 0,
+    "variable": "stage",
+    "warning_danger_comparisons_computed": 0
+  },
+  {
+    "gauge_datum_compatibility": "datum_unresolved",
+    "historical_effective_dates": "UNKNOWN",
+    "official_document_has_warning_and_danger": true,
+    "official_status": "monitoring_only",
+    "source_ordinal": "427",
+    "source_pdf_page": 38,
+    "source_station_code_in_threshold_row": false,
+    "source_table_reference": "flood season2025",
+    "source_url": "https://cwc.gov.in/sites/default/files/sopapril2025.pdf",
+    "station_id_candidate": "CW1KRU000339",
+    "threshold_values_published_here": false,
+    "units": "m",
+    "usable_flood_thresholds": 0,
+    "variable": "stage",
+    "warning_danger_comparisons_computed": 0
+  }
+]

@@ -1593,3 +1593,80 @@ Baseline: `877fd40b1accd9fb241e291ec082c4c761559e2c`, branch `feature/karnataka-
 **Coverage and scientific result:** source district aliases Belgaum/Raichur only, not resolved current-LGD joins. Future reach/district design retains all rights-cleared, dated line intersections; one gauge/flow prediction never applies uniformly to localities or creates street-level inundation. Existing public directory and SOI restrictions preserved. Zero verified predictive reaches/districts; zero scientifically eligible measured targets, future pairs, official-threshold positives/non-exceedance labels, complete historically available feature rows or evaluated baseline scores. Karnataka-wide flood prediction is not implemented. Conditional dataset/clarification path does not lift prior training NO-GO.
 
 **Validation/protection/delivery:**53 new focused tests and317 complete root research tests passed. Backend regression1,353 passed/one actual model-fitting reproduction test deselected/one existing Starlette-httpx deprecation warning.24 source checks passed (21 prior read-only checks plus metadata and two Phase12F deterministic replays). No original news extraction/model fit in validation. Initial2,961-file baseline covers tracked files, QandA.md and existing data except runtime/cache directories and new Phase12F outputs; SHA256/size/nanosecondmtime exact outside allowed README.md/update.md. Preserve backend/.env.example and untracked QandA.md byte-for-byte and mtime; original update.md retained as exact prefix. Commit scope: four new research scripts, isolated safety tests, methodology, unsent request, permitted aggregate/source/target/validation JSON, README link and this chronological append. No raw CSV/archive/PDF, restricted geometry/derivative, credentials or unrelated edits included. Commit/push then independently confirm remote branch using git ls-remote; final commit hash reported after delivery. Main report: docs/RIVERINE_FORECASTING_FOUNDATION.md; machine-readable evidence: docs/phase12f/.
+
+
+### Phase12G — River gauge verification (12 October2026)
+
+- Authorized scope: retained Sadalga/Huvinhedgi NWDP gauge histories only, on
+  `feature/karnataka-data-foundation`, baseline
+  `6df2514171ef6a28130e4f83db4aa843f27de389`. No full four-archive inventory,
+  news expansion, satellite acquisition, forecast-feed integration or model fit.
+- Implemented `scripts/verify_river_gauge_histories.py`: one bounded selection
+  of the two already-retained manual archives; original checksums/434,102,798
+  bytes verified. Complete native fields/strings/resource hashes/row ordinals and
+  all duplicates/conflicts stay ignored privately. Candidate subset87,526 rows:
+  stage72,031/discharge15,495. Diagnostic refinements replay this subset; final
+  focused raw replay proves extraction completeness without repeating the full
+  four-resource inventory. Public outputs contain aggregate metadata only.
+- Every selected timestamp is `DD-MM-YYYY HH:MM`, naive/unverified; zero selected
+  date-only or malformed strings. No timezone conversion, gauge offset,
+  interpolation, revision preference or invented interval/negative label.
+- Sadalga stage36,646 rows/34,175 unique times,9Oct2012–31Dec2020;2,471 extra
+  duplicates/929 conflicting times. Huvinhedgi stage35,385/32,894,
+  3Jun2004–31Dec2020;2,491/218. Daily discharge remains separate: Sadalga
+  6,534/6,513 with21 extra duplicates/17 conflicts; Huvinhedgi8,961/8,893 with
+  68/62. Counts exactly agree with preserved Phase12F records.
+- Chronological unique stage intervals: Sadalga30,424 one-hour,2,322 five-hour,
+  1,155 fourteen-hour,273 other; Huvinhedgi28,993/2,546/1,262/92. The retained
+  official2018 policy describes general hourly monsoon and08/13/18 non-monsoon
+  stage, daily discharge. It does not certify the exact export schedule/timezone.
+  Native stage dates2,469/2,513; dates without a row between bounds537/3,543;
+  gaps>24h13/16. Huvinhedgi has no stage records2005–2011; sparse2004/2012
+  blocks are preserved. Missing dates never become non-flood evidence.
+- Exact+6h structural reading-issued matches30,334/28,776; exact+24h
+  33,762/32,438. Native00/06/12/18 grid with latest input<=1h:12,020/24,223
+  candidate issues,4,912/4,829 +6h pairs and6,029/6,077 +24h pairs. Singleton
+  finite input/target grid+6h counts4,188/4,182, still ineligible. Exact1/6/24h
+  diagnostic antecedents and their conflicts/missingness are reported separately
+  from minimum persistence requirements. Matching times are not as-issued inputs.
+- All selected stage times are integer-hour. Zero original UTC-grid issue times
+  are verified. IF CWC confirms IST, the original00/06/12/18UTC proposal maps to
+  half-hour native issues/targets absent from these histories; this is conditional
+  arithmetic, not an assumed timezone or permission to interpolate.
+- Compared fixed6h,24h and documented-schedule alternatives. Restricting5h to
+  native08/13 clocks gives4,901/4,990 matches;14h from18 gives2,442/2,482.
+  These remain unapproved, unlike a retrospectively selected next-row target.
+  Changing horizon changes operational meaning; no target is approved to inflate
+  counts. Persistence and simple statistical baselines must precede complex AI
+  after independent chronological/event evaluation and explicit fitting approval.
+- Reviewed existing CWC dictionary/reconciliation/reuse evidence and visually
+  checked the official2018 policy frequency page and2025 SOP threshold rows.
+  Warning/danger stage entries exist for both gauges, but dated station-code,
+  datum and historical effective applicability are unresolved. Zero threshold
+  comparisons, compatible thresholds or flood-positive/negative labels.
+- Published `docs/RIVER_GAUGE_VERIFICATION.md` and `docs/phase12g/` aggregate
+  readiness/coverage/pair/cadence/source/provenance/threshold reports. The final
+  CWC request/checklist is UNSENT. It names the exact two dataset/resource IDs,
+  fields, sparse blocks and conflicts; requests a two-station dictionary, dated
+  gauge history, QC/corrections and historical release/latency records, rather
+  than another basin-wide transfer. Current KGBO routing and policy/user category
+  require confirmation before separately authorized dispatch. Accounts/messages0.
+- Decision: CONDITIONAL on that named official augmentation and independent
+  review; current experimental training NO-GO. Scientifically eligible pairs0,
+  compatible official thresholds0, metrics0, fits0, verified predictive geographic
+  units0. Belgaum/Raichur source identities are not current public district/reach
+  joins. Karnataka-wide flood prediction is not implemented by this audit.
+- Validation:31 new focused tests and348 full root research tests passed;
+  backend1,353 passed/1 actual model-fitting test deselected/1 existing
+  Starlette-httpx warning.24 source checks passed (23 preserved validators plus
+  Phase12G private/public replay with focused raw extraction completeness).
+  `git diff --check` passed. No tests train a model or send Telegram alerts.
+- Protected snapshot covers3,123 pre-existing files with SHA-256/size/ns-mtime.
+  Only README research documentation and this chronological append are authorized
+  differences; original research datasets/models/app and unrelated
+  `backend/.env.example`/untracked `QandA.md` remain exact. This append preserves
+  all500,964 original update bytes. Raw/restricted rows, geometry, credentials,
+  derived native candidate registers and recovery logs remain ignored/uncommitted.
+- Delivery is limited to tested code, tests, documentation and permitted aggregate
+  metadata. Commit/push and independent `git ls-remote` receipts are retained
+  privately after delivery; no operational map/model/feed change is included.

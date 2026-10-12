@@ -39,6 +39,12 @@ availability remain unresolved. A six-hour measured-stage experiment is
 training remains NO-GO**. Official-source forecast access is audited separately;
 no live forecast integration, model fit or alert is activated.
 
+[Phase12G river-gauge verification](docs/RIVER_GAUGE_VERIFICATION.md) examines
+87,526 retained Sadalga/Huvinhedgi stage and discharge rows. Exact native-clock
+six-hour/24-hour matches and mixed reading schedules are reported separately from
+scientific eligibility: **zero eligible forecast pairs; training remains NO-GO**.
+The station-specific CWC dictionary/QC/datum/release request is prepared and unsent.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.
