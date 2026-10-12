@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useWeatherSession from './useWeatherSession.js'
 import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
 import WeatherPanel from './WeatherPanel.jsx'
@@ -7,6 +7,8 @@ import PublicShelters from './PublicShelters.jsx'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
+import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
+import useHomeGeolocation from './useHomeGeolocation.js'
 
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
@@ -44,32 +46,34 @@ export default function App() {
  const [shelterMapTarget,setShelterMapTarget]=useState(null)
  const [contextVisible,setContextVisible]=useState(true)
  const weatherPage=path==='/' || path==='/weather'
- const session=useWeatherSession(selectedPoint,weatherPage)
+ const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!selectedPoint))
+ const manualRevision=useRef(0)
+ const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
  const publicPage=path !== '/admin' && !!pageInfo[path]
  const selectorPage=publicPage&&path!=='/flood-map'
  const sheltersPage=path==='/' || path==='/shelters'
  const overview=useOverviewEvidence(path==='/',districtId)
  const info=pageInfo[path]
- function chooseDistrict(next){setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
- function filterDistrict(id,record){setDistrictId(id);setDistrict(record||null);setEvidenceFeature(null)}
- function choosePoint(next){if(next.district_id)setDistrictId(next.district_id);if(next.latitude===point.latitude&&next.longitude===point.longitude&&weatherPage)session.refresh(next);setSelectedPoint({...next})}
+ function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
+ function filterDistrict(id,record){manualRevision.current++;homeLocation.cancel();setDistrictId(id);setDistrict(record||null);setEvidenceFeature(null)}
+ function choosePoint(next){manualRevision.current++;homeLocation.cancel();if(next.district_id)setDistrictId(next.district_id);if(next.latitude===point.latitude&&next.longitude===point.longitude&&weatherPage)session.refresh(next);setSelectedPoint({...next})}
  return <>
   <AppHeader path={path} navigate={navigate} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
    <section className="page-intro"><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
-   {publicPage&&<div className="wireframe-workspace">
+   {path==='/'&&<HomeEmergencyDashboard point={selectedPoint} district={district} districtId={districtId} session={session} overview={overview} location={homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate} onEvidence={setEvidenceFeature}/> }
+   {publicPage&&path!=='/'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
      <WeatherLocationSelector point={point} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>. Weather remains point-specific. {!district?.navigation_bounds&&'Public district navigation bounds are unavailable; no bounds or representative point are invented.'}</p>}
-     {path==='/'&&<section className="panel emergency-overview" aria-labelledby="emergency-overview-title"><p className="eyebrow">DISTRICT & EMERGENCY EVIDENCE</p><h2 id="emergency-overview-title">Emergency overview</h2><div className="overview-status-grid"><article><h3>Official warning feed</h3><p>Not connected</p><small>This does not establish that no emergency exists. Follow official local advice.</small></article><article><h3>Historical flood evidence</h3><p>{overview.data?`${overview.data.total} reviewed historical cells`:'Coverage unavailable'}</p><small>Historical observations, not active flooding or independent event counts.</small></article><article><h3>Published hazard zones</h3><p>No verified polygons</p><small>No danger levels or district risk percentages are assigned.</small></article></div>{overview.error&&<p role="status">{overview.error}</p>}<PageLink to="/flood-map" navigate={navigate}>Inspect sources and historical evidence</PageLink></section>}
      <div hidden={!weatherPage} className="weather-sections">
-      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={path==='/'}/>
-      <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={path==='/'} active={weatherPage}/>
+      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false}/>
+      <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={false} active={weatherPage}/>
      </div>
-     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={sheltersPage} overview={path==='/'} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
+     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={sheltersPage} overview={false} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>
-    {(path==='/'||path==='/weather')&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{path==='/'?'Karnataka overview':district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{(path==='/'||contextVisible)&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={path==='/'?overview.data:null}/>}<p className="map-legend">Selected point: {point.name}. {path==='/'&&'Rust polygons show historical observed floodwater, not current warnings or potential hazard.'} District filtering and point weather remain separate.</p></section>}
+    {path==='/weather'&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{contextVisible&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={null}/>}<p className="map-legend">Selected point: {point.name}.  District filtering and point weather remain separate.</p></section>}
     {path==='/shelters'&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}
     {path==='/flood-map'&&<FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
    </div>}

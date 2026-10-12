@@ -21,6 +21,7 @@ const open = () => {const editor=screen.queryByText('Change location')?.closest(
 const district = async (id = districts[0].id) => { await waitFor(() => expect(screen.getByLabelText('Karnataka district').disabled).toBe(false)); fireEvent.change(screen.getByLabelText('Karnataka district'), { target: { value: id } }) }
 
 beforeEach(() => {
+  window.history.replaceState(null, '', '/weather')
   vi.clearAllMocks()
   mapState.map.mockReturnValue({ setView: vi.fn().mockReturnThis(), fitBounds: vi.fn(), remove: vi.fn(), removeLayer: vi.fn(), on: vi.fn() })
   mapState.tileLayer.mockReturnValue({ addTo: vi.fn().mockReturnThis(), on: vi.fn() })

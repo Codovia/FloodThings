@@ -89,7 +89,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
       if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
         setLocating(false); setError('GPS returned invalid coordinates. Use verified place search or the map.'); return
       }
-      choose({ name: 'GPS-selected point', latitude: lat, longitude: lon,
+      choose({ name: 'GPS-selected point', kind: 'gps', latitude: lat, longitude: lon,
         accuracy_m: Number.isFinite(accuracy) && accuracy >= 0 ? accuracy : null })
     }, failure => {
       if (selection.current !== request) return

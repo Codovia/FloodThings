@@ -3,6 +3,7 @@ import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import App from './App.jsx'
 vi.mock('./WeatherLocationSelector.jsx',()=>({DEFAULT_POINT:{name:'Bengaluru, Karnataka',latitude:12.9767936,longitude:77.590082},WeatherPointMap:()=> <div>Context map fixture</div>,default:({point,onSelect})=><section><span>{point.name} location control</span><button onClick={()=>onSelect({name:'Udupi test selection',latitude:13.34,longitude:74.74})}>Select test point</button></section>}))
+vi.mock('./HomeFloodMap.jsx',()=>({default:()=> <div>Home map fixture</div>}))
 vi.mock('./FloodIntelligenceMap.jsx',()=>({default:()=> <div>Historical map fixture</div>}))
 vi.mock('./DrainageResearchLayers.jsx',()=>({default:()=> <div>Drainage fixture</div>}))
 const reply=(body,status=200)=>Promise.resolve({ok:status===200,status,json:async()=>body})
@@ -10,19 +11,19 @@ const weather=point=>({status:'available',location:point,retrieved_at:new Date()
 beforeEach(()=>{window.history.replaceState(null,'','/weather');vi.spyOn(window,'scrollTo').mockImplementation(()=>{});vi.stubGlobal('fetch',vi.fn(url=>{if(url.startsWith('/api/weather')){const query=new URL(url,'http://localhost').searchParams;return reply(weather({latitude:+(query.get('latitude')||12.9767936),longitude:+(query.get('longitude')||77.590082)}))}if(url.startsWith('/api/shelters'))return reply({status:'available',mode:'live',shelters:[],retrieved_at:new Date().toISOString()});if(url.startsWith('/api/flood-map/historical'))return reply({status:'available',total:0,geojson:{type:'FeatureCollection',features:[]}});if(url==='/api/admin/session')return reply({},401);throw Error('Unexpected fixture request')}))})
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks()})
 it('location, forecasts and retrieval clock persist across public routes without repeated weather requests',async()=>{render(<App/>);await screen.findByText('27 °C');fireEvent.click(screen.getByRole('button',{name:'Select test point'}));await screen.findByRole('heading',{name:'Udupi test selection'});const count=()=>fetch.mock.calls.filter(([u])=>u.startsWith('/api/weather')).length;await waitFor(()=>expect(count()).toBe(2));const receipt=screen.getByRole('status',{name:'Weather data freshness'}).textContent;fireEvent.click(screen.getByRole('link',{name:'Flood Map',exact:true}));expect(screen.getByText('Historical map fixture')).toBeTruthy();fireEvent.click(screen.getByRole('link',{name:'Shelters',exact:true}));await screen.findByText('No currently verified open shelters are available in this directory.');fireEvent.click(screen.getByRole('link',{name:'Weather & AI',exact:true}));expect(screen.getByRole('heading',{name:'Udupi test selection'})).toBeTruthy();expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7);expect(screen.getByRole('status',{name:'Weather data freshness'}).textContent).toBe(receipt);expect(count()).toBe(2)})
-it('direct admin route checks authentication without fetching public weather and enables weather upon return',async()=>{window.history.replaceState(null,'','/admin');render(<App/>);await screen.findByRole('button',{name:'Sign in'});expect(fetch.mock.calls.map(([u])=>u)).toEqual(['/api/admin/session']);fireEvent.click(screen.getByRole('link',{name:'Return to citizen dashboard'}));await screen.findByText('27 °C');expect(screen.getByRole('heading',{name:'FloodPulse',exact:true})).toBeTruthy()})
+it('direct admin route checks authentication and returns to statewide Home without invented point weather',async()=>{window.history.replaceState(null,'','/admin');render(<App/>);await screen.findByRole('button',{name:'Sign in'});expect(fetch.mock.calls.map(([u])=>u)).toEqual(['/api/admin/session']);fireEvent.click(screen.getByRole('link',{name:'Return to citizen dashboard'}));await screen.findByRole('heading',{name:'Karnataka statewide view'});expect(fetch.mock.calls.filter(([u])=>u.startsWith('/api/weather'))).toHaveLength(0);expect(screen.getByRole('heading',{name:'FloodPulse',exact:true})).toBeTruthy()})
 it('unknown route offers recovery instead of showing another page as valid',()=>{window.history.replaceState(null,'','/not-real');render(<App/>);expect(screen.getByRole('heading',{name:'This page is unavailable'})).toBeTruthy();expect(screen.getByRole('link',{name:'Return Home'}).getAttribute('href')).toBe('/')})
 it('provider outage is explicit and the experimental model never fabricates a response',async()=>{fetch.mockImplementation(url=>url.startsWith('/api/weather')?reply({message:'Controlled provider failure'},503):reply({},401));render(<App/>);await screen.findByRole('alert');expect(screen.getByRole('status',{name:'Weather data freshness'}).textContent).toContain('No weather data available');expect(screen.getByRole('button',{name:'Run experimental rainfall model'}).disabled).toBe(true);expect(screen.getByText(/Model unavailable for this selected point/)).toBeTruthy();expect(fetch.mock.calls.filter(([u])=>u.startsWith('/api/ai/'))).toHaveLength(0)})
 
 it('returning from admin uses a fresh cached point without hidden weather requests',async()=>{
- render(<App/>);await screen.findByText('27 °C')
+ render(<App/>);await screen.findByText('27 °C');fireEvent.click(screen.getByRole('button',{name:'Select test point'}));await screen.findByRole('heading',{name:'Udupi test selection'})
  const count=()=>fetch.mock.calls.filter(([u])=>u.startsWith('/api/weather')).length
  fireEvent.click(screen.getByRole('link',{name:'Admin',exact:true}));await screen.findByRole('button',{name:'Sign in'})
- expect(count()).toBe(1)
- fireEvent.click(screen.getByRole('link',{name:'Return to citizen dashboard'}));await screen.findByText('27 °C');expect(count()).toBe(1)
+ expect(count()).toBe(2)
+ fireEvent.click(screen.getByRole('link',{name:'Return to citizen dashboard'}));await screen.findByText('27 °C');expect(count()).toBe(2)
 })
 it('Home distinguishes unconnected warnings from absence of emergencies and shows evidence count',async()=>{
- window.history.replaceState(null,'','/');render(<App/>);await screen.findByText('0 reviewed historical cells')
+ window.history.replaceState(null,'','/');render(<App/>);await screen.findByText(/0 reviewed historical cells/)
  expect(screen.getByText(/does not establish that no emergency exists/)).toBeTruthy()
  expect(screen.getByText('No verified polygons')).toBeTruthy()
  expect(screen.queryByText(/Low flood risk/)).toBeNull()

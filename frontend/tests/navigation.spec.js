@@ -23,7 +23,7 @@ test('five routes, direct URLs, back/forward, persistent location and one freshn
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.goBack();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await page.goForward();await expect(page).toHaveURL(/\/shelters$/)
- await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Weather location selection map'})).toBeVisible();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
+ await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
  await page.clock.fastForward(6*3600000);await expect.poll(requests).toBe(3)
  await nav(page).getByRole('link',{name:'Weather & AI',exact:true}).click();await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(3)
  await nav(page).getByRole('link',{name:'Admin',exact:true}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible();await expect(nav(page).getByRole('link',{name:'Admin',exact:true})).toHaveAttribute('aria-current','page')

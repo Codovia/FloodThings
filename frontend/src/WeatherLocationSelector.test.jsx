@@ -78,7 +78,7 @@ it('GPS preserves device uncertainty and ignores callbacks after a newer map sel
   const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   act(() => success({ coords: { latitude: 13.34, longitude: 74.74, accuracy: 50 } }))
-  expect(selected).toHaveBeenLastCalledWith({ name: 'GPS-selected point', latitude: 13.34, longitude: 74.74, accuracy_m: 50 })
+  expect(selected).toHaveBeenLastCalledWith({ name: 'GPS-selected point', kind: 'gps', latitude: 13.34, longitude: 74.74, accuracy_m: 50 })
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   coordinates('14', '75')
   act(() => success({ coords: { latitude: 13, longitude: 74, accuracy: 50 } }))
@@ -90,7 +90,7 @@ it('public coordinate fields are absent and invalid GPS is rejected while zero i
  const selected=vi.fn();render(<WeatherLocationSelector onSelect={selected}/>);
  expect(screen.queryByLabelText('Weather latitude')).toBeNull();expect(screen.queryByLabelText('Weather longitude')).toBeNull()
  fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:91,longitude:75}}));expect(screen.getByRole('alert')).toBeTruthy();expect(selected).not.toHaveBeenCalled()
- fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:0,longitude:0,accuracy:50}}));expect(selected).toHaveBeenCalledWith({name:'GPS-selected point',latitude:0,longitude:0,accuracy_m:50})
+ fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:0,longitude:0,accuracy:50}}));expect(selected).toHaveBeenCalledWith({name:'GPS-selected point',kind:'gps',latitude:0,longitude:0,accuracy_m:50})
 })
 
 it('failed point request clears old readings and refresh retains the requested point', async () => {

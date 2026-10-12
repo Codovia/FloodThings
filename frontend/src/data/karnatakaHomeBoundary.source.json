@@ -1,0 +1,25 @@
+{
+  "purpose": "Home-only simplified state context and cautious GPS coverage; no district assignment or flood boundary",
+  "url": "https://media.githubusercontent.com/media/wmgeolab/geoBoundaries/9469f09/releaseData/gbOpen/IND/ADM1/geoBoundaries-IND-ADM1_simplified.geojson",
+  "expected_bytes": 5103747,
+  "publisher_lfs_sha256": "4c63fe43294a391e8f2de4e9f86f3edb60f8688275b9fee90c61fb2aa0c26061",
+  "free_bytes": 358335987712,
+  "license": "Creative Commons Attribution 2.5 India (CC BY 2.5 IN)",
+  "represented_year": "2011",
+  "initial_2MiB_preview": "Exceeded preview cap; discarded partial body; no full archive retained",
+  "retrieved_at": "2026-10-12T18:14:56.918201+00:00",
+  "verified_sha256": "4c63fe43294a391e8f2de4e9f86f3edb60f8688275b9fee90c61fb2aa0c26061",
+  "feature_properties": {
+    "shapeName": "Karn\u0101taka",
+    "shapeISO": "IN-KA",
+    "shapeID": "1811400B56841107211215",
+    "shapeGroup": "IND",
+    "shapeType": "ADM1"
+  },
+  "derived_bytes": 189831,
+  "derived_sha256": "f9213191c3d2750aade035dc872e666a97243b221f6c42b4996b470823cc32e8",
+  "publisher_metadata_url": "https://www.geoboundaries.org/api/current/gbOpen/IND/ADM1/",
+  "source_attribution": "DataMeet India community, Election Commission of India",
+  "license_url": "https://creativecommons.org/licenses/by/2.5/in/",
+  "caution": "Simplified 2011 geography, not current legal boundaries; 2 km screening margin is application policy, not documented positional accuracy."
+}
