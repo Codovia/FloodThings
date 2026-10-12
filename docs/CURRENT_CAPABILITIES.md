@@ -9,6 +9,11 @@ and daily-label training prerequisites. Its current decision is **NO-GO**: no
 scientifically eligible daily flood labels, verified negatives or independent
 flood test set. The experimental rainfall classifier remains a separate model.
 
+[Phase 12B observation feasibility](FLOOD_OBSERVATION_FEASIBILITY.md) verifies
+Groundsource's actual Parquet schema and satellite observation requirements.
+Groundsource Karnataka counts remain UNKNOWN; no eligible flood labels or new
+operational forecasts were produced.
+
 | Route | Implemented capability | Limits |
 |---|---|---|
 | `/` | Location, map, weather, experimental rainfall and shelter overview | Point information; no connected official emergency-warning feed |

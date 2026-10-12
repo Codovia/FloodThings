@@ -6,6 +6,10 @@ evidence/coverage audit and scientific training gates. Current flood-model train
 decision: **NO-GO**; no verified negative labels or independent daily-outcome test
 set. The existing heavy-rainfall model remains separate.
 
+[Phase 12B observation feasibility](docs/FLOOD_OBSERVATION_FEASIBILITY.md) verifies
+Groundsource's schema and audits satellite acquisition/absence requirements.
+Karnataka Groundsource coverage remains UNKNOWN; eligible flood labels remain zero.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.

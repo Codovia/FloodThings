@@ -1,5 +1,9 @@
 # Phase 12A — actual Karnataka flood-outcome foundation
 
+This is the frozen Phase 12A review. [Phase 12B](FLOOD_OBSERVATION_FEASIBILITY.md)
+supersedes its Groundsource schema/CRS uncertainty with verified footer metadata;
+Karnataka coverage and training remain unresolved / NO-GO.
+
 Verified 12 October 2026 against `ca55762d25ab33f58542ff3be0c90120cfc972d4`.
 The objective is actual flood occurrence across Karnataka. This milestone is an
 offline data foundation, not statewide prediction. The supplied
