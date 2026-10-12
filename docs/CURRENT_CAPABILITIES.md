@@ -9,10 +9,14 @@ and daily-label training prerequisites. Its current decision is **NO-GO**: no
 scientifically eligible daily flood labels, verified negatives or independent
 flood test set. The experimental rainfall classifier remains a separate model.
 
-[Phase 12B observation feasibility](FLOOD_OBSERVATION_FEASIBILITY.md) verifies
-Groundsource's actual Parquet schema and satellite observation requirements.
-Groundsource Karnataka counts remain UNKNOWN; no eligible flood labels or new
-operational forecasts were produced.
+[Phase 12C Groundsource extraction](GROUNDSOURCE_KARNATAKA_EXTRACTION.md) verifies
+19,854 Karnataka candidate news records: 18,194 state-contained/date-usable and
+17,296 additionally contained in one source district. All 31 fixed SOI source
+district polygons have candidates; current LGD identities remain unresolved.
+All records require manual verification, with zero eligible predictive positives
+or defensible negatives. Operational forecasts are unchanged. The
+[Phase 12B observation protocol](FLOOD_OBSERVATION_FEASIBILITY.md) still governs
+the distinction between acquisition truth, daily occurrence and absence evidence.
 
 | Route | Implemented capability | Limits |
 |---|---|---|

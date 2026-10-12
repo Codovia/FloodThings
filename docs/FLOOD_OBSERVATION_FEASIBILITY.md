@@ -1,5 +1,11 @@
 # Phase 12B: Karnataka flood observation feasibility
 
+This is the frozen Phase 12B review. The subsequently authorized
+[Phase 12C extraction](GROUNDSOURCE_KARNATAKA_EXTRACTION.md) supersedes its
+UNKNOWN Groundsource coverage with 19,854 verified candidate records, including
+18,194 state-contained/date-usable records. These remain unreviewed news locations;
+the original NO-GO decision and observation requirements remain unchanged.
+
 Verified 12 October 2026 against retained manifests and bounded publisher
 responses. Baseline: `ce6a3517449ea493433a1066bc91f4d2dd65c8bd`.
 

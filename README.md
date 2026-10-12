@@ -6,9 +6,13 @@ evidence/coverage audit and scientific training gates. Current flood-model train
 decision: **NO-GO**; no verified negative labels or independent daily-outcome test
 set. The existing heavy-rainfall model remains separate.
 
-[Phase 12B observation feasibility](docs/FLOOD_OBSERVATION_FEASIBILITY.md) verifies
-Groundsource's schema and audits satellite acquisition/absence requirements.
-Karnataka Groundsource coverage remains UNKNOWN; eligible flood labels remain zero.
+[Phase 12C Groundsource extraction](docs/GROUNDSOURCE_KARNATAKA_EXTRACTION.md)
+verifies **19,854 Karnataka candidate news records**, including **18,194** with
+state-contained geometry and usable reported dates. Coverage uses all 31 fixed
+SOI source district polygons; current LGD identities remain unresolved. These are
+unreviewed reported locations, not confirmed inundation or predictive labels.
+Eligible flood positives and defensible negatives remain **zero**.
+[Phase 12B](docs/FLOOD_OBSERVATION_FEASIBILITY.md) retains the observation protocol.
 
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending

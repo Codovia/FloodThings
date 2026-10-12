@@ -1,0 +1,32 @@
+source_district_id,source_district_name,nic_exact_name_candidate,supplied_lgd_code_unverified,current_lgd_verified,intersecting_report_records,fully_contained_report_records,single_district_temporally_usable_records
+soi-abdb2025:objectid:344,B<galkot,,556,False,755,517,517
+soi-abdb2025:objectid:345,Bengal#ru (Rural),,583,False,399,115,115
+soi-abdb2025:objectid:346,Belag<vi,,555,False,1906,1590,1590
+soi-abdb2025:objectid:347,Chikkamagal#ru,,570,False,550,440,440
+soi-abdb2025:objectid:348,Ball<ri,,565,False,232,157,157
+soi-abdb2025:objectid:349,Ch<mar<janagara,,578,False,392,173,173
+soi-abdb2025:objectid:350,Chitradurga,Chitradurga,566,False,210,131,131
+soi-abdb2025:objectid:351,Koppal,Koppal,560,False,287,189,189
+soi-abdb2025:objectid:352,Vijayanagara,Vijayanagara,761,False,313,175,175
+soi-abdb2025:objectid:353,Raich#r,,559,False,464,300,300
+soi-abdb2025:objectid:354,Chikkaball<pura,,582,False,98,70,70
+soi-abdb2025:objectid:355,D<vanagere,,567,False,248,161,161
+soi-abdb2025:objectid:356,Dh<rw<d,,562,False,597,437,437
+soi-abdb2025:objectid:357,Gadag,Gadag,561,False,422,221,221
+soi-abdb2025:objectid:358,H<veri,,564,False,447,294,294
+soi-abdb2025:objectid:359,H<ssan,,574,False,398,241,241
+soi-abdb2025:objectid:360,Kalaburagi,Kalaburagi,579,False,899,713,713
+soi-abdb2025:objectid:361,Bengal#ru (Urban),,572,False,5816,5489,5489
+soi-abdb2025:objectid:362,Kol<ra,,581,False,339,154,154
+soi-abdb2025:objectid:363,Mandya,Mandya,573,False,369,261,261
+soi-abdb2025:objectid:364,Mys#ru,,577,False,733,492,492
+soi-abdb2025:objectid:365,Shivamogga,Shivamogga,568,False,455,365,365
+soi-abdb2025:objectid:366,Dakshina Kannada,Dakshina Kannada,575,False,1598,1374,1374
+soi-abdb2025:objectid:367,Uttara Kannada,Uttara Kannada,563,False,993,670,670
+soi-abdb2025:objectid:368,Vijayapura,Vijayapura,557,False,561,394,394
+soi-abdb2025:objectid:369,Y<dgir,,580,False,380,249,249
+soi-abdb2025:objectid:370,R<managara,,584,False,430,169,169
+soi-abdb2025:objectid:371,Udupi,Udupi,569,False,940,719,719
+soi-abdb2025:objectid:372,Tumak#ru,,571,False,292,190,190
+soi-abdb2025:objectid:373,Kodagu,Kodagu,576,False,844,558,558
+soi-abdb2025:objectid:374,B\dar,,558,False,404,288,288

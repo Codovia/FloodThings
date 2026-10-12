@@ -1,0 +1,66 @@
+{
+  "source_title": "Groundsource: A Dataset of Flood Events from News",
+  "authors": [
+    "Mayo, Rotem",
+    "Zlydenko, Oleg",
+    "Bootbool, Moral",
+    "Fronman, Shmuel",
+    "Gilon, Oren",
+    "Hassidim, Avinatan",
+    "Kratzert, Frederik",
+    "Loike, Gila",
+    "Matias, Yossi",
+    "Nakar, Yonatan",
+    "Nearing, Grey",
+    "Sayag, Reuven",
+    "Sicherman, Amitay",
+    "Zemach, Ido",
+    "Cohen, Deborah"
+  ],
+  "doi": "10.5281/zenodo.18647054",
+  "publisher_record_url": "https://zenodo.org/records/18647054",
+  "publication_date": "2026-02-15",
+  "version": "v1 (official HTML; not API revision)",
+  "licence": "CC BY 4.0",
+  "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+  "file": {
+    "key": "groundsource_2026.parquet",
+    "size": 667122400,
+    "checksum": "md5:cd1b5de6508f7aad8e1d1d0dd4cecea6"
+  },
+  "checked_on": "2026-10-12",
+  "preflight_free_bytes": 361307488256,
+  "derivation": "FloodPulse candidate spatial/date screening and aggregate analysis; no individual flood label certified",
+  "research_only": true,
+  "download_integrity": {
+    "record": 18647054,
+    "version": "v1",
+    "licence": "CC BY 4.0",
+    "url": "https://zenodo.org/records/18647054/files/groundsource_2026.parquet",
+    "expected_bytes": 667122400,
+    "publisher_md5": "cd1b5de6508f7aad8e1d1d0dd4cecea6",
+    "free_disk_bytes": 360945209344,
+    "bytes": 667122400,
+    "sha256": "77c266ba5a5176d983edca989a81ff73f21c556fd98c82e2131c2f8d172546ce",
+    "md5": "cd1b5de6508f7aad8e1d1d0dd4cecea6",
+    "full_publisher_checksum_verified": true
+  },
+  "verified_footer": {
+    "actual_archive_rows": 2646302,
+    "row_group_rows": [
+      1048576,
+      1048576,
+      549150
+    ],
+    "columns": [
+      "uuid",
+      "area_km2",
+      "geometry",
+      "start_date",
+      "end_date",
+      "__index_level_0__"
+    ],
+    "footer_bytes": 7727,
+    "footer_sha256": "01f5bc16f161082d5edfa8fe3a22a8c680ef499b57d38bde3c4a2e9e0917ac1a"
+  }
+}

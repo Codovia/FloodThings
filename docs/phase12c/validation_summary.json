@@ -1,0 +1,26 @@
+{
+  "verified_on": "2026-10-12",
+  "root_tests_passed": 173,
+  "new_focused_tests_included": 35,
+  "backend_tests_passed": 1354,
+  "backend_warnings": "one existing Starlette/httpx deprecation warning",
+  "read_only_retained_source_checks_passed": 17,
+  "full_archive_row_replay_passed": 2646302,
+  "candidate_source_rows_reproduced": 19854,
+  "independent_csv_sqlite_register_invariants_passed": true,
+  "public_derived_artifacts_byte_identical_to_completed_local_outputs": true,
+  "completed_output_hashes_and_timestamps_unchanged_during_validation": true,
+  "protected_baseline_files": 2548,
+  "authorized_existing_document_paths": [
+    "README.md",
+    "docs/CURRENT_CAPABILITIES.md",
+    "docs/FLOOD_OBSERVATION_FEASIBILITY.md",
+    "update.md"
+  ],
+  "other_original_files_matching_sha256_size_mtime_ns": 2543,
+  "environment_template_changed_during_task": "observed separately; current contents left untouched and excluded from commit",
+  "qanda_unchanged_and_excluded": true,
+  "raw_archive_runtime_geometries_and_restricted_records_ignored_and_excluded": true,
+  "models_trained_replaced_or_deployed": 0,
+  "training_decision": "NO-GO"
+}
