@@ -1,0 +1,652 @@
+source_district_id,source_name_unresolved,start_year,review_groups_intersecting,eligible_positive_labels,eligible_negative_labels
+soi-abdb2025:objectid:344,B<galkot,2005,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2006,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2007,1,0,0
+soi-abdb2025:objectid:344,B<galkot,2008,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2009,7,0,0
+soi-abdb2025:objectid:344,B<galkot,2010,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2011,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2012,0,0,0
+soi-abdb2025:objectid:344,B<galkot,2013,3,0,0
+soi-abdb2025:objectid:344,B<galkot,2014,1,0,0
+soi-abdb2025:objectid:344,B<galkot,2015,2,0,0
+soi-abdb2025:objectid:344,B<galkot,2016,12,0,0
+soi-abdb2025:objectid:344,B<galkot,2017,7,0,0
+soi-abdb2025:objectid:344,B<galkot,2018,9,0,0
+soi-abdb2025:objectid:344,B<galkot,2019,156,0,0
+soi-abdb2025:objectid:344,B<galkot,2020,90,0,0
+soi-abdb2025:objectid:344,B<galkot,2021,93,0,0
+soi-abdb2025:objectid:344,B<galkot,2022,78,0,0
+soi-abdb2025:objectid:344,B<galkot,2023,4,0,0
+soi-abdb2025:objectid:344,B<galkot,2024,96,0,0
+soi-abdb2025:objectid:344,B<galkot,2025,196,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2005,1,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2006,0,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2007,0,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2008,0,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2009,2,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2010,3,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2011,3,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2012,2,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2013,10,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2014,7,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2015,10,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2016,9,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2017,28,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2018,18,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2019,35,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2020,29,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2021,30,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2022,67,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2023,24,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2024,55,0,0
+soi-abdb2025:objectid:345,Bengal#ru (Rural),2025,66,0,0
+soi-abdb2025:objectid:346,Belag<vi,2005,1,0,0
+soi-abdb2025:objectid:346,Belag<vi,2006,0,0,0
+soi-abdb2025:objectid:346,Belag<vi,2007,0,0,0
+soi-abdb2025:objectid:346,Belag<vi,2008,1,0,0
+soi-abdb2025:objectid:346,Belag<vi,2009,5,0,0
+soi-abdb2025:objectid:346,Belag<vi,2010,1,0,0
+soi-abdb2025:objectid:346,Belag<vi,2011,0,0,0
+soi-abdb2025:objectid:346,Belag<vi,2012,5,0,0
+soi-abdb2025:objectid:346,Belag<vi,2013,34,0,0
+soi-abdb2025:objectid:346,Belag<vi,2014,24,0,0
+soi-abdb2025:objectid:346,Belag<vi,2015,6,0,0
+soi-abdb2025:objectid:346,Belag<vi,2016,46,0,0
+soi-abdb2025:objectid:346,Belag<vi,2017,16,0,0
+soi-abdb2025:objectid:346,Belag<vi,2018,41,0,0
+soi-abdb2025:objectid:346,Belag<vi,2019,417,0,0
+soi-abdb2025:objectid:346,Belag<vi,2020,190,0,0
+soi-abdb2025:objectid:346,Belag<vi,2021,198,0,0
+soi-abdb2025:objectid:346,Belag<vi,2022,152,0,0
+soi-abdb2025:objectid:346,Belag<vi,2023,99,0,0
+soi-abdb2025:objectid:346,Belag<vi,2024,327,0,0
+soi-abdb2025:objectid:346,Belag<vi,2025,342,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2005,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2006,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2007,1,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2008,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2009,1,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2010,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2011,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2012,10,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2013,13,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2014,9,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2015,2,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2016,0,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2017,7,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2018,42,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2019,101,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2020,58,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2021,35,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2022,52,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2023,18,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2024,80,0,0
+soi-abdb2025:objectid:347,Chikkamagal#ru,2025,121,0,0
+soi-abdb2025:objectid:348,Ball<ri,2005,0,0,0
+soi-abdb2025:objectid:348,Ball<ri,2006,0,0,0
+soi-abdb2025:objectid:348,Ball<ri,2007,0,0,0
+soi-abdb2025:objectid:348,Ball<ri,2008,0,0,0
+soi-abdb2025:objectid:348,Ball<ri,2009,7,0,0
+soi-abdb2025:objectid:348,Ball<ri,2010,6,0,0
+soi-abdb2025:objectid:348,Ball<ri,2011,0,0,0
+soi-abdb2025:objectid:348,Ball<ri,2012,1,0,0
+soi-abdb2025:objectid:348,Ball<ri,2013,5,0,0
+soi-abdb2025:objectid:348,Ball<ri,2014,11,0,0
+soi-abdb2025:objectid:348,Ball<ri,2015,6,0,0
+soi-abdb2025:objectid:348,Ball<ri,2016,1,0,0
+soi-abdb2025:objectid:348,Ball<ri,2017,3,0,0
+soi-abdb2025:objectid:348,Ball<ri,2018,8,0,0
+soi-abdb2025:objectid:348,Ball<ri,2019,31,0,0
+soi-abdb2025:objectid:348,Ball<ri,2020,20,0,0
+soi-abdb2025:objectid:348,Ball<ri,2021,14,0,0
+soi-abdb2025:objectid:348,Ball<ri,2022,48,0,0
+soi-abdb2025:objectid:348,Ball<ri,2023,2,0,0
+soi-abdb2025:objectid:348,Ball<ri,2024,34,0,0
+soi-abdb2025:objectid:348,Ball<ri,2025,35,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2005,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2006,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2007,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2008,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2009,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2010,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2011,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2012,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2013,9,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2014,5,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2015,7,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2016,0,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2017,6,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2018,27,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2019,43,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2020,19,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2021,20,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2022,140,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2023,14,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2024,64,0,0
+soi-abdb2025:objectid:349,Ch<mar<janagara,2025,38,0,0
+soi-abdb2025:objectid:350,Chitradurga,2005,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2006,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2007,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2008,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2009,1,0,0
+soi-abdb2025:objectid:350,Chitradurga,2010,11,0,0
+soi-abdb2025:objectid:350,Chitradurga,2011,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2012,0,0,0
+soi-abdb2025:objectid:350,Chitradurga,2013,2,0,0
+soi-abdb2025:objectid:350,Chitradurga,2014,1,0,0
+soi-abdb2025:objectid:350,Chitradurga,2015,3,0,0
+soi-abdb2025:objectid:350,Chitradurga,2016,1,0,0
+soi-abdb2025:objectid:350,Chitradurga,2017,7,0,0
+soi-abdb2025:objectid:350,Chitradurga,2018,3,0,0
+soi-abdb2025:objectid:350,Chitradurga,2019,21,0,0
+soi-abdb2025:objectid:350,Chitradurga,2020,13,0,0
+soi-abdb2025:objectid:350,Chitradurga,2021,13,0,0
+soi-abdb2025:objectid:350,Chitradurga,2022,44,0,0
+soi-abdb2025:objectid:350,Chitradurga,2023,8,0,0
+soi-abdb2025:objectid:350,Chitradurga,2024,35,0,0
+soi-abdb2025:objectid:350,Chitradurga,2025,47,0,0
+soi-abdb2025:objectid:351,Koppal,2005,0,0,0
+soi-abdb2025:objectid:351,Koppal,2006,0,0,0
+soi-abdb2025:objectid:351,Koppal,2007,0,0,0
+soi-abdb2025:objectid:351,Koppal,2008,0,0,0
+soi-abdb2025:objectid:351,Koppal,2009,2,0,0
+soi-abdb2025:objectid:351,Koppal,2010,2,0,0
+soi-abdb2025:objectid:351,Koppal,2011,0,0,0
+soi-abdb2025:objectid:351,Koppal,2012,0,0,0
+soi-abdb2025:objectid:351,Koppal,2013,3,0,0
+soi-abdb2025:objectid:351,Koppal,2014,5,0,0
+soi-abdb2025:objectid:351,Koppal,2015,2,0,0
+soi-abdb2025:objectid:351,Koppal,2016,1,0,0
+soi-abdb2025:objectid:351,Koppal,2017,4,0,0
+soi-abdb2025:objectid:351,Koppal,2018,11,0,0
+soi-abdb2025:objectid:351,Koppal,2019,37,0,0
+soi-abdb2025:objectid:351,Koppal,2020,24,0,0
+soi-abdb2025:objectid:351,Koppal,2021,16,0,0
+soi-abdb2025:objectid:351,Koppal,2022,65,0,0
+soi-abdb2025:objectid:351,Koppal,2023,6,0,0
+soi-abdb2025:objectid:351,Koppal,2024,48,0,0
+soi-abdb2025:objectid:351,Koppal,2025,61,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2005,0,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2006,0,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2007,0,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2008,0,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2009,2,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2010,2,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2011,0,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2012,3,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2013,11,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2014,12,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2015,5,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2016,1,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2017,4,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2018,11,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2019,37,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2020,27,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2021,24,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2022,55,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2023,11,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2024,43,0,0
+soi-abdb2025:objectid:352,Vijayanagara,2025,64,0,0
+soi-abdb2025:objectid:353,Raich#r,2005,0,0,0
+soi-abdb2025:objectid:353,Raich#r,2006,0,0,0
+soi-abdb2025:objectid:353,Raich#r,2007,1,0,0
+soi-abdb2025:objectid:353,Raich#r,2008,0,0,0
+soi-abdb2025:objectid:353,Raich#r,2009,9,0,0
+soi-abdb2025:objectid:353,Raich#r,2010,1,0,0
+soi-abdb2025:objectid:353,Raich#r,2011,0,0,0
+soi-abdb2025:objectid:353,Raich#r,2012,0,0,0
+soi-abdb2025:objectid:353,Raich#r,2013,7,0,0
+soi-abdb2025:objectid:353,Raich#r,2014,8,0,0
+soi-abdb2025:objectid:353,Raich#r,2015,2,0,0
+soi-abdb2025:objectid:353,Raich#r,2016,3,0,0
+soi-abdb2025:objectid:353,Raich#r,2017,3,0,0
+soi-abdb2025:objectid:353,Raich#r,2018,9,0,0
+soi-abdb2025:objectid:353,Raich#r,2019,92,0,0
+soi-abdb2025:objectid:353,Raich#r,2020,63,0,0
+soi-abdb2025:objectid:353,Raich#r,2021,41,0,0
+soi-abdb2025:objectid:353,Raich#r,2022,51,0,0
+soi-abdb2025:objectid:353,Raich#r,2023,9,0,0
+soi-abdb2025:objectid:353,Raich#r,2024,67,0,0
+soi-abdb2025:objectid:353,Raich#r,2025,98,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2005,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2006,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2007,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2008,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2009,1,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2010,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2011,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2012,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2013,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2014,0,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2015,1,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2016,2,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2017,1,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2018,1,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2019,4,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2020,8,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2021,15,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2022,22,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2023,7,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2024,10,0,0
+soi-abdb2025:objectid:354,Chikkaball<pura,2025,26,0,0
+soi-abdb2025:objectid:355,D<vanagere,2005,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2006,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2007,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2008,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2009,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2010,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2011,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2012,2,0,0
+soi-abdb2025:objectid:355,D<vanagere,2013,6,0,0
+soi-abdb2025:objectid:355,D<vanagere,2014,2,0,0
+soi-abdb2025:objectid:355,D<vanagere,2015,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2016,0,0,0
+soi-abdb2025:objectid:355,D<vanagere,2017,3,0,0
+soi-abdb2025:objectid:355,D<vanagere,2018,11,0,0
+soi-abdb2025:objectid:355,D<vanagere,2019,22,0,0
+soi-abdb2025:objectid:355,D<vanagere,2020,25,0,0
+soi-abdb2025:objectid:355,D<vanagere,2021,39,0,0
+soi-abdb2025:objectid:355,D<vanagere,2022,55,0,0
+soi-abdb2025:objectid:355,D<vanagere,2023,5,0,0
+soi-abdb2025:objectid:355,D<vanagere,2024,37,0,0
+soi-abdb2025:objectid:355,D<vanagere,2025,41,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2005,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2006,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2007,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2008,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2009,10,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2010,1,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2011,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2012,0,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2013,3,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2014,3,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2015,2,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2016,6,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2017,8,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2018,8,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2019,95,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2020,58,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2021,42,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2022,107,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2023,38,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2024,78,0,0
+soi-abdb2025:objectid:356,Dh<rw<d,2025,137,0,0
+soi-abdb2025:objectid:357,Gadag,2005,0,0,0
+soi-abdb2025:objectid:357,Gadag,2006,0,0,0
+soi-abdb2025:objectid:357,Gadag,2007,0,0,0
+soi-abdb2025:objectid:357,Gadag,2008,0,0,0
+soi-abdb2025:objectid:357,Gadag,2009,6,0,0
+soi-abdb2025:objectid:357,Gadag,2010,0,0,0
+soi-abdb2025:objectid:357,Gadag,2011,0,0,0
+soi-abdb2025:objectid:357,Gadag,2012,0,0,0
+soi-abdb2025:objectid:357,Gadag,2013,2,0,0
+soi-abdb2025:objectid:357,Gadag,2014,2,0,0
+soi-abdb2025:objectid:357,Gadag,2015,0,0,0
+soi-abdb2025:objectid:357,Gadag,2016,2,0,0
+soi-abdb2025:objectid:357,Gadag,2017,15,0,0
+soi-abdb2025:objectid:357,Gadag,2018,10,0,0
+soi-abdb2025:objectid:357,Gadag,2019,82,0,0
+soi-abdb2025:objectid:357,Gadag,2020,49,0,0
+soi-abdb2025:objectid:357,Gadag,2021,32,0,0
+soi-abdb2025:objectid:357,Gadag,2022,96,0,0
+soi-abdb2025:objectid:357,Gadag,2023,11,0,0
+soi-abdb2025:objectid:357,Gadag,2024,47,0,0
+soi-abdb2025:objectid:357,Gadag,2025,68,0,0
+soi-abdb2025:objectid:358,H<veri,2005,0,0,0
+soi-abdb2025:objectid:358,H<veri,2006,0,0,0
+soi-abdb2025:objectid:358,H<veri,2007,0,0,0
+soi-abdb2025:objectid:358,H<veri,2008,0,0,0
+soi-abdb2025:objectid:358,H<veri,2009,3,0,0
+soi-abdb2025:objectid:358,H<veri,2010,0,0,0
+soi-abdb2025:objectid:358,H<veri,2011,0,0,0
+soi-abdb2025:objectid:358,H<veri,2012,1,0,0
+soi-abdb2025:objectid:358,H<veri,2013,4,0,0
+soi-abdb2025:objectid:358,H<veri,2014,5,0,0
+soi-abdb2025:objectid:358,H<veri,2015,0,0,0
+soi-abdb2025:objectid:358,H<veri,2016,1,0,0
+soi-abdb2025:objectid:358,H<veri,2017,4,0,0
+soi-abdb2025:objectid:358,H<veri,2018,14,0,0
+soi-abdb2025:objectid:358,H<veri,2019,89,0,0
+soi-abdb2025:objectid:358,H<veri,2020,47,0,0
+soi-abdb2025:objectid:358,H<veri,2021,53,0,0
+soi-abdb2025:objectid:358,H<veri,2022,73,0,0
+soi-abdb2025:objectid:358,H<veri,2023,21,0,0
+soi-abdb2025:objectid:358,H<veri,2024,63,0,0
+soi-abdb2025:objectid:358,H<veri,2025,68,0,0
+soi-abdb2025:objectid:359,H<ssan,2005,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2006,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2007,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2008,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2009,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2010,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2011,0,0,0
+soi-abdb2025:objectid:359,H<ssan,2012,5,0,0
+soi-abdb2025:objectid:359,H<ssan,2013,7,0,0
+soi-abdb2025:objectid:359,H<ssan,2014,5,0,0
+soi-abdb2025:objectid:359,H<ssan,2015,3,0,0
+soi-abdb2025:objectid:359,H<ssan,2016,2,0,0
+soi-abdb2025:objectid:359,H<ssan,2017,15,0,0
+soi-abdb2025:objectid:359,H<ssan,2018,36,0,0
+soi-abdb2025:objectid:359,H<ssan,2019,56,0,0
+soi-abdb2025:objectid:359,H<ssan,2020,33,0,0
+soi-abdb2025:objectid:359,H<ssan,2021,39,0,0
+soi-abdb2025:objectid:359,H<ssan,2022,70,0,0
+soi-abdb2025:objectid:359,H<ssan,2023,15,0,0
+soi-abdb2025:objectid:359,H<ssan,2024,54,0,0
+soi-abdb2025:objectid:359,H<ssan,2025,58,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2005,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2006,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2007,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2008,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2009,1,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2010,4,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2011,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2012,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2013,12,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2014,7,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2015,0,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2016,23,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2017,8,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2018,5,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2019,35,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2020,211,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2021,73,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2022,62,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2023,68,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2024,93,0,0
+soi-abdb2025:objectid:360,Kalaburagi,2025,297,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2005,17,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2006,0,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2007,0,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2008,0,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2009,32,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2010,23,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2011,63,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2012,44,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2013,127,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2014,105,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2015,114,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2016,116,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2017,619,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2018,191,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2019,272,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2020,361,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2021,445,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2022,882,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2023,459,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2024,864,0,0
+soi-abdb2025:objectid:361,Bengal#ru (Urban),2025,1058,0,0
+soi-abdb2025:objectid:362,Kol<ra,2005,2,0,0
+soi-abdb2025:objectid:362,Kol<ra,2006,0,0,0
+soi-abdb2025:objectid:362,Kol<ra,2007,0,0,0
+soi-abdb2025:objectid:362,Kol<ra,2008,0,0,0
+soi-abdb2025:objectid:362,Kol<ra,2009,2,0,0
+soi-abdb2025:objectid:362,Kol<ra,2010,4,0,0
+soi-abdb2025:objectid:362,Kol<ra,2011,4,0,0
+soi-abdb2025:objectid:362,Kol<ra,2012,4,0,0
+soi-abdb2025:objectid:362,Kol<ra,2013,6,0,0
+soi-abdb2025:objectid:362,Kol<ra,2014,13,0,0
+soi-abdb2025:objectid:362,Kol<ra,2015,6,0,0
+soi-abdb2025:objectid:362,Kol<ra,2016,5,0,0
+soi-abdb2025:objectid:362,Kol<ra,2017,11,0,0
+soi-abdb2025:objectid:362,Kol<ra,2018,18,0,0
+soi-abdb2025:objectid:362,Kol<ra,2019,33,0,0
+soi-abdb2025:objectid:362,Kol<ra,2020,20,0,0
+soi-abdb2025:objectid:362,Kol<ra,2021,28,0,0
+soi-abdb2025:objectid:362,Kol<ra,2022,43,0,0
+soi-abdb2025:objectid:362,Kol<ra,2023,25,0,0
+soi-abdb2025:objectid:362,Kol<ra,2024,39,0,0
+soi-abdb2025:objectid:362,Kol<ra,2025,76,0,0
+soi-abdb2025:objectid:363,Mandya,2005,0,0,0
+soi-abdb2025:objectid:363,Mandya,2006,0,0,0
+soi-abdb2025:objectid:363,Mandya,2007,0,0,0
+soi-abdb2025:objectid:363,Mandya,2008,0,0,0
+soi-abdb2025:objectid:363,Mandya,2009,0,0,0
+soi-abdb2025:objectid:363,Mandya,2010,1,0,0
+soi-abdb2025:objectid:363,Mandya,2011,0,0,0
+soi-abdb2025:objectid:363,Mandya,2012,4,0,0
+soi-abdb2025:objectid:363,Mandya,2013,7,0,0
+soi-abdb2025:objectid:363,Mandya,2014,6,0,0
+soi-abdb2025:objectid:363,Mandya,2015,9,0,0
+soi-abdb2025:objectid:363,Mandya,2016,2,0,0
+soi-abdb2025:objectid:363,Mandya,2017,17,0,0
+soi-abdb2025:objectid:363,Mandya,2018,33,0,0
+soi-abdb2025:objectid:363,Mandya,2019,51,0,0
+soi-abdb2025:objectid:363,Mandya,2020,16,0,0
+soi-abdb2025:objectid:363,Mandya,2021,32,0,0
+soi-abdb2025:objectid:363,Mandya,2022,88,0,0
+soi-abdb2025:objectid:363,Mandya,2023,13,0,0
+soi-abdb2025:objectid:363,Mandya,2024,41,0,0
+soi-abdb2025:objectid:363,Mandya,2025,49,0,0
+soi-abdb2025:objectid:364,Mys#ru,2005,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2006,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2007,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2008,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2009,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2010,1,0,0
+soi-abdb2025:objectid:364,Mys#ru,2011,0,0,0
+soi-abdb2025:objectid:364,Mys#ru,2012,3,0,0
+soi-abdb2025:objectid:364,Mys#ru,2013,8,0,0
+soi-abdb2025:objectid:364,Mys#ru,2014,3,0,0
+soi-abdb2025:objectid:364,Mys#ru,2015,4,0,0
+soi-abdb2025:objectid:364,Mys#ru,2016,4,0,0
+soi-abdb2025:objectid:364,Mys#ru,2017,60,0,0
+soi-abdb2025:objectid:364,Mys#ru,2018,94,0,0
+soi-abdb2025:objectid:364,Mys#ru,2019,98,0,0
+soi-abdb2025:objectid:364,Mys#ru,2020,53,0,0
+soi-abdb2025:objectid:364,Mys#ru,2021,57,0,0
+soi-abdb2025:objectid:364,Mys#ru,2022,105,0,0
+soi-abdb2025:objectid:364,Mys#ru,2023,18,0,0
+soi-abdb2025:objectid:364,Mys#ru,2024,120,0,0
+soi-abdb2025:objectid:364,Mys#ru,2025,104,0,0
+soi-abdb2025:objectid:365,Shivamogga,2005,0,0,0
+soi-abdb2025:objectid:365,Shivamogga,2006,0,0,0
+soi-abdb2025:objectid:365,Shivamogga,2007,1,0,0
+soi-abdb2025:objectid:365,Shivamogga,2008,0,0,0
+soi-abdb2025:objectid:365,Shivamogga,2009,1,0,0
+soi-abdb2025:objectid:365,Shivamogga,2010,1,0,0
+soi-abdb2025:objectid:365,Shivamogga,2011,0,0,0
+soi-abdb2025:objectid:365,Shivamogga,2012,7,0,0
+soi-abdb2025:objectid:365,Shivamogga,2013,13,0,0
+soi-abdb2025:objectid:365,Shivamogga,2014,3,0,0
+soi-abdb2025:objectid:365,Shivamogga,2015,8,0,0
+soi-abdb2025:objectid:365,Shivamogga,2016,1,0,0
+soi-abdb2025:objectid:365,Shivamogga,2017,5,0,0
+soi-abdb2025:objectid:365,Shivamogga,2018,21,0,0
+soi-abdb2025:objectid:365,Shivamogga,2019,76,0,0
+soi-abdb2025:objectid:365,Shivamogga,2020,40,0,0
+soi-abdb2025:objectid:365,Shivamogga,2021,69,0,0
+soi-abdb2025:objectid:365,Shivamogga,2022,57,0,0
+soi-abdb2025:objectid:365,Shivamogga,2023,13,0,0
+soi-abdb2025:objectid:365,Shivamogga,2024,98,0,0
+soi-abdb2025:objectid:365,Shivamogga,2025,39,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2005,0,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2006,0,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2007,1,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2008,0,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2009,5,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2010,9,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2011,0,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2012,40,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2013,36,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2014,24,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2015,22,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2016,4,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2017,27,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2018,162,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2019,214,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2020,163,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2021,66,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2022,163,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2023,112,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2024,253,0,0
+soi-abdb2025:objectid:366,Dakshina Kannada,2025,288,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2005,1,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2006,0,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2007,1,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2008,1,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2009,11,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2010,1,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2011,2,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2012,1,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2013,3,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2014,13,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2015,2,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2016,7,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2017,9,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2018,25,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2019,152,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2020,96,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2021,158,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2022,124,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2023,85,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2024,164,0,0
+soi-abdb2025:objectid:367,Uttara Kannada,2025,137,0,0
+soi-abdb2025:objectid:368,Vijayapura,2005,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2006,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2007,1,0,0
+soi-abdb2025:objectid:368,Vijayapura,2008,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2009,1,0,0
+soi-abdb2025:objectid:368,Vijayapura,2010,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2011,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2012,0,0,0
+soi-abdb2025:objectid:368,Vijayapura,2013,4,0,0
+soi-abdb2025:objectid:368,Vijayapura,2014,4,0,0
+soi-abdb2025:objectid:368,Vijayapura,2015,2,0,0
+soi-abdb2025:objectid:368,Vijayapura,2016,4,0,0
+soi-abdb2025:objectid:368,Vijayapura,2017,14,0,0
+soi-abdb2025:objectid:368,Vijayapura,2018,7,0,0
+soi-abdb2025:objectid:368,Vijayapura,2019,69,0,0
+soi-abdb2025:objectid:368,Vijayapura,2020,128,0,0
+soi-abdb2025:objectid:368,Vijayapura,2021,24,0,0
+soi-abdb2025:objectid:368,Vijayapura,2022,70,0,0
+soi-abdb2025:objectid:368,Vijayapura,2023,8,0,0
+soi-abdb2025:objectid:368,Vijayapura,2024,83,0,0
+soi-abdb2025:objectid:368,Vijayapura,2025,142,0,0
+soi-abdb2025:objectid:369,Y<dgir,2005,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2006,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2007,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2008,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2009,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2010,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2011,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2012,0,0,0
+soi-abdb2025:objectid:369,Y<dgir,2013,3,0,0
+soi-abdb2025:objectid:369,Y<dgir,2014,4,0,0
+soi-abdb2025:objectid:369,Y<dgir,2015,1,0,0
+soi-abdb2025:objectid:369,Y<dgir,2016,6,0,0
+soi-abdb2025:objectid:369,Y<dgir,2017,4,0,0
+soi-abdb2025:objectid:369,Y<dgir,2018,3,0,0
+soi-abdb2025:objectid:369,Y<dgir,2019,54,0,0
+soi-abdb2025:objectid:369,Y<dgir,2020,67,0,0
+soi-abdb2025:objectid:369,Y<dgir,2021,26,0,0
+soi-abdb2025:objectid:369,Y<dgir,2022,29,0,0
+soi-abdb2025:objectid:369,Y<dgir,2023,9,0,0
+soi-abdb2025:objectid:369,Y<dgir,2024,50,0,0
+soi-abdb2025:objectid:369,Y<dgir,2025,124,0,0
+soi-abdb2025:objectid:370,R<managara,2005,1,0,0
+soi-abdb2025:objectid:370,R<managara,2006,0,0,0
+soi-abdb2025:objectid:370,R<managara,2007,0,0,0
+soi-abdb2025:objectid:370,R<managara,2008,0,0,0
+soi-abdb2025:objectid:370,R<managara,2009,2,0,0
+soi-abdb2025:objectid:370,R<managara,2010,2,0,0
+soi-abdb2025:objectid:370,R<managara,2011,3,0,0
+soi-abdb2025:objectid:370,R<managara,2012,2,0,0
+soi-abdb2025:objectid:370,R<managara,2013,9,0,0
+soi-abdb2025:objectid:370,R<managara,2014,6,0,0
+soi-abdb2025:objectid:370,R<managara,2015,8,0,0
+soi-abdb2025:objectid:370,R<managara,2016,7,0,0
+soi-abdb2025:objectid:370,R<managara,2017,31,0,0
+soi-abdb2025:objectid:370,R<managara,2018,21,0,0
+soi-abdb2025:objectid:370,R<managara,2019,33,0,0
+soi-abdb2025:objectid:370,R<managara,2020,24,0,0
+soi-abdb2025:objectid:370,R<managara,2021,32,0,0
+soi-abdb2025:objectid:370,R<managara,2022,99,0,0
+soi-abdb2025:objectid:370,R<managara,2023,26,0,0
+soi-abdb2025:objectid:370,R<managara,2024,55,0,0
+soi-abdb2025:objectid:370,R<managara,2025,69,0,0
+soi-abdb2025:objectid:371,Udupi,2005,0,0,0
+soi-abdb2025:objectid:371,Udupi,2006,0,0,0
+soi-abdb2025:objectid:371,Udupi,2007,1,0,0
+soi-abdb2025:objectid:371,Udupi,2008,0,0,0
+soi-abdb2025:objectid:371,Udupi,2009,1,0,0
+soi-abdb2025:objectid:371,Udupi,2010,4,0,0
+soi-abdb2025:objectid:371,Udupi,2011,0,0,0
+soi-abdb2025:objectid:371,Udupi,2012,37,0,0
+soi-abdb2025:objectid:371,Udupi,2013,19,0,0
+soi-abdb2025:objectid:371,Udupi,2014,5,0,0
+soi-abdb2025:objectid:371,Udupi,2015,2,0,0
+soi-abdb2025:objectid:371,Udupi,2016,2,0,0
+soi-abdb2025:objectid:371,Udupi,2017,8,0,0
+soi-abdb2025:objectid:371,Udupi,2018,71,0,0
+soi-abdb2025:objectid:371,Udupi,2019,71,0,0
+soi-abdb2025:objectid:371,Udupi,2020,171,0,0
+soi-abdb2025:objectid:371,Udupi,2021,52,0,0
+soi-abdb2025:objectid:371,Udupi,2022,75,0,0
+soi-abdb2025:objectid:371,Udupi,2023,47,0,0
+soi-abdb2025:objectid:371,Udupi,2024,226,0,0
+soi-abdb2025:objectid:371,Udupi,2025,148,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2005,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2006,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2007,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2008,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2009,1,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2010,1,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2011,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2012,1,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2013,6,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2014,2,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2015,2,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2016,0,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2017,8,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2018,10,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2019,21,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2020,15,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2021,25,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2022,122,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2023,5,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2024,38,0,0
+soi-abdb2025:objectid:372,Tumak#ru,2025,35,0,0
+soi-abdb2025:objectid:373,Kodagu,2005,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2006,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2007,1,0,0
+soi-abdb2025:objectid:373,Kodagu,2008,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2009,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2010,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2011,0,0,0
+soi-abdb2025:objectid:373,Kodagu,2012,5,0,0
+soi-abdb2025:objectid:373,Kodagu,2013,6,0,0
+soi-abdb2025:objectid:373,Kodagu,2014,11,0,0
+soi-abdb2025:objectid:373,Kodagu,2015,10,0,0
+soi-abdb2025:objectid:373,Kodagu,2016,4,0,0
+soi-abdb2025:objectid:373,Kodagu,2017,7,0,0
+soi-abdb2025:objectid:373,Kodagu,2018,162,0,0
+soi-abdb2025:objectid:373,Kodagu,2019,105,0,0
+soi-abdb2025:objectid:373,Kodagu,2020,103,0,0
+soi-abdb2025:objectid:373,Kodagu,2021,41,0,0
+soi-abdb2025:objectid:373,Kodagu,2022,70,0,0
+soi-abdb2025:objectid:373,Kodagu,2023,62,0,0
+soi-abdb2025:objectid:373,Kodagu,2024,125,0,0
+soi-abdb2025:objectid:373,Kodagu,2025,132,0,0
+soi-abdb2025:objectid:374,B\dar,2005,0,0,0
+soi-abdb2025:objectid:374,B\dar,2006,0,0,0
+soi-abdb2025:objectid:374,B\dar,2007,0,0,0
+soi-abdb2025:objectid:374,B\dar,2008,0,0,0
+soi-abdb2025:objectid:374,B\dar,2009,1,0,0
+soi-abdb2025:objectid:374,B\dar,2010,0,0,0
+soi-abdb2025:objectid:374,B\dar,2011,0,0,0
+soi-abdb2025:objectid:374,B\dar,2012,0,0,0
+soi-abdb2025:objectid:374,B\dar,2013,1,0,0
+soi-abdb2025:objectid:374,B\dar,2014,4,0,0
+soi-abdb2025:objectid:374,B\dar,2015,0,0,0
+soi-abdb2025:objectid:374,B\dar,2016,16,0,0
+soi-abdb2025:objectid:374,B\dar,2017,0,0,0
+soi-abdb2025:objectid:374,B\dar,2018,2,0,0
+soi-abdb2025:objectid:374,B\dar,2019,5,0,0
+soi-abdb2025:objectid:374,B\dar,2020,38,0,0
+soi-abdb2025:objectid:374,B\dar,2021,43,0,0
+soi-abdb2025:objectid:374,B\dar,2022,22,0,0
+soi-abdb2025:objectid:374,B\dar,2023,16,0,0
+soi-abdb2025:objectid:374,B\dar,2024,50,0,0
+soi-abdb2025:objectid:374,B\dar,2025,206,0,0

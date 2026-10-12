@@ -1,0 +1,98 @@
+[
+  {
+    "bytes": 980176,
+    "document_date": "2020-09-22",
+    "evidence_date": "2020-09-21",
+    "family": "OFFICIAL_STATE_REPORT",
+    "finding": "Udupi named in affected coastal districts and rescue response; enclosure received September 21, not a new September 22 observation",
+    "http_status": 200,
+    "id": "mha-2020",
+    "inspection": "ANALYST_TEXT_AND_RENDER_INSPECTED_NOT_SCIENTIFIC_APPROVAL",
+    "limits": "Flood/heavy-rainfall regional report; exact Udupi flood footprint, onset and each candidate association UNKNOWN; coastal totals not assigned to Udupi",
+    "pages": [
+      1,
+      5,
+      6
+    ],
+    "publisher": "Ministry of Home Affairs / National Disaster Management Division",
+    "publisher_checksum": "NOT_PUBLISHED_IN_RESPONSE",
+    "reference": "data/raw/flood_event_pilot_phase12d_v1/mha-2020.pdf",
+    "response_date": "Mon, 12 Oct 2026 13:39:50 GMT",
+    "rights": "LOCAL_ONLY; source and imagery permissions unresolved for redistribution",
+    "sha256": "4378593eb6d445ada07ab8f2f3e028f2b2201eaf8d26c1c598ea39a082deb57b",
+    "type": "REGIONAL_RESPONSE_CONTEXT",
+    "url": "https://ndmindia.mha.gov.in/ndmi/viewUploadedDocument?uid=NEW308"
+  },
+  {
+    "bytes": 910728,
+    "document_date": "2021-07-27",
+    "evidence_date": "2021-07-27",
+    "family": "OFFICIAL_STATE_REPORT",
+    "finding": "Karnataka flood section reports villages flooded along rivers in Belagavi, Bagalkot and Gadag; attributed to Upper Krishna reservoir discharge",
+    "http_status": 200,
+    "id": "mha-2021",
+    "inspection": "ANALYST_TEXT_AND_RENDER_INSPECTED_NOT_SCIENTIFIC_APPROVAL",
+    "limits": "Regional event evidence, no exact cell geometry or onset; mechanism is official reported context, not a verified mechanism for each news group",
+    "pages": [
+      1,
+      2,
+      3
+    ],
+    "publisher": "Ministry of Home Affairs / National Disaster Management Division",
+    "publisher_checksum": "NOT_PUBLISHED_IN_RESPONSE",
+    "reference": "data/raw/flood_event_pilot_phase12d_v1/mha-2021.pdf",
+    "response_date": "Mon, 12 Oct 2026 13:41:42 GMT",
+    "rights": "LOCAL_ONLY; source and imagery permissions unresolved for redistribution",
+    "sha256": "4d0b5161f65ee61db3f649087ebd29f3d1ccc257b0267f8e97a4fe69b799db50",
+    "type": "REGIONAL_FLOOD_OUTCOME",
+    "url": "https://ndmindia.mha.gov.in/ndmi/viewUploadedDocument?uid=D322"
+  },
+  {
+    "bytes": 2732373,
+    "document_date": "2021-07-29",
+    "evidence_date": "2021-07-26",
+    "family": "OFFICIAL_REMOTE_SENSING",
+    "finding": "Official map labels inundation around Hulagabali/Halyal/Sankaratti in parts of Belgaum",
+    "http_status": 200,
+    "id": "nrsc-2021-26",
+    "inspection": "ANALYST_TEXT_AND_RENDER_INSPECTED_NOT_SCIENTIFIC_APPROVAL",
+    "limits": "Acquisition date only; cloud occlusion, no validated target-grid mask, for-official-use notice and external imagery rights",
+    "map_id": "2021/01",
+    "pages": [
+      1
+    ],
+    "publisher": "National Remote Sensing Centre / ISRO",
+    "publisher_checksum": "NOT_PUBLISHED_IN_RESPONSE",
+    "reference": "data/raw/flood_event_pilot_phase12d_v1/nrsc-2021-26.pdf",
+    "response_date": "Mon, 12 Oct 2026 13:39:53 GMT",
+    "rights": "LOCAL_ONLY; source and imagery permissions unresolved for redistribution",
+    "sensor": "WorldView-3",
+    "sha256": "e9ef7fa6beeb9eec773dec6fdcd1c2ca223a021d91156e7b7f71e4247e70ecdf",
+    "type": "SATELLITE_DOCUMENTARY_INUNDATION",
+    "url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/maps_dms/Karnataka_floods_26jul_VAP_tile1.pdf"
+  },
+  {
+    "bytes": 4041023,
+    "document_date": "2021-07-29",
+    "evidence_date": "2021-07-28",
+    "family": "OFFICIAL_REMOTE_SENSING",
+    "finding": "Official inundation map with flood annotations in Maharashtra/Karnataka near Hulagabali and Kudachi",
+    "http_status": 200,
+    "id": "nrsc-2021-28",
+    "inspection": "ANALYST_TEXT_AND_RENDER_INSPECTED_NOT_SCIENTIFIC_APPROVAL",
+    "limits": "Acquisition date only; clouds, map viewport is not flood extent, no validated target-grid mask; for official use",
+    "map_id": "2021/06",
+    "pages": [
+      1
+    ],
+    "publisher": "National Remote Sensing Centre / ISRO",
+    "publisher_checksum": "NOT_PUBLISHED_IN_RESPONSE",
+    "reference": "data/raw/flood_event_pilot_phase12d_v1/nrsc-2021-28.pdf",
+    "response_date": "Mon, 12 Oct 2026 13:42:02 GMT",
+    "rights": "LOCAL_ONLY; source and imagery permissions unresolved for redistribution",
+    "sensor": "Resourcesat-2A LISS-III",
+    "sha256": "f92b680bb87b1c675bb76da47ca482800085838102126cb6c0cd07007099c676",
+    "type": "SATELLITE_DOCUMENTARY_INUNDATION",
+    "url": "https://www.nrsc.gov.in/nrscnew/assets/pdf/maps_dms/Maharashtra_floods_28jul_VAP_tile6.pdf"
+  }
+]

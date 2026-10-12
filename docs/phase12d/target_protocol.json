@@ -1,0 +1,40 @@
+{
+  "protocol_id": "floodpulse-occurrence-pilot-proposed-v1",
+  "review_status": "PROPOSED_REQUIRES_INDEPENDENT_SCIENTIFIC_REVIEW",
+  "training_authorized": false,
+  "geographic_unit": {
+    "crs": "EPSG:32643",
+    "grid_origin_m": [0, 0],
+    "cell_side_m": 250,
+    "initial_domain_reference": "data/processed/udupi_drainage_gis_v1/study_area.geojson",
+    "initial_domain_sha256": "4ff462c31f3cea5e7c00875ce9088942ad22e794ac1a7edfbede995eac4d0c6d",
+    "inclusion": "Only whole grid cells covered by the pre-existing study window; freeze unit geometry and hash before outcome sampling",
+    "administrative_identity": "Public research window, not a certified current or historical district boundary"
+  },
+  "issue_time": "00:00:00 UTC on each scheduled date",
+  "issue_clock_utc": "00:00:00",
+  "horizon_hours": 24,
+  "minimum_contiguous_patch_area_m2": 2500,
+  "target_interval": "[issue_time, issue_time + 24 hours)",
+  "flood_occurrence": "At least one independently confirmed contiguous patch of temporary inundation covering at least 2500 square metres of previously non-permanent-water land inside the fixed cell during the target interval",
+  "threshold_review": "2500 square metres is a proposed operational definition, not a validated sensor detection limit; local sensitivity and permanent-water baselines require independent scientific approval",
+  "scope_limit": "Floods below the proposed mapping threshold, under vegetation or buildings, and narrow urban drainage flooding may be unobservable; this pilot is not a validated all-flood Karnataka service",
+  "positive": "Independent observed inundation and validated permanence/quality/geometry with exact observation time within the interval, sufficient to meet the proposed patch threshold; candidate-group/event identity separately adjudicated",
+  "negative": "Independent, quality-reviewed observation process covers the same complete cell throughout the entire interval, capable of detecting the target patch, and verifies its absence throughout; discrete dry acquisitions alone are insufficient",
+  "unknown": "Any unresolved location, time, source independence, detection limit, partial coverage, permanence, rights, or review; no news silence or missing observation becomes a negative",
+  "required_observations": [
+    "Original source bytes and checksum, independent reference and provenance",
+    "Categorical temporary/permanent/dry/unknown coverage and spatial registration uncertainty",
+    "Exact acquisition timestamps and observation validity; issue dates and multi-day composites are not acquisition timestamps",
+    "Patch area/contiguity evidence, permanence baseline and independently validated local detection performance",
+    "Separately supplied scientific review receipt bound to protocol, source, cell geometry, interval and interpretation"
+  ],
+  "secondary_acquisition_target": "Temporary inundation at a predeclared actual future acquisition, issued 24 hours before its scheduled time; separate protocol approval needed. Acquisition classification alone is not future prediction or daily absence",
+  "independent_evaluation": [
+    "Hold out independently adjudicated physical events, spatial regions and later time blocks; unresolved group relationships cannot be declared independent examples or split across training and evaluation",
+    "Archive forecast runs, publication/availability receipts and antecedent feature windows available by issue time; delayed reanalysis and contemporaneous satellite outcomes cannot act as future predictors",
+    "Report event-level and unit-level sensitivity, precision, calibration and uncertainty against independently observed outcomes and simple baselines",
+    "Assess observation selection bias, missingness, geography transfer and seasonal coverage; sample-size/power and class coverage require external scientific review",
+    "No model fit until target, positive/negative evidence, rights and evaluation design receive independent scientific approval"
+  ]
+}

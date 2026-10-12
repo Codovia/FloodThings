@@ -14,6 +14,14 @@ unreviewed reported locations, not confirmed inundation or predictive labels.
 Eligible flood positives and defensible negatives remain **zero**.
 [Phase 12B](docs/FLOOD_OBSERVATION_FEASIBILITY.md) retains the observation protocol.
 
+[Phase 12D verified-event pilot](docs/VERIFIED_FLOOD_EVENT_PILOT.md) proposes a
+fixed-cell 24-hour flood-occurrence target and retains **19,814 cautious review
+groups**. Eight inspected news groups and two Udupi satellite reference controls
+yield **zero certified physical news groups and zero eligible training labels**.
+Official July 2021 Belagavi documentation corroborates regional flooding; exact
+candidate-group location/time and target-cell observations still require review.
+The target is proposed, scientifically unapproved; **NO-GO remains unchanged**.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.

@@ -5,6 +5,12 @@ distinct from satellite-observed inundation and independently approved predictiv
 labels. **Flood-model training remains NO-GO. No model is trained, replaced or
 deployed by this workflow.**
 
+The subsequent [Phase 12D verified-event pilot](VERIFIED_FLOOD_EVENT_PILOT.md)
+reuses this frozen extraction for conservative review grouping and a ten-item
+documentary pilot. It preserves these original results and retains the NO-GO
+decision; regional official evidence is not automatically a candidate-group or
+predictive training label.
+
 ## Acquisition and input integrity
 
 The explicitly approved source is [Groundsource v1 on Zenodo](https://zenodo.org/records/18647054),
