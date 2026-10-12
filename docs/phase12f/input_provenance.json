@@ -1,0 +1,58 @@
+{
+  "data/raw/reference/stage4a_v1/cwc_hddp2018.pdf": {
+    "bytes": 6912793,
+    "sha256": "16cecaf2c81fb6aa61879b39d96addd5ee4b39d0058e0ee249a6abeab6a64016"
+  },
+  "data/working/karnataka_external_hydrology_closure_v1/summary.json": {
+    "bytes": 909,
+    "sha256": "ea79ceaedf07e711cb601e1bd085ebce05d81f716ffef445c9153943407dd842"
+  },
+  "data/working/karnataka_glofas_2019_pilot_v1/daily_modelled_discharge.csv": {
+    "bytes": 280041,
+    "sha256": "f09b934c41a7ab856abdc4ccf1cefce1fd3a5b8d30d61969da42a2a6f6905bf3"
+  },
+  "data/working/karnataka_glofas_2019_pilot_v1/manifest.json": {
+    "bytes": 9477,
+    "sha256": "8ab83036518a89dbb14d8aae8147dd499f3e34636c92ccbdc2636db285700afd"
+  },
+  "data/working/karnataka_glofas_2019_pilot_v1/station_mapping.json": {
+    "bytes": 1760,
+    "sha256": "2e088083278e934190a42eade3353c5fe8f9d183f499bd2e3cc6140cd34fb0bf"
+  },
+  "data/working/karnataka_hydrology_2019_reconciled_v1/datum_compatibility.json": {
+    "bytes": 7489,
+    "sha256": "8f8f93243a0253a6c655a7d6db051b3f4adf0d450b94e464a5bd93402c981c29"
+  },
+  "data/working/karnataka_hydrology_2019_reconciled_v1/discharge_reconciliation.csv": {
+    "bytes": 42669,
+    "sha256": "1ba0dd8fbd4b842bbbefb55a13477da9eeb1dc61b20134bc5b305a841d2ffab5"
+  },
+  "data/working/karnataka_hydrology_2019_reconciled_v1/observation_quality.csv": {
+    "bytes": 2054142,
+    "sha256": "9a0429d13fc24a5c7532482812bd4a8d06bf3e9228237ba5da73a2f9ba2c456d"
+  },
+  "data/working/karnataka_hydrology_semantics_v1/coordinate_provenance.json": {
+    "bytes": 17471,
+    "sha256": "4c7b76020866c096bebbec9bfac609faa11c2fef938805019f6a3c3929cf1991"
+  },
+  "data/working/karnataka_hydrology_semantics_v1/stage4d_readiness.json": {
+    "bytes": 2938,
+    "sha256": "b2f4eb3b46ac886fbb1f1465c80d4e6a1538da33e8eef740011adc4c8861cf00"
+  },
+  "docs/phase12e/riverine_readiness.json": {
+    "bytes": 3537,
+    "sha256": "a257c89eb04936f30c73ff770b42fd8c450d465a6983e2782ead0d085d752a20"
+  },
+  "docs/phase12f/measured_series_inventory.json": {
+    "bytes": 8051,
+    "sha256": "02c0ff085374f770cd787749d58491bbba49ec10a3a06d73fc89f27bfe3f0b1b"
+  },
+  "docs/phase12f/measured_station_year_coverage.json": {
+    "bytes": 42745,
+    "sha256": "01df7d845cc79b581b686770ffa5e47c323fefaccc6fe27d7f392d4debcf7e06"
+  },
+  "docs/phase12f/source_access_review.json": {
+    "bytes": 8459,
+    "sha256": "c0e2752d96ae856af43d91855ce536f546935baefb1d808111256f0215a48988"
+  }
+}

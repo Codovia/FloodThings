@@ -31,6 +31,14 @@ positives, zero defensible negatives and NO-GO for future-flood training**. A
 forecast issued 24 hours before a pre-scheduled acquisition is proposed for
 scientific review; acquisition-time water classification is not a flood forecast.
 
+[Phase12F riverine forecasting foundation](docs/RIVERINE_FORECASTING_FOUNDATION.md)
+streams four retained NWDP archives and identifies 143,381 candidate station rows
+for Sadalga, Huvinhedgi and deferred Gokak. Time/datum/QC/identity and historical
+availability remain unresolved. A six-hour measured-stage experiment is
+**CONDITIONAL on named CWC documentation/corrections and independent review;
+training remains NO-GO**. Official-source forecast access is audited separately;
+no live forecast integration, model fit or alert is activated.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.

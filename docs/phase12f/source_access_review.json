@@ -1,0 +1,93 @@
+{
+  "phase": "12F",
+  "review_date": "2026-10-12",
+  "review_kind": "PRIMARY_SOURCE_ACCESS_AUDIT_NOT_INDEPENDENT_SCIENTIFIC_APPROVAL",
+  "scientific_approval": null,
+  "live_forecast_integrations": 0,
+  "local_ewds_access": {
+    "user_cdsapirc_file_exists": true,
+    "credential_contents_read": false,
+    "credential_validity": "UNVERIFIED",
+    "terms_acceptance": "UNVERIFIED",
+    "authenticated_request_attempted": false,
+    "note": "The earlier absent-configuration snapshot is not current; file presence does not prove credentials, accepted terms or forecast access."
+  },
+  "sources": [
+    {
+      "source": "CWC_MEASUREMENTS",
+      "receipt_names": ["cwc-ho.html", "nwdp-api.html", "cwc-copyright.html", "cwc-mso-directory.html"],
+      "coverage": "Three reconciled27-day Krishna-basin pilot stations; longer source-alias series already retained in four NWDP archives and streamed separately; no authoritative QC-approved dated-code series",
+      "access": "Existing NWDP resources and India-WRIS registered-user route; request absent unclassified records from Chief Engineer KGBO under retained2018 policy section6.2",
+      "policy_source": "https://www.cwc.gov.in/sites/default/files/hddp2018_0.pdf",
+      "policy_pdf_pages": [4, 5, 7],
+      "resource_ids": ["7778f459-0e82-4681-9638-5e494c36fd42", "f95150ea-c8fc-4740-8815-d9c34c9d53a3"],
+      "rights": "Detailed observations/coordinates remain local; portal Other(Open), CWC permission policy and possible third-party rights unresolved",
+      "additional_requirement": "Authoritative time/statistic/QC/datum/site-history dictionary, corrected QC-augmented records and release latency for retained histories, plus detailed-reuse permission; do not re-download raw archives",
+      "new_measurements_obtained": 0
+    },
+    {
+      "source": "CWC_FLOODWATCH",
+      "receipt_names": ["floodwatch-launch.html", "floodwatch-launch-explicit.html", "cwc-copyright.html"],
+      "classification": "OFFICIAL_RIVER_FORECAST_IF_ORIGINAL_FORECAST_RECORD_IS_OBTAINED",
+      "coverage": "2024 launch describes592 monitoring stations and150 reservoirs nationally; current Karnataka forecast-station set and forecast availability at shortlisted monitoring-only stations unverified",
+      "update_frequency": "Launch says real-time; exact machine-feed refresh schedule/SLA unverified",
+      "issue_time": "No original station forecast issue/valid timestamps obtained",
+      "access": "Public mobile application verified; documented public reusable machine endpoint not established in inspected official sources",
+      "display_rights": "Permission for republishing CWC website content required; app-feed-specific reuse permission not established",
+      "integration": "BLOCKED_NO_AUTHORIZED_FEED_OR_RIGHTS",
+      "request": "CWC Flood Forecasting Management/Information System Organisation: request documented read-only feed, station IDs, issue/availability/valid clocks, version/corrections/cadence, quota and public display permission; request referral rather than guessing an endpoint"
+    },
+    {
+      "source": "IMD_FFG",
+      "receipt_names": ["imd-reference.html", "imd-register.html", "imd-contact.html", "imd-basin-qpf.json", "imd-hydrology-sop.pdf"],
+      "classification": "OFFICIAL_FLASH_FLOOD_GUIDANCE_NOT_MEASURED_RIVER_FORECAST",
+      "coverage": "2021 SOP describes South Asia watershed guidance including India; exact current Karnataka watershed IDs not acquired",
+      "update_frequency": "2021 SOP: FFG products updated hourly; forecast-threat products at00/06/12/18UTC. Current external feed schedule unverified",
+      "issue_time": "No original current FFG product issue/valid clock obtained",
+      "sop_source": "https://mausam.imd.gov.in/imd_latest/contents/pdf/hydrology_sop.pdf",
+      "sop_browser_review_pages": [61, 64, 102, 103],
+      "sop_local_receipt": "Not accepted by bounded transport (ValueError); official browser text reviewed. No locally checksum-verified PDF claimed",
+      "access": "SOP user interface authorized/password-protected; public API reference does not establish a dedicated FFG endpoint. Documented basin-QPF endpoint returned401 without credentials",
+      "qpf_is_flood_forecast": false,
+      "display_rights": "FFG external-feed terms and public display permission unresolved",
+      "integration": "BLOCKED_AUTHORIZATION_PRODUCT_SCHEMA_AND_RIGHTS",
+      "request": "Use api.imd.gov.in public account registration (manual CAPTCHA/email verification) and API contact page for approved FFG access, product/watershed schema, issuance/validity/cadence and display rights. No account created or message sent"
+    },
+    {
+      "source": "KSNDMC",
+      "receipt_names": ["ksndmc-flood.html", "ksndmc-hydrology.html"],
+      "classification": "OFFICIAL_ALERT_IF_ORIGINAL_ALERT_IS_OBTAINED",
+      "coverage": "Karnataka public institution; inspected Flood Alerts page describes2022 rainfall spells, not a verified live issue-time feed",
+      "update_frequency": "UNKNOWN",
+      "issue_time": "No current original alert issue/expiry obtained",
+      "access": "Public information pages accessible; documented approved machine alert feed not established in inspected source scope",
+      "display_rights": "Copyright notice, no inspected alert-feed republication licence",
+      "integration": "BLOCKED_DOCUMENTED_ACCESS_AND_RIGHTS",
+      "request": "Director KSNDMC via official published contact: request read-only alert API/CAP/RSS if supported, stable source geographic IDs, issue/valid/expiry clocks, corrections, cadence and public display permission; do not infer endpoints from dashboards"
+    },
+    {
+      "source": "COPERNICUS_GLOFAS",
+      "receipt_names": ["glofas-forecast.html", "glofas-reforecast.html", "glofas-historical.html", "glofas-licence.html", "glofas-access.html", "glofas-web-services.html"],
+      "classification": "EXTERNAL_MODELLED_RIVER_FORECAST_NOT_CWC_OR_FLOODPULSE_AI",
+      "coverage": "Global model includes Karnataka spatial domain; station/reach identity remains separately gated",
+      "update_frequency": "Forecast overview daily; reforecast overview00UTC Mon/Thu24h steps46-day lead,2003-2022 reference years; historical daily",
+      "issue_time": "Initialization/reference time is not publication/availability; native current forecast issue/availability not obtained",
+      "versions": "Current retrieved overview: forecast/reforecast4.0; historical5.0 released2026-07-15. Do not mix versions or overwrite frozen v5 pilot",
+      "access": "Documented EWDS authenticated API and licence acceptance route. Web-services page describes WMS-T/SOS selected products but child tree cannot load; Karnataka SOS location/access not established",
+      "display_rights": "CEMS-FLOODS rev1 permits communication/distribution subject to terms, attribution and restricted-data exceptions; informational model output is not a national flood warning",
+      "integration": "CONDITIONAL_AUTHENTICATED_ACCESS_NATIVE_PRODUCT_RECEIPT_AND_REACH_REVIEW",
+      "request": "Account owner verifies applicable EWDS terms/CEMS-FLOODS acceptance. Then predeclare a tiny two-supported-cell, few-reference-date request using the actual download-form schema, byte estimate and version; no multiGB transfer or silent source/version fallback"
+    },
+    {
+      "source": "OPENHYDRONET",
+      "receipt_names": ["openhydronet-readme.md", "openhydronet-licence.txt", "openhydronet-docs.html"],
+      "classification": "CANDIDATE_AI_IMPLEMENTATION_NOT_LOCAL_PREDICTIVE_SKILL",
+      "access": "google-research/flood-forecasting official repository and documentation retrieved; no installation, weights or forcing archives downloaded",
+      "rights": "Retrieved repository code licence Apache2.0; data/weights licences require separate checks",
+      "requirements": "Caravan-compatible measured discharge, static catchment attributes and issue-appropriate meteorological hindcast/forecast forcings; model configuration and calibration/training participation need review",
+      "finding": "Current raw README uses modular Zarr Caravan setup; indexed search/older documentation mentions NetCDF. Pin actual reviewed revision/schema before future use",
+      "stage_target_compatibility": "Not established for proposed instantaneous +6h stage target; no direct stage-from-discharge substitution or unreviewed rating curve",
+      "integration": "DEFER_UNTIL_MEASURED_TARGET_AND_LOCAL_EVALUATION_READY"
+    }
+  ]
+}

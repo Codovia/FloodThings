@@ -1,0 +1,1419 @@
+[
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2001
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2002
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2003
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2004
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2005
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 333,
+      "rows": 333
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 333,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2006
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 216,
+      "rows": 216
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 214,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2007
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 373,
+      "rows": 373
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2008
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 151,
+      "rows": 151
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 151,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2009
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 155,
+      "rows": 155
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 152,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 214,
+      "rows": 214
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 213,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 363,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 367,
+      "rows": 367
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 364,
+      "rows": 364
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 340,
+      "rows": 340
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 340,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2020
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2021
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2022
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2023
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2024
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 368,
+      "rows": 368
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "discharge",
+    "year": 2025
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2001
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2002
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2003
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2004
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2005
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 334,
+      "rows": 334
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 334,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2006
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 153,
+      "rows": 153
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 153,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2007
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 96,
+      "rows": 96
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 96,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3,
+      "rows": 3
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 3,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2014
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 123,
+      "rows": 123
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 123,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2015
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 123,
+      "rows": 123
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 123,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 98,
+      "rows": 98
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 96,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 145,
+      "rows": 145
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 142,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 8,
+      "rows": 8
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 8,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 84,
+      "rows": 84
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 84,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2020
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 164,
+      "rows": 164
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 164,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2021
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 150,
+      "rows": 150
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 150,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2022
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 90,
+      "rows": 90
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 90,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2023
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 209,
+      "rows": 209
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 198,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2024
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 64,
+      "rows": 64
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 63,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "discharge",
+    "year": 2025
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2001
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2002
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2003
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2004
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 365,
+      "rows": 365
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2005
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 351,
+      "rows": 351
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 351,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2006
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 354,
+      "rows": 354
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 354,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2007
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2008
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 348,
+      "rows": 348
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 347,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2009
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 334,
+      "rows": 334
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 334,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2010
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 345,
+      "rows": 345
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 345,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2011
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 345,
+      "rows": 345
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 345,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2012
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 322,
+      "rows": 322
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 310,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 343,
+      "rows": 343
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 331,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2014
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 307,
+      "rows": 307
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 298,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2015
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 289,
+      "rows": 289
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 285,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 274,
+      "rows": 274
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 262,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 345,
+      "rows": 345
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 339,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 376,
+      "rows": 376
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 370,
+      "rows": 370
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2020
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 371,
+      "rows": 371
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2021
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 366,
+      "rows": 366
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2022
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 377,
+      "rows": 377
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2023
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 381,
+      "rows": 381
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2024
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 571,
+      "rows": 571
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "discharge",
+    "year": 2025
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 53,
+      "rows": 53
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 3,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2012
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 2319,
+      "rows": 2319
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 101,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3814,
+      "rows": 3814
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 213,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2014
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4174,
+      "rows": 4174
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2015
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 5033,
+      "rows": 5033
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 6014,
+      "rows": 6014
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 6013,
+      "rows": 6013
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4370,
+      "rows": 4370
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 352,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4856,
+      "rows": 4856
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 340,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000083",
+    "variable": "water_level",
+    "year": 2020
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1991
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1098,
+      "rows": 1098
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1992
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1993
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1994
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1995
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1098,
+      "rows": 1098
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1996
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1997
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1998
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 1999
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1098,
+      "rows": 1098
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2000
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2001
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2002
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2003
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1098,
+      "rows": 1098
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2004
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 1095,
+      "rows": 1095
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2005
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 453,
+      "rows": 453
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 151,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2006
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 53,
+      "rows": 53
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 3,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2012
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 2810,
+      "rows": 2810
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 265,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3849,
+      "rows": 3849
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 214,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2014
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4181,
+      "rows": 4181
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 364,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2015
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 5030,
+      "rows": 5030
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 5481,
+      "rows": 5481
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4710,
+      "rows": 4710
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 343,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4665,
+      "rows": 4665
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 332,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4516,
+      "rows": 4516
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 335,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000212",
+    "variable": "water_level",
+    "year": 2020
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 18,
+      "rows": 18
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 3,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2004
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 53,
+      "rows": 53
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 3,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2012
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3243,
+      "rows": 3243
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 268,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2013
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3880,
+      "rows": 3880
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 220,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2014
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4306,
+      "rows": 4306
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2015
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 5032,
+      "rows": 5032
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 366,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2016
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 5081,
+      "rows": 5081
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2017
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 6052,
+      "rows": 6052
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 365,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2018
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 3716,
+      "rows": 3716
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 292,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2019
+  },
+  {
+    "counts": {
+      "FINITE_SOURCE_VALUE_NOT_QC_APPROVED": 4004,
+      "rows": 4004
+    },
+    "eligible_training_rows": 0,
+    "scheduled_completeness": "UNKNOWN_NO_VALIDATED_EXPECTED_SCHEDULE",
+    "source_date_count": 266,
+    "source_resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+    "station_id_candidate": "CW1KRU000339",
+    "variable": "water_level",
+    "year": 2020
+  }
+]

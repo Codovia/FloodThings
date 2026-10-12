@@ -1,0 +1,50 @@
+[
+  {
+    "blocker": "Gauge/datum stability, exact timezone, QC, record-release evidence",
+    "feature": "Measured stage lags/change",
+    "issue_time_status": "UNKNOWN",
+    "retained": "1642 source rows"
+  },
+  {
+    "blocker": "Observed/computed/session statistic, timestamps, QC and release latency",
+    "feature": "Measured discharge lags",
+    "issue_time_status": "UNKNOWN",
+    "retained": "55 source rows, 14 legacy quality-caveated rows"
+  },
+  {
+    "blocker": "Verified upstream basin polygons with rights, rain gauge/grid mapping, interval bounds, latency",
+    "feature": "Upstream observed rainfall, 1/6/24h antecedents",
+    "issue_time_status": "UNKNOWN",
+    "retained": "No validated gauge-catchment issue-time joins"
+  },
+  {
+    "blocker": "Archived initialization/issue/publication/valid intervals and upstream aggregation; IMD QPF returned401",
+    "feature": "Historically issued NWP/QPF",
+    "issue_time_status": "UNKNOWN",
+    "retained": "No validated original issue-time forecast joins"
+  },
+  {
+    "blocker": "Historical simulation, not original forecast; v5 vs current v4 forecast overview, calibration/mapping/aggregation caveats",
+    "feature": "GloFAS historical discharge",
+    "issue_time_status": "NOT_DEMONSTRATED_AS_ISSUED",
+    "retained": "806 modelled rows"
+  },
+  {
+    "blocker": "EWDS authenticated access/terms, exact version/native schema; daily means not +6h stage",
+    "feature": "GloFAS reforecast",
+    "issue_time_status": "LATER_GENERATED_REFERENCE_ONLY",
+    "retained": "No newly acquired native values"
+  },
+  {
+    "blocker": "Original issued operation records, station network travel times, publication latency",
+    "feature": "Reservoir operation/releases and upstream stage",
+    "issue_time_status": "UNKNOWN",
+    "retained": "No validated issue-time joins"
+  },
+  {
+    "blocker": "Canonical dated gauge and upstream delineation; 2025 publication not proof of2019 geometry",
+    "feature": "Catchment/static attributes",
+    "issue_time_status": "HISTORICAL_APPLICABILITY_UNRESOLVED",
+    "retained": "CWC2025 catchment context and model static grids retained"
+  }
+]

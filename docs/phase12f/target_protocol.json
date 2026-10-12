@@ -1,0 +1,60 @@
+{
+  "A_discharge_alternative": "Measured discharge at a declared session/interval with compatible method and timing; existing daily sessions cannot validate +6h instantaneous discharge",
+  "A_is_flood_prediction": false,
+  "A_metrics": [
+    "MAE/RMSE/bias in original units",
+    "skill relative to persistence",
+    "peak magnitude/timing and rising-limb errors",
+    "event-block confidence intervals"
+  ],
+  "A_stage": "Instantaneous measured water-level at issue+6h, metre, same verified station datum",
+  "B": "Stage strictly greater than effective official CWC danger level at issue+6h; warning-level exceedance is a separately named target",
+  "B_interval_claim": "Point-time only; any exceedance during (issue,issue+6h] requires separately approved sampling/detection and full interval coverage for absence",
+  "B_is_inundation_map": false,
+  "B_metrics": [
+    "event detection/misses/false alarms and warning lead time",
+    "precision/recall and Brier/reliability for probabilities",
+    "separate point-time vs event-window scoring"
+  ],
+  "B_negative": "Accepted measured value <= applicable official level at the exact future instant only; missing times and daily averages cannot establish interval absence",
+  "first_experiment": "A_STAGE_PLUS_6H",
+  "historical_inputs": "Actual release/availability <= issue; retrospective reforecasts explicitly labelled later-generated, version-pinned, tested separately from as-issued operational claims",
+  "interval_convention": "Half-open UTC; provisional water-year blocks, confirm seasonal completeness before approval",
+  "issue_times_utc": [
+    "00:00",
+    "06:00",
+    "12:00",
+    "18:00"
+  ],
+  "last_measured_input_maximum_age_hours": 1,
+  "lead_hours": 6,
+  "models": [
+    "Persistence of last available measured stage",
+    "Training-only regularized linear regression of stage lags/change and reviewed rainfall",
+    "GloFAS only as compatible modelled-discharge reference, not a stage baseline without reviewed conversion",
+    "OpenHydroNet only after forcing/static/observed-discharge/schema/local skill gates"
+  ],
+  "sample_adequacy": "Independent reviewer must approve usable water years, effective event sample count, missingness, non-exceedance coverage and uncertainty; seven nominal common water years is not an automatic pass",
+  "scientific_approval": null,
+  "split_rule": "Chronological, no random rows; feature/outcome windows wholly within split; maximum24h antecedents and minimum24h embargo around boundaries; complete flood episodes assigned to one block, enlarging embargo to episode end; longer AI context requires separate larger embargo",
+  "station_priority": [
+    "CW1KRU000339",
+    "CW1KRU000083"
+  ],
+  "status": "PROPOSED_NOT_INDEPENDENTLY_APPROVED",
+  "test_period": [
+    "2018-06-01",
+    "2020-06-01"
+  ],
+  "training_authorized": false,
+  "training_period": [
+    "2013-06-01",
+    "2017-06-01"
+  ],
+  "unit": "One verified dated gauge cross-section; never whole district or inundation footprint",
+  "unknown": "Missing/conflicted/unapproved/computed/rejected/datum-incompatible/time-ambiguous measurements; never filled by GloFAS",
+  "validation_period": [
+    "2017-06-01",
+    "2018-06-01"
+  ]
+}
