@@ -1,0 +1,21 @@
+{
+  "checked_date": "2026-10-12",
+  "record_url": "https://zenodo.org/records/18647054",
+  "doi": "10.5281/zenodo.18647054",
+  "version": "v1 from landing page",
+  "licence": {
+    "id": "cc-by-4.0"
+  },
+  "files": [
+    {
+      "name": "groundsource_2026.parquet",
+      "bytes": 667122400,
+      "checksum": "md5:cd1b5de6508f7aad8e1d1d0dd4cecea6"
+    }
+  ],
+  "metadata_sha256": "245704dca997dcd8e5cb17f6e11a46164765c2707af2e109641820d9323ec38c",
+  "parquet_downloaded": false,
+  "schema_verified_from_parquet": false,
+  "karnataka_record_count": null,
+  "status": "METADATA_ONLY_SCHEMA_AND_KARNATAKA_COVERAGE_UNVERIFIED"
+}

@@ -1,5 +1,11 @@
 # FloodPulse — weather, historical flood evidence and GIS research
 
+Primary development objective: **actual flood-occurrence prediction across
+Karnataka**. [Phase 12A](docs/FLOOD_OUTCOME_FOUNDATION.md) implements an offline
+evidence/coverage audit and scientific training gates. Current flood-model training
+decision: **NO-GO**; no verified negative labels or independent daily-outcome test
+set. The existing heavy-rainfall model remains separate.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.

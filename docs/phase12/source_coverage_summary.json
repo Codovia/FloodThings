@@ -1,0 +1,382 @@
+{
+  "version": "karnataka_flood_outcome_foundation_v1",
+  "objective": "Karnataka actual flood occurrence; rainfall is supporting context",
+  "scopes": [
+    {
+      "gfd_id": 2728,
+      "district": "Udupi",
+      "shape_id": "76128533B4839184447445",
+      "start": "2005-09-14",
+      "end": "2005-09-30",
+      "positive_pixels": 33,
+      "valid_pixels": null,
+      "region_pixels": null,
+      "valid_fraction": null,
+      "status": "satellite_positive",
+      "reference": "data/processed/udupi_flood_spatial_v1/event_2728.geojson",
+      "sha256": "1ccaef876a7fa0cc396d284f8a40d8053c5ab927ec7ec90a83b16f951665a5b5"
+    },
+    {
+      "gfd_id": 3551,
+      "district": "Udupi",
+      "shape_id": "76128533B4839184447445",
+      "start": "2009-09-25",
+      "end": "2009-10-12",
+      "positive_pixels": 23,
+      "valid_pixels": null,
+      "region_pixels": null,
+      "valid_fraction": null,
+      "status": "satellite_positive",
+      "reference": "data/processed/udupi_flood_spatial_v1/event_3551.geojson",
+      "sha256": "c6ad0fe7b82ea2b02a477c2af42a798e24dfc5d3c3f07a504e7c4627654ec408"
+    },
+    {
+      "gfd_id": 3160,
+      "district": "Chikkaballapura",
+      "shape_id": "76128533B80772392204057",
+      "start": "2007-08-08",
+      "end": "2007-08-15",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 67383,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json",
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    {
+      "gfd_id": 2690,
+      "district": "Dharwad",
+      "shape_id": "76128533B75110579117636",
+      "start": "2005-07-07",
+      "end": "2005-07-27",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 67538,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json",
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    {
+      "gfd_id": 4382,
+      "district": "Raichur",
+      "shape_id": "76128533B284680734793",
+      "start": "2016-07-25",
+      "end": "2016-08-26",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 135207,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json",
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    {
+      "gfd_id": 3652,
+      "district": "Chitradurga",
+      "shape_id": "76128533B47594161132413",
+      "start": "2010-05-18",
+      "end": "2010-05-24",
+      "positive_pixels": 2,
+      "valid_pixels": 125242,
+      "region_pixels": 135134,
+      "valid_fraction": 0.9267985851081149,
+      "status": "satellite_positive",
+      "reference": "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json",
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    {
+      "gfd_id": 4508,
+      "district": "Gadag",
+      "shape_id": "76128533B33966968116377",
+      "start": "2017-08-10",
+      "end": "2017-08-26",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 74193,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json",
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    {
+      "gfd_id": 2935,
+      "district": "Mandya",
+      "shape_id": "76128533B43335986553000",
+      "start": "2006-07-28",
+      "end": "2006-09-12",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 78484,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    {
+      "gfd_id": 2507,
+      "district": "Dharwad",
+      "shape_id": "76128533B75110579117636",
+      "start": "2004-06-20",
+      "end": "2004-10-07",
+      "positive_pixels": 0,
+      "valid_pixels": 0,
+      "region_pixels": 67538,
+      "valid_fraction": 0.0,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    {
+      "gfd_id": 4378,
+      "district": "Kodagu",
+      "shape_id": "76128533B57609583882472",
+      "start": "2016-07-07",
+      "end": "2016-08-03",
+      "positive_pixels": 0,
+      "valid_pixels": 3314,
+      "region_pixels": 66031,
+      "valid_fraction": 0.050188547803304506,
+      "status": "insufficient_observation",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    {
+      "gfd_id": 2698,
+      "district": "Bijapur",
+      "shape_id": "76128533B40495457052818",
+      "start": "2005-07-23",
+      "end": "2005-08-16",
+      "positive_pixels": 0,
+      "valid_pixels": 166123,
+      "region_pixels": 166424,
+      "valid_fraction": 0.998191366629813,
+      "status": "observed_no_qualifying_floodwater",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    {
+      "gfd_id": 2758,
+      "district": "Kolar",
+      "shape_id": "76128533B29292403538801",
+      "start": "2005-10-23",
+      "end": "2005-12-09",
+      "positive_pixels": 329,
+      "valid_pixels": 63302,
+      "region_pixels": 65827,
+      "valid_fraction": 0.9616418794719492,
+      "status": "satellite_positive",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    {
+      "gfd_id": 3107,
+      "district": "Raichur",
+      "shape_id": "76128533B284680734793",
+      "start": "2007-06-22",
+      "end": "2007-07-04",
+      "positive_pixels": 0,
+      "valid_pixels": 132615,
+      "region_pixels": 135207,
+      "valid_fraction": 0.9808293949277774,
+      "status": "observed_no_qualifying_floodwater",
+      "reference": "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json",
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    }
+  ],
+  "inputs": {
+    "data/processed/udupi_flood_spatial_v1/event_2728.geojson": {
+      "bytes": 49455,
+      "sha256": "1ccaef876a7fa0cc396d284f8a40d8053c5ab927ec7ec90a83b16f951665a5b5"
+    },
+    "data/processed/udupi_flood_spatial_v1/event_3551.geojson": {
+      "bytes": 34289,
+      "sha256": "c6ad0fe7b82ea2b02a477c2af42a798e24dfc5d3c3f07a504e7c4627654ec408"
+    },
+    "data/working/karnataka_satellite_event_evidence_v2/event_evidence.json": {
+      "bytes": 709448,
+      "sha256": "428121e32b89e5d057c911690971e064aa8097125c971ccf7375dfcfb0fbe230"
+    },
+    "data/working/karnataka_satellite_event_evidence_v3/event_evidence.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json": {
+      "bytes": 860202,
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    "data/raw/flood_inventory/zenodo_16994648_recovery_v1/India_Flood_Inventory_v3.csv": {
+      "bytes": 1801579,
+      "sha256": "ef9ab2cd0db7bf917dcc22c7cb094ec599f5013ef1b96ba525d816f26ff1b108"
+    },
+    "data/raw/flood_inventory/zenodo_16994648_recovery_v1/source_retrieval.json": {
+      "bytes": 965,
+      "sha256": "63421139ae2f331b270b529f01f15274b460b367662454aec32b2c03e838d442"
+    },
+    "data/raw/flood_inventory/zenodo_16994648_recovery_v1/record.json": {
+      "bytes": 6163,
+      "sha256": "195cd2fe6afacb329d3a361f91214ac9e3cf7359c7534664a0050d9568a3becc"
+    },
+    "data/processed/udupi_historical_v1/event_evidence.csv": {
+      "bytes": 970,
+      "sha256": "7cf7c85e9ee47379b30caff5fd27c62bd24b8d68feef18e5adec599de91eb1b6"
+    },
+    "data/processed/udupi_historical_v1/manifest.json": {
+      "bytes": 15442,
+      "sha256": "6432a0730512012c7e9a048139b092636e9a3e005039191f75cc24fe95e389b1"
+    },
+    "data/working/karnataka_flood_events_v1/events.json": {
+      "bytes": 1117098,
+      "sha256": "770480e56cd36c91a8e157df0ceb0c4251e396961ad6c1146ed0f6be06a96874"
+    },
+    "data/working/karnataka_hydrology_2019_reconciled_v1/observation_quality.csv": {
+      "bytes": 2054142,
+      "sha256": "9a0429d13fc24a5c7532482812bd4a8d06bf3e9228237ba5da73a2f9ba2c456d"
+    },
+    "data/working/karnataka_hydrology_2019_reconciled_v1/discharge_reconciliation.csv": {
+      "bytes": 42669,
+      "sha256": "1ba0dd8fbd4b842bbbefb55a13477da9eeb1dc61b20134bc5b305a841d2ffab5"
+    },
+    "data/working/karnataka_glofas_2019_pilot_v1/daily_modelled_discharge.csv": {
+      "bytes": 280041,
+      "sha256": "f09b934c41a7ab856abdc4ccf1cefce1fd3a5b8d30d61969da42a2a6f6905bf3"
+    },
+    "data/working/karnataka_chirps_soi2025_2025_v1/daily_rainfall.csv": {
+      "bytes": 4142083,
+      "sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819"
+    },
+    "backend/models/rainfall_logistic_v1/model.json": {
+      "bytes": 1496,
+      "sha256": "f3fa9b53d7047746f9d26cba8556705fb3fd2328128a236cb4f423575acf4316"
+    },
+    "data/reference/karnataka_location_directory_v2/directory.json": {
+      "bytes": 24785,
+      "sha256": "567eaee63192b25d487491bb7f1b88e63e7082987ede259b2e0a1cf93792163b"
+    }
+  },
+  "ifi": {
+    "accessible_rows": 494,
+    "unique_source_event_ids": 494,
+    "date_window_status": {
+      "usable": 492,
+      "unusable": 2
+    },
+    "resolved_current_geometry": 0,
+    "label_semantics": "reported positives only; all 494 unresolved for fixed-unit daily training"
+  },
+  "gfd": {
+    "reviewed_event_groups": 13,
+    "status_counts": {
+      "satellite_positive": 4,
+      "insufficient_observation": 7,
+      "observed_no_qualifying_floodwater": 2
+    },
+    "positive_event_pixels": 387,
+    "positive_event_groups": 4,
+    "verified_negative_labels": 0,
+    "unknown_scope_records": 9,
+    "semantics": "at least one qualified non-permanent mapped-water cell in original event window; no daily onset"
+  },
+  "cwc": {
+    "accessible_observations": 1697,
+    "comparisons": 81,
+    "eligible_with_quality_caveat": 14,
+    "per_station_variable": {
+      "CW1KRU000083:discharge": 27,
+      "CW1KRU000083:water_level": 552,
+      "CW1KRU000212:discharge": 2,
+      "CW1KRU000212:water_level": 573,
+      "CW1KRU000339:discharge": 26,
+      "CW1KRU000339:water_level": 517
+    },
+    "datum_status": {
+      "CW1KRU000083": "datum_unresolved",
+      "CW1KRU000212": "datum_unresolved",
+      "CW1KRU000339": "datum_unresolved"
+    },
+    "flood_labels": 0
+  },
+  "glofas": {
+    "accessible_modelled_rows": 806,
+    "columns": [
+      "station_id",
+      "cell_id",
+      "latitude",
+      "longitude",
+      "model_valid_time",
+      "interpreted_interval_start",
+      "interpreted_interval_end",
+      "interval_status",
+      "hydrology_source_type",
+      "dataset_id",
+      "model_version",
+      "variable",
+      "modelled_discharge",
+      "units",
+      "status",
+      "source_sha256",
+      "role"
+    ],
+    "flood_labels": 0,
+    "role": "modelled context; historical averages are not issued forecasts or measured truth"
+  },
+  "chirps": {
+    "accessible_annual_rows": 11315,
+    "columns": [
+      "source_state_lgd_code",
+      "source_district_lgd_code",
+      "district_name_original",
+      "nic_exact_name",
+      "identity_status",
+      "geometry_edition",
+      "geometry_source_id",
+      "geometry_version",
+      "date",
+      "source_collection",
+      "source_image_id",
+      "source_time_start_ms",
+      "source_time_end_ms",
+      "image_asset_version",
+      "units",
+      "mean_mm_per_day",
+      "min_mm_per_day",
+      "max_mm_per_day",
+      "expected_pixel_count",
+      "valid_pixel_count",
+      "valid_fraction",
+      "status",
+      "retrieved_at"
+    ],
+    "flood_labels": 0
+  },
+  "coverage_note": "Zeros count retained records only. Unobserved district-days are unenumerated UNKNOWN, never negative; exact-name source-region matches are not historical/current administrative certification.",
+  "unassigned_source_regions": [
+    "Bijapur"
+  ],
+  "training_readiness": {
+    "decision": "NO-GO",
+    "blocking_evidence": [
+      "TEST lacks independent positive and verified negative observations",
+      "TRAIN lacks independent positive and verified negative observations",
+      "complete one-to-one issue-time feature table absent",
+      "no scientifically eligible FLOOD_OBSERVED",
+      "no scientifically eligible NON_FLOOD_OBSERVED",
+      "reviewed fixed 24-hour flood-occurrence target/protocol absent"
+    ],
+    "eligible_rows": 0,
+    "operational_forecast_authorized": false
+  },
+  "candidate_audit": {
+    "counts": {
+      "eligible_rows": 0,
+      "ineligible_rows": 13,
+      "invalid_rows": 0,
+      "label_FLOOD_OBSERVED": 4,
+      "label_UNKNOWN": 9,
+      "rows": 13
+    },
+    "event_groups": 13,
+    "scientific_status": "NOT_CERTIFIED_FOR_TRAINING"
+  }
+}

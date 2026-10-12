@@ -3,6 +3,12 @@
 This is the current application summary. Dated research reports retain their
 historical findings; they do not establish new operational coverage.
 
+The primary objective is **actual Karnataka flood-occurrence prediction**. The
+[Phase 12A foundation](FLOOD_OUTCOME_FOUNDATION.md) audits retained flood evidence
+and daily-label training prerequisites. Its current decision is **NO-GO**: no
+scientifically eligible daily flood labels, verified negatives or independent
+flood test set. The experimental rainfall classifier remains a separate model.
+
 | Route | Implemented capability | Limits |
 |---|---|---|
 | `/` | Location, map, weather, experimental rainfall and shelter overview | Point information; no connected official emergency-warning feed |
