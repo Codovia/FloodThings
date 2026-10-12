@@ -1,0 +1,176 @@
+{
+  "approved_scope": "Small primary-source metadata/documents and bounded previews only; no credentials written, full native tile/SAFE/HDF/reforecast acquisition or government geometry redistribution",
+  "deferred_original_opera": {
+    "access_status": "No Earthdata netrc configured; existing EE access was used for small platform-derived subsets only",
+    "authorized": false,
+    "products": [
+      {
+        "native_class_files_bytes": 5118691,
+        "original_package_bytes": 5605057,
+        "product_id": "OPERA_L3_DSWx-S1_T43PDQ_20241204T004900Z_20241204T183634Z_S1A_30_v1.0",
+        "publisher_integrity": "Per-file NASA MD5 available in product register; untouched original files not acquired or checksum-verified"
+      },
+      {
+        "native_class_files_bytes": 719766,
+        "original_package_bytes": 1097295,
+        "product_id": "OPERA_L3_DSWx-S1_T43PDQ_20241209T005659Z_20241212T220859Z_S1A_30_v1.0",
+        "publisher_integrity": "Per-file NASA MD5 available in product register; untouched original files not acquired or checksum-verified"
+      }
+    ],
+    "purpose": "Recover untouched originals, embedded tags, source masks and publisher MD5 verification; does not resolve independent flood truth or permanence",
+    "rights": "NASA unrestricted data use with attribution; Earthdata access required for protected originals",
+    "total_original_package_bytes": 6702352,
+    "total_uncompressed_four_layer_bytes": 107164800,
+    "working_disk_reservation_bytes": 536870912
+  },
+  "deferred_sentinel1": {
+    "authorized": false,
+    "expected_total_product_bytes": 5119244656,
+    "products": [
+      {
+        "catalogue_content_length_bytes": 1706401930,
+        "catalogue_id": "86c826ef-26f3-5913-b6f2-afce1d90969a",
+        "product_id": "S1A_IW_GRDH_1SDV_20210717T004732_20210717T004757_038810_049451_0405.SAFE",
+        "publisher_checksums": [
+          {
+            "Algorithm": "MD5",
+            "ChecksumDate": "2025-12-01T07:48:43.575812Z",
+            "Value": "6199928c6f080c0d29c4b21a1e8b32ba"
+          },
+          {
+            "Algorithm": "BLAKE3",
+            "ChecksumDate": "2025-12-01T07:48:46.822656Z",
+            "Value": "19b4736faa98add3f077951289bf4204eea97e339202d88edfd4eb574aa2147b"
+          }
+        ]
+      },
+      {
+        "catalogue_content_length_bytes": 1706385435,
+        "catalogue_id": "5d077da8-e44c-5de5-b16b-6a5ecaec5e55",
+        "product_id": "S1A_IW_GRDH_1SDV_20210729T004733_20210729T004758_038985_049989_7AE1.SAFE",
+        "publisher_checksums": [
+          {
+            "Algorithm": "MD5",
+            "ChecksumDate": "2025-12-01T06:59:00.042834Z",
+            "Value": "eaf17d050f4a2d7a88945d5822916f40"
+          },
+          {
+            "Algorithm": "BLAKE3",
+            "ChecksumDate": "2025-12-01T06:59:02.501364Z",
+            "Value": "e287d822191779505a32fad9d9d4bd461dc9745fa2283801a2a56dd374dd2214"
+          }
+        ]
+      },
+      {
+        "catalogue_content_length_bytes": 1706457291,
+        "catalogue_id": "6851eb50-edc0-5d58-850f-15de994c5de3",
+        "product_id": "S1A_IW_GRDH_1SDV_20210705T004732_20210705T004757_038635_048F13_BF03.SAFE",
+        "publisher_checksums": [
+          {
+            "Algorithm": "MD5",
+            "ChecksumDate": "2025-12-01T08:37:27.467821Z",
+            "Value": "441c934d0d49d238e3a35d97d3f4a42c"
+          },
+          {
+            "Algorithm": "BLAKE3",
+            "ChecksumDate": "2025-12-01T08:37:30.888530Z",
+            "Value": "7ae617ab69cf3dc1368fb24628541593a121da267c8e2402bd69fdde063ba41b"
+          }
+        ]
+      }
+    ],
+    "purpose": "Recover native SAFE calibration/noise/orbit/version annotations for the existing July2021 research scenes; backscatter alone does not verify temporary flooding and July29 is not contemporaneous with July26/28 NRSC maps",
+    "reservation_basis": "Conservative20GiB initial budget for retained source, extraction, calibration/orbit/terrain/noise intermediates and scratch; must re-estimate actual transfer/unpacked volume before request",
+    "rights": "Copernicus Sentinel free full open access with attribution; legitimate CDSE download access and any service limits must be checked",
+    "working_disk_reservation_bytes": 21474836480
+  },
+  "free_bytes_after_acquisition": 359654350848,
+  "free_bytes_before_acquisition": 359662538752,
+  "gfd_modis": {
+    "authorized": false,
+    "catalogue_size_fields_mb": [
+      "40.3153",
+      "39.7163"
+    ],
+    "metadata_only_ids": [
+      "MOD09GQ.A2005257.h25v07.061.2020245185739",
+      "MOD09GQ.A2009268.h25v07.061.2021142075429"
+    ],
+    "reference_events": [
+      2728,
+      3551
+    ],
+    "scientific_gap": "Daily reflectance v061 is not exact original GFD V006 lineage or satellite acquisition time; companion Terra/Aqua MOD09GA/GQ QA, actual source pixels/acquisitions, JRC permanence and independent event timing still needed"
+  },
+  "glofas_reforecast": {
+    "authorized": false,
+    "catalogue_version_status": "Current reforecast overviewv4 vs retained historicalv5; verify native download schema/version/calibration/reference-date/lead/member/units/time windows first",
+    "expected_bytes": "UNKNOWN_NO_SCIENTIFICALLY_VALID_REQUEST_DEFINITION",
+    "products_requested": 0,
+    "rights": "Separate CEMS-FLOODS terms and legitimate account acceptance; no request made"
+  },
+  "native_opera_preview": {
+    "bands": [
+      "WTR_Water_classification",
+      "BWTR_Binary_water",
+      "CONF_Confidence",
+      "DIAG_diagnostic"
+    ],
+    "byte_ceiling_per_download": 2097152,
+    "dimensions": [
+      100,
+      100
+    ],
+    "expected_uncompressed_class_bytes_per_acquisition": 40000,
+    "large_download_authorized": false,
+    "maximum_pixels_per_acquisition": 10000,
+    "native_crs": "EPSG:32643",
+    "native_transform": [
+      30,
+      0,
+      399960,
+      0,
+      -30,
+      1500000
+    ],
+    "plan_status": "BOUNDED_PREVIEW_NOT_FULL_NATIVE_TILE",
+    "product_version": "1.0",
+    "provenance_limit": "Earth Engine native-grid subset, not untouched original PO.DAAC granule; exact sensing start/end requires CMR crosscheck. No source government geometry.",
+    "scientific_purpose": "Test native-resolution class/mask interpretability and adequate-observation guard over the preexisting public Udupi research window; not assert December flood events or train labels. Select first two sorted December 2024 passes, independent of pixel classes. Dates outside documented 2025 processing-issue interval.",
+    "source_ids": [
+      "OPERA/DSWX/L3_V1/S1/T43PDQ_20241204T004900Z_20241204T183634Z_S1A",
+      "OPERA/DSWX/L3_V1/S1/T43PDQ_20241209T005659Z_20241212T220859Z_S1A"
+    ],
+    "source_rights_reference": "https://developers.google.com/earth-engine/datasets/catalog/OPERA_DSWX_L3_V1_S1#terms-of-use",
+    "storage": "data/raw/direct_flood_observations_phase12e_v1/previews/",
+    "total_download_ceiling": 4194304,
+    "window_reference": "data/processed/udupi_drainage_gis_v1/study_area.geojson",
+    "window_transform": [
+      30,
+      0,
+      471150,
+      0,
+      -30,
+      1476450
+    ]
+  },
+  "next_gate": "Before any substantial new transfer, identify source/right/ID/native bytes/disk requirement and exact independent scientific purpose, then obtain explicit user authorization. Current full-scene transfers would not by themselves clear label/training gates.",
+  "nrsc_originals": {
+    "authorized": false,
+    "download_bytes": "UNKNOWN_NO_NATIVE_SCENE_IDENTIFIED",
+    "official_map_ids": [
+      "09-FL-2021-KA/2021/01",
+      "08-FL-2021-MH/2021/06"
+    ],
+    "original_granule_ids": "UNKNOWN",
+    "original_sensing_clock": "UNKNOWN",
+    "rights": "For-official-use notices; WorldView/InternationalCharter830 rights unresolved. General23.5mLISSIII free2yearlag archive policy does not identify or license this exact disaster product",
+    "source_images": [
+      "WorldView3,2021-07-26",
+      "Resourcesat2A LISSIII,2021-07-28"
+    ]
+  },
+  "phase": "12E",
+  "protected_storage": "Existing ignored data/raw/direct_flood_observations_phase12e_v1/; derived audit in data/working/direct_flood_observations_phase12e_v1/",
+  "status": "BOUNDED_ACQUISITIONS_COMPLETED_LARGE_TRANSFERS_NOT_AUTHORIZED"
+}

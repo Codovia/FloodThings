@@ -1,0 +1,68 @@
+{
+  "blockers": [
+    "No contemporary independently reviewed permanent-water baseline",
+    "Publisher catalogue bounds differ from platform footprints; original GeoTIFF georeferencing not verified",
+    "No local class/detection-limit validation, especially inundated vegetation",
+    "Second acquisition is entirely no-data; source footprint is not valid coverage",
+    "2500m2 threshold is not supported by OPERA documented >3ha/200m open-water domain",
+    "Discrete acquisitions cannot certify complete next24hour absence",
+    "No pre-issued acquisition schedule or historical feature availability receipts",
+    "No independently approved target or independent event/time/geography evaluation set",
+    "CWC time/datum/QC/threshold/coordinate and reuse gaps;14caveated rows are not labels",
+    "GloFAS modelled dailymean/reforecast version parity is unresolved"
+  ],
+  "bounded_previews_acquired": 2,
+  "complete_issue_time_feature_joins": 0,
+  "defensible_negative_labels": 0,
+  "district_coverage": {
+    "Belagavi_native_scene_metadata": {
+      "eligible_labels": 0,
+      "new_native_rasters": 0,
+      "scenes": 3
+    },
+    "Udupi_public_research_window": {
+      "acquisitions": 2,
+      "eligible_labels": 0,
+      "nonfill_acquisitions": 1
+    }
+  },
+  "eligible_positive_labels": 0,
+  "independent_eligible_flood_events": 0,
+  "metadata_acquisition": {
+    "requests": 26,
+    "retained_metadata_document_bytes": 2443538,
+    "statuses": {
+      "RETRIEVED": 19,
+      "UNAVAILABLE_HTTP": 6,
+      "UNAVAILABLE_OR_BUDGET_REJECTED": 1
+    }
+  },
+  "models_trained": 0,
+  "native_geographic_accuracy_verified_acquisitions": 0,
+  "native_metadata_product_ids": 12,
+  "negative_24hour_intervals_verified": 0,
+  "observation_pixel_contexts": 20000,
+  "observation_year_coverage": {
+    "2024": {
+      "eligible_labels": 0,
+      "previews": 2
+    }
+  },
+  "outcome_evidence_partition": {
+    "ADEQUATELY_OBSERVED_ABSENCE": 0,
+    "INSUFFICIENT_OBSERVATION": 13885,
+    "OBSERVED_TEMPORARY_INUNDATION": 0,
+    "PERMANENT_WATER": 0,
+    "UNKNOWN": 6115
+  },
+  "phase": "12E",
+  "preview_bytes": 13227,
+  "proposed_target_id": "floodpulse-future-scheduled-open-water-acquisition-proposed-v1",
+  "publisher_platform_footprint_disagreements": 2,
+  "source_inundated_vegetation_pixels": 7,
+  "source_nonfill_acquisitions": 1,
+  "source_open_water_high_confidence_pixels": 0,
+  "target_review_status": "PROPOSED_REQUIRES_INDEPENDENT_SCIENTIFIC_REVIEW",
+  "training_decision": "NO_GO",
+  "verified_future_predictive_observations": 0
+}

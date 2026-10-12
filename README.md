@@ -22,6 +22,15 @@ Official July 2021 Belagavi documentation corroborates regional flooding; exact
 candidate-group location/time and target-cell observations still require review.
 The target is proposed, scientifically unapproved; **NO-GO remains unchanged**.
 
+[Phase 12E direct-observation acquisition](docs/DIRECT_FLOOD_OBSERVATION_ACQUISITION.md)
+recovers two bounded OPERA Udupi source-class previews and the original catalogue
+metadata for three Belagavi Sentinel-1 scenes. One preview contains non-fill
+classes; the other is entirely no-data. Permanent-water interpretation, native
+georeferencing and independent outcomes remain unresolved: **zero eligible flood
+positives, zero defensible negatives and NO-GO for future-flood training**. A
+forecast issued 24 hours before a pre-scheduled acquisition is proposed for
+scientific review; acquisition-time water classification is not a flood forecast.
+
 See [current capabilities and operational limits](docs/CURRENT_CAPABILITIES.md) for
 the current application summary and shelter-freshness policy. The pending
 handwritten-wireframe redesign has not been implemented.

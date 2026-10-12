@@ -1,0 +1,106 @@
+{
+  "complete_forecast_outcome_joins": 0,
+  "current_catalogue": {
+    "historical_overview": "v5.0 operational released2026-07-15",
+    "reforecast_overview": "v4.0;2003-2022 referenceyears;00UTC Mon/Thu;24hmeans",
+    "version_parity": "UNRESOLVED_NOT_INTERCHANGEABLE"
+  },
+  "independently_validated_discharge_flood_thresholds": 0,
+  "measured_glofas_rows": 0,
+  "retained_closure_counts": {
+    "authenticated_requests": 0,
+    "features_created": 0,
+    "gokak_status": "gokak_reach_externally_unresolved",
+    "labels_created": 0,
+    "messages_sent": 0,
+    "new_retained_sources": 8,
+    "nwdp_attributes": {
+      "aggregation_window": "unresolved",
+      "timestamp_meaning": "unresolved",
+      "timezone": "unresolved",
+      "value_semantics": "unresolved",
+      "yearbook_equivalence": "unresolved"
+    },
+    "nwdp_status": "nwdp_temporal_semantics_externally_unresolved",
+    "performance_metrics": 0,
+    "preserved_comparison_cases": 81,
+    "preserved_disagreements": 33,
+    "preserved_eligible_rows": 14,
+    "preserved_measured_rows": 1697,
+    "public_search_closed": true,
+    "quantitative_comparisons": 0,
+    "search_queries": 24,
+    "selected_gokak_cell": null,
+    "stage": "4F",
+    "station_coordinate_status": "coordinate_conflict_unresolved",
+    "status": "external_hydrology_closure_complete_with_unresolved_items"
+  },
+  "retained_glofas_counts": {
+    "access": "glofas_v5_access_verified_from_supplied_official_file_not_new_authentication",
+    "approved_measured_rows_reviewed": 14,
+    "comparison_status": "temporal_semantics_unresolved",
+    "coordinate_repairs": 0,
+    "coordinate_variants": 12,
+    "extracted_cell_series": 13,
+    "features": 0,
+    "gokak_comparison": "measured_comparison_unavailable",
+    "labels": 0,
+    "mapping_status_counts": {
+      "glofas_cell_match_ambiguous": 1,
+      "glofas_cell_match_supported": 2
+    },
+    "model_time_steps": 62,
+    "modelled_rows": 806,
+    "preserved_comparisons": 81,
+    "preserved_eligible_rows": 14,
+    "preserved_measured_observations": 1697,
+    "preserved_unresolved_disagreements": 33,
+    "readiness": "modelled_hydrology_ready_limited",
+    "reviewed_candidates": 48,
+    "stations": 3,
+    "time_compatible_quantitative_comparisons": 0,
+    "valid_modelled_rows": 806
+  },
+  "station_coverage": {
+    "CW1KRU000083": {
+      "caveated_daily_discharge_rows": 2,
+      "compatible_flood_threshold": "NONE_VERIFIED",
+      "first_source_date": "2019-07-25",
+      "forecast_validation_status": "NO_GO",
+      "last_source_date": "2019-08-20",
+      "level_datum": "UNKNOWN",
+      "source_rows": {
+        "discharge": 27,
+        "water_level": 552
+      },
+      "timezone": "UNKNOWN"
+    },
+    "CW1KRU000212": {
+      "caveated_daily_discharge_rows": 0,
+      "compatible_flood_threshold": "NONE_VERIFIED",
+      "first_source_date": "2019-07-25",
+      "forecast_validation_status": "NO_GO",
+      "last_source_date": "2019-08-20",
+      "level_datum": "UNKNOWN",
+      "source_rows": {
+        "discharge": 2,
+        "water_level": 573
+      },
+      "timezone": "UNKNOWN"
+    },
+    "CW1KRU000339": {
+      "caveated_daily_discharge_rows": 12,
+      "compatible_flood_threshold": "NONE_VERIFIED",
+      "first_source_date": "2019-07-25",
+      "forecast_validation_status": "NO_GO",
+      "last_source_date": "2019-08-20",
+      "level_datum": "UNKNOWN",
+      "source_rows": {
+        "discharge": 26,
+        "water_level": 517
+      },
+      "timezone": "UNKNOWN"
+    }
+  },
+  "threshold_exceedance_labels": 0
+}

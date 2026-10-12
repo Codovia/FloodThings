@@ -1,0 +1,277 @@
+{
+  "backend_regression": {
+    "command": "backend/.venv/bin/python -B -m pytest -q backend/tests -k 'not real_training_reproduction' -o faulthandler_timeout=120",
+    "deselected": 1,
+    "passed": 1353,
+    "reason_for_deselection": "Existing real_training_reproduction test fits the rainfall model; no model fitting authorized or performed",
+    "warning": "Existing Starlette/httpx deprecation",
+    "warnings": 1
+  },
+  "baseline_commit": "8e702b944a5d207cb1d56b0c30fe6c73930eec68",
+  "branch": "feature/karnataka-data-foundation",
+  "complete_research_tests": {
+    "command": "PYTHONPATH=data/working/groundsource_runtime_v1 backend/.venv/bin/python -B -m pytest -q tests",
+    "passed": 264
+  },
+  "delivery_verification_method": "Explicit scoped Git commit/push followed independently by git ls-remote; exact resulting commit reported after delivery",
+  "final_protected_integrity": {
+    "authorized_existing_changes": [
+      "README.md",
+      "update.md"
+    ],
+    "comparison": "SHA256,size,nanosecondmtime",
+    "original_update_prefix_bytes": 482773,
+    "original_update_prefix_preserved": true,
+    "snapshot_files": 3472,
+    "unchanged_verified": 3470,
+    "unexpected_changes": []
+  },
+  "focused_tests": {
+    "command": "backend/.venv/bin/python -B -m pytest -q tests/test_direct_flood_observations.py",
+    "passed": 63
+  },
+  "models_fitted_or_deployed": 0,
+  "phase": "12E",
+  "pre_document_integrity": {
+    "authorized_existing_changes": [],
+    "snapshot_files": 3472,
+    "unexpected_changes": []
+  },
+  "protected_delivery_scope": {
+    "authorized_existing_paths": [
+      "README.md",
+      "update.md"
+    ],
+    "large_sources_restricted_geometry_credentials": "Ignored and excluded from Git",
+    "required_unchanged_files": 3470,
+    "snapshot_files": 3472,
+    "unrelated_environment_and_QandA": "Exact hash/size/nanosecondmtime required; excluded from staging"
+  },
+  "read_only_reproduction": "All new product/class/observation/contract/riverine/receipt/report outputs reproduced; public permitted copies matched exactly",
+  "source_checks": [
+    {
+      "check": "ifi",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/catalogue_karnataka_floods.py",
+        "--validate-only",
+        "data/working/karnataka_flood_events_v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "gfd_v2",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/recover_karnataka_satellite.py",
+        "--validate-only",
+        "data/working/karnataka_satellite_event_evidence_v2"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "gfd_v3",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/expand_karnataka_satellite.py",
+        "--validate-only",
+        "data/working/karnataka_satellite_event_evidence_v3"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "gfd_v4",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/expand_karnataka_satellite.py",
+        "--validate-only",
+        "data/working/karnataka_satellite_event_evidence_v4"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "hydro_reconciled",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/reconcile_karnataka_hydrology.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "hydro_semantics",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/resolve_hydrology_semantics.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "hydro_closure",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/close_hydrology_semantics.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "external_closure",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/close_external_hydrology.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "glofas",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/build_glofas_pilot.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "incidence",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/audit_belagavi_incidence.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "sar_calibration",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/calibrate_belagavi_sentinel1.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "sar_pilot",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/verify_sentinel1_pilot.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "udupi_history",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/extract_udupi_history.py",
+        "--validate-only"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "saved_rainfall",
+      "command": [
+        "backend/.venv/bin/python",
+        "-B",
+        "scripts/validate_saved_rainfall.py"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "foundation",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/build_flood_outcome_foundation.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "feasibility",
+      "command": [
+        "python3",
+        "-B",
+        "scripts/build_flood_observation_feasibility.py",
+        "validate",
+        "--public",
+        "docs/phase12b"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "soi",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/verify_soi_karnataka.py",
+        "--validate-only",
+        "data/working/karnataka_soi_abdb2025_v1"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "phase12c",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/audit_groundsource_karnataka.py",
+        "validate",
+        "--public",
+        "docs/phase12c"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "phase12d",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/build_verified_flood_event_pilot.py",
+        "validate",
+        "--public",
+        "docs/phase12d"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "phase12e_metadata",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/acquire_direct_observation_metadata.py",
+        "validate"
+      ],
+      "exit_code": 0
+    },
+    {
+      "check": "phase12e_observation_replay",
+      "command": [
+        "scripts/.venv/bin/python",
+        "-B",
+        "scripts/audit_direct_flood_observations.py",
+        "validate",
+        "--public",
+        "docs/phase12e"
+      ],
+      "exit_code": 0
+    }
+  ],
+  "source_checks_passed": 21,
+  "training_decision": "NO_GO"
+}
