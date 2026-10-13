@@ -5,6 +5,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from alembic import command
+from alembic.script import ScriptDirectory
 from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy import select, text, update
@@ -27,7 +28,7 @@ def imported(db):
 
 def test_clean_and_existing_schema_migration_and_safe_rollback(db):
     with db.connect() as c:
-        assert c.exec_driver_sql('SELECT version_num FROM alembic_version').scalar() == '0003_admin_notifications'
+        assert c.exec_driver_sql('SELECT version_num FROM alembic_version').scalar() == ScriptDirectory.from_config(migrate()).get_current_head()
         assert c.exec_driver_sql('SELECT note FROM unrelated_existing WHERE id=1').scalar() == 'preserve'
         names = set(c.exec_driver_sql("SELECT tablename FROM pg_tables WHERE schemaname='public'").scalars())
         assert set(dbmod.metadata.tables) <= names

@@ -6,10 +6,11 @@ from app.shelter_schema import SHELTER_TABLES
 from app.notification_schema import NOTIFICATION_TABLES
 from app.report_schema import REPORT_TABLES
 from app.subscription_schema import SUBSCRIPTION_TABLES
+from app.report_position_schema import POSITION_TABLES
 from sqlalchemy import MetaData
 
 target_metadata = MetaData()
-for table in [*metadata.tables.values(), *SHELTER_TABLES, *NOTIFICATION_TABLES, *REPORT_TABLES, *SUBSCRIPTION_TABLES]:
+for table in [*metadata.tables.values(), *SHELTER_TABLES, *NOTIFICATION_TABLES, *REPORT_TABLES, *SUBSCRIPTION_TABLES, *POSITION_TABLES]:
     table.to_metadata(target_metadata)
 
 engine = database_engine(os.environ.get('LOCATION_DIRECTORY_ADMIN_URL') or os.environ.get('DATABASE_URL'))

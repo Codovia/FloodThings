@@ -62,7 +62,7 @@ for name in ['DATABASE_URL', 'SHELTER_DATABASE_URL']:
     if not os.environ.get(name):
         sys.exit(f'Missing {name}. Configure the private launcher profile data/tmp/launcher/config.json or export this variable; activating a virtual environment does not configure database connections. See README.')
 try:
-    for name in ['fastapi', 'uvicorn', 'httpx', 'sqlalchemy', 'alembic', 'psycopg', 'geoalchemy2', 'numpy', 'sklearn']:
+    for name in ['fastapi', 'uvicorn', 'httpx', 'sqlalchemy', 'alembic', 'psycopg', 'geoalchemy2', 'numpy', 'sklearn', 'PIL']:
         importlib.import_module(name)
     from sqlalchemy.engine import make_url
     from app.shelter_security import SecurityConfig
@@ -126,7 +126,11 @@ try:
     from app.location_database import database_engine, DatabaseLocationStore, metadata
     from app.shelter_schema import SHELTER_TABLES
     from app.notification_schema import NOTIFICATION_TABLES
-    for key, tables in [('DATABASE_URL', list(metadata.tables.values())), ('SHELTER_DATABASE_URL', [*SHELTER_TABLES, *NOTIFICATION_TABLES])]:
+    from app.report_schema import REPORT_TABLES
+    from app.subscription_schema import SUBSCRIPTION_TABLES
+    from app.report_position_schema import POSITION_TABLES
+    from app.mvp_database import check_app_connection
+    for key, tables in [('DATABASE_URL', list(metadata.tables.values())), ('SHELTER_DATABASE_URL', [*SHELTER_TABLES, *NOTIFICATION_TABLES, *REPORT_TABLES, *SUBSCRIPTION_TABLES, *POSITION_TABLES])]:
         engine = database_engine(os.environ[key]); engines.append(engine)
         with engine.connect().execution_options(postgresql_readonly=True) as connection:
             connection.execute(text('SELECT postgis_lib_version()')).scalar_one()
@@ -136,6 +140,7 @@ try:
                 connection.execute(table.select().limit(0))
             assert inspector.has_table('alembic_version')
             if key == 'SHELTER_DATABASE_URL':
+                check_app_connection(connection)
                 for table, privileges in [('shelter_sessions', 'INSERT,UPDATE,DELETE'), ('shelter_login_limits', 'INSERT,UPDATE,DELETE'), ('emergency_shelters', 'INSERT,UPDATE'), ('shelter_audit', 'INSERT'), ('admin_notifications', 'INSERT,UPDATE')]:
                     for privilege in privileges.split(','):
                         assert connection.execute(text('SELECT has_table_privilege(current_user, :table, :privilege)'), {'table': table, 'privilege': privilege}).scalar_one()
