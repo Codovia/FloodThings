@@ -73,3 +73,9 @@ The integrated demo can prove application/database behavior with conspicuously l
 ## Verified delivery
 
 Database slice `9aab89cfd23a6f5486c9ede25561d20fca9e0c72` and citizen-evidence slice `83b79ed4a66c6b0cd04cd346054eb61a389ca3f2` were each pushed to `git@github.com:Codovia/FloodThings.git`, branch `feature/karnataka-data-foundation`, then separately compared with an independent `git ls-remote` query. Both matched exactly. The final integration/documentation commit hash is reported after publication outside this document to avoid a self-referential hash.
+
+## Administrator setup follow-up — 13 October 2026, 17:18:56 UTC
+
+The earlier zero-administrator snapshot has been superseded. The user ran **`./scripts/setup-admin.sh`**, privately chose their username/password, and created one administrator in the existing `floodpulse_directory` database at `0006`. The real browser verification receipt and an independent read-only account count confirm **one active administrator**, successful login at **http://127.0.0.1:14180/admin**, authenticated shelter management, citizen-report moderation and alert administration, logout and server-side session revocation. No credentials were provided to Codex, saved in source or logged; no alerts were sent. The original secure provisioning/authentication implementation is unchanged. Account setup now works without manually exporting the missing maintenance URL: the local command reads the existing owner-only maintenance secret in its own process. See [the one-command README procedure](../README.md).
+
+Persistent administrator provisioning is resolved. Real shelter authorization/capacity and Telegram configuration with a consenting recipient remain separate operational dependencies. The API receives no maintenance URL; Vite receives no database/bot credentials. Current application and development database remain running; isolated test services were stopped.
