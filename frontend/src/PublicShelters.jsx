@@ -24,9 +24,11 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const map=<><h2>Verified shelter entrances</h2><ShelterMap points={data?.shelters||[]} origin={point} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Only freshly revalidated Open destinations with spare capacity are marked. The selected-point marker is an origin, not a shelter. No markers are invented for missing records.</p></>
   const directions=s=>'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:`${s.latitude},${s.longitude}`,...(point?{origin:`${point.latitude},${point.longitude}`}:{})})
   async function checkDestination(event,shelter) {
-    event.preventDefault();setNavigation(null);setNavigationNotice('Rechecking destination availability…')
+    event.preventDefault();setNavigation(null)
+    if(!usableNavigationOrigin(selectedPoint)){setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.');return}
+    setNavigationNotice('Rechecking destination availability…')
     const requestedKey=key,latest=await current.refresh()
-    if(selectedKey.current!==requestedKey)return
+    if(selectedKey.current!==requestedKey||!usableNavigationOrigin(selectedPoint))return
     const found=latest?.shelters.find(s=>s.id===shelter.id&&s.latitude===shelter.latitude&&s.longitude===shelter.longitude)
     if(!found){setNavigationNotice('This destination could not be revalidated. No directions were opened. Check the current directory.');return}
     setNavigation({id:found.id,key:requestedKey,url:directions(found),at:Date.now()})
@@ -35,10 +37,10 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   return <section className={overview?"panel shelters-overview":"panel"} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">ADMINISTRATOR-REPORTED AVAILABILITY</p><h2 id="public-shelters-title">Emergency shelter directory</h2></div><button onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
     {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
-    {selectedPoint && !point && <p role="status">Your weather location is too uncertain or its GPS fix is stale for a navigation origin. External navigation will ask for your starting location.</p>}
+    {selectedPoint && !point && <p role="status">Your weather location is too uncertain or its GPS fix is stale for a navigation origin. Select an adequate starting location before requesting directions.</p>}
     <p className="muted">Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.</p>
     <details className="shelter-usage"><summary>Availability and safe navigation limitations</summary><p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed. This prototype is not affiliated with a disaster-management authority.</p>
-    {point?<p>Distances from selected point: {point.name}.</p>:<p>No starting location selected. Directions can ask you to enter an origin.</p>}
+    {point?<p>Distances from selected point: {point.name}.</p>:<p>No starting location selected. Choose a starting point on the map or an explicitly selected locality before requesting directions.</p>}
     <p className="notice">Approximate straight-line distance is not road distance. Flooding and road closures may make external routes unsafe. Confirm access and availability with local authorities before travel.</p>
     </details>
     {mapTarget&&enabled&&createPortal(map,mapTarget)}
@@ -59,7 +61,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
           <p>Verified {clock(s.verified_at)} · updated {clock(s.updated_at)} · verification expires {clock(s.verification_expires_at)}</p>
           {s.restrictions&&<p>Restrictions: {s.restrictions}</p>}{s.contact&&<p>Approved contact: {s.contact}</p>}
           {navigation?.id===s.id&&navigation.key===key&&navigation.url===directions(s)&&Date.now()-navigation.at<5000
-            ?<a href={navigation.url} onClick={event=>{if(Date.now()-navigation.at>=5000){event.preventDefault();setNavigation(null)}else setNavigation(null)}} target="_blank" rel="noopener noreferrer">{data.mode==='demonstration'?'Inspect demonstration directions (not for travel)':'Open external directions to verified entrance'}</a>
+            ?<a href={navigation.url} onClick={event=>{if(Date.now()-navigation.at>=5000||!usableNavigationOrigin(selectedPoint)){event.preventDefault();setNavigation(null)}else setNavigation(null)}} target="_blank" rel="noopener noreferrer">{data.mode==='demonstration'?'Inspect demonstration directions (not for travel)':'Open external directions to verified entrance'}</a>
             :<button type="button" onClick={event=>checkDestination(event,s)} disabled={current.loading}>Recheck availability for directions</button>}
         </li>)}</ul>
       </>}

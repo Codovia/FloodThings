@@ -22,6 +22,7 @@ beforeEach(() => {
   state.tileLayer.mockReturnValue({ addTo: vi.fn().mockReturnThis(), on: vi.fn((name, fn) => { state.tileEvents[name] = fn }) })
   state.circleMarker.mockReturnValue({ addTo: vi.fn().mockReturnThis() })
   vi.stubGlobal('fetch', vi.fn(async url => {
+    if(url==='/api/environment')return reply({mode:'live'})
     const query = new URL(url, 'http://localhost').searchParams
     const point = query.has('latitude') ? { latitude: Number(query.get('latitude')), longitude: Number(query.get('longitude')) } : null
     return reply(weather(point))
@@ -37,7 +38,7 @@ function coordinates(lat = '13.34', lon = '74.74') {
 
 it('keeps Bengaluru default and replaces weather with selected coordinates, preserving nulls and provenance', async () => {
   render(<App />); await screen.findByText('27 °C')
-  expect(fetch.mock.calls[0][0]).toBe('/api/weather')
+  expect(fetch.mock.calls.filter(([url])=>url.startsWith('/api/weather'))[0][0]).toBe('/api/weather')
   coordinates()
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74'))
   await screen.findByText('Selected map point')

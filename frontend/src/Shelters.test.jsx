@@ -78,6 +78,6 @@ it('malformed district contract stays an explicit error rather than crashing or 
 
 it.each([{kind:'network',accuracy_m:null},{kind:'gps',accuracy_m:1200,gps_timestamp:Date.now()},{kind:'gps',accuracy_m:40,gps_timestamp:0}])('does not send an uncertain/stale weather point as the routing origin',async properties=>{
  render(<PublicShelters point={{...point,...properties}} active/>);await screen.findByText(row.name)
- fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}));const link=await screen.findByRole('link',{name:'Inspect demonstration directions (not for travel)'})
- expect(new URL(link.href).searchParams.has('origin')).toBe(false);expect(screen.getByText(/External navigation will ask for your starting location/)).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}));await screen.findByText(/Select an adequate starting location before requesting directions. Network estimates/)
+ expect(screen.queryByRole('link',{name:/directions/})).toBeNull();expect(fetch).toHaveBeenCalledTimes(1)
 })

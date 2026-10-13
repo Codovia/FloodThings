@@ -71,6 +71,12 @@ def get_weather(request: Request) -> OpenMeteoAdapter:
     return request.app.state.weather
 
 
+@app.get('/api/environment')
+def environment_mode():
+    from .shelters import mode
+    return JSONResponse({'mode':mode()},headers={'Cache-Control':'no-store'})
+
+
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "floodpulse", "version": "0.1.0"}

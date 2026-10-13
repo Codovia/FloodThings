@@ -24,6 +24,8 @@ const pageInfo={
 
 export default function App() {
  const {path,navigate,heading}=usePage()
+ const [deploymentMode,setDeploymentMode]=useState(null)
+ useEffect(()=>{const controller=new AbortController();void(async()=>{try{const response=await fetch('/api/environment',{signal:controller.signal});const body=await response.json();if(response.ok&&['live','demonstration'].includes(body.mode)&&!controller.signal.aborted)setDeploymentMode(body.mode)}catch{/* Mode failure never invents operational readiness. */}})();return()=>controller.abort()},[])
  // Three separate identities: district evidence filter, weather point, map cell.
  // A district without a verified point never changes weather coordinates.
  const [selectedPoint,setSelectedPoint]=useState(null)
@@ -46,7 +48,7 @@ export default function App() {
  function filterDistrict(id,record){manualRevision.current++;homeLocation.cancel();setDistrictId(id);setDistrict(record||null);setEvidenceFeature(null)}
  function choosePoint(next){manualRevision.current++;homeLocation.cancel();if(next.district_id)setDistrictId(next.district_id);if(next.latitude===point.latitude&&next.longitude===point.longitude&&weatherPage)session.refresh(next);setSelectedPoint({...next})}
  return <>
-  <AppHeader path={path} navigate={navigate} />
+  <AppHeader path={path} navigate={navigate} mode={deploymentMode} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
    <section className="page-intro"><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }

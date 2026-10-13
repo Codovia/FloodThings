@@ -1,6 +1,8 @@
-# FloodPulse — weather, historical flood evidence and GIS research
+# FloodPulse — emergency response, local weather and research evidence
 
 Current user decision (13 October 2026): **emergency response MVP for demonstration on 16 October 2026**. Read [MVP priorities and decisions](docs/FLOODPULSE_MVP_PRIORITIES.md), [agent instructions](AGENTS.md), and [the implementation handoff](CODEX_START_HERE.md). This supersedes the previous prediction-first sequencing; Sprint 13.1 was not executed. Citizen alerts, verified shelters/navigation and moderated GPS/photo reports take priority. Minimal experimental prediction supports the demo and does not block application development or wait for CWC. The scientific validated-model training **NO-GO** remains; original research and provenance remain protected.
+
+[MVP end-to-end readiness](docs/MVP_END_TO_END_READINESS.md) records the verified database upgrade, real-browser reporting/moderation/shelter/navigation journey, live weather and experimental rainfall inference, screenshots and remaining administrator/shelter/Telegram setup dependencies. The isolated demonstration runner is `scripts/verify_mvp_e2e.py`; its fixtures are not operational facilities or incidents.
 
 [Phase 12C Groundsource extraction](docs/GROUNDSOURCE_KARNATAKA_EXTRACTION.md)
 verifies **19,854 Karnataka candidate news records**, including **18,194** with

@@ -53,9 +53,9 @@ test('provider and tile failure keep Home honest while historical evidence remai
 })
 test('Home does not request historical evidence or shelters and retains explicit unknown outcomes',async({page})=>{
  await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})
- await page.goto('/');await expect(page.getByRole('heading',{name:'Nearby river outlook'})).toBeVisible();await expect(page.getByText(/cannot currently be assessed reliably/)).toBeVisible()
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Nearby river outlook'})).toBeVisible();await expect(page.getByText(/Select a location to check supported river coverage/)).toBeVisible()
  await expect(page.getByText(/reviewed historical cells|Verified Open shelters/)).toHaveCount(0);await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0)
- await expect(page.getByText(/does not establish that no emergency exists/)).toBeVisible();expect(calls).toEqual([])
+ await expect(page.getByText(/Missing forecasts do not mean no flood risk/)).toBeVisible();expect(calls).toEqual([])
 })
 test('Shelters retains its fresh fixture and expiry protection after removal from Home',async({page})=>{
  await setup(page,'denied');let calls=0
@@ -74,8 +74,8 @@ test('Home has a large 60 percent map on desktop and normal overflow-free mobile
  }
 })
 
-test('reload preserves only the tab-session attempt flag and does not request GPS again',async({page})=>{
- await setup(page,'denied');await page.goto('/');await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);await page.reload();await expect(page.getByRole('heading',{name:'Karnataka statewide view'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(0);expect(await page.evaluate(()=>sessionStorage.getItem('floodpulse-home-location-attempted'))).toBe('1')
+test('reload makes one fresh bounded GPS attempt and stores no location coordinates',async({page})=>{
+ await setup(page,'denied');await page.goto('/');await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);await page.reload();await expect(page.getByRole('heading',{name:'Karnataka statewide view'})).toBeVisible();await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>Object.entries(sessionStorage))).toEqual([['floodpulse-home-location-attempted','1']])
 })
 
 test('native browser geolocation permission grant automatically selects the controlled GPS fix',async({page})=>{

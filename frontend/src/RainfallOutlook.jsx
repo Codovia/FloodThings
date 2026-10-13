@@ -43,7 +43,7 @@ export default function RainfallOutlook({ point, weather, freshness, overview=fa
   const validation=current.data?.validation
   const metricsAvailable=validation?.model_type==='Logistic Regression' && Number.isFinite(validation.precision) && validation.precision>=0 && validation.precision<=1 && Number.isFinite(validation.recall) && validation.recall>=0 && validation.recall<=1 && Number.isInteger(validation.samples) && validation.samples>0
   return <section className={overview?"panel ai-overview":"panel"} aria-labelledby="rainfall-outlook-title">
-    <div className="panel-heading"><div><p className="eyebrow">EXPERIMENTAL MACHINE LEARNING</p><h2 id="rainfall-outlook-title">AI Rainfall Outlook</h2></div>
+    <div className="panel-heading"><div><p className="eyebrow">EXPERIMENTAL MACHINE LEARNING</p><h2 id="rainfall-outlook-title">Experimental Heavy-Rainfall Indicator</h2></div>
       <button type="button" onClick={()=>open?setAttempt(n=>n+1):setOpen(true)} disabled={!active||!eligible||current.loading}>{current.loading?'Running rainfall model…':open?'Retry rainfall outlook':'Run experimental rainfall model'}</button></div>
     {!eligible&&<p role="status">Model unavailable for this selected point. Choose the verified Kundapur or Mangaluru locality; no inference request is made for unsupported locations.</p>}
     <p>{point.name} · next 24 complete hours beginning at the next full UTC hour.</p>

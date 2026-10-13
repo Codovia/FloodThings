@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-const record = () => ({ id: 'isolated-fixture', name: 'DEMONSTRATION ONLY — not a shelter', address: 'Isolated fixture', district_name: 'Udupi', latitude: 13.5, longitude: 74.7, capacity: 10, occupancy: 2, available_capacity: 8, water: 'yes', toilets: 'unknown', accessibility: 'TEST ONLY', status: 'open', verified_at: new Date().toISOString(), updated_at: new Date().toISOString(), verification_expires_at: new Date(Date.now() + 86400000).toISOString(), demonstration: true, straight_line_km: null })
+const record = () => ({ id: 'isolated-fixture', name: 'DEMONSTRATION ONLY — not a shelter', address: 'Isolated fixture', district_id: 'nic:udupi.nic.in', district_name: 'Udupi', latitude: 13.5, longitude: 74.7, capacity: 10, occupancy: 2, available_capacity: 8, water: 'yes', toilets: 'unknown', accessibility: 'TEST ONLY', status: 'open', verified_at: new Date().toISOString(), updated_at: new Date().toISOString(), verification_expires_at: new Date(Date.now() + 86400000).toISOString(), demonstration: true, straight_line_km: null })
 const directory = rows => ({ status: 'available', mode: 'demonstration', total: rows.length, verification_valid_hours: 24, shelters: rows })
 test.beforeEach(async ({ page }) => {
   await page.route('**/*', route => ['localhost', '127.0.0.1'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort())
@@ -23,9 +23,16 @@ test('directions are disclosed only after a fresh check and a failure removes de
   const link = page.getByRole('link', { name: 'Inspect demonstration directions (not for travel)' })
   await expect(link).toHaveCount(0)
   await page.getByRole('button', { name: 'Recheck availability for directions' }).click()
+  await expect(page.getByText(/Select an adequate starting location before requesting directions. Network estimates/)).toBeVisible()
+  await expect(link).toHaveCount(0)
+  await page.getByText('Change location',{exact:true}).click()
+  await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
+  await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
+  await page.getByRole('button', { name: 'Recheck availability for directions' }).click()
   await expect(link).toBeVisible()
   expect(new URL(await link.getAttribute('href')).searchParams.get('destination')).toBe('13.5,74.7')
-  expect(new URL(await link.getAttribute('href')).searchParams.has('origin')).toBe(false)
+  expect(new URL(await link.getAttribute('href')).searchParams.get('origin')).toBe('13.6250993,74.6915722')
   fail = true
   await page.getByRole('button', { name: 'Refresh shelters' }).click()
   await expect(page.getByText(/Controlled directory outage/)).toBeVisible()
