@@ -1,0 +1,46 @@
+import {test,expect} from '@playwright/test'
+import {mkdir,writeFile} from 'node:fs/promises'
+const output='/tmp/floodpulse-final-verification'
+// Owned uniform-colour 24x18 JPEG with explicitly constructed test-only EXIF.
+// Embedded capture clock/GPS are untrusted fixture metadata, never observations.
+const ownedJPEG='/9j/4AAQSkZJRgABAQAAAQABAAD/4QDORXhpZgAATU0AKgAAAAgAAodpAAQAAAABAAAAJoglAAQAAAABAAAAYAAAAAAAApADAAIAAAAUAAAARJARAAIAAAAHAAAAWAAAAAAyMDI2OjEwOjEzIDE3OjQzOjQ3ACswMDowMAAAAAQAAQACAAAAAk4AAAAAAgAFAAAAAwAAAJYAAwACAAAAAkUAAAAABAAFAAAAAwAAAK4AAAAAAAAADQAAAAEAAAAYAAAAAQAAAAAAAAABAAAASgAAAAEAAAAqAAAAAQAAAAAAAAAB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8AAEQgAEgAYAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/aAAwDAQACEQMRAD8A5yiiivtT4MKKKKACiiigAooooA//2Q=='
+test.skip(!process.env.FLOODPULSE_REPORT_TEST_PASSWORD,'Requires isolated UUID database runner')
+test('Chrome drainage GPS/photo -> private real metadata -> rejection -> withdrawal without public hazard or research promotion',async({page,browser})=>{
+ test.setTimeout(60000)
+ await mkdir(output,{recursive:true,mode:0o700})
+ await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort())
+ await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.4,longitude:74.7,accuracy:1250}) // Explicit CDP GPS fixture, not native device evidence.
+ await page.goto('/report');await page.getByLabel('Event type').selectOption('drainage_blockage')
+ await page.getByLabel('What did you see?').fill('DEMONSTRATION ONLY — drainage-obstruction report and owned JPEG metadata fixture, not a real incident.')
+ await page.getByRole('button',{name:'Use GPS for this report'}).click();await expect(page.getByText(/GPS accuracy ±1250 m/)).toBeVisible()
+ await page.locator('input[type=file]').first().setInputFiles({name:'DEMONSTRATION_ONLY_owned_metadata_fixture.jpg',mimeType:'image/jpeg',buffer:Buffer.from(ownedJPEG,'base64')})
+ await page.getByLabel(/I own or have permission/).check();await page.getByLabel(/Allow private extraction/).check();await page.getByLabel(/I consent to private admin review/).check()
+ await page.getByRole('button',{name:'Review report'}).click();await page.getByRole('button',{name:'Submit for private review'}).click()
+ await expect(page.getByText(/Recorded for private admin review/)).toBeVisible()
+ const id=(await page.getByRole('heading',{name:/^Report [a-f0-9]{8}-/,level:3}).innerText()).slice(7)
+ expect((await page.request.get('/api/admin/reports/'+id+'/photo')).status()).toBe(401)
+ expect((await page.request.get('/api/admin/reports')).status()).toBe(401)
+ expect([404,405]).toContain((await page.request.get('/api/reports/'+id)).status())
+ await page.screenshot({path:output+'/chrome-drainage-submission.png',fullPage:true})
+ const ctx=await browser.newContext({baseURL:'http://127.0.0.1:14173',viewport:{width:1366,height:768}});const admin=await ctx.newPage()
+ await admin.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort())
+ await admin.goto('/admin');await admin.getByLabel('Username',{exact:true}).fill('test-report-admin');await admin.getByLabel('Password',{exact:true}).fill(process.env.FLOODPULSE_REPORT_TEST_PASSWORD);await admin.getByRole('button',{name:'Sign in',exact:true}).click()
+ await admin.getByRole('button',{name:'Citizen reports',exact:true}).click();await admin.getByRole('button',{name:'drainage blockage · SUBMITTED',exact:true}).click()
+ await expect(admin.getByText('Decoded JPEG: 24 × 18 pixels. Vision model: unavailable.')).toBeVisible()
+ await expect(admin.getByText(/Location source: BROWSER_GPS/)).toBeVisible()
+ const queue=await (await admin.request.get('/api/admin/reports')).json();const before=queue.reports.find(r=>r.id===id)
+ expect(before.accuracy_m).toBe(1250);expect(before.image_metadata.vision_model).toBe('unavailable');expect(before.image_metadata.exif.trust).toBe('user_supplied_metadata_not_verified');expect(before.image_metadata.exif.gps.latitude).toBe(13.4)
+ const photo=await admin.request.get('/api/admin/reports/'+id+'/photo');expect(photo.status()).toBe(200);expect(photo.headers()['cache-control']).toContain('no-store')
+ await admin.getByLabel('Review reason and evidence (avoid personal identifiers)').fill('DEMONSTRATION ONLY: reject controlled drainage fixture; no verified incident or training outcome established.')
+ await admin.getByRole('button',{name:'Start review',exact:true}).click();await admin.getByRole('button',{name:'Reject report',exact:true}).click();await expect(admin.getByRole('button',{name:'drainage blockage · REJECTED',exact:true})).toBeVisible()
+ await admin.getByRole('button',{name:'Inspect report audit'}).click();await expect(admin.locator('pre').last()).toContainText('REJECTED')
+ const evidence=await (await admin.request.get('/api/admin/reports/evidence')).json();expect(evidence.records.some(r=>r.id===id)).toBe(false)
+ await admin.screenshot({path:output+'/chrome-drainage-rejection.png',fullPage:true})
+ await page.getByRole('button',{name:'Withdraw private evidence'}).click();await expect(page.getByText(/Private photo and location removed/)).toBeVisible()
+ expect((await admin.request.get('/api/admin/reports/'+id+'/photo')).status()).toBe(404)
+ await admin.getByRole('button',{name:'Refresh reports'}).click();await expect(admin.getByRole('button',{name:'drainage blockage · WITHDRAWN',exact:true})).toBeVisible()
+ await admin.getByRole('button',{name:'drainage blockage · WITHDRAWN',exact:true}).click();await expect(admin.getByRole('link',{name:'View private sanitized photo'})).toHaveCount(0)
+ const after=(await (await admin.request.get('/api/admin/reports')).json()).reports.find(r=>r.id===id);expect(after.latitude).toBeNull();expect(after.image_metadata).toBeNull()
+ await writeFile(output+'/drainage-results.json',JSON.stringify({browser:'Google Chrome',isolated:true,photo:'owned 24x18 JPEG/embedded EXIF fixture',GPS:'Chrome CDP override, 1250m accuracy',submitted:true,private_access:true,metadata_decoded:true,rejection_audited:true,rejected_export_excluded:true,withdrawal_erases_location_and_photo:true,training_truth_created:false,provider_mocks:false},null,2),{mode:0o600})
+ await ctx.close()
+})
