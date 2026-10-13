@@ -24,7 +24,7 @@ it('returning from admin uses a fresh cached point without hidden weather reques
 })
 it('Home distinguishes unconnected warnings from absence of emergencies and removes historical content',async()=>{
  window.history.replaceState(null,'','/');render(<App/>);await screen.findByRole('heading',{name:'Nearby river outlook'})
- expect(screen.getByText(/does not establish that no emergency exists/)).toBeTruthy()
+ expect(screen.getByText(/cannot confirm warning status/)).toBeTruthy()
  expect(screen.queryByText('No verified polygons')).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
  expect(screen.queryByText(/Low flood risk/)).toBeNull()
  expect(screen.queryByLabelText('Weather latitude')).toBeNull()

@@ -226,3 +226,19 @@ def test_reverse_geocoding_honors_provider_retry_after_across_different_points()
 def test_reverse_geocoding_requires_an_explicit_reported_accuracy():
  with TestClient(app) as c:
   assert c.post('/api/location/reverse',json={'latitude':16.575,'longitude':74.525}).status_code==422
+
+
+def test_location_provider_discovery_has_no_coordinates_or_secrets():
+ with TestClient(app) as c:
+  response=c.get('/api/location/provider')
+  assert response.json()=={'provider':'BigDataCloud'}
+  assert response.headers['cache-control']=='no-store'
+
+
+def test_locality_accuracy_policy_allows_kilometre_uncertainty_only_with_covering_polygon():
+ from app.home_geocoding import validate_name
+ point=HomePoint(latitude=16.575,longitude=74.525,accuracy_m=1200)
+ feature=geocode()
+ polygon={'type':'Polygon','coordinates':[[[74.4,16.45],[74.65,16.45],[74.65,16.7],[74.4,16.7],[74.4,16.45]]]}
+ assert validate_name(feature,{'type':'Feature','id':feature['id'],'geometry':polygon},point)['accuracy_supported']
+ with pytest.raises(ValueError):validate_name(feature,{'type':'Feature','id':feature['id'],'geometry':{'type':'Polygon','coordinates':[[[74.52,16.57],[74.53,16.57],[74.53,16.58],[74.52,16.58],[74.52,16.57]]]}},point)

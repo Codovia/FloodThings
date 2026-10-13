@@ -48,7 +48,7 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate }) {
       // Very large uncertainty circles obscure the entire state; report their radius in text instead.
       if (gps.accuracy_m > 0 && gps.accuracy_m <= 10000) L.circle([gps.latitude, gps.longitude], { radius: gps.accuracy_m, color: '#286ba4', weight: 1, fillOpacity: .08, interactive: false }).addTo(layers)
     }
-    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#087e7c', fillOpacity: .9 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : 'selected weather point; locality unconfirmed'}.`, 'Point weather details', '/weather', () => actions.current.navigate('/weather'))).addTo(layers)
+    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#087e7c', fillOpacity: .9 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : point.kind === 'network' ? 'approximate network estimate; uncertainty unknown' : 'selected weather point; locality unconfirmed'}.`, 'Point weather details', '/weather', () => actions.current.navigate('/weather'))).addTo(layers)
     if (river?.reach?.verified_grid === true) {
       const grid = river.grid_location
       L.circleMarker([grid.latitude, grid.longitude], { bubblingMouseEvents: false, radius: 7, color: '#6951a3', fillOpacity: .9 }).bindPopup(popup(`${river.reach.name} · verified model cell; daily GloFAS v4 discharge, not a flood boundary or observed water level.`, 'Inspect Flood Map context', '/flood-map', () => actions.current.navigate('/flood-map'))).addTo(layers)
@@ -57,7 +57,7 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate }) {
   }, [point, river])
   useEffect(() => {
     if (!map.current || !point) return
-    map.current.setView([point.latitude, point.longitude], point.accuracy_m > 10000 ? 8 : point.accuracy_m > 1000 ? 11 : 13, { animate: false })
+    map.current.setView([point.latitude, point.longitude], point.kind === 'network' || point.accuracy_m > 10000 ? 8 : point.accuracy_m > 1000 ? 11 : 13, { animate: false })
   }, [point?.latitude, point?.longitude, point?.accuracy_m])
   function statewide() { if (stateBounds.current) map.current?.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false }) }
   return <section className="panel workspace-map home-map-stage" aria-labelledby="home-map-title">

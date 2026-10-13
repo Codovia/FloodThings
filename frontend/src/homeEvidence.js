@@ -22,7 +22,8 @@ export function rainfallWindow(intervals, start, end) {
     if (r.start !== cursor || r.end > end || r.unit !== 'mm' || !Number.isFinite(r.mm) || r.mm < 0) return null
     total += r.mm; cursor = r.end
   }
-  return cursor === end && Number.isFinite(total) ? { mm: total, start, end } : null
+  const wet = relevant.filter(r => r.mm > 0)
+  return cursor === end && Number.isFinite(total) ? { mm: total, start, end, wet_hours: wet.length, rain_start: wet[0]?.start ?? null, rain_end: wet.at(-1)?.end ?? null } : null
 }
 export function assessNext24Rainfall(data, now) {
   // Provider timestamps END the preceding hour: first selected end is start + 1h.

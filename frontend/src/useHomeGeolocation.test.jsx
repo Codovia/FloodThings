@@ -4,7 +4,7 @@ import useHomeGeolocation, { GPS_TIMEOUT_MS } from './useHomeGeolocation.js'
 let get, success, failure, revision, selected, watcher
 beforeEach(() => {
   sessionStorage.clear(); vi.useFakeTimers(); vi.stubGlobal('isSecureContext', true)
-  vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({status:'disabled'})})))
+  vi.stubGlobal('fetch',vi.fn(async url=>({ok:true,json:async()=>url==='/api/location/provider'?{provider:'MapTiler'}:{status:'disabled'}})))
   revision = { current: 0 }; selected = vi.fn(); watcher = vi.fn()
   get = vi.fn((yes, no) => { success = yes; failure = no })
   Object.defineProperty(navigator, 'geolocation', { configurable: true, value: { getCurrentPosition: get, watchPosition: watcher } })
@@ -54,16 +54,16 @@ it('discards callbacks after leaving Home and only retries on an explicit action
   h.rerender({ active:true }); expect(get).toHaveBeenCalledTimes(1); act(() => h.result.current.request()); expect(get).toHaveBeenCalledTimes(2)
 })
 
-it('tab-session flag prevents another automatic request on application reload without storing coordinates', () => {
- const h=mount();act(()=>success(position()));h.unmount();get.mockClear();mount();expect(get).not.toHaveBeenCalled();expect(Object.entries(sessionStorage)).toEqual([['floodpulse-home-location-attempted','1']])
+it('a fresh application retries automatic location without storing coordinates', () => {
+ const h=mount();act(()=>success(position()));h.unmount();get.mockClear();mount();expect(get).toHaveBeenCalledTimes(1);expect(Object.entries(sessionStorage)).toEqual([['floodpulse-home-location-attempted','1']])
 })
 
 it('coarse GPS keeps statewide fallback without weather selection or reverse-geocoder calls',()=>{
  const h=mount();act(()=>success(position(13.34,74.74,279949)))
- expect(h.result.current.status).toBe('coarse');expect(h.result.current.gps).toBeNull();expect(h.result.current.message).toContain('Approximate location — select your town');expect(selected).not.toHaveBeenCalled();expect(fetch).not.toHaveBeenCalled()
+ expect(h.result.current.status).toBe('coarse');expect(h.result.current.gps).toBeNull();expect(h.result.current.message).toContain('Approximate location — select your town');expect(selected).not.toHaveBeenCalled();expect(fetch).toHaveBeenCalledTimes(1);expect(fetch.mock.calls[0][0]).not.toContain('latitude')
 })
 it('accepts a verified provider label without changing actual coordinates or assigning a district ID',async()=>{
- fetch.mockResolvedValue({ok:true,json:async()=>({status:'available',name:'Verified fixture town, Fixture context',accuracy_supported:true,geometry_verification:'provider_locality_polygon_covers_accuracy',feature_id:'municipality.test-only',source:{provider:'MapTiler'},administrative_identity_status:'provider_context_not_canonical_directory_join'})})
+ fetch.mockImplementation(async url=>({ok:true,json:async()=>url==='/api/location/provider'?{provider:'MapTiler'}:({status:'available',name:'Verified fixture town, Fixture context',accuracy_supported:true,geometry_verification:'provider_locality_polygon_covers_accuracy',feature_id:'municipality.test-only',source:{provider:'MapTiler'},administrative_identity_status:'provider_context_not_canonical_directory_join'})}))
  const h=mount();await act(async()=>success(position()))
  expect(h.result.current.gps.name).toBe('Verified fixture town, Fixture context')
  expect(selected).toHaveBeenLastCalledWith(expect.objectContaining({latitude:13.34,longitude:74.74,accuracy_m:50}))
@@ -84,4 +84,25 @@ it('times out naming without discarding the accepted weather coordinates',async(
  fetch.mockImplementation((_,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')))))
  const h=mount();act(()=>success(position()));await act(async()=>vi.advanceTimersByTimeAsync(GPS_TIMEOUT_MS))
  expect(h.result.current.gps.latitude).toBe(13.34);expect(selected).toHaveBeenCalledTimes(1);expect(h.result.current.message).toContain('Place naming timed out')
+})
+
+it.each([150,1200,8000])('accepts ±%s m for approximate weather without treating it as river precision', async accuracy=>{
+ const h=mount();await act(async()=>success(position(13.34,74.74,accuracy)))
+ expect(selected.mock.calls[0][0].accuracy_m).toBe(accuracy);expect(h.result.current.gps.latitude).toBe(13.34)
+})
+it('automatically names a live browser fix through the permitted client provider',async()=>{
+ fetch.mockImplementation(async url=>({ok:true,json:async()=>url==='/api/location/provider'?{provider:'BigDataCloud'}:{city:'TEST ONLY city',countryCode:'IN',lookupSource:'coordinates',latitude:13.34,longitude:74.74}}))
+ const h=mount();await act(async()=>success(position(13.34,74.74,1200)))
+ expect(h.result.current.gps.name).toBe('TEST ONLY city');expect(h.result.current.message).toContain('Approximate provider town label')
+ expect(fetch.mock.calls[1][0]).toContain('latitude=13.34');expect(fetch.mock.calls.some(([u])=>u==='/api/location/reverse')).toBe(false)
+})
+it('a coarse browser fix uses a separately attributed network point without sending coarse coordinates',async()=>{
+ fetch.mockResolvedValue({ok:true,json:async()=>({city:'TEST ONLY network city',countryCode:'IN',lookupSource:'ipGeolocation',latitude:13.3,longitude:74.7})})
+ const h=mount();await act(async()=>success(position(13.34,74.74,279949)))
+ expect(selected).toHaveBeenCalledWith(expect.objectContaining({kind:'network',accuracy_m:null,latitude:13.3}));expect(h.result.current.message).toContain('uncertainty unknown')
+ expect(fetch.mock.calls[0][0]).not.toContain('latitude');expect(h.result.current.gps).toBeNull()
+})
+it('ignores a late coarse fix after manual selection',()=>{
+ const h=mount();revision.current++;act(()=>h.result.current.cancel());act(()=>success(position(13.34,74.74,279949)))
+ expect(fetch).not.toHaveBeenCalled();expect(selected).not.toHaveBeenCalled()
 })

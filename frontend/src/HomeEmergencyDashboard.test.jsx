@@ -30,7 +30,7 @@ it.each(['loading','failure','stale'])('shows explicit %s weather without a curr
 })
 it('coarse fallback is prominent and requests neither weather nor river for an unaccepted point',()=>{
  render(<HomeEmergencyDashboard {...props()} point={null} location={{message:'Accuracy too large',status:'coarse'}}/>);
- expect(screen.getByRole('heading',{name:'Approximate location — select your town'})).toBeTruthy();expect(screen.getByText('Nearby flood possibility cannot currently be assessed reliably. Check official local warnings.')).toBeTruthy();expect(screen.getByText('Not connected')).toBeTruthy();expect(fetch).not.toHaveBeenCalled()
+ expect(screen.getByRole('heading',{name:'Approximate location — select your town'})).toBeTruthy();expect(screen.getByRole('heading',{name:'Local Conditions & Flood Outlook'})).toBeTruthy();expect(screen.getByText('Not connected')).toBeTruthy();expect(fetch).not.toHaveBeenCalled()
 })
 it('shows WMO current conditions, optional fields and a complete hourly total without flood inference',async()=>{
  const p=props(),begin=Math.ceil((Date.now()+19800000)/3600000)*3600000-19800000

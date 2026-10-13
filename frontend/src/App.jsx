@@ -8,7 +8,7 @@ import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
-import useHomeGeolocation, {MAX_GPS_ACCURACY_M} from './useHomeGeolocation.js'
+import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.js'
 
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
@@ -28,7 +28,7 @@ export default function App() {
  const [shelterMapTarget,setShelterMapTarget]=useState(null)
  const [contextVisible,setContextVisible]=useState(true)
  const weatherPage=path==='/' || path==='/weather'
- const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_GPS_ACCURACY_M)
+ const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_WEATHER_ACCURACY_M)
  const homePoint=homeGpsUnusable?null:selectedPoint
  const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!homePoint))
  const manualRevision=useRef(0)

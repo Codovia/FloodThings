@@ -1,10 +1,6 @@
 # FloodPulse — weather, historical flood evidence and GIS research
 
-Primary development objective: **actual flood-occurrence prediction across
-Karnataka**. [Phase 12A](docs/FLOOD_OUTCOME_FOUNDATION.md) implements an offline
-evidence/coverage audit and scientific training gates. Current flood-model training
-decision: **NO-GO**; no verified negative labels or independent daily-outcome test
-set. The existing heavy-rainfall model remains separate.
+Current user decision (13 October 2026): **emergency response MVP for demonstration on 16 October 2026**. Read [MVP priorities and decisions](docs/FLOODPULSE_MVP_PRIORITIES.md), [agent instructions](AGENTS.md), and [the implementation handoff](CODEX_START_HERE.md). This supersedes the previous prediction-first sequencing; Sprint 13.1 was not executed. Citizen alerts, verified shelters/navigation and moderated GPS/photo reports take priority. Minimal experimental prediction supports the demo and does not block application development or wait for CWC. The scientific validated-model training **NO-GO** remains; original research and provenance remain protected.
 
 [Phase 12C Groundsource extraction](docs/GROUNDSOURCE_KARNATAKA_EXTRACTION.md)
 verifies **19,854 Karnataka candidate news records**, including **18,194** with

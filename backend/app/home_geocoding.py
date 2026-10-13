@@ -14,7 +14,7 @@ import secrets
 import time
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from .home_geography import GPSPoint, MAX_GPS_ACCURACY_M, covers_accuracy
+from .home_geography import GPSPoint, covers_accuracy
 from .home_sources import SourceFailure, read_json
 
 router = APIRouter()
@@ -64,7 +64,7 @@ class ReverseGeocoder:
         self._cache_salt = secrets.token_bytes(32)
 
     async def resolve(self, point):
-        if point.accuracy_m > MAX_GPS_ACCURACY_M:
+        if point.accuracy_m > 5000:
             return {'status': 'unsupported', 'message': 'Approximate location — select your town.', 'source': CREDIT}
         if not self.enabled:
             return {'status': 'disabled', 'message': 'Automatic place naming is not configured. Select your town to show a reviewed locality name.', 'source': CREDIT}
@@ -110,3 +110,8 @@ class ReverseGeocoder:
 async def reverse_location(point: GPSPoint, request: Request):
     result = await request.app.state.reverse_geocoder.resolve(point)
     return JSONResponse(content=result, headers={'Cache-Control': 'no-store'})
+
+
+@router.get('/api/location/provider')
+async def location_provider(request: Request):
+    return JSONResponse({'provider': 'MapTiler' if request.app.state.reverse_geocoder.enabled else 'BigDataCloud'}, headers={'Cache-Control': 'no-store'})
