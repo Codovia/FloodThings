@@ -54,7 +54,7 @@ export default function App() {
       <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false}/>
       <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={false} active={weatherPage}/>
      </div>
-     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={point} active={sheltersPage} overview={false} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
+     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} active={sheltersPage} overview={false} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>
     {path==='/weather'&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{contextVisible&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={null}/>}<p className="map-legend">Selected point: {point.name}.  District filtering and point weather remain separate.</p></section>}
     {path==='/shelters'&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}

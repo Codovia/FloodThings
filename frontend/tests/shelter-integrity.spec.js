@@ -25,6 +25,7 @@ test('directions are disclosed only after a fresh check and a failure removes de
   await page.getByRole('button', { name: 'Recheck availability for directions' }).click()
   await expect(link).toBeVisible()
   expect(new URL(await link.getAttribute('href')).searchParams.get('destination')).toBe('13.5,74.7')
+  expect(new URL(await link.getAttribute('href')).searchParams.has('origin')).toBe(false)
   fail = true
   await page.getByRole('button', { name: 'Refresh shelters' }).click()
   await expect(page.getByText(/Controlled directory outage/)).toBeVisible()

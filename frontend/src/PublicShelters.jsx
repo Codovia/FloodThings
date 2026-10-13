@@ -5,8 +5,15 @@ import useShelterDirectory from './useShelterDirectory.js'
 export { validShelterDirectory } from './useShelterDirectory.js'
 import './Shelters.css'
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
+export function usableNavigationOrigin(point, now=Date.now()) {
+  if (!point || point.kind === 'network' || !Number.isFinite(point.latitude) || Math.abs(point.latitude)>90 || !Number.isFinite(point.longitude) || Math.abs(point.longitude)>180) return null
+  if (point.kind === 'gps' && (!Number.isFinite(point.accuracy_m) || point.accuracy_m>100 || point.accuracy_m<0 || !Number.isFinite(point.gps_timestamp) || point.gps_timestamp>now || now-point.gps_timestamp>300000)) return null
+  return point
+}
 export default function PublicShelters({point=null,active,overview=false,mapTarget=null,districtId='',navigationBounds=null}) {
   const [open,setOpen]=useState(false),[navigation,setNavigation]=useState(null),[navigationNotice,setNavigationNotice]=useState(null)
+  const selectedPoint=point
+  point=usableNavigationOrigin(point)
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
   const enabled=active===undefined?open:active
   const selectedKey=useRef(key);selectedKey.current=key
@@ -28,6 +35,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   return <section className={overview?"panel shelters-overview":"panel"} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">ADMINISTRATOR-REPORTED AVAILABILITY</p><h2 id="public-shelters-title">Emergency shelter directory</h2></div><button onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
     {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
+    {selectedPoint && !point && <p role="status">Your weather location is too uncertain or its GPS fix is stale for a navigation origin. External navigation will ask for your starting location.</p>}
     <p className="muted">Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.</p>
     <details className="shelter-usage"><summary>Availability and safe navigation limitations</summary><p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed. This prototype is not affiliated with a disaster-management authority.</p>
     {point?<p>Distances from selected point: {point.name}.</p>:<p>No starting location selected. Directions can ask you to enter an origin.</p>}
