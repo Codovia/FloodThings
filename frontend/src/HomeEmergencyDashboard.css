@@ -13,6 +13,11 @@ main.app-content.page-home{flex:none;overflow:visible}
 .page-home .home-summary-card h2{font-size:1.125rem;line-height:1.3;margin:4px 0}
 .page-home .home-flood-summary h2{font-size:.9375rem}
 .page-home .home-rain-summary h2{font-size:.9375rem}
+.page-home .home-river-table{width:100%;border-collapse:collapse;font-size:.8125rem;margin:8px 0}
+.page-home .home-river-table th,.page-home .home-river-table td{text-align:left;padding:5px 3px;border-bottom:1px solid #d7dfdd;overflow-wrap:anywhere}
+.page-home .home-river-table caption{text-align:left;margin-bottom:6px}
+.page-home .home-map-legend .river{background:#6951a3}
+.page-home .home-river-outlook>button{font-size:.8125rem;padding:7px 10px;min-height:36px}
 .page-home .home-summary-card p{font-size:.8125rem;line-height:1.4;margin:4px 0 0}
 .page-home .home-summary-card small,.page-home .home-area-summary small{display:block;color:#546460;font-size:.75rem;line-height:1.4}
 .page-home .home-main-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:16px;align-items:start;min-width:0;min-height:0}

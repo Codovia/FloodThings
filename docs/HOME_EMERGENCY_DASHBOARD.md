@@ -1,227 +1,175 @@
 # Home emergency dashboard
 
-Implemented on `/` only, following the approved photographed sketch 01 and the
-Home Emergency Dashboard request. The shared navigation and four detail pages
-retain their existing workflows. The weather response now adds validated current
-fields and hourly precipitation as documented below; endpoint paths, database
-schema, models, operational Flood Map layers, administrator permissions and
-Telegram workflows are preserved.
+Current behavior after Sprint 13, 13 October 2026. `/` keeps FloodPulse branding,
+all five navigation routes and the approved 40% information / 60% map workspace.
+Weather & AI, Shelters, Admin and Flood Map retain their own functionality.
+See the [Sprint 13 evidence/access report](SPRINT_13_HOME_LOCATION_RIVER_OUTLOOK.md)
+and [validated weather contract](OPEN_METEO_WEATHER.md).
 
 ## Location and privacy
 
-Home immediately mounts Leaflet with the publication-permitted Karnataka state
-context and existing historical observations. Its first visit in a tab session
-requests browser geolocation in a secure context, using `getCurrentPosition`,
-`maximumAge: 0`, a 10-second timeout and an independent timeout guard. Permission,
-policy errors, unsupported APIs, invalid/stale positions and timeouts leave the
-statewide view available with name search. No continuous watcher is created.
+On the first Home visit in a tab, the existing browser permission flow makes one
+bounded high-accuracy request, `maximumAge: 0`, with a ten-second timeout and
+independent deadline. No continuous watcher is created. The existing tab-session
+attempt flag contains no location. React retains accepted coordinates in memory;
+reload does not persist them or automatically repeat permission prompts.
+**Use my location** retries explicitly. Permission denial, insecure context,
+unsupported API, stale/invalid fix or timeout keeps manual search and statewide
+framing available.
 
-Only a non-location `floodpulse-home-location-attempted=1` flag enters
-`sessionStorage`; coordinates and accuracy remain in React memory. Reloading
-clears coordinates without prompting again. Explicit **Use my location** remains
-available. Blocked storage falls back to the App-lifetime initialization guard.
-Leaving Home cancels callbacks; manual locality or district selection invalidates
-pending GPS before it can replace the selection. Successful GPS is never snapped
-to one of the reviewed locality points. Browser accuracy and source timing are
-checked; recent fixes must have finite, nonnegative accuracy and timestamps no
-more than 60 seconds old or one second ahead of the browser clock.
+A reported GPS radius above **100 m**, or unknown accuracy, cannot establish local
+Home weather, a town label or river focus. This is an application acceptance
+policy, not certified positional accuracy. Home displays **Approximate location —
+select your town**, starts no point weather/naming/river request for that fix and
+keeps the state view. This also applies when a coarse GPS point was selected on
+another route. A reviewed manual locality supplies its own mapped point instead.
 
-GPS/weather point, reviewed locality, selected district filter and inspected
-historical cell retain separate meanings. A district alone produces no weather
-point on Home. Name search uses the existing verified directory. GPS has no
-inferred district association. A minimal `kind: gps` source tag on the existing
-opt-in selector preserves GPS meaning when returning from Weather & AI.
+Precise GPS uses its **actual coordinates** for weather and map focus. It is
+never snapped to a nearest directory locality. Optional reverse geocoding changes
+only the displayed name. Manual selection always takes precedence over late GPS
+or naming replies; revision checks and cancellation protect it. Leaving Home
+cancels pending work. Changing only the name does not repeat weather requests.
+District filter, weather point and source/provider geographic context remain
+separate identities; naming never silently assigns a canonical district ID.
 
-Browser requirements were checked against
-[MDN geolocation documentation](https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/getCurrentPosition).
-Native headless Chrome cannot establish the device's actual GPS location; grant,
-timeout and delayed-result cases are controlled browser/unit tests.
+MapTiler naming is **disabled** in the verified configuration: no authorized key,
+rights/quota confirmation was available. No Nominatim endpoint is activated.
+Manual locality names remain available. The opt-in server adapter requires an
+explicit reported radius, reviewed access, a request budget and a full matched
+locality polygon covering the accuracy circle plus a 20 m policy margin. Point
+centroids, bounding boxes, ambiguous results and incomplete geometry cannot
+approve names. Full source geometry stays transient; names cache in memory for
+60 seconds. Provider attribution follows any accepted name.
+
+New Home source calls POST coordinates with no-store responses; no location
+archive/database write occurs. Provider logging omits private key/location paths,
+and Uvicorn coordinate-bearing weather/shelter queries are omitted from access
+logs. Existing logs are preserved rather than rewritten. Native headless Chrome
+cannot prove device GPS hardware accuracy; controlled GPS/name fixtures are
+separate from unmocked Chrome/provider checks. The user's successful precise fix
+after reloading is a user report, not a newly measured hardware result.
 
 ## Geographic context and rights
 
-The retained district research includes restricted Survey of India geometry.
-None is copied, reconstructed or published here. Home instead uses the Karnataka
-`IN-KA` feature from the pinned geoBoundaries gbOpen India ADM1 simplified product,
-commit `9469f09`, boundary `IND-ADM1-1811400`, represented year 2011. Publisher:
-geoBoundaries; source attribution: DataMeet India community / Election Commission
-of India; licence: **CC BY 2.5 IN**, not the other directory's ADM2 licence.
-
+Home retains the publication-permitted Karnataka `IN-KA` feature from pinned
+geoBoundaries gbOpen India ADM1, commit `9469f09`, boundary
+`IND-ADM1-1811400`, represented year **2011**. Attribution: geoBoundaries /
+DataMeet India community / Election Commission of India; **CC BY 2.5 IN**.
 [Publisher metadata](https://www.geoboundaries.org/api/current/gbOpen/IND/ADM1/)
 and [licence](https://creativecommons.org/licenses/by/2.5/in/) accompany
-`frontend/src/data/karnatakaHomeBoundary.source.json`. The 5,103,747-byte original
-is retained only under ignored `data/recovery/home_emergency_v1/geography/`.
-Its SHA-256 matches the publisher Git LFS pointer:
-`4c63fe43294a391e8f2de4e9f86f3edb60f8688275b9fee90c61fb2aa0c26061`.
-Only the 189,831-byte, separately hashed Karnataka feature and small receipt are
-published. Geometry coordinates are unchanged; extraction selects one feature
-and serializes it separately. An initial 2 MiB preview exceeded its cap and was
-discarded before the full bounded transfer and successful checksum verification.
+`frontend/src/data/karnatakaHomeBoundary.source.json`. Its bytes/geometry and
+source checksum are unchanged. Original transfer evidence stays in ignored
+`data/recovery/home_emergency_v1/geography/`.
 
-Point-in-polygon screening respects holes. Positions within the browser accuracy
-radius plus a **2 km application caution margin** of any boundary are uncertain.
-This margin is a conservative display policy, not a measured positional accuracy.
-The simplified 2011 outline is context, not a certified current legal boundary,
-district lookup, hazard zone or inundation extent. Clear outside-state fixes,
-including Goa, receive an out-of-coverage explanation; point weather can still be
-requested independently. The existing public geographic directory is unchanged.
+The simplified outline is map context, not a certified current legal boundary,
+district lookup, hazard or inundation extent. The original 2 km policy caution
+margin plus GPS radius still identifies border uncertainty. No district is
+inferred from it. Retained Survey of India polygons and derivatives remain
+restricted/local, never copied or reconstructed here. The existing public place
+directory and geographic provenance remain intact.
 
-## Weather and rainfall
+## Weather and precipitation
 
-Home uses App's existing `useWeatherSession` and one FastAPI/provider request for
-current, hourly and seven-day daily data at the exact selected coordinates. It
-creates no second lifecycle and requests no default Bengaluru weather when Home
-has no selected point. Current temperature, current WMO condition, humidity,
-wind with returned units, preceding-interval precipitation, valid time and source
-come from validated Open-Meteo model output. A missing temperature does not hide
-other valid fields; a daily WMO code never substitutes for the current code.
+Home uses the single App `useWeatherSession` and validated FastAPI/Open-Meteo
+current/hourly/seven-day request at an accepted point. It fetches no default
+Bengaluru weather when Home has no point. Missing optional fields retain other
+valid readings. Current WMO condition never comes from daily severity codes.
+Wind has returned units; precipitation retains its real preceding interval.
+These are model-grid estimates, not certified station observations.
 
-The current card requires a fresh receipt and a valid current estimate no older
-than 90 minutes. Six-hour session retrieval cadence remains; current estimates
-that age out are unavailable until a successful refresh. Failed refreshes mark
-cached data stale. A manually initiated refresh is always available at a selected
-point. Backend network/timeout, upstream HTTP 429/503 and malformed-response
-categories remain distinct; retries are bounded, respect Retry-After and apply
-only to transient failures. Unsupported provider requests are HTTP errors;
-absence of a requested field alone does not establish that it is unsupported.
+The top cards remain **Current Weather**, **Rainfall Forecast**, **Flood Forecast**.
+Temperature/condition/valid time and the full-hour precipitation window are shown
+compactly. Humidity, wind and current precipitation appear in the information
+panel; repeated temperature/rainfall prose is removed. Accessible details retain
+source, freshness, missing-hour reason and scientific limitations. Current valid
+time expires after 90 minutes; existing six-hour retrieval cadence and explicit
+manual refresh remain. Failed or stale cached data are not presented as current.
 
-**Next 24 full forecast hours: X mm** uses exactly 24 consecutive one-hour
-precipitation intervals beginning at the next full IST hour (at an exact hour,
-that boundary starts the window). Open-Meteo timestamps END the preceding hour:
-a reference of 10:20 means a window 11:00 today to 11:00 tomorrow and selected
-provider timestamps 12:00 today through 11:00 tomorrow. Both local endpoints are
-shown. The pure calculation accepts an explicit reference clock and returns
-interval count, source, retrieval time and unavailable forecast-issuance time.
-The browser updates its window clock at hourly boundaries without fetching again.
+**Next 24 full forecast hours: X mm** selects exactly 24 ordered consecutive
+one-hour precipitation intervals beginning at the next full IST hour. Provider
+timestamps end the preceding hour. At 10:20, the window is 11:00 today–11:00
+tomorrow; selected ends are 12:00 today–11:00 tomorrow. Both endpoints are shown.
+Missing/null/non-finite/negative values, unsupported units/clocks, duplicates,
+reverse ordering, overlap, gaps or non-hourly intervals reject the entire total.
+No interpolation or daily substitution, even at midnight. The pure calculation,
+source timestamp distinctions, cancellation and backoff are preserved.
 
-Unknown clocks, duplicate or out-of-order timestamps, gaps, overlapping or
-non-hourly intervals, missing/null/non-finite/negative values and incompatible
-units make the entire total unavailable, with its reason in the information
-panel. No interpolation, daily substitution (including midnight windows) or
-synthetic fallback is allowed. Independently valid current weather remains
-available when hourly coverage fails. Source, freshness and extended limitations
-are accessible in native expandable details. Seven-day calendar forecasts on
-Weather & AI retain their existing contract and presentation.
+## Simplified content and availability
 
-See [weather contract and diagnostic evidence](OPEN_METEO_WEATHER.md) and the
-[official variable definitions](https://open-meteo.com/en/docs). Weather-model
-estimates are not certified local station observations, flood labels, flood
-probabilities or official emergency warnings.
+Home no longer fetches or displays the shelter list, Refresh Shelters button,
+historical section, 56-cell count, historical/shelter markers or Show historical
+evidence control. These data/workflows remain on `/shelters`, Admin and
+`/flood-map`. Historical GFD observations remain attributed research evidence,
+not approved operational flood-training labels; no dataset is deleted.
 
-## Evidence and assistance
+The exact flood card remains **Validated flood forecast unavailable for this
+location.** The pinned information area also displays:
 
-The flood card uses the exact required phrase:
-**Validated flood forecast unavailable for this location.** No AI rainfall
-inference runs on Home. Official warnings are **Not connected** and published
-hazard polygons are unavailable. Missing coverage does not mean no flood risk.
+> Nearby flood possibility cannot currently be assessed reliably. Check official local warnings.
 
-Home reuses `/api/flood-map/historical` and accepts only attributed,
-observation-qualified CRS84 polygon cells with source dates and geometry hashes.
-The current collection has 56 Udupi cells from two historical GFD event-window
-products, not 56 independent floods or current inundation boundaries. Unsupported
-geometry is excluded. Historical map popups link to Flood Map details and keep
-weather coordinates unchanged. General map clicks link to complete evidence
-without creating a forecast or weather location.
+Official warning feed remains **Not connected**. None of these unavailable states
+means no flood risk. Rainfall alone cannot confirm flooding. All three critical
+statuses stay outside internal scrolling; long explanations use native details.
 
-One `useShelterDirectory` receipt feeds Home's list and map. Only live, fresh,
-verified Open entrances with reported capacity are shown; optional district
-filtering does not assign GPS to that district. Test/demonstration assignments
-are excluded from emergency markers. The hook's one-minute revalidation and
-verification expiry remove destinations during rechecking or failure. Directions
-remain on the existing Shelters workflow with its explicit revalidation; capacity
-is not a reservation and routes are not verified flood-safe.
+A small Global Flood API pilot returned actual modelled GloFAS v4 discharge, but
+no native river/reach identity or issue timestamp. Retained v5 screening cannot
+verify v4 topology or a user's hydrological association. **Zero Home river
+associations are approved**, so the actual panel is unsupported and shows no
+model cell marker. Query coordinates come only from internal independently
+reviewed reach records, never arbitrary nearest-user points. Full details,
+request/response samples and exact blockers are in the Sprint 13 report.
 
-OSM uses the existing origin-referrer tile configuration, ordinary viewport
-requests and stop-on-first-failure behavior. No tile proxy, prefetch or retry is
-added. [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/).
-Missing background tiles retain evidence overlays and do not establish flood
-absence. Leaflet's existing ResizeObserver invalidates size without moving the
-selected point.
+For a future verified association the read-only service/panel can preserve daily
+GMT dates, m³/s discharge, optional mean/p25–p75, source/hash, reviewed viewing
+scope and cache age. Cache expiry is not forecast validity or issuance. Missing
+values stay unavailable. Changing modelled discharge alone cannot identify
+flooded villages, danger categories or probabilities. Modelled river discharge
+is not measured CWC level/discharge, a FloodPulse AI prediction or an official
+warning. No flow-derived inundation polygon is constructed.
 
-## Validation and limits
+## Map and responsive layout
 
-Home uses a 40% information / 60% map grid on desktop with three compact cards
-above it. The desktop follow-up replaces the earlier tall, page-scrolling layout
-with a Home-scoped 100vh/100dvh flex/grid workspace. Header, footer and content
-rows reserve their actual heights; shrinkable children have min-height: 0.
-The left panel pins forecast availability and official warning status above a
-keyboard-focusable internal scrolling region. Additional provenance uses native,
-accessible details controls. The map fills the remaining workspace; a background
-failure notice does not shrink its canvas. Leaflet invalidates its size through
-the existing ResizeObserver and refreshes initial statewide framing after the
-first viewport fit, without moving a selected point.
+Home renders an accepted GPS point and its supported radius, or the selected
+manual locality, plus the state context. Only a verified fresh river association
+could add a model point; actual production currently has none. No authorized
+warning geometry exists. Detailed historical geography stays on Flood Map.
+**Show Karnataka**, **Show selected point** and the existing Full map link retain
+keyboard/pointer navigation. Changing a label does not move the actual point.
 
-Viewport fitting requires width >= 1100 px, height >= 740 px and enough remaining
-space for a readable workspace and essential statuses. ResizeObserver checks
-header/footer, location, cards and essential-content sizes, including font changes.
-Short screens, narrower zoom-equivalent viewports and enlarged text that cannot
-fit use natural scrolling. No body overflow suppression or global font reduction
-is used. Mobile stacks the information and map, with a 380 px map. Other pages
-retain their existing layouts and scroll assertions.
+Existing OSM viewport requests, attribution, origin-only identification,
+cache behavior and stop-on-first-tile-error are preserved. No tile proxy, bulk
+fetch, retry or provider substitution. [OSM tile policy](https://operations.osmfoundation.org/policies/tiles/).
+Failed tiles retain location/context and do not establish flood absence.
+Leaflet's ResizeObserver still invalidates changing container dimensions.
 
-Independent installed **Google Chrome 154.0.8037.57** inspected all five routes,
-with no API mocking and no page errors. Final Home map rectangles:
+Home-scoped 100vh/100dvh flex/grid accounts for header/footer and reserved rows.
+Shrinkable children use min-height: 0; only the lower information region scrolls
+internally when needed. Nothing globally hides body overflow or shrinks fonts.
+Measured essential content must fit before viewport mode activates. Narrow/short
+screens, zoom-equivalent viewports and enlarged text keep natural scrolling;
+mobile stacks the panel and 380 px map. Other pages retain their own layouts.
 
-| Viewport | Document height | Leaflet map | Left panel |
-| --- | --- | --- | --- |
-| 1366 × 768 | 768 px | 764 × 352.16 px | 524 × 444.34 px |
-| 1920 × 1080 | 1080 px | 1096.39 × 664.16 px | 745.59 × 756.34 px |
-| 1600 × 900 | 900 px | 904.39 × 484.16 px | 617.59 × 576.34 px |
-| 390 × 844 | 2530 px (natural scrolling) | 332 × 380 px | 358 × 849.55 px |
+Unmocked installed **Chrome 155.0.8059.39**, DPR 1, visual-viewport scale 1 and CSS
+zoom 1, inspected the retained manually selected **Kundapur, Udupi** point:
 
-Current viewport and full-page screenshots, measurements and validation receipts
-are in ignored `data/recovery/home_viewport_v1/`. Desktop full-page image heights
-match their viewport heights; mobile deliberately remains taller. Current layout
-checks also cover keyboard panel scrolling, bounded search, expandable source
-notes, pinned statuses, short screens, a 1093 × 614 zoom-equivalent viewport and
-200% root text scaling. Weather/GPS/rainfall/history/shelter validation logic and
-scientific claims are unchanged.
+| Viewport | Document height | Map | Information panel |
+|---|---:|---:|---:|
+|1366×768|768 px|764×353.55 px|524×445.73 px|
+|1600×900|900 px|904.39×485.55 px|617.59×577.73 px|
+|1920×1080|1080 px|1096.39×665.55 px|745.59×757.73 px|
+|390×844|2223 px, natural scrolling|332×380 px|358×569.58 px|
 
-Full-page screenshots and receipts are retained under ignored
-`data/recovery/home_emergency_v1/`. They are actual browser captures, not generated
-mockups. The real configured PostgreSQL directory returned HTTP 200, live mode,
-zero shelters. The existing database container was stopped initially and started
-without creation, migrations or record changes. Real weather returned HTTP 200
-before midnight (26.6 °C for reviewed Kundapur); a later real check returned HTTP
-503, **Weather provider returned incomplete or invalid data**, and Home displayed
-unavailable. The cause of that upstream invalid response is unconfirmed. No
-synthetic weather or cached fixture substitutes for the failure.
+Document widths equal viewport widths; no page errors. At 1366, internal keyboard
+scroll moved 55 px while the document stayed at 0. Essential statuses/cards,
+location, map and footer stayed visible. Actual tiles loaded at all sizes.
+Real fullPage:false/fullPage:true captures, DOM measurements and API receipts are
+in ignored `data/recovery/sprint13_home_v1/`; older sprint evidence is unchanged.
+Controlled tests additionally exercise names/coarse GPS/delayed responses,
+verified/ambiguous river fixtures, short screens and 200% text scaling. Native
+GPS hardware and live MapTiler naming remain unverified, not falsely claimed.
 
-The complete frontend, Playwright, backend, build and 24 source/provenance checks
-are recorded in the chronological `update.md` entry after completion. Controlled
-GPS/weather/shelter fixtures are separate from the unmocked Chrome receipts.
-The production build's bundle-size advisory remains a packaging limitation.
-
-The initial full browser suite exposed a pre-existing test writing three Admin
-fixture screenshots into `data/recovery/wireframe_ui_v1/after/`. Those ignored
-PNG artifacts were regenerated and their original hashes no longer match; no
-original copies were found. The test now uses Playwright's temporary output path,
-preventing further overwrite. This exception is recorded in the protected-file
-receipt; scientific datasets, provenance, models and unrelated files are checked
-separately and remain unchanged. These fixture screenshots are not research
-observations and are not staged.
-
-No scientific training decision changes: validated future-flood prediction
-remains unavailable, and the earlier research NO-GO is retained.
-
-## Live weather follow-up, 2026-10-13
-
-Independent installed Chrome, with no API mocks, selected the retained verified
-Kundapur directory point. One weather request served all viewport resizes:
-HTTP 200, 35.8 °C / Clear sky / humidity 33% / wind 13 km/h, current valid
-11:45 IST, precipitation 0 mm for 11:30–11:45 IST. The full forecast-hour total
-was 0 mm for 13 October 12:00 to 14 October 12:00 IST, with 24 intervals. Zero
-forecast precipitation makes no claim about flood occurrence or safety.
-
-| Viewport | Document height | Leaflet map | Information panel | Each weather card |
-| --- | --- | --- | --- | --- |
-| 1366 × 768 | 768 px | 764 × 353.55 px | 524 × 445.73 px | 434 × 83.08 px |
-| 1600 × 900 | 900 px | 904.39 × 485.55 px | 617.59 × 577.73 px | 512 × 83.08 px |
-| 1920 × 1080 | 1080 px | 1096.39 × 665.55 px | 745.59 × 757.73 px | ~618.67 × 83.08 px |
-| 390 × 844 | 2685 px, natural scroll | 332 × 380 px | 358 × 990.53 px | current 358 × 92.38; rain 358 × 108.06 px |
-
-Document width equals viewport width throughout; desktop page scroll remains zero
-when keyboard-scrolling the information region. Actual OSM tiles loaded at all
-four sizes (12/15/20/20); no page errors. Essential statuses, navigation, footer
-and all three cards remain visible on desktop. Real viewport and full-page PNGs,
-raw provider responses and timestamped measurements are retained in ignored
-`data/recovery/home_weather_hourly_v1/`. Previous screenshots remain unchanged.
+Phase 12G scientific **NO-GO** and pending CWC clarification are preserved. No
+model, dataset, flood-risk claim, administrator permission or Telegram workflow
+was changed. Exact tests and protection/delivery results are appended to root
+`update.md`. Previous Home iterations remain documented in its chronological
+entries and their original recovery directories.

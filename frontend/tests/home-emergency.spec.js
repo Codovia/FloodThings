@@ -25,7 +25,7 @@ test('automatic GPS uses exact coordinates, browser accuracy and one weather ses
  const requests=await setup(page);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();expect(requests).toHaveLength(0)
  await locate(page,13.34261,74.74953);await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34261&longitude=74.74953'])
  await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible();await expect(page.getByText('Next-24-hour total unavailable')).toBeVisible()
- expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:false,timeout:10000,maximumAge:0})
+ expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
  await nav(page).getByRole('link',{name:'Weather & AI',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
  await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>window.__watchCalls)).toBe(0);expect(requests).toHaveLength(1)
  expect(new URL(page.url()).search).toBe('');expect(await page.evaluate(()=>Object.keys(sessionStorage).concat(Object.keys(localStorage)).filter(k=>/gps|latitude|longitude/i.test(k)))).toEqual([])
@@ -44,21 +44,26 @@ test('district-only selection cancels late GPS; verified locality then chooses i
  await locate(page,14,75);await expect(page.getByRole('heading',{name:'Karnataka statewide view'})).toBeVisible();expect(requests).toHaveLength(0)
  await page.getByRole('button',{name:/^Kundapur — Udupi/}).click();await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C'})).toBeVisible();expect(requests).toEqual(['?latitude=13.6250993&longitude=74.6915722']);await locate(page,14,75);expect(requests).toHaveLength(1)
 })
-test('provider failure and tile failure preserve genuine historical cells and detail navigation',async({page})=>{
+test('provider and tile failure keep Home honest while historical evidence remains on Flood Map',async({page})=>{
  await setup(page);await page.route('**/api/weather?**',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Controlled provider failure'})}));await page.goto('/');await locate(page);await expect(page.getByRole('alert').filter({hasText:'Controlled provider failure'})).toBeVisible();await expect(page.getByRole('heading',{name:'Current weather unavailable.'})).toBeVisible()
- await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(56);await expect(page.getByText(/Background tiles are unavailable/)).toBeVisible();await expect(page.locator('.home-flood-map img.leaflet-tile')).toHaveCount(0)
- await page.getByRole('button',{name:'Show historical evidence'}).click();await page.locator('.home-flood-map path[fill="#dc6047"]').first().click({force:true});await page.getByRole('link',{name:'Inspect historical evidence',exact:true}).click();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
+ await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByText(/Background tiles are unavailable/)).toBeVisible();await expect(page.locator('.home-flood-map img.leaflet-tile')).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'Show historical evidence'})).toHaveCount(0)
+ await page.getByRole('link',{name:'Full map',exact:true}).click();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
+ await page.getByLabel('Historical evidence cell (keyboard alternative)',{exact:true}).selectOption({index:1});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
 })
-test('invalid historical geometry is excluded and absence remains unknown',async({page})=>{
- await setup(page,'denied');await page.route('**/api/flood-map/historical*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',total:1,geojson:{type:'FeatureCollection',features:[{type:'Feature',geometry:{type:'Point',coordinates:[74,13]},properties:{category:'predicted_flood'}}]}})}));await page.goto('/');await expect(page.getByText(/0 reviewed historical cells/)).toBeVisible();await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByText('No verified polygons')).toBeVisible();await expect(page.getByText(/does not establish that no emergency exists/)).toBeVisible()
+test('Home does not request historical evidence or shelters and retains explicit unknown outcomes',async({page})=>{
+ await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})
+ await page.goto('/');await expect(page.getByRole('heading',{name:'Nearby river outlook'})).toBeVisible();await expect(page.getByText(/cannot currently be assessed reliably/)).toBeVisible()
+ await expect(page.getByText(/reviewed historical cells|Verified Open shelters/)).toHaveCount(0);await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0)
+ await expect(page.getByText(/does not establish that no emergency exists/)).toBeVisible();expect(calls).toEqual([])
 })
-test('fresh live shelter fixture feeds one list/map receipt and disappears on verification expiry',async({page})=>{
+test('Shelters retains its fresh fixture and expiry protection after removal from Home',async({page})=>{
  await setup(page,'denied');let calls=0
  await page.route('**/api/shelters*',async r=>{
   calls++;if(calls>1)return r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled directory outage'})})
-  const now=await page.evaluate(()=>Date.now());return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',mode:'live',shelters:[{id:'isolated-test',name:'ISOLATED TEST entrance',status:'open',available_capacity:4,latitude:13.4,longitude:74.7,verified_at:new Date(now).toISOString(),verification_expires_at:new Date(now+5000).toISOString(),demonstration:false}]})})
- });await page.goto('/');await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toBeVisible();await expect(page.locator('.home-flood-map path[fill="#3da86e"]')).toHaveCount(1);expect(calls).toBe(1)
- await page.clock.fastForward(5001);await expect(page.getByRole('alert').filter({hasText:'Controlled directory outage'})).toBeVisible();await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#3da86e"]')).toHaveCount(0);expect(calls).toBe(2)
+  const now=await page.evaluate(()=>Date.now());return r.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',mode:'demonstration',shelters:[{id:'isolated-test',name:'ISOLATED TEST entrance',address:'TEST ONLY',district_id:'nic:udupi.nic.in',district_name:'Udupi',status:'open',capacity:10,occupancy:6,available_capacity:4,latitude:13.4,longitude:74.7,verified_at:new Date(now).toISOString(),updated_at:new Date(now).toISOString(),verification_expires_at:new Date(now+5000).toISOString(),demonstration:true,revision:1}]})})
+ });await page.goto('/');expect(calls).toBe(0);await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toBeVisible();expect(calls).toBe(1)
+ await page.clock.fastForward(5001);await expect(page.getByRole('alert').filter({hasText:'Controlled directory outage'})).toBeVisible();await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toHaveCount(0);expect(calls).toBe(2)
 })
 test('Home has a large 60 percent map on desktop and normal overflow-free mobile scrolling',async({page})=>{
  await setup(page,'denied')

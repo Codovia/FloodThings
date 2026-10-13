@@ -14,6 +14,8 @@ from .flood_map import router as flood_map_router
 from .locations import router as locations_router
 from .shelters import router as shelters_router, dispose_shelter_engine
 from .notifications import router as notifications_router
+from .home_geocoding import router as geocoding_router, ReverseGeocoder
+from .river_outlook import router as river_outlook_router, RiverOutlook
 
 
 @asynccontextmanager
@@ -21,6 +23,8 @@ async def lifespan(app: FastAPI):
     # Bounded upstream requests, with no retries, persistence or background jobs.
     async with httpx.AsyncClient(timeout=httpx.Timeout(10.0), follow_redirects=False) as client:
         app.state.weather = OpenMeteoAdapter(client)
+        app.state.reverse_geocoder = ReverseGeocoder(client)
+        app.state.river_outlook = RiverOutlook(client)
         try:
             yield
         finally:
@@ -36,6 +40,8 @@ app.include_router(flood_map_router)
 app.include_router(locations_router)
 app.include_router(shelters_router)
 app.include_router(notifications_router)
+app.include_router(geocoding_router)
+app.include_router(river_outlook_router)
 
 
 @app.exception_handler(RequestValidationError)

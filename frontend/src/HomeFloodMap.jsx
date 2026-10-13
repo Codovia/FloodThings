@@ -12,11 +12,11 @@ function popup(text, label, href, action) {
   link.addEventListener('click', event => { if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); action() } })
   box.append(p, link); return box
 }
-export default function HomeFloodMap({ fitViewport, point, gps, features, shelters, navigate, onEvidence }) {
-  gps = point?.kind === 'gps' ? point : gps
-  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onEvidence })
+export default function HomeFloodMap({ fitViewport, point, river, navigate }) {
+  const gps = point?.kind === 'gps' ? point : null
+  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate })
   const [tileError, setTileError] = useState(false)
-  actions.current = { navigate, onEvidence }
+  actions.current = { navigate }
   useEffect(() => {
     const view = L.map(element.current, { scrollWheelZoom: false }).setView(KARNATAKA_CENTER, 6); map.current = view
     addBasemap(L, view, () => setTileError(true))
@@ -27,6 +27,12 @@ export default function HomeFloodMap({ fitViewport, point, gps, features, shelte
     return () => { view.remove(); map.current = null }
   }, [])
   useMapResize(map)
+  useEffect(() => {
+    if (point?.name_source?.provider !== 'MapTiler' || !map.current) return
+    const attribution = '<a href="https://www.maptiler.com/copyright/">© MapTiler place label</a>'
+    map.current.attributionControl.addAttribution(attribution)
+    return () => map.current?.attributionControl.removeAttribution(attribution)
+  }, [point?.name_source?.provider])
   useEffect(() => {
     if (!map.current) return
     // The first viewport fit changes the canvas after Leaflet's initial bounds.
@@ -43,22 +49,23 @@ export default function HomeFloodMap({ fitViewport, point, gps, features, shelte
       if (gps.accuracy_m > 0 && gps.accuracy_m <= 10000) L.circle([gps.latitude, gps.longitude], { radius: gps.accuracy_m, color: '#286ba4', weight: 1, fillOpacity: .08, interactive: false }).addTo(layers)
     }
     if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#087e7c', fillOpacity: .9 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : 'selected weather point; locality unconfirmed'}.`, 'Point weather details', '/weather', () => actions.current.navigate('/weather'))).addTo(layers)
-    if (features.length) L.geoJSON({ type: 'FeatureCollection', features }, { bubblingMouseEvents: false, style: { color: '#9c3627', weight: 1.5, fillColor: '#dc6047', fillOpacity: .65 }, onEachFeature: (feature, layer) => { layer.options.bubblingMouseEvents = false; layer.bindPopup(popup(`Historical observed floodwater · ${feature.properties.district} · ${feature.properties.start_date} to ${feature.properties.end_date_inclusive} (UTC source dates). Observation cells, not current flood boundaries.`, 'Inspect historical evidence', '/flood-map', () => { actions.current.onEvidence(feature.id || feature.properties.feature_id); actions.current.navigate('/flood-map') })) } }).addTo(layers)
-    for (const s of shelters) L.circleMarker([s.latitude, s.longitude], { bubblingMouseEvents: false, radius: 8, color: '#167044', fillColor: '#3da86e', fillOpacity: .9 }).bindPopup(popup(`${s.name} · ${s.available_capacity} reported spaces. Confirm availability and road access before travel.`, 'Recheck shelter details', '/shelters', () => actions.current.navigate('/shelters'))).addTo(layers)
+    if (river?.reach?.verified_grid === true) {
+      const grid = river.grid_location
+      L.circleMarker([grid.latitude, grid.longitude], { bubblingMouseEvents: false, radius: 7, color: '#6951a3', fillOpacity: .9 }).bindPopup(popup(`${river.reach.name} · verified model cell; daily GloFAS v4 discharge, not a flood boundary or observed water level.`, 'Inspect Flood Map context', '/flood-map', () => actions.current.navigate('/flood-map'))).addTo(layers)
+    }
     return () => { if (map.current) map.current.removeLayer(layers) }
-  }, [point, gps, features, shelters])
+  }, [point, river])
   useEffect(() => {
     if (!map.current || !point) return
     map.current.setView([point.latitude, point.longitude], point.accuracy_m > 10000 ? 8 : point.accuracy_m > 1000 ? 11 : 13, { animate: false })
   }, [point?.latitude, point?.longitude, point?.accuracy_m])
   function statewide() { if (stateBounds.current) map.current?.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false }) }
-  function historyView() { if (features.length) map.current?.fitBounds(L.geoJSON({ type: 'FeatureCollection', features }).getBounds(), { padding: [25, 25], maxZoom: 13, animate: false }) }
   return <section className="panel workspace-map home-map-stage" aria-labelledby="home-map-title">
-    <div className="home-map-toolbar"><div className="home-map-heading"><div><p className="eyebrow">EVIDENCE & ASSISTANCE</p><h2 id="home-map-title">Karnataka Flood Map</h2></div><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
-    <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={historyView} disabled={!features.length}>Show historical evidence</button></div></div>
+    <div className="home-map-toolbar"><div className="home-map-heading"><div><p className="eyebrow">EVIDENCE & ASSISTANCE</p><h2 id="home-map-title">Karnataka Map</h2></div><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
+    <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={()=>point&&map.current?.setView([point.latitude,point.longitude],13,{animate:false})} disabled={!point}>Show selected point</button></div></div>
     <div ref={element} className="home-flood-map" role="region" aria-label="Karnataka emergency map" />
     {tileError && <p className="notice home-tile-notice" role="status">{BASEMAP_NOTICE}</p>}
-    <div className="home-map-footer"><ul className="home-map-legend" aria-label="Map legend"><li><i className="gps"/>GPS point</li><li><i className="locality"/>Selected place</li><li><i className="history"/>Historical floodwater</li><li><i className="shelter"/>Verified Open shelter</li></ul>
-    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">Historical cells are past observations, not live flooding. Hazard and official forecast geometry are unavailable. State outline: simplified 2011 context; border coverage is uncertain.</p></details></div>
+    <div className="home-map-footer"><ul className="home-map-legend" aria-label="Map legend"><li><i className="gps"/>GPS point</li><li><i className="locality"/>Selected place</li>{river&&<li><i className="river"/>Reviewed river model cell</li>}</ul>
+    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">Points are locations, not flooded-area polygons. River cells appear only with a verified association. Official warning geometry is unavailable. State outline: simplified 2011 context; border coverage is uncertain.</p></details></div>
   </section>
 }

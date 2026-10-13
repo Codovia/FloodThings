@@ -8,7 +8,7 @@ import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
-import useHomeGeolocation from './useHomeGeolocation.js'
+import useHomeGeolocation, {MAX_GPS_ACCURACY_M} from './useHomeGeolocation.js'
 
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
@@ -16,24 +16,6 @@ const pageInfo={
  '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Manage verified shelter assignments and explicitly approved Telegram notifications.'],
-}
-
-function useOverviewEvidence(active,districtId) {
- const [view,setView]=useState({key:null,data:null,error:null})
- const key=districtId||'statewide'
- useEffect(()=>{
-  if(!active)return
-  const controller=new AbortController();let stopped=false
-  setView({key,data:null,error:null})
-  const timer=setTimeout(()=>controller.abort(),15000)
-  fetch('/api/flood-map/historical'+(districtId?'?district_id='+encodeURIComponent(districtId):''),{signal:controller.signal}).then(async response=>{
-   const data=await response.json()
-   if(!response.ok||data.status!=='available'||data.geojson?.type!=='FeatureCollection'||!Array.isArray(data.geojson.features)||!Number.isInteger(data.total))throw Error('Historical evidence unavailable')
-   if(!stopped&&!controller.signal.aborted)setView({key,data,error:null})
-  }).catch(()=>{if(!stopped)setView({key,data:null,error:'Historical evidence could not be checked. No substitute geometry is shown.'})}).finally(()=>clearTimeout(timer))
-  return()=>{stopped=true;clearTimeout(timer);controller.abort()}
- },[active,key])
- return view.key===key?view:{data:null,error:null}
 }
 
 export default function App() {
@@ -46,14 +28,15 @@ export default function App() {
  const [shelterMapTarget,setShelterMapTarget]=useState(null)
  const [contextVisible,setContextVisible]=useState(true)
  const weatherPage=path==='/' || path==='/weather'
- const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!selectedPoint))
+ const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_GPS_ACCURACY_M)
+ const homePoint=homeGpsUnusable?null:selectedPoint
+ const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!homePoint))
  const manualRevision=useRef(0)
  const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
  const publicPage=path !== '/admin' && !!pageInfo[path]
  const selectorPage=publicPage&&path!=='/flood-map'
- const sheltersPage=path==='/' || path==='/shelters'
- const overview=useOverviewEvidence(path==='/',districtId)
+ const sheltersPage=path==='/shelters'
  const info=pageInfo[path]
  function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
  function filterDistrict(id,record){manualRevision.current++;homeLocation.cancel();setDistrictId(id);setDistrict(record||null);setEvidenceFeature(null)}
@@ -62,7 +45,7 @@ export default function App() {
   <AppHeader path={path} navigate={navigate} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
    <section className="page-intro"><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
-   {path==='/'&&<HomeEmergencyDashboard point={selectedPoint} district={district} districtId={districtId} session={session} overview={overview} location={homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate} onEvidence={setEvidenceFeature}/> }
+   {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
    {publicPage&&path!=='/'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
      <WeatherLocationSelector point={point} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>

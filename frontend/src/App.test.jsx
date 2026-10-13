@@ -22,10 +22,10 @@ it('returning from admin uses a fresh cached point without hidden weather reques
  expect(count()).toBe(2)
  fireEvent.click(screen.getByRole('link',{name:'Return to citizen dashboard'}));await screen.findByText('27 °C');expect(count()).toBe(2)
 })
-it('Home distinguishes unconnected warnings from absence of emergencies and shows evidence count',async()=>{
- window.history.replaceState(null,'','/');render(<App/>);await screen.findByText(/0 reviewed historical cells/)
+it('Home distinguishes unconnected warnings from absence of emergencies and removes historical content',async()=>{
+ window.history.replaceState(null,'','/');render(<App/>);await screen.findByRole('heading',{name:'Nearby river outlook'})
  expect(screen.getByText(/does not establish that no emergency exists/)).toBeTruthy()
- expect(screen.getByText('No verified polygons')).toBeTruthy()
+ expect(screen.queryByText('No verified polygons')).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
  expect(screen.queryByText(/Low flood risk/)).toBeNull()
  expect(screen.queryByLabelText('Weather latitude')).toBeNull()
 })

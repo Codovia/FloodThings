@@ -11,11 +11,11 @@ test.beforeEach(async({page})=>{
 
 test('actual PostgreSQL public directory is empty, read-only and leaves weather/manual workflows usable',async({page})=>{
  await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
- await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
+ await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  const response=await page.request.post('/api/shelters',{data:{name:'Must not write'}});expect(response.status()).toBe(405)
  const unauthorized=await page.request.post('/api/admin/shelters',{data:{name:'TEST ONLY',address:'Not a shelter',district_id:'nic:udupi.nic.in',capacity:10,occupancy:0}});expect(unauthorized.status()).toBe(401)
- await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.6,longitude:74.8,accuracy:40});await page.getByRole('button',{name:'Use my location'}).click()
+ await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.6,longitude:74.8,accuracy:40});await page.getByRole('button',{name:'Use my location'}).click()
  await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
  await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible()
  await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible()

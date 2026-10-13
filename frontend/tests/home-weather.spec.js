@@ -51,6 +51,6 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)
 })
 test('one null hour makes the whole total unavailable while keeping valid current weather',async({page})=>{
- await setup(page,true);await page.goto('/');await expect(page.getByRole('heading',{name:'Next-24-hour total unavailable'})).toBeVisible();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
+ await setup(page,true);await page.goto('/');await expect(page.getByRole('heading',{name:'Next-24-hour total unavailable'})).toBeVisible();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByText('Weather source & freshness',{exact:true}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
  await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible()
 })
