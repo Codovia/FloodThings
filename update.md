@@ -1784,3 +1784,11 @@ Final alert-slice verification: current ADMIN_ALERT exact-content/consent/one-at
 ## 2026-10-13 — P1 withdrawal refresh correction
 
 Moderator refresh now replaces the selected report with the server's current row and clears cached audit/export displays. Withdrawn records no longer offer a private photo link or retain the old description/EXIF in the selected card. The actual browser->HTTP->disposable PostGIS report flow passed again with explicit checks that the withdrawn private content/link/export disappears; production build passed with the existing chunk-size warning. Alert local commit 4cdb2fd; publication remains blocked by automatic approval review. Only backend/.env.example and QandA.md remain unrelated user changes.
+
+## 2026-10-13 — User-approved push and actual automatic network/weather proof
+
+The user explicitly approved both publication to git@github.com:Codovia/FloodThings.git and live BigDataCloud/Open-Meteo location testing. Five initial verified commits pushed successfully; independent git ls-remote matched 21913f49de6e796497825a5b2c595a818fd94e1d. The prior automatic-review blocks are resolved.
+
+Real Chrome native geolocation: code 3, Timeout expired. Separate BigDataCloud lookup: HTTP 307 redirect -> api-bdc.io HTTP 200; Mysuru shown explicitly as approximate network city/unknown uncertainty. Weather loaded automatically, Open-Meteo HTTP 200: 26.3 °C, clear sky, valid 13 October 20:30 IST; exact next-24-full-hour 0.4 mm over 21:00–next day 21:00 IST. Manual Kundapur afterward: 27.7 °C, overcast, 0 mm. No GPS precision or flood outcome claimed. 1366x768/dpr 1: document 1366x768, 524/786 px split, zero page errors. Screenshots/provider/native evidence under /tmp/floodpulse-*-authorized-live.png and /tmp/floodpulse-authorized-live-results.json; details in docs/MVP_EXECUTION_2026_10_13.md.
+
+Fixed the observed application-timeout/late-browser-error race to start only one network fallback. Final live trace confirms one redirected lookup. Targeted hook 27 passed, location/river Playwright 7 passed, final build passed (existing large chunk warning). This small correction and the final evidence are committed/pushed after verification; final independently matched hash is reported in chat. Unrelated environment/QandA and research data preserved.

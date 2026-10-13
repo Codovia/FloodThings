@@ -39,8 +39,8 @@ export default function useHomeGeolocation(active, manualRevision, hasSelection,
       return true
     }
     function networkFallback(message, status) {
+      if (job.browserDone || pending.current !== job || !live.current || job.revision !== manualRevision.current) return
       job.browserDone = true
-      if (pending.current !== job || !live.current || job.revision !== manualRevision.current) return
       clearTimeout(job.timer)
       setState({ status, gps: null, message: message + ' Checking a separate approximate network city estimate…' })
       job.timer = setTimeout(() => { job.controller.abort(); finish(message + ' Network estimate unavailable; select your town.', status) }, GPS_TIMEOUT_MS)

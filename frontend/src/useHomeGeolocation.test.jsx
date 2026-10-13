@@ -106,3 +106,9 @@ it('ignores a late coarse fix after manual selection',()=>{
  const h=mount();revision.current++;act(()=>h.result.current.cancel());act(()=>success(position(13.34,74.74,279949)))
  expect(fetch).not.toHaveBeenCalled();expect(selected).not.toHaveBeenCalled()
 })
+
+it('overlapping browser timeout/error starts only one approximate network lookup',()=>{
+ fetch.mockImplementation(()=>new Promise(()=>{}))
+ const h=mount();act(()=>vi.advanceTimersByTime(GPS_TIMEOUT_MS));expect(fetch).toHaveBeenCalledTimes(1)
+ act(()=>failure({code:3}));expect(fetch).toHaveBeenCalledTimes(1);expect(h.result.current.status).toBe('timeout')
+})
