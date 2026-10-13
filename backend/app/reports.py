@@ -17,6 +17,7 @@ from .shelters import authorized, shelter_engine, mode
 from .shelter_security import SecurityConfig, now, digest
 from .shelter_schema import limits
 from .report_schema import reports, images, audit
+from .report_position_schema import positions
 from .report_images import extract_image
 
 router = APIRouter()
@@ -32,7 +33,9 @@ class ReportInput(BaseModel):
     event_type: Literal['flooding','waterlogging','drainage_blockage','other']
     description: str = Field(min_length=10, max_length=2000)
     observed_at: datetime
-    gps_at: datetime
+    gps_at: datetime | None = None
+    position_source: Literal['BROWSER_GPS','USER_SELECTED_MAP'] = 'BROWSER_GPS'
+    location_selected_at: datetime | None = None
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
     accuracy_m: float = Field(ge=0, le=10000000)
@@ -42,15 +45,20 @@ class ReportInput(BaseModel):
     photo_base64: str | None = Field(default=None, max_length=7000000)
     photo_mime: Literal['image/jpeg','image/png'] | None = None
 
-    @field_validator('observed_at', 'gps_at')
+    @field_validator('observed_at', 'gps_at', 'location_selected_at')
     @classmethod
     def utc_clock(cls, value):
+        if value is None:return value
         if value.tzinfo is None or value.utcoffset() is None:
             raise ValueError('Timezone required')
         return value.astimezone(timezone.utc)
 
     @model_validator(mode='after')
     def valid(self):
+        if self.position_source=='BROWSER_GPS' and (self.gps_at is None or self.location_selected_at is not None):
+            raise ValueError('Browser GPS requires acquisition time and must not claim a manual selection timestamp')
+        if self.position_source=='USER_SELECTED_MAP' and (self.gps_at is not None or self.location_selected_at is None or self.accuracy_m<1):
+            raise ValueError('Manual location requires selection time and explicit estimated uncertainty; it must not claim GPS')
         if not self.consent:
             raise ValueError('Private review consent required')
         if bool(self.photo_base64) != bool(self.photo_mime) or (self.photo_base64 and not self.image_rights):
@@ -82,10 +90,14 @@ def receipt(row):
             'message': 'Recorded for private admin review; no emergency dispatch, public warning or training label was created.'}
 
 
+def report_query():
+    return select(reports,positions.c.position_source,positions.c.accuracy_kind,positions.c.location_selected_at).outerjoin(positions,positions.c.report_id==reports.c.id)
+
+
 def serialize(row):
     result = {k: v for k, v in dict(row).items() if k not in ('position','withdrawal_hash','payload_sha256')}
     if row['received_at'] <= now()-timedelta(days=30):
-        result.update(description='[private evidence expired]',latitude=None,longitude=None,accuracy_m=None,gps_at=None,image_metadata=None)
+        result.update(description='[private evidence expired]',latitude=None,longitude=None,accuracy_m=None,gps_at=None,image_metadata=None,location_selected_at=None)
     return result
 
 
@@ -121,9 +133,13 @@ class ReportStore:
                 return receipt(old)
             if not timestamp-timedelta(days=7) <= payload.observed_at <= timestamp+timedelta(minutes=5):
                 raise HTTPException(422,'Observed time must be within the last seven days and not in the future')
-            if not timestamp-timedelta(minutes=10) <= payload.gps_at <= timestamp+timedelta(seconds=5):
-                raise HTTPException(422,'Acquire a fresh GPS fix before submitting')
+            position_at=payload.gps_at if payload.position_source=='BROWSER_GPS' else payload.location_selected_at
+            if not timestamp-timedelta(minutes=10) <= position_at <= timestamp+timedelta(seconds=5):
+                raise HTTPException(422,'Acquire GPS or select the incident position within ten minutes before submitting')
             photo = extract_image(payload.photo_base64,payload.photo_mime,payload.metadata_consent,payload.latitude,payload.longitude,payload.accuracy_m,payload.observed_at) if payload.photo_base64 else None
+            if photo and payload.position_source=='USER_SELECTED_MAP':
+                flags=photo['metadata']['flags']
+                photo['metadata']['flags']=[f.replace('COARSE_SUBMITTED_GPS','COARSE_USER_ESTIMATED_LOCATION') for f in flags]+['USER_SELECTED_LOCATION']
             identity = str(uuid.uuid4())
             values = dict(id=identity, request_id=str(payload.request_id), payload_sha256=fingerprint,
                 withdrawal_hash=digest(payload.withdrawal_secret), source='USER_REPORTED',
@@ -133,6 +149,7 @@ class ReportStore:
                 state='SUBMITTED', revision=1, demonstration=mode()=='demonstration', consent_version=CONSENT_VERSION,
                 image_sha256=photo['sha256'] if photo else None, image_metadata=photo['metadata'] if photo else None)
             c.execute(reports.insert().values(**values))
+            c.execute(positions.insert().values(report_id=identity,position_source=payload.position_source,accuracy_kind='BROWSER_REPORTED' if payload.position_source=='BROWSER_GPS' else 'USER_ESTIMATED',location_selected_at=payload.location_selected_at))
             if photo:
                 c.execute(images.insert().values(report_id=identity,original=photo['original'],preview=photo['preview'],preview_sha256=photo['preview_sha256'],expires_at=timestamp+timedelta(days=7)))
             c.execute(audit.insert().values(**event(identity,None,'SUBMITTED','Citizen consented to private review')))
@@ -140,7 +157,7 @@ class ReportStore:
 
     def rows(self, limit=50, offset=0):
         with self.engine.connect().execution_options(postgresql_readonly=True) as c:
-            query = select(reports).where(reports.c.demonstration==(mode()=='demonstration'))
+            query = report_query().where(reports.c.demonstration==(mode()=='demonstration'))
             rows = c.execute(query.order_by(reports.c.received_at.desc(),reports.c.id).limit(limit).offset(offset)).mappings()
             total = c.execute(select(func.count()).select_from(reports).where(reports.c.demonstration==(mode()=='demonstration'))).scalar_one()
             return {'reports':[serialize(r) for r in rows], 'total':total,'limit':limit,'offset':offset,'mode':mode()}
@@ -157,7 +174,7 @@ class ReportStore:
                 raise HTTPException(409,'Start review before approving/rejecting; completed or withdrawn reports cannot transition')
             c.execute(update(reports).where(reports.c.id==identity).values(state=payload.state,revision=row['revision']+1,reviewed_by=actor['id'],reviewed_at=now(),review_reason=payload.reason))
             c.execute(audit.insert().values(**event(identity,row['state'],payload.state,payload.reason,actor['id'])))
-            return serialize(c.execute(select(reports).where(reports.c.id==identity)).mappings().one())
+            return serialize(c.execute(report_query().where(reports.c.id==identity)).mappings().one())
 
     def history(self, identity):
         with self.engine.connect().execution_options(postgresql_readonly=True) as c:
@@ -186,20 +203,22 @@ class ReportStore:
 
     def erase(self,c,row,actor,reason):
         c.execute(delete(images).where(images.c.report_id==row['id']))
+        c.execute(update(positions).where(positions.c.report_id==row['id']).values(location_selected_at=None))
         c.execute(update(reports).where(reports.c.id==row['id']).values(state='WITHDRAWN',revision=row['revision']+1,description='[private evidence removed]',latitude=None,longitude=None,accuracy_m=None,position=None,gps_at=None,image_metadata=None))
         c.execute(audit.insert().values(**event(row['id'],row['state'],'WITHDRAWN',reason,actor)))
 
     def purge(self, actor):
         with self.engine.begin() as c:
-            c.execute(delete(images).where(images.c.expires_at<=now()))
-            rows = c.execute(select(reports).where(reports.c.received_at<=now()-timedelta(days=30),reports.c.state!='WITHDRAWN').with_for_update()).mappings().all()
+            in_mode=select(reports.c.id).where(reports.c.demonstration==(mode()=='demonstration'))
+            c.execute(delete(images).where(images.c.expires_at<=now(),images.c.report_id.in_(in_mode)))
+            rows = c.execute(select(reports).where(reports.c.received_at<=now()-timedelta(days=30),reports.c.state!='WITHDRAWN',reports.c.demonstration==(mode()=='demonstration')).with_for_update()).mappings().all()
             for row in rows:
                 self.erase(c,row,actor['id'],'Private evidence retention elapsed')
             return {'state':'purged','reports_removed':len(rows)}
 
     def evidence(self, limit=50, offset=0):
         with self.engine.connect().execution_options(postgresql_readonly=True) as c:
-            rows = c.execute(select(reports).where(reports.c.state=='APPROVED',reports.c.demonstration==(mode()=='demonstration'),reports.c.received_at>now()-timedelta(days=30)).order_by(reports.c.received_at,reports.c.id).limit(limit).offset(offset)).mappings()
+            rows = c.execute(report_query().where(reports.c.state=='APPROVED',reports.c.demonstration==(mode()=='demonstration'),reports.c.received_at>now()-timedelta(days=30)).order_by(reports.c.received_at,reports.c.id).limit(limit).offset(offset)).mappings()
             return {'schema_version':'citizen-evidence-v1','source':'USER_REPORTED','label_eligibility':'NOT_ASSESSED','negative_labels':False,
                     'records':[{**serialize(r),'training_eligible':False,'official_warning':False,'environmental_snapshot_status':'not_captured','image_license':'submitter_authorized_private_review_only' if r['image_sha256'] else None} for r in rows], 'limit':limit,'offset':offset}
 

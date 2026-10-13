@@ -30,3 +30,10 @@ it('withdraws with a secret in the body and removes private GPS from the view',a
  fetch.mockResolvedValueOnce({ok:true,json:async()=>({id:'TEST ONLY report',state:'WITHDRAWN'})});fireEvent.click(screen.getByRole('button',{name:'Withdraw private evidence'}));await screen.findByText(/Private photo and location removed/)
  expect(fetch.mock.calls[1][0]).toBe('/api/reports/TEST ONLY report/withdraw');expect(JSON.parse(fetch.mock.calls[1][1].body).withdrawal_secret).toMatch(/^[a-f0-9]{64}$/)
 })
+it('manual reporting records a declared radius and source without requesting GPS or fabricating a fix',async()=>{
+ render(<CitizenReport/>);fireEvent.click(screen.getByRole('button',{name:'Select location manually'}))
+ fireEvent.change(screen.getByLabelText('Incident latitude'),{target:{value:'13.4'}});fireEvent.change(screen.getByLabelText('Incident longitude'),{target:{value:'74.7'}})
+ fireEvent.click(screen.getByRole('button',{name:'Place manual incident point'}));expect(screen.getByRole('button',{name:'Review report'}).disabled).toBe(true)
+ fireEvent.change(screen.getByLabelText('Estimated uncertainty radius (m)'),{target:{value:'250'}});fireEvent.change(screen.getByLabelText('What did you see?'),{target:{value:'TEST ONLY manual drainage observation'}});fireEvent.click(screen.getByLabelText(/I consent to private admin review/));fireEvent.click(screen.getByRole('button',{name:'Review report'}));fireEvent.click(screen.getByRole('button',{name:'Submit for private review'}));await screen.findByText(/Report TEST ONLY report/)
+ const body=JSON.parse(fetch.mock.calls[0][1].body);expect(body.position_source).toBe('USER_SELECTED_MAP');expect(body.gps_at).toBeNull();expect(body.accuracy_m).toBe(250);expect(gps).not.toHaveBeenCalled()
+})

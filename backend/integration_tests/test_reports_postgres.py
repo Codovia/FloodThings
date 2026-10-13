@@ -129,3 +129,38 @@ def test_invalid_image_rolls_back_and_rate_limit_is_persistent(report_api):
         assert not c.execute(select(reports)).all()
     for _ in range(4):submit(report_api,payload(False))
     assert client.post('/api/reports',headers={'Origin':ORIGIN,'X-FloodPulse-Report':'1'},json=payload(False)).status_code==429
+
+
+def test_manual_position_preserves_source_estimated_uncertainty_and_absent_gps(report_api):
+    from app.report_position_schema import positions
+    client,db,*_=report_api;body=payload();body.update(position_source='USER_SELECTED_MAP',gps_at=None,location_selected_at=now().isoformat(),accuracy_m=250)
+    body,row=submit(report_api,body);headers=sign_in(report_api)
+    r=client.get('/api/admin/reports').json()['reports'][0]
+    assert r['position_source']=='USER_SELECTED_MAP' and r['accuracy_kind']=='USER_ESTIMATED' and r['gps_at'] is None
+    assert 'USER_SELECTED_LOCATION' in r['image_metadata']['flags']
+    for state,revision in [('UNDER_REVIEW',1),('APPROVED',2)]:
+        assert client.post('/api/admin/reports/'+row['id']+'/review',headers=headers,json={'state':state,'revision':revision,'reason':'TEST ONLY reviewed manual-position evidence'}).status_code==200
+    exported=client.get('/api/admin/reports/evidence').json()['records'][0]
+    assert exported['position_source']=='USER_SELECTED_MAP' and not exported['training_eligible']
+    assert client.post('/api/reports/'+row['id']+'/withdraw',headers={'Origin':ORIGIN},json={'withdrawal_secret':body['withdrawal_secret']}).status_code==200
+    with db.connect() as c:
+        assert c.execute(select(positions.c.location_selected_at)).scalar_one() is None
+
+
+def test_manual_position_cannot_claim_a_gps_timestamp_or_missing_uncertainty(report_api):
+    client=report_api[0];body=payload(False);body.update(position_source='USER_SELECTED_MAP',location_selected_at=now().isoformat())
+    headers={'Origin':ORIGIN,'X-FloodPulse-Report':'1'}
+    assert client.post('/api/reports',headers=headers,json=body).status_code==422
+    body.update(gps_at=None,accuracy_m=0)
+    assert client.post('/api/reports',headers=headers,json=body).status_code==422
+
+
+def test_demo_retention_does_not_erase_live_mode_evidence(report_api,monkeypatch):
+    client,db,*_=report_api;body,row=submit(report_api);headers=sign_in(report_api)
+    with db.begin() as c:
+        c.execute(update(reports).values(demonstration=False,received_at=now()-timedelta(days=31)))
+        c.execute(update(images).values(expires_at=now()-timedelta(seconds=1)))
+    assert client.post('/api/admin/reports/retention/purge',headers=headers).json()['reports_removed']==0
+    with db.connect() as c:
+        assert c.execute(select(reports.c.state)).scalar_one()=='SUBMITTED'
+        assert len(c.execute(select(images)).all())==1
