@@ -7,7 +7,7 @@ test('desktop workspaces fit viewport, retain reachable internal panels and excl
   for(const path of ['/','/weather','/flood-map','/shelters','/admin']){
    await page.goto(path);await expect(page.getByRole('heading',{level:1})).toBeVisible()
    await expect(page.getByLabel('Weather latitude')).toHaveCount(0);await expect(page.getByLabel('Weather longitude')).toHaveCount(0)
-   if(path==='/'){expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(size.width);expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeGreaterThanOrEqual(size.height)}else expect(await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.scrollHeight])).toEqual([size.width,size.height])
+   expect(await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.scrollHeight])).toEqual([size.width,size.height])
    if(path==='/'){
     const frame=await page.getByRole('region',{name:'Karnataka emergency map'}).boundingBox()
     expect(frame.height).toBeGreaterThan(350);await page.getByRole('region',{name:'Karnataka emergency map'}).scrollIntoViewIfNeeded();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()

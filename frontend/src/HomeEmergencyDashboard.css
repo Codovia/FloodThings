@@ -1,54 +1,77 @@
-.page-home .home-emergency-dashboard{width:100%;flex:none;min-width:0;display:flex;flex-direction:column;gap:16px}
-.page-home .home-location-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding:16px 20px;border:1px solid var(--line,#d7dfdd);background:#fff;border-radius:14px}
-.page-home .home-location-bar h2{font-size:20px;margin:3px 0 6px}
-.page-home .home-location-bar p{margin:4px 0;line-height:1.45;font-size:13px}
-.page-home .home-location-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;max-width:48%}
+/* All sizing changes apply only while Home is mounted. Other routes retain their layouts. */
+#root:has(.page-home){height:auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;overflow:visible}
+main.app-content.page-home{flex:none;overflow:visible}
+.page-home .home-emergency-dashboard{width:100%;min-width:0;display:grid;grid-template-rows:auto auto auto;gap:16px}
+.page-home .home-location-bar{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:14px 16px;border:1px solid #d7dfdd;background:#fff;border-radius:12px;min-width:0}
+.page-home .home-location-bar h2{font-size:1.125rem;margin:0 0 4px}
+.page-home .home-location-bar p{margin:3px 0;line-height:1.4;font-size:.8125rem}
+.page-home .home-location-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;flex-shrink:0;max-width:48%}
 .page-home .home-location-actions>.location-directory{margin:0;min-width:0}
-.page-home .home-location-actions button{min-height:40px;font-size:12px}
-.page-home .home-summary-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.page-home .home-summary-card{border:1px solid #d7dfdd;border-radius:14px;background:white;padding:16px 20px;min-width:0}
-.page-home .home-summary-card h2{font-size:22px;line-height:1.35;margin:6px 0 8px}
-.page-home .home-flood-summary h2{font-size:17px}
-.page-home .home-summary-card p{font-size:13px;line-height:1.5;margin:5px 0}
-.page-home .home-summary-card small,.page-home .home-area-summary small{display:block;color:#546460;font-size:11px;line-height:1.5}
-.page-home .home-main-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);align-items:start;gap:18px;min-width:0}
-.page-home .home-area-summary.workspace-information{display:block;overflow:visible;min-width:0;padding:20px;background:#fff;border:1px solid #d7dfdd;border-radius:14px}
-.page-home .home-area-summary h2{font-size:21px;margin:6px 0 14px}
-.page-home .home-area-summary article{padding:14px 0;border-top:1px solid #e0e8e5}
-.page-home .home-area-summary h3{font-size:15px;margin:0 0 8px}
-.page-home .home-area-summary p{font-size:13px;line-height:1.6;margin:8px 0}
-.page-home .home-detail-links{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:12px;font-size:13px}
-.page-home .home-detail-links button,.page-home .home-shelter-heading button{font-size:11px;padding:7px 10px;min-height:36px}
-.page-home .home-map-stage.workspace-map{height:auto;display:block;min-width:0;overflow:hidden;padding:16px;background:#fff;border:1px solid #d7dfdd;border-radius:14px}
-.page-home .home-map-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}
-.page-home .home-map-heading h2{font-size:21px;margin:4px 0}.page-home .home-map-heading>a{font-size:13px}
-.page-home .home-map-stage .map-actions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
-.page-home .home-map-stage .map-actions button{font-size:12px;padding:8px 12px;min-height:36px}
-.page-home .home-flood-map{height:clamp(430px,calc(100dvh - 300px),780px);width:100%;border:1px solid #d1dfd8;border-radius:10px;background:#e9f0ec;z-index:0}
-.page-home .home-map-legend{list-style:none;display:flex;flex-wrap:wrap;gap:8px 14px;padding:0;margin:12px 0;font-size:11px}
-.page-home .home-map-legend li{display:flex;align-items:center;gap:5px}.home-map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%}
-.home-map-legend .gps{background:#286ba4}.home-map-legend .locality{background:#087e7c}.home-map-legend .history{background:#dc6047}.home-map-legend .shelter{background:#3da86e}
-.page-home .home-map-limitations,.page-home .home-tile-notice{font-size:11px;line-height:1.5;margin:6px 0}
+.page-home .home-location-actions button{min-height:36px;font-size:.8125rem;padding:8px 12px}
+.page-home .home-summary-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-width:0}
+.page-home .home-summary-card{border:1px solid #d7dfdd;border-radius:12px;background:#fff;padding:10px 14px;min-width:0}
+.page-home .home-summary-card h2{font-size:1.125rem;line-height:1.3;margin:4px 0}
+.page-home .home-flood-summary h2{font-size:.9375rem}
+.page-home .home-summary-card p{font-size:.8125rem;line-height:1.4;margin:4px 0 0}
+.page-home .home-summary-card small,.page-home .home-area-summary small{display:block;color:#546460;font-size:.75rem;line-height:1.4}
+.page-home .home-main-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:16px;align-items:start;min-width:0;min-height:0}
+.page-home .home-area-summary.workspace-information{display:flex;flex-direction:column;min-width:0;min-height:0;overflow:visible;padding:14px;background:#fff;border:1px solid #d7dfdd;border-radius:12px}
+.page-home .home-essential-status{flex:none;border-bottom:1px solid #d7dfdd;padding-bottom:8px}
+.page-home .home-area-summary h2{font-size:1.0625rem;line-height:1.35;margin:0 0 8px}
+.page-home .home-area-summary h3{font-size:.9375rem;margin:0 0 6px;line-height:1.4}
+.page-home .home-area-summary p{font-size:.875rem;line-height:1.45;margin:6px 0}
+.page-home .home-area-summary article{padding:12px 0;border-bottom:1px solid #e0e8e5}
+.page-home .home-area-scroll{min-height:0;min-width:0;scrollbar-gutter:stable;overflow:visible}
+.page-home .home-area-scroll:focus-visible{outline:3px solid #087f83;outline-offset:2px}
+.page-home .home-source-details{font-size:.8125rem;line-height:1.4;margin:8px 0}
+.page-home .home-source-details summary,.page-home .home-map-notes summary{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.page-home .home-detail-links{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:8px;font-size:.875rem}
+.page-home .home-detail-links button,.page-home .home-shelter-heading button{font-size:.8125rem;padding:7px 10px;min-height:36px}
+.page-home .home-map-stage.workspace-map{height:auto;display:flex;flex-direction:column;gap:8px;min-width:0;min-height:0;overflow:visible;padding:12px;background:#fff;border:1px solid #d7dfdd;border-radius:12px}
+.page-home .home-map-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;flex:none}
+.page-home .home-map-heading{display:flex;align-items:center;justify-content:space-between;flex:1;gap:12px}
+.page-home .home-map-heading h2{font-size:1.125rem;margin:0;line-height:1.4}.page-home .home-map-heading>a{font-size:.8125rem;white-space:nowrap}
+.page-home .home-map-heading .eyebrow{display:none}
+.page-home .home-map-stage .map-actions{display:flex;flex-wrap:wrap;gap:8px;margin:0}
+.page-home .home-map-stage .map-actions button{font-size:.8125rem;padding:8px 10px;min-height:36px}
+.page-home .home-flood-map{height:clamp(380px,calc(100dvh - 300px),780px);width:100%;min-height:0;border:1px solid #d1dfd8;border-radius:8px;background:#e9f0ec;z-index:0}
+.page-home .home-map-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px;flex:none;position:relative}
+.page-home .home-map-legend{list-style:none;display:flex;flex-wrap:wrap;gap:6px 12px;padding:0;margin:0;font-size:.75rem;line-height:1.4}
+.page-home .home-map-legend li{display:flex;align-items:center;gap:5px}.page-home .home-map-legend i{display:inline-block;width:9px;height:9px;border-radius:50%}
+.page-home .home-map-legend .gps{background:#286ba4}.page-home .home-map-legend .locality{background:#087e7c}.page-home .home-map-legend .history{background:#dc6047}.page-home .home-map-legend .shelter{background:#3da86e}
+.page-home .home-map-notes{font-size:.8125rem;line-height:1.4}
+.page-home .home-map-limitations,.page-home .home-tile-notice{font-size:.8125rem;line-height:1.4;margin:0}
 .page-home .home-shelter-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
-.page-home .home-shelter-list{list-style:none;padding:0;margin:10px 0}.page-home .home-shelter-list li{padding:8px 0}.page-home .home-shelter-list span{display:block;font-size:12px;margin:4px 0}
-@media(max-width:800px){
- .page-home .home-location-bar{display:block;padding:16px}.page-home .home-location-actions{justify-content:flex-start;max-width:none;margin-top:12px}
- .page-home .home-main-grid{grid-template-columns:minmax(0,1fr)}.page-home .home-summary-cards{grid-template-columns:minmax(0,1fr);gap:10px}
- .page-home .home-summary-card{padding:14px 16px}.page-home .home-summary-card h2{font-size:19px}.page-home .home-flood-summary h2{font-size:16px}
- .page-home .home-area-summary.workspace-information{padding:16px}.page-home .home-map-stage.workspace-map{padding:12px}.page-home .home-flood-map{height:380px}
- .page-home .home-location-bar h2{overflow-wrap:anywhere}.page-home .home-location-actions>.location-directory{width:100%}
-}
-/* Home needs normal document scrolling: a fixed inherited workspace clipped the map. */
-@media(min-width:1100px) and (min-height:740px){
- #root:has(.page-home){height:auto;min-height:100dvh;overflow:visible}
- main.app-content.page-home{flex:none;overflow:visible}
- .page-home .page-intro{padding:2px 4px;margin:0 0 12px}
+.page-home .home-shelter-list{list-style:none;padding:0;margin:8px 0}.page-home .home-shelter-list li{padding:8px 0}.page-home .home-shelter-list span{display:block;font-size:.875rem;margin:4px 0}
+@media(min-width:1100px){
+ #root:has(.page-home) .header-inner{padding-top:12px;padding-bottom:12px}
+ main.app-content.page-home{width:100%;max-width:none;margin:0;padding:8px 20px}
+ .page-home .page-intro{padding:0;margin:0 0 6px;flex:none}
  .page-home .page-intro>div{display:flex;align-items:center;gap:16px}
- .page-home .page-intro .eyebrow{display:none}.page-home .page-intro h1{margin:0;font-size:23px}.page-home .page-intro p{margin:0;font-size:12px}
- .page-home .home-emergency-dashboard{gap:12px}
- .page-home .home-location-bar{padding:10px 16px}.page-home .home-location-bar .eyebrow{display:none}
- .page-home .home-location-bar h2{font-size:18px;margin:0 0 3px}.page-home .home-location-bar p{font-size:12px;margin:3px 0}
- .page-home .home-summary-card{padding:12px 16px}.page-home .home-summary-card h2{font-size:20px;margin:4px 0 6px}
- .page-home .home-flood-summary h2{font-size:15px}.page-home .home-summary-card p{font-size:12px;margin:4px 0;line-height:1.4}
- .page-home .home-map-heading .eyebrow{display:none}.page-home .home-map-heading h2{font-size:20px}
+ .page-home .page-intro .eyebrow{display:none}.page-home .page-intro h1{margin:0;font-size:1.25rem;line-height:1.3}.page-home .page-intro p{margin:0;font-size:.8125rem}
+ .page-home .home-emergency-dashboard{gap:4px}
+ .page-home .home-location-bar{padding:6px 12px;align-items:center}.page-home .home-location-bar .eyebrow{display:none}
+ .page-home .home-location-bar h2{font-size:1rem;line-height:1.25;margin:0}.page-home .home-location-bar p{font-size:.8125rem;margin:2px 0}
+ .page-home .home-summary-card{padding:8px 12px}.page-home .home-summary-card>.eyebrow{margin:0;line-height:1.3}
+ .page-home .home-location-actions>.location-directory{position:relative}
+ .page-home .home-location-actions .directory-content{position:absolute;top:calc(100% + 8px);right:0;width:min(36rem,calc(100vw - 40px));max-height:calc(100dvh - 200px);overflow:auto;background:#fff;border:1px solid #7897a5;border-radius:8px;padding:16px;box-shadow:0 8px 24px #17313c24;z-index:1200}
+ .page-home .home-map-notes[open]>.home-map-limitations{position:absolute;bottom:calc(100% + 8px);right:0;width:min(34rem,100%);max-height:45dvh;overflow:auto;padding:14px;background:#fff;border:1px solid #7897a5;border-radius:8px;box-shadow:0 8px 24px #17313c24;z-index:1000}
+ #root:has(.home-viewport-fit){height:100vh;height:100dvh;min-height:0}
+ main.app-content.page-home:has(.home-viewport-fit){display:flex;flex-direction:column;flex:1;min-height:0}
+ .page-home .home-viewport-fit{flex:1;min-height:0;grid-template-rows:auto auto minmax(0,1fr)}
+ .page-home .home-viewport-fit .home-main-grid{align-items:stretch;min-height:0}
+ .page-home .home-viewport-fit .home-area-summary,.page-home .home-viewport-fit .home-map-stage{height:100%;min-height:0;padding:10px}
+ .page-home .home-viewport-fit .home-area-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain}
+ .page-home .home-viewport-fit .home-flood-map{height:auto;flex:1;min-height:0}
+}
+@media(max-width:800px){
+ .page-home .home-location-bar{display:block}.page-home .home-location-actions{justify-content:flex-start;max-width:none;margin-top:10px}
+ .page-home .home-main-grid,.page-home .home-summary-cards{grid-template-columns:minmax(0,1fr)}
+ .page-home .home-flood-map{height:380px}.page-home .home-location-bar h2{overflow-wrap:anywhere}
+ .page-home .home-location-actions>.location-directory{width:100%}.page-home .home-map-toolbar{display:block}.page-home .home-map-stage .map-actions{margin-top:10px}
+}
+/* A failed background must not collapse the evidence canvas or cover its controls. */
+@media(min-width:1100px){
+ .page-home .home-viewport-fit .home-map-stage{position:relative}
+ .page-home .home-viewport-fit .home-tile-notice{position:absolute;left:14px;right:14px;bottom:64px;z-index:700;background:#fff;padding:8px 10px;border:1px solid #7897a5;box-shadow:0 2px 8px #17313c24}
 }

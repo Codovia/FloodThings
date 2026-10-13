@@ -12,7 +12,7 @@ function popup(text, label, href, action) {
   link.addEventListener('click', event => { if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); action() } })
   box.append(p, link); return box
 }
-export default function HomeFloodMap({ point, gps, features, shelters, navigate, onEvidence }) {
+export default function HomeFloodMap({ fitViewport, point, gps, features, shelters, navigate, onEvidence }) {
   gps = point?.kind === 'gps' ? point : gps
   const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onEvidence })
   const [tileError, setTileError] = useState(false)
@@ -27,6 +27,13 @@ export default function HomeFloodMap({ point, gps, features, shelters, navigate,
     return () => { view.remove(); map.current = null }
   }, [])
   useMapResize(map)
+  useEffect(() => {
+    if (!map.current) return
+    // The first viewport fit changes the canvas after Leaflet's initial bounds.
+    // Refresh its size before framing statewide fallback; selected points stay put.
+    map.current.invalidateSize({ pan: false })
+    if (!point && stateBounds.current) map.current.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false })
+  }, [fitViewport])
   useEffect(() => {
     if (!map.current) return
     const layers = L.layerGroup().addTo(map.current)
@@ -47,11 +54,11 @@ export default function HomeFloodMap({ point, gps, features, shelters, navigate,
   function statewide() { if (stateBounds.current) map.current?.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false }) }
   function historyView() { if (features.length) map.current?.fitBounds(L.geoJSON({ type: 'FeatureCollection', features }).getBounds(), { padding: [25, 25], maxZoom: 13, animate: false }) }
   return <section className="panel workspace-map home-map-stage" aria-labelledby="home-map-title">
-    <div className="home-map-heading"><div><p className="eyebrow">EVIDENCE & ASSISTANCE</p><h2 id="home-map-title">Karnataka Flood Map</h2></div><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
-    <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={historyView} disabled={!features.length}>Show historical evidence</button></div>
+    <div className="home-map-toolbar"><div className="home-map-heading"><div><p className="eyebrow">EVIDENCE & ASSISTANCE</p><h2 id="home-map-title">Karnataka Flood Map</h2></div><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
+    <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={historyView} disabled={!features.length}>Show historical evidence</button></div></div>
     <div ref={element} className="home-flood-map" role="region" aria-label="Karnataka emergency map" />
     {tileError && <p className="notice home-tile-notice" role="status">{BASEMAP_NOTICE}</p>}
-    <ul className="home-map-legend" aria-label="Map legend"><li><i className="gps"/>GPS point</li><li><i className="locality"/>Selected place</li><li><i className="history"/>Historical floodwater</li><li><i className="shelter"/>Verified Open shelter</li></ul>
-    <p className="home-map-limitations">Historical cells are past observations, not live flooding. Hazard and official forecast geometry are unavailable. State outline: simplified 2011 context; border coverage is uncertain.</p>
+    <div className="home-map-footer"><ul className="home-map-legend" aria-label="Map legend"><li><i className="gps"/>GPS point</li><li><i className="locality"/>Selected place</li><li><i className="history"/>Historical floodwater</li><li><i className="shelter"/>Verified Open shelter</li></ul>
+    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">Historical cells are past observations, not live flooding. Hazard and official forecast geometry are unavailable. State outline: simplified 2011 context; border coverage is uncertain.</p></details></div>
   </section>
 }

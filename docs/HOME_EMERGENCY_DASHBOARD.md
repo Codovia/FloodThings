@@ -122,20 +122,42 @@ selected point.
 
 ## Validation and limits
 
-Home uses a 40% information / 60% map grid on desktop, three compact cards above
-it and normal document scrolling. The inherited fixed workspace had clipped the
-new map, so Home alone opts out of that constraint. Mobile stacks the information
-and map, with a 380 px map and no horizontal overflow, including 320 px checks.
-Other pages retain their existing viewport and internal-scroll assertions.
+Home uses a 40% information / 60% map grid on desktop with three compact cards
+above it. The desktop follow-up replaces the earlier tall, page-scrolling layout
+with a Home-scoped 100vh/100dvh flex/grid workspace. Header, footer and content
+rows reserve their actual heights; shrinkable children have min-height: 0.
+The left panel pins forecast availability and official warning status above a
+keyboard-focusable internal scrolling region. Additional provenance uses native,
+accessible details controls. The map fills the remaining workspace; a background
+failure notice does not shrink its canvas. Leaflet invalidates its size through
+the existing ResizeObserver and refreshes initial statewide framing after the
+first viewport fit, without moving a selected point.
+
+Viewport fitting requires width >= 1100 px, height >= 740 px and enough remaining
+space for a readable workspace and essential statuses. ResizeObserver checks
+header/footer, location, cards and essential-content sizes, including font changes.
+Short screens, narrower zoom-equivalent viewports and enlarged text that cannot
+fit use natural scrolling. No body overflow suppression or global font reduction
+is used. Mobile stacks the information and map, with a 380 px map. Other pages
+retain their existing layouts and scroll assertions.
 
 Independent installed **Google Chrome 154.0.8037.57** inspected all five routes,
 with no API mocking and no page errors. Final Home map rectangles:
 
-| Viewport | Leaflet map width × height |
-| --- | --- |
-| 1366 × 768 | 746 × 468 px |
-| 1920 × 1080 | 1078.39 × 780 px |
-| 390 × 844 | 332 × 380 px |
+| Viewport | Document height | Leaflet map | Left panel |
+| --- | --- | --- | --- |
+| 1366 × 768 | 768 px | 764 × 352.16 px | 524 × 444.34 px |
+| 1920 × 1080 | 1080 px | 1096.39 × 664.16 px | 745.59 × 756.34 px |
+| 1600 × 900 | 900 px | 904.39 × 484.16 px | 617.59 × 576.34 px |
+| 390 × 844 | 2530 px (natural scrolling) | 332 × 380 px | 358 × 849.55 px |
+
+Current viewport and full-page screenshots, measurements and validation receipts
+are in ignored `data/recovery/home_viewport_v1/`. Desktop full-page image heights
+match their viewport heights; mobile deliberately remains taller. Current layout
+checks also cover keyboard panel scrolling, bounded search, expandable source
+notes, pinned statuses, short screens, a 1093 × 614 zoom-equivalent viewport and
+200% root text scaling. Weather/GPS/rainfall/history/shelter validation logic and
+scientific claims are unchanged.
 
 Full-page screenshots and receipts are retained under ignored
 `data/recovery/home_emergency_v1/`. They are actual browser captures, not generated

@@ -62,10 +62,10 @@ test('fresh live shelter fixture feeds one list/map receipt and disappears on ve
 })
 test('Home has a large 60 percent map on desktop and normal overflow-free mobile scrolling',async({page})=>{
  await setup(page,'denied')
- for(const size of [{width:1366,height:768},{width:1920,height:1080},{width:390,height:844},{width:320,height:720}]){
+ for(const size of [{width:1366,height:768},{width:1920,height:1080},{width:1600,height:900},{width:390,height:844},{width:320,height:720}]){
   await page.setViewportSize(size);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();const left=await page.locator('.home-area-summary').boundingBox(),stage=await page.locator('.home-map-stage').boundingBox(),map=await page.locator('.home-flood-map').boundingBox()
   expect(map.height).toBeGreaterThan(350);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
-  if(size.width>1000){expect(stage.x).toBeGreaterThan(left.x+left.width);expect(stage.width/(stage.width+left.width)).toBeCloseTo(.6,1)}else{expect(stage.y).toBeGreaterThan(left.y+left.height-1);await page.locator('.home-flood-map').scrollIntoViewIfNeeded();await expect(page.locator('.home-flood-map')).toBeVisible()}
+  if(size.width>1000){await expect(page.locator('.home-viewport-fit')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBe(size.height);expect(stage.x).toBeGreaterThan(left.x+left.width);expect(stage.width/(stage.width+left.width)).toBeCloseTo(.6,1)}else{expect(stage.y).toBeGreaterThan(left.y+left.height-1);await page.locator('.home-flood-map').scrollIntoViewIfNeeded();await expect(page.locator('.home-flood-map')).toBeVisible()}
  }
 })
 
