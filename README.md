@@ -369,16 +369,21 @@ Open `/admin` to manage manually assigned facilities. This is a project prototyp
 
 Revision `0002_emergency_shelters`, following the existing location-directory migration, creates `shelter_admins`, `shelter_sessions`, `shelter_login_limits`, `emergency_shelters` and `shelter_audit`. It uses the same PostgreSQL/PostGIS database and preserves location tables. Entrance geometry is WGS84 `POINT`, **X=longitude / Y=latitude**, checked against stored numeric coordinates. Database constraints enforce capacity, occupancy, coordinate pairs, verification and status consistency. Updates use revision checks and transactions that also insert audit snapshots; a failed audit insert rolls back the assignment. Downgrade removes only these shelter tables; back up operational data before any downgrade.
 
-Run `alembic upgrade head` through the existing authorized maintenance environment. Provision a designated administrator privately; the command prompts twice without echoing or saving the password:
+From the repository root, create your chosen administrator with one command:
 
 ```bash
-cd backend
-.venv/bin/python -B -m app.provision_shelter_admin --username YOUR_ADMIN_USERNAME
-# Explicit password rotation also revokes all existing sessions:
-.venv/bin/python -B -m app.provision_shelter_admin --username YOUR_ADMIN_USERNAME --reset-password
+./scripts/setup-admin.sh
 ```
 
-The maintenance process alone receives `LOCATION_DIRECTORY_ADMIN_URL`. Passwords must contain 16–128 characters and are salted using scrypt (`N=131072, r=8, p=1`), the [OWASP documented fallback when Argon2id is unavailable](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). No administrator password file is supported. Do not pass the maintenance URL to the API or reuse the directory's read-only role for writes. Configure a distinct, privately provisioned `floodpulse_shelter_app` login with only these privileges in the intended database:
+It checks the existing `floodpulse_directory` database on `127.0.0.1:55436` against the verified migration head (currently `0006`). Both username and password are entered privately; the password is confirmed without echoing or saving it. The command reuses the existing secure provisioner and then opens a real headless browser to verify login, shelter management, citizen-report moderation, alert administration and logout at **http://127.0.0.1:14180/admin**. It sends no alerts and creates no shelter/report data. Start the current application with `./start.sh` for browser verification; if an older launcher is already running, stop that launcher with Ctrl+C and restart it so new administration routes are loaded.
+
+For this inspected local installation, no maintenance environment export is needed: setup reads the existing user-owned `0600` file `data/tmp/sprint6-db/admin-password`, already mounted into `floodpulse-sprint6-db`. Service connections are checked using the existing private launcher profile. This is a separate terminal maintenance process; it never starts the API with maintenance credentials, alters grants, runs migrations or creates another database.
+
+Existing usernames are refused and left unchanged. To verify an account you already created, run `./scripts/setup-admin.sh --verify-only`; it asks privately for that account's credentials and does not reset its password. `./scripts/setup-admin.sh --check` checks connectivity/schema/privileges without prompting for staff credentials or creating an account. The local verification receipt is ignored, owner-only `data/tmp/admin_setup/verification.json`; it contains results, not credentials, cookies or CSRF tokens.
+
+If the existing maintenance secret is missing, unreadable or not owner-only, run **`./scripts/setup-admin.sh --maintenance-prompt`** and privately enter an authorized connection to the **same database**. Its shape is `postgresql+psycopg://MAINTENANCE_ROLE:URL_ENCODED_DB_PASSWORD@127.0.0.1:55436/floodpulse_directory`; substitute your actual authorized database credentials in the hidden prompt, not in a command, source file or chat. The role needs schema/migration reads and SELECT/INSERT on `shelter_admins`. Existing `LOCATION_DIRECTORY_ADMIN_URL`, when privately configured for this terminal process, remains supported. Reader/application credentials cannot provision staff. If neither an authorized maintenance connection nor the existing private secret is available, setup refuses without creating an account; obtain the connection from the local database administrator. Activating the virtual environment alone never configures maintenance access.
+
+Any explicit `LOCATION_DIRECTORY_ADMIN_URL` is used only by the maintenance process. Passwords must contain 16–128 characters and are salted using scrypt (`N=131072, r=8, p=1`), the [OWASP documented fallback when Argon2id is unavailable](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html). No administrator password file is supported. Do not pass the maintenance URL to the API or reuse the directory's read-only role for writes. Configure a distinct, privately provisioned `floodpulse_shelter_app` login with only these privileges in the intended database:
 
 ```sql
 GRANT CONNECT ON DATABASE floodpulse_directory TO floodpulse_shelter_app;
