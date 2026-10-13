@@ -1,6 +1,7 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
 import AdminEntranceMap from './AdminEntranceMap.jsx'
 import AdminNotifications from './AdminNotifications.jsx'
+import AdminReports from './AdminReports.jsx'
 import useAdminRequests from './useAdminRequests.js'
 import './Shelters.css'
 const blank=()=>({name:'',address:'',district_id:'',latitude:'',longitude:'',capacity:'',occupancy:'',water:'unknown',toilets:'unknown',accessibility:'',contact:'',publish_contact:false,status:'pending',notes:'',restrictions:'',revision:null,verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})
@@ -52,7 +53,8 @@ export default function AdminShelters({embedded=false,onHome=null}){
     {!checking&&!session&&<form className="panel shelter-form" onSubmit={login}><h2>Administrator login</h2><label>Username<input autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e=>setPassword(e.target.value)} /></label><button disabled={busy}>Sign in</button></form>}
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
-      <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button><button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button></nav>
+      <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button><button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button><button type="button" aria-pressed={adminTab==='reports'} onClick={()=>setAdminTab('reports')}>Citizen reports</button></nav>
+      {adminTab==='reports'&&<AdminReports request={request} active/>}
       <div hidden={adminTab!=='notifications'} className="admin-notifications"><AdminNotifications session={session} request={request} /></div>
       <div className="admin-management" hidden={adminTab!=='shelters'}>
       <div className="admin-information">

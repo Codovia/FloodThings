@@ -1,0 +1,12 @@
+.report-workspace{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:16px;align-items:start;min-width:0}
+.report-workspace>*,.report-form{min-width:0}
+.report-form form,.report-form fieldset{display:grid;gap:12px;min-width:0}
+.report-form fieldset{border:1px solid #c4d5df;border-radius:8px;padding:12px}
+.report-form label,.report-workspace label{display:block;line-height:1.5;margin:8px 0}
+.report-form input:not([type=checkbox]),.report-form select,.report-form textarea,.report-workspace textarea{display:block;width:100%;box-sizing:border-box;margin-top:6px;padding:9px;border:1px solid #7897a5;border-radius:6px;font:inherit}
+.report-form textarea,.report-workspace textarea{min-height:110px}
+.report-actions{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.report-review{padding:12px;background:#eef6fb;border-radius:8px}
+.report-workspace pre,.admin-shell pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8125rem;max-height:360px;overflow:auto}
+.report-workspace code{overflow-wrap:anywhere;font-size:.8125rem}
+@media(max-width:900px){.report-workspace{grid-template-columns:minmax(0,1fr)}}

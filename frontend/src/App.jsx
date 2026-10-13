@@ -7,6 +7,7 @@ import PublicShelters from './PublicShelters.jsx'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
+import CitizenReport from './CitizenReport.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
 import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.js'
 
@@ -15,6 +16,7 @@ const pageInfo={
  '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather & AI','Real forecasts for your selected point, with an experimental heavy-rainfall outlook.'],
  '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
+ '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','GPS and optional photo evidence for administrator review.'],
  '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Manage verified shelter assignments and explicitly approved Telegram notifications.'],
 }
 
@@ -35,7 +37,7 @@ export default function App() {
  const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
  const publicPage=path !== '/admin' && !!pageInfo[path]
- const selectorPage=publicPage&&path!=='/flood-map'
+ const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'
  const sheltersPage=path==='/shelters'
  const info=pageInfo[path]
  function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
@@ -46,7 +48,7 @@ export default function App() {
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
    <section className="page-intro"><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
-   {publicPage&&path!=='/'&&<div className="wireframe-workspace">
+   {publicPage&&path!=='/'&&path!=='/report'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
      <WeatherLocationSelector point={point} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>. Weather remains point-specific. {!district?.navigation_bounds&&'Public district navigation bounds are unavailable; no bounds or representative point are invented.'}</p>}
@@ -60,6 +62,7 @@ export default function App() {
     {path==='/shelters'&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}
     {path==='/flood-map'&&<FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
    </div>}
+   {path==='/report'&&<CitizenReport/>}
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
    {!info&&<PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
   </main>

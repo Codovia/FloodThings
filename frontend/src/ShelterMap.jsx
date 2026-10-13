@@ -5,11 +5,11 @@ import {tileMetadataURL,validatedTileMetadata} from './adminMapProvider.js'
 import useMapResize from './useMapResize.js'
 import 'leaflet/dist/leaflet.css'
 
-export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null}) {
-  const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect)
+export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null}) {
+  const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect),inspect=useRef(onInspect)
   const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
-  choose.current=onSelect
+  choose.current=onSelect;inspect.current=onInspect
   useEffect(()=>{
     const view=L.map(container.current,{scrollWheelZoom:false}).setView([15.1,76.1],6)
     map.current=view;layers.current=L.layerGroup().addTo(view)
@@ -38,7 +38,7 @@ export default function ShelterMap({points=[],origin=null,onSelect=null,label='S
     if(origin){L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])}
     for(const point of points){
       const text=document.createElement('span');text.textContent=point.name
-      L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'}).bindTooltip(text).addTo(layers.current);bounds.push([point.latitude,point.longitude])
+      L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'}).bindTooltip(text).on('click',()=>inspect.current?.(point)).addTo(layers.current);bounds.push([point.latitude,point.longitude])
     }
     const geometry=JSON.stringify([bounds,inspection])
     if(geometry!==lastGeometry.current){

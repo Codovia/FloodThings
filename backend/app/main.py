@@ -14,6 +14,7 @@ from .flood_map import router as flood_map_router
 from .locations import router as locations_router
 from .shelters import router as shelters_router, dispose_shelter_engine
 from .notifications import router as notifications_router
+from .reports import router as reports_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_outlook import router as river_outlook_router, RiverOutlook
 
@@ -40,21 +41,22 @@ app.include_router(flood_map_router)
 app.include_router(locations_router)
 app.include_router(shelters_router)
 app.include_router(notifications_router)
+app.include_router(reports_router)
 app.include_router(geocoding_router)
 app.include_router(river_outlook_router)
 
 
 @app.exception_handler(RequestValidationError)
 async def validation_without_admin_secrets(request: Request, exc):
-    if request.url.path.startswith('/api/admin/'):
-        return JSONResponse(status_code=422, content={'detail': 'Invalid administrator request; check fields and verification requirements'})
+    if request.url.path.startswith(('/api/admin/', '/api/reports')):
+        return JSONResponse(status_code=422, content={'detail': 'Invalid administrator request; check fields and verification requirements' if request.url.path.startswith('/api/admin/') else 'Invalid citizen report; check consent, timestamps, GPS and photo fields'})
     return await request_validation_exception_handler(request, exc)
 
 
 @app.middleware("http")
 async def shelter_response_security(request: Request, call_next):
     response = await call_next(request)
-    if request.url.path.startswith('/api/admin/') or request.url.path == '/api/shelters':
+    if request.url.path.startswith('/api/admin/') or request.url.path == '/api/shelters' or request.url.path.startswith('/api/reports'):
         response.headers['Cache-Control'] = 'no-store'
         response.headers['Pragma'] = 'no-cache'
         response.headers['X-Content-Type-Options'] = 'nosniff'
