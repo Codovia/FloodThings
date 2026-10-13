@@ -13,7 +13,7 @@ const CONDITIONS = {
   96: 'Thunderstorm with slight hail', 97: 'Heavy thunderstorm', 99: 'Thunderstorm with heavy hail',
 }
 const reading = (value, unit) => value == null ? 'Unavailable' : `${value} ${unit}`
-const condition = code => code == null ? 'Unavailable' : CONDITIONS[code] || `Unrecognized weather code (${code})`
+export const condition = code => code == null ? 'Unavailable' : CONDITIONS[code] || `Unrecognized weather code (${code})`
 const dayLabel = date => new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }).format(new Date(date + 'T00:00:00+05:30'))
 
 export default function DailyForecast({ days, coverage, compact=false }) {

@@ -198,3 +198,36 @@ it('an expired receipt is refreshed once upon route reactivation, never while in
  await flush();rerender({enabled:false});await advance(FRESHNESS_MS);expect(fetch).toHaveBeenCalledTimes(1)
  rerender({enabled:true});await flush();expect(fetch).toHaveBeenCalledTimes(2);expect(result.current.freshness).toBe('fresh')
 })
+
+it.each(['rate_limited', 'provider_unavailable'])('respects Retry-After beyond ordinary backoff for %s', async kind => {
+ fetch.mockResolvedValue({ok:false,status:503,headers:new Headers({'Retry-After':'7200'}),json:async()=>({status:'unavailable',failure_kind:kind,upstream_status:kind==='rate_limited'?429:503,message:'Controlled transient outage',retry_after_seconds:7200})})
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ expect(result.current.failureKind).toBe(kind);expect(result.current.retryAt).toBe(BASE.getTime()+7200000)
+ await advance(7199999);event('focus');expect(fetch).toHaveBeenCalledTimes(1)
+ await advance(1);expect(fetch).toHaveBeenCalledTimes(2)
+})
+it.each(['invalid_response','provider_http_error'])('does not automatically retry a non-transient %s', async kind=>{
+ fetch.mockResolvedValue({ok:false,status:503,json:async()=>({status:'unavailable',failure_kind:kind,message:'Controlled permanent rejection'})})
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ expect(result.current.failureKind).toBe(kind);expect(result.current.retryAt).toBeNull()
+ await advance(FRESHNESS_MS*2);event('focus');expect(fetch).toHaveBeenCalledTimes(1)
+ act(()=>{result.current.refresh()});await flush();expect(fetch).toHaveBeenCalledTimes(2)
+})
+it('rejects invalid JSON as a response problem instead of an outage or retry loop',async()=>{
+ fetch.mockResolvedValue({ok:true,status:200,json:async()=>{throw new SyntaxError('fixture malformed JSON')}})
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ expect(result.current.failureKind).toBe('invalid_response');expect(result.current.error).toContain('invalid JSON');expect(result.current.retryAt).toBeNull()
+ await advance(FRESHNESS_MS);expect(fetch).toHaveBeenCalledTimes(1)
+})
+it('updates the hourly window clock without a duplicate weather call',async()=>{
+ const data=body(UDUPI);data.hourly_precipitation={status:'available',intervals:[]}
+ fetch.mockResolvedValue(reply(data))
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ await advance(30*60000)
+ expect(result.current.now).toBe(BASE.getTime()+30*60000);expect(fetch).toHaveBeenCalledTimes(1)
+})
+it('classifies a successful HTTP response with no weather status as invalid schema',async()=>{
+ fetch.mockResolvedValue({ok:true,status:200,json:async()=>({})})
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ expect(result.current.failureKind).toBe('invalid_response');expect(result.current.retryAt).toBeNull();expect(result.current.data).toBeNull()
+})

@@ -17,7 +17,7 @@ NOW = datetime(2026, 10, 8, 6, 0, tzinfo=timezone.utc)
 
 @pytest.fixture
 def provider(monkeypatch):
-    monkeypatch.setattr('app.location_weather.datetime', type('Clock', (datetime,), {'now': staticmethod(lambda tz: NOW)}))
+    monkeypatch.setattr('app.weather.datetime', type('Clock', (datetime,), {'now': staticmethod(lambda tz: NOW)}))
     return {'latitude': 13.35, 'longitude': 74.75, 'utc_offset_seconds': 19800,
             'current_units': {'temperature_2m': '°C', 'relative_humidity_2m': '%', 'precipitation': 'mm'},
             'current': {'time': '2026-10-08T11:30', 'interval': 900, 'temperature_2m': 27, 'relative_humidity_2m': 70, 'precipitation': 0},

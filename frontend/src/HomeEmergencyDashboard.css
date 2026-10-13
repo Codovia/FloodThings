@@ -12,6 +12,7 @@ main.app-content.page-home{flex:none;overflow:visible}
 .page-home .home-summary-card{border:1px solid #d7dfdd;border-radius:12px;background:#fff;padding:10px 14px;min-width:0}
 .page-home .home-summary-card h2{font-size:1.125rem;line-height:1.3;margin:4px 0}
 .page-home .home-flood-summary h2{font-size:.9375rem}
+.page-home .home-rain-summary h2{font-size:.9375rem}
 .page-home .home-summary-card p{font-size:.8125rem;line-height:1.4;margin:4px 0 0}
 .page-home .home-summary-card small,.page-home .home-area-summary small{display:block;color:#546460;font-size:.75rem;line-height:1.4}
 .page-home .home-main-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:16px;align-items:start;min-width:0;min-height:0}

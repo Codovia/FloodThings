@@ -53,3 +53,19 @@ it('district filtering preserves actual GPS point and offers existing detail rou
  fireEvent.click(screen.getByText('View shelter details and recheck directions'));expect(p.navigate).toHaveBeenCalledWith('/shelters')
  fireEvent.click(screen.getByText('Inspect sources and historical evidence'));expect(p.navigate).toHaveBeenCalledWith('/flood-map')
 })
+it('shows WMO current conditions, optional fields and a full-hour total without flood inference',async()=>{
+ const p=props(),begin=Math.ceil((Date.now()+19800000)/3600000)*3600000-19800000
+ p.session.data.current={...p.session.data.current,weather_code:61,humidity_percent:70,wind_speed:12,wind_speed_unit:'km/h'}
+ p.session.data.hourly_precipitation={status:'available',timezone:'Asia/Kolkata',unit:'mm',interval_seconds:3600,interval_semantics:'preceding_hour',source:{name:'Open-Meteo'},intervals:Array.from({length:24},(_,i)=>({start:new Date(begin+i*3600000).toISOString(),end:new Date(begin+(i+1)*3600000).toISOString(),precipitation_mm:.5,unit:'mm'}))}
+ render(<HomeEmergencyDashboard {...p}/>);await screen.findByText('No currently verified open shelters are available in this directory.')
+ expect(screen.getByRole('heading',{name:'Next 24 full forecast hours: 12 mm'})).toBeTruthy()
+ expect(screen.getByText(/Humidity: 70%\. Wind: 12 km\/h/)).toBeTruthy()
+ expect(screen.getAllByText(/Slight rain/)).toHaveLength(2)
+ expect(screen.getByText('Validated flood forecast unavailable for this location.')).toBeTruthy()
+ expect(fetch).toHaveBeenCalledTimes(1)
+})
+it('missing temperature preserves other valid current weather rather than hiding it',async()=>{
+ const p=props();p.session.data.current.temperature_c=null;p.session.data.current.humidity_percent=70
+ render(<HomeEmergencyDashboard {...p}/>);await screen.findByText('No currently verified open shelters are available in this directory.')
+ expect(screen.getByRole('heading',{name:'Temperature unavailable.'})).toBeTruthy();expect(screen.getByText(/Humidity: 70%/)).toBeTruthy()
+})

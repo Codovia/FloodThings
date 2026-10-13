@@ -3,12 +3,9 @@
 User coordinates are not district identities. No persistence, geocoding, risk
 classification or scientific dataset writes occur here.
 """
-import asyncio
-from datetime import datetime, timezone
-
 import httpx
 
-from .weather import API_URL, PARAMS, WeatherUnavailable, number, parse_weather
+from .weather import PARAMS, WeatherUnavailable, fetch_weather, number
 
 
 def selected_location(latitude: float, longitude: float) -> dict:
@@ -28,16 +25,11 @@ async def fetch_point_weather(client: httpx.AsyncClient, latitude: float, longit
         if latitude is None or longitude is None:
             raise ValueError("Both coordinates required")
         params = {**PARAMS, "latitude": latitude, "longitude": longitude}
-        async with asyncio.timeout(10):
-            response = await client.get(API_URL, params=params)
-        response.raise_for_status()
-        body = parse_weather(response.json(), datetime.now(timezone.utc))
+        body = await fetch_weather(client, params)
         if any(value is None for value in body["grid_location"].values()):
             raise ValueError("Provider grid coordinates unavailable")
         return {**body, "location": selected_location(latitude, longitude),
                 "prediction_status": "not_available",
                 "prediction_message": "Flood prediction target and label methodology are not yet validated."}
-    except (httpx.HTTPError, TimeoutError) as exc:
-        raise WeatherUnavailable("Weather provider could not be reached. Try again later.") from exc
     except (ValueError, KeyError, TypeError, OverflowError) as exc:
-        raise WeatherUnavailable("Weather provider returned incomplete or invalid data.") from exc
+        raise WeatherUnavailable(f"Weather provider returned incomplete or invalid data: {exc}", kind="invalid_response") from exc

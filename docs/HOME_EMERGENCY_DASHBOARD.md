@@ -2,8 +2,10 @@
 
 Implemented on `/` only, following the approved photographed sketch 01 and the
 Home Emergency Dashboard request. The shared navigation and four detail pages
-retain their existing workflows. No backend endpoint, database schema, model,
-operational Flood Map layer, administrator permission or Telegram workflow changes.
+retain their existing workflows. The weather response now adds validated current
+fields and hourly precipitation as documented below; endpoint paths, database
+schema, models, operational Flood Map layers, administrator permissions and
+Telegram workflows are preserved.
 
 ## Location and privacy
 
@@ -65,30 +67,45 @@ requested independently. The existing public geographic directory is unchanged.
 
 ## Weather and rainfall
 
-Home uses App's existing `useWeatherSession`, with its exact-coordinate validation,
-six-hour retrieval freshness, bounded requests, cancellation and inactive-route
-pause. It creates no second weather lifecycle and requests no default Bengaluru
-weather when Home has no selected point. The current card requires a fresh model
-receipt, finite temperature and a valid estimate timestamp at most 90 minutes
-old. Precipitation is described as the model's preceding measurement interval;
-a current conditions description is unavailable when that information is absent.
-Daily WMO codes are not presented as the current condition.
+Home uses App's existing `useWeatherSession` and one FastAPI/provider request for
+current, hourly and seven-day daily data at the exact selected coordinates. It
+creates no second lifecycle and requests no default Bengaluru weather when Home
+has no selected point. Current temperature, current WMO condition, humidity,
+wind with returned units, preceding-interval precipitation, valid time and source
+come from validated Open-Meteo model output. A missing temperature does not hide
+other valid fields; a daily WMO code never substitutes for the current code.
 
-The existing API supplies **IST calendar-day totals**, with units and coverage
-metadata. It supplies no hourly intervals or forecast issue timestamp. Those
-facts were inspected in `backend/app/weather.py` and checked against the
-[Open-Meteo documentation](https://open-meteo.com/en/docs).
+The current card requires a fresh receipt and a valid current estimate no older
+than 90 minutes. Six-hour session retrieval cadence remains; current estimates
+that age out are unavailable until a successful refresh. Failed refreshes mark
+cached data stale. A manually initiated refresh is always available at a selected
+point. Backend network/timeout, upstream HTTP 429/503 and malformed-response
+categories remain distinct; retries are bounded, respect Retry-After and apply
+only to transient failures. Unsupported provider requests are HTTP errors;
+absence of a requested field alone does not establish that it is unsupported.
 
-The displayed 24-hour forecast window starts at the next complete IST hour and
-states both timestamps. Whole intervals must tile it exactly, without a gap,
-overlap, duplicate, unknown clock, negative/missing value or incompatible unit.
-Daily totals are never prorated. A daily total can serve this window only when it
-starts at local midnight and ends at the following midnight. At other times the
-card says **Next-24-hour total unavailable** and links to the calendar-day
-forecasts on Weather & AI. This is a precipitation forecast, never a flood label,
-flood probability or warning. Consistently timestamped hourly forecast intervals
-would be needed for general next-24-hour availability; no backend expansion was
-performed to fill the card.
+**Next 24 full forecast hours: X mm** uses exactly 24 consecutive one-hour
+precipitation intervals beginning at the next full IST hour (at an exact hour,
+that boundary starts the window). Open-Meteo timestamps END the preceding hour:
+a reference of 10:20 means a window 11:00 today to 11:00 tomorrow and selected
+provider timestamps 12:00 today through 11:00 tomorrow. Both local endpoints are
+shown. The pure calculation accepts an explicit reference clock and returns
+interval count, source, retrieval time and unavailable forecast-issuance time.
+The browser updates its window clock at hourly boundaries without fetching again.
+
+Unknown clocks, duplicate or out-of-order timestamps, gaps, overlapping or
+non-hourly intervals, missing/null/non-finite/negative values and incompatible
+units make the entire total unavailable, with its reason in the information
+panel. No interpolation, daily substitution (including midnight windows) or
+synthetic fallback is allowed. Independently valid current weather remains
+available when hourly coverage fails. Source, freshness and extended limitations
+are accessible in native expandable details. Seven-day calendar forecasts on
+Weather & AI retain their existing contract and presentation.
+
+See [weather contract and diagnostic evidence](OPEN_METEO_WEATHER.md) and the
+[official variable definitions](https://open-meteo.com/en/docs). Weather-model
+estimates are not certified local station observations, flood labels, flood
+probabilities or official emergency warnings.
 
 ## Evidence and assistance
 
@@ -185,3 +202,26 @@ observations and are not staged.
 
 No scientific training decision changes: validated future-flood prediction
 remains unavailable, and the earlier research NO-GO is retained.
+
+## Live weather follow-up, 2026-10-13
+
+Independent installed Chrome, with no API mocks, selected the retained verified
+Kundapur directory point. One weather request served all viewport resizes:
+HTTP 200, 35.8 °C / Clear sky / humidity 33% / wind 13 km/h, current valid
+11:45 IST, precipitation 0 mm for 11:30–11:45 IST. The full forecast-hour total
+was 0 mm for 13 October 12:00 to 14 October 12:00 IST, with 24 intervals. Zero
+forecast precipitation makes no claim about flood occurrence or safety.
+
+| Viewport | Document height | Leaflet map | Information panel | Each weather card |
+| --- | --- | --- | --- | --- |
+| 1366 × 768 | 768 px | 764 × 353.55 px | 524 × 445.73 px | 434 × 83.08 px |
+| 1600 × 900 | 900 px | 904.39 × 485.55 px | 617.59 × 577.73 px | 512 × 83.08 px |
+| 1920 × 1080 | 1080 px | 1096.39 × 665.55 px | 745.59 × 757.73 px | ~618.67 × 83.08 px |
+| 390 × 844 | 2685 px, natural scroll | 332 × 380 px | 358 × 990.53 px | current 358 × 92.38; rain 358 × 108.06 px |
+
+Document width equals viewport width throughout; desktop page scroll remains zero
+when keyboard-scrolling the information region. Actual OSM tiles loaded at all
+four sizes (12/15/20/20); no page errors. Essential statuses, navigation, footer
+and all three cards remain visible on desktop. Real viewport and full-page PNGs,
+raw provider responses and timestamped measurements are retained in ignored
+`data/recovery/home_weather_hourly_v1/`. Previous screenshots remain unchanged.

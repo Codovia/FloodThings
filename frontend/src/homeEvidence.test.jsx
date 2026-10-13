@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { rainfallWindow, next24Rainfall, usableCurrent, validHistoricalFeature } from './homeEvidence.js'
+import { rainfallWindow, next24Rainfall, assessNext24Rainfall, usableCurrent, validHistoricalFeature } from './homeEvidence.js'
 import { classifyCoverage, boundary } from './homeGeography.js'
 import receipt from './data/karnatakaHomeBoundary.source.json'
 import { createHash } from 'node:crypto'
@@ -9,33 +9,39 @@ const rows = Array.from({ length: 24 }, (_, i) => ({ start: new Date(start + i *
 const copy = () => structuredClone(rows)
 describe('strict 24-hour totals over whole supported intervals', () => {
   it('sums exactly 24 complete intervals in millimetres with offset-independent times', () => { expect(rainfallWindow(rows, start, start + 86400000).mm).toBeCloseTo(27.6) })
-  it.each(['missing', 'duplicate', 'overlap', 'null', 'unit', 'negative', 'clock'])('rejects %s instead of inventing a total', kind => {
+  it.each(['missing', 'duplicate', 'overlap', 'null', 'unit', 'negative', 'clock', 'nan', 'infinite', 'reverse', 'daily', 'null_row'])('rejects %s instead of inventing a total', kind => {
     const r = copy()
     if (kind === 'missing') r.splice(5, 1)
     if (kind === 'duplicate') r.push(r[5])
     if (kind === 'overlap') r[5].end = r[6].end
     if (kind === 'null') r[5].precipitation_mm = null
+    if (kind === 'null_row') r[5] = null
     if (kind === 'unit') r[5].unit = 'inches'
     if (kind === 'negative') r[5].precipitation_mm = -1
+    if (kind === 'nan') r[5].precipitation_mm = NaN
+    if (kind === 'infinite') r[5].precipitation_mm = Infinity
+    if (kind === 'reverse') [r[4], r[5]] = [r[5], r[4]]
+    if (kind === 'daily') r.splice(0, 24, { ...r[0], end: r[23].end })
     if (kind === 'clock') r[5].start = '2026-10-12T10:00:00'
     expect(rainfallWindow(r, start, start + 86400000)).toBeNull()
   })
-  it('never prorates daily totals; accepts only an exact midnight-aligned future window', () => {
+  it('never substitutes calendar-day totals, even at midnight', () => {
     const data = { forecast_coverage: { day_definition: 'local_calendar_day', timezone: 'Asia/Kolkata' }, forecast_units: { precipitation_mm: 'mm' }, forecast: [{ date: '2026-10-13', precipitation_mm: 12 }] }
     expect(next24Rainfall(data, start)).toBeNull()
     const midnight = Date.parse('2026-10-13T00:00:00+05:30')
-    expect(next24Rainfall(data, midnight - 1800000)).toEqual({ start: midnight, end: midnight + 86400000, mm: 12 })
+    expect(next24Rainfall(data, midnight - 1800000)).toBeNull()
     expect(next24Rainfall({ ...data, forecast_units: {} }, midnight)).toBeNull()
     expect(next24Rainfall({ ...data, forecast: [{ date: '2026-10-13', precipitation_mm: null }] }, midnight)).toBeNull()
   })
 })
-it('current model estimate requires valid fresh timestamps and a finite temperature', () => {
+it('current model estimate requires valid fresh timestamps and preserves other fields when temperature is missing', () => {
   const data = { current: { valid_at: new Date(start).toISOString(), temperature_c: 27 } }
   expect(usableCurrent(data, 'fresh', start)).toBe(data.current)
   expect(usableCurrent(data, 'stale', start)).toBeNull()
   expect(usableCurrent(data, 'fresh', start + 91 * 60000)).toBeNull()
   expect(usableCurrent(data, 'fresh', start - 1)).toBeNull()
   expect(usableCurrent({ current: { ...data.current, temperature_c: null } }, 'fresh', start)).toBeNull()
+  expect(usableCurrent({ current: { ...data.current, temperature_c: null, humidity_percent: 70 } }, 'fresh', start)?.humidity_percent).toBe(70)
 })
 it('retains only attributed, observation-qualified historical polygon cells', () => {
   const f = { type: 'Feature', geometry: { type: 'Polygon', coordinates: [[[74,13],[75,13],[75,14],[74,13]]] }, properties: { feature_id: 'gfd:1', category: 'historical_observed_floodwater', geometry_crs: 'OGC:CRS84', observation_quality: 'qualified_source_mask_and_clear_views', source: { license: 'CC BY-NC 4.0' }, source_geometry_sha256: 'a'.repeat(64), start_date: '2021-07-01', end_date_inclusive: '2021-07-02' } }
@@ -65,4 +71,23 @@ it('handles holes, large uncertainty and missing geography conservatively', () =
   expect(classifyCoverage({ latitude:3, longitude:3, accuracy_m:500000 }, geometry)).toBe('uncertain')
   expect(classifyCoverage({ latitude:NaN, longitude:0 }, geometry)).toBe('unknown')
   expect(classifyCoverage({ latitude:5, longitude:5 }, null)).toBe('unknown')
+})
+
+const hourlyData = intervals => ({ retrieved_at: '2026-10-12T04:50:00Z', forecast_issued_at: null, hourly_precipitation: {status:'available', timezone:'Asia/Kolkata', unit:'mm', interval_seconds:3600, interval_semantics:'preceding_hour', source:{name:'Open-Meteo', data_kind:'weather_model_output'}, intervals} })
+it('uses preceding-hour ENDS from 12:00 through 11:00 tomorrow for a 10:20 reference', () => {
+ const reference = Date.parse('2026-10-12T10:20:00+05:30'), begin = Date.parse('2026-10-12T11:00:00+05:30')
+ const intervals = Array.from({length:26}, (_,i)=>({start:new Date(begin+(i-1)*3600000).toISOString(),end:new Date(begin+i*3600000).toISOString(),precipitation_mm:i,unit:'mm'}))
+ const result=assessNext24Rainfall(hourlyData(intervals), reference)
+ expect(result).toMatchObject({status:'available',start:begin,end:begin+86400000,interval_count:24,mm:300,source:{name:'Open-Meteo'},forecast_issued_at:null})
+ expect(assessNext24Rainfall(hourlyData(intervals.filter((_,i)=>i!==7)), reference).status).toBe('unavailable')
+})
+it('IST midnight crossover and UTC representation select the same exact full-hour window',()=>{
+ const midnight=Date.parse('2026-10-13T00:00:00+05:30')
+ const intervals=Array.from({length:24},(_,i)=>({start:new Date(midnight+i*3600000).toISOString(),end:new Date(midnight+(i+1)*3600000).toISOString(),precipitation_mm:.5,unit:'mm'}))
+ expect(next24Rainfall(hourlyData(intervals),Date.parse('2026-10-12T23:20:00+05:30'))).toMatchObject({start:midnight,end:midnight+86400000,mm:12,interval_count:24})
+ expect(next24Rainfall(hourlyData(intervals),midnight)).toMatchObject({start:midnight,mm:12})
+})
+it.each(['timezone','unit','interval_seconds','interval_semantics'])('rejects unsupported hourly metadata %s',field=>{
+ const data=hourlyData(rows);data.hourly_precipitation[field]='unsupported'
+ expect(assessNext24Rainfall(data,start).status).toBe('unavailable')
 })

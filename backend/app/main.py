@@ -79,10 +79,11 @@ async def weather(
             return await adapter.fetch()
         return await fetch_point_weather(adapter.client, latitude, longitude)
     except WeatherUnavailable as exc:
-        body = unavailable(str(exc))
+        body = unavailable(str(exc), exc)
         if latitude is not None:
             body.update(location=selected_location(latitude, longitude), prediction_status="not_available")
-        return JSONResponse(status_code=503, content=body)
+        headers = {"Retry-After": str(int(exc.retry_after_seconds + 1))} if exc.retry_after_seconds is not None else None
+        return JSONResponse(status_code=503, content=body, headers=headers)
 
 
 @app.get("/api/ai/rainfall-outlook")

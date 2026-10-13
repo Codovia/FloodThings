@@ -18,7 +18,6 @@ NOW = datetime(2026, 10, 8, 6, tzinfo=timezone.utc)
 def seven(monkeypatch):
     clock = type('Clock', (datetime,), {'now': staticmethod(lambda tz: NOW)})
     monkeypatch.setattr('app.weather.datetime', clock)
-    monkeypatch.setattr('app.location_weather.datetime', clock)
     return {
         'latitude': 13.35, 'longitude': 74.75, 'utc_offset_seconds': 19800,
         'current_units': {'temperature_2m': '°C', 'relative_humidity_2m': '%', 'precipitation': 'mm'},
