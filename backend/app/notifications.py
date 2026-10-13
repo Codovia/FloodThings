@@ -8,9 +8,13 @@ from typing import Literal
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import select, update, func, text as sql_text
+from sqlalchemy.exc import SQLAlchemyError
 
 from .notification_schema import notifications
 from .shelters import authorized, get_store, shelter_engine, execute, mode, now
+from .telegram_subscriptions import require_subscription,is_subscribed
+from .shelter_schema import limits
+from .shelter_security import digest
 from .telegram_delivery import ConfigurationUnavailable, TelegramConfig, TOKEN_PATTERN, get_sender
 
 router = APIRouter(prefix='/api/admin/notifications')
@@ -80,7 +84,7 @@ def available_shelter(store, identity):
 
 
 def render_message(payload, snapshot):
-    outgoing = 'FloodPulse prototype — administrator-approved ' + payload.kind.upper() + ' notice\n\n' + payload.message
+    outgoing = 'FloodPulse prototype — administrator-approved ' + payload.kind.upper() + ' notice\nSource: ADMIN_ALERT\n\n' + payload.message
     if snapshot:
         outgoing += ('\n\nAdministrator-verified shelter information:\n' + snapshot['name'] + '\n'
             + snapshot['address'] + ' · ' + snapshot['district_name'] + '\n'
@@ -100,10 +104,10 @@ def render_message(payload, snapshot):
 
 def safe_record(row):
     # Token, chat ID, routing fingerprint and provider response body never leave this service.
-    return {k: row[k] for k in ['id', 'created_by', 'destination_id', 'destination_label', 'kind',
+    return {'source':'ADMIN_ALERT', **{k: row[k] for k in ['id', 'created_by', 'destination_id', 'destination_label', 'kind',
         'text', 'content_sha256', 'shelter_id', 'demonstration', 'created_at', 'confirmed_at',
         'confirmed_by', 'attempted_at', 'completed_at', 'status', 'result_code', 'http_status',
-        'telegram_error_code', 'telegram_message_id']}
+        'telegram_error_code', 'telegram_message_id']}}
 
 
 class NotificationStore:
@@ -130,6 +134,7 @@ class NotificationStore:
         content = canonical_hash({'destination': destination.id, 'label': destination.label,
             'fingerprint': fingerprint, 'kind': payload.kind, 'text': outgoing, 'shelter': snapshot})
         with self.engine.begin() as c:
+            require_subscription(c,config,destination)
             # Serialize same-key preview retries; no duplicate draft on lost responses.
             c.execute(sql_text('SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))'),
                       {'key': actor['id'] + ':' + str(payload.request_id)})
@@ -164,9 +169,18 @@ class NotificationStore:
             destination = config.destinations.get(row['destination_id'])
             if not destination or (mode() == 'demonstration' and not destination.test_only) or config.fingerprint(destination) != row['destination_fingerprint'] or destination.label != row['destination_label']:
                 raise HTTPException(409, 'Destination configuration changed; create a new preview')
+            require_subscription(c,config,destination)
             if row['shelter_id'] and available_shelter(shelter_store, row['shelter_id']) != row['shelter_snapshot']:
                 raise HTTPException(409, 'Shelter information changed; create and review a new preview')
             timestamp = now()
+            c.execute(sql_text('SELECT pg_advisory_xact_lock(814211)'))
+            key=digest('telegram-dispatch-global')
+            start=timestamp.replace(minute=timestamp.minute//15*15,second=0,microsecond=0)
+            bucket=c.execute(select(limits).where(limits.c.key==key)).mappings().one_or_none()
+            count=bucket['attempts'] if bucket and bucket['window_start']==start else 0
+            if count>=20:raise HTTPException(429,'Telegram send limit reached; retry after 15 minutes',headers={'Retry-After':'900'})
+            if bucket:c.execute(update(limits).where(limits.c.key==key).values(window_start=start,attempts=count+1))
+            else:c.execute(limits.insert().values(key=key,window_start=start,attempts=1))
             updated = c.execute(update(notifications).where(notifications.c.id == identity, notifications.c.status == 'draft')
                 .values(status='sending', confirmed_at=timestamp, confirmed_by=actor['id'], attempted_at=timestamp)
                 .returning(notifications)).mappings().one()
@@ -194,8 +208,15 @@ def options(actor=Depends(authorized), store=Depends(get_store)):
     except ConfigurationUnavailable as exc:
         return {'configured': False, 'reason': str(exc), 'destinations': [], 'shelters': []}
     shelters = execute(store.rows, public=True)['shelters']
-    return {'configured': True, 'destinations': [{'id': d.id, 'label': d.label, 'test_only': d.test_only}
-        for d in sorted(config.destinations.values(), key=lambda d: (d.label.casefold(), d.id)) if mode() != 'demonstration' or d.test_only], 'shelters': [{'id': s['id'], 'name': s['name'], 'district_name': s['district_name']} for s in shelters]}
+    try:
+        with store.engine.connect().execution_options(postgresql_readonly=True) as c:
+            destinations=[{'id':d.id,'label':d.label,'test_only':d.test_only,'opted_in':is_subscribed(c,config,d)}
+                for d in sorted(config.destinations.values(),key=lambda d:(d.label.casefold(),d.id)) if mode()!='demonstration' or d.test_only]
+    except SQLAlchemyError:
+        raise HTTPException(503,'Subscription database unavailable') from None
+    return {'configured':True,'destinations':destinations,'send_limit':'20 attempts per 15 minutes',
+        'shelters':[{'id':s['id'],'name':s['name'],'district_name':s['district_name']} for s in shelters]}
+
 
 
 @router.get('')

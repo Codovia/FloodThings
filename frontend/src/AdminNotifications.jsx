@@ -60,16 +60,17 @@ export default function AdminNotifications({ session, request }) {
     })
   }
   function reset() { setMessage(''); setShelter(''); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
-  const enabled = options?.configured && options.destinations.length > 0
+  const enabled = options?.configured && options.destinations.some(d=>d.opted_in!==false)
   return <section className="panel" aria-labelledby="admin-notifications-title">
     <h2 id="admin-notifications-title">Alerts — administrator-controlled Telegram notices</h2>
     <p>Every notice requires your review and explicit approval. Experimental rainfall outputs never trigger notifications. This prototype is not an official disaster-management service.</p>
     {session.mode === 'demonstration' && <p className="notice error">DEMONSTRATION ONLY. Only explicitly configured private test destinations are permitted. Simulated test results do not verify real Telegram delivery.</p>}
     {!options && !error && <p role="status">Loading notification configuration…</p>}
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
+    {options?.send_limit&&<p>{options.send_limit}. Private recipients must send /start floodpulse to opt in; /stop opts out. Consent is checked again before an attempt.</p>}
     {error && <p role="alert">{error}</p>}
     <form className="shelter-form" aria-label="Telegram notification composer" onSubmit={review}>
-      <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose authorized destination</option>{options?.destinations.map(d => <option key={d.id} value={d.id}>{d.label}{d.test_only ? ' — private test only' : ''}</option>)}</select>
+      <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose authorized destination</option>{options?.destinations.map(d => <option key={d.id} value={d.id} disabled={d.opted_in===false}>{d.label}{d.test_only ? ' — private test only' : ''}{d.opted_in===false ? ' — not opted in' : ''}</option>)}</select>
       <label htmlFor="notice-kind">Notification type</label><select id="notice-kind" disabled={busy || !enabled} value={kind} onChange={e => change(setKind, e.target.value)}><option value="informational">Informational</option><option value="emergency">Emergency — independently verified by administrator</option></select>
       <label>Notification message<textarea required maxLength={3500} disabled={busy || !enabled} value={message} onChange={e => change(setMessage, e.target.value)} /></label>
       <label htmlFor="notice-shelter">Include currently verified Open shelter</label><select id="notice-shelter" disabled={busy || !enabled} value={shelter} onChange={e => change(setShelter, e.target.value)}><option value="">No shelter information</option>{options?.shelters.map(s => <option key={s.id} value={s.id}>{s.name} — {s.district_name}</option>)}</select>

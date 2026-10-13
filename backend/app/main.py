@@ -15,6 +15,7 @@ from .locations import router as locations_router
 from .shelters import router as shelters_router, dispose_shelter_engine
 from .notifications import router as notifications_router
 from .reports import router as reports_router
+from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_outlook import router as river_outlook_router, RiverOutlook
 
@@ -42,6 +43,7 @@ app.include_router(locations_router)
 app.include_router(shelters_router)
 app.include_router(notifications_router)
 app.include_router(reports_router)
+app.include_router(subscriptions_router)
 app.include_router(geocoding_router)
 app.include_router(river_outlook_router)
 

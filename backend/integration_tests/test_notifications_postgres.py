@@ -11,7 +11,9 @@ from sqlalchemy.exc import IntegrityError, OperationalError
 from app.main import app
 from app.notifications import NotificationStore, get_notifications, DraftInput, ApprovalInput
 from app.notification_schema import notifications
-from app.telegram_delivery import get_sender, DeliveryResult
+from app.telegram_delivery import get_sender, DeliveryResult,TelegramConfig
+from app.telegram_subscriptions import SubscriptionStore
+from app.shelter_security import now
 from test_shelter_postgres import api, sign_in, fixture_record, verified
 
 TOKEN = '123456:' + 'ISOLATED_ONLY_TOKEN_' * 2
@@ -27,6 +29,7 @@ class FakeSender:
 def notice(api,monkeypatch):
     monkeypatch.setenv('TELEGRAM_BOT_TOKEN',TOKEN)
     monkeypatch.setenv('TELEGRAM_DESTINATIONS', json.dumps({'test':{'label':'ISOLATED PRIVATE TEST','chat_id':'123','test_only':True}}))
+    SubscriptionStore(api[1]).intake({'update_id':1,'message':{'date':int(now().timestamp()),'text':'/start floodpulse','chat':{'id':123,'type':'private'},'from':{'id':123,'is_bot':False}}},TelegramConfig.from_environment())
     store=NotificationStore(api[1]);sender=FakeSender()
     app.dependency_overrides[get_notifications]=lambda:store
     app.dependency_overrides[get_sender]=lambda:sender
@@ -59,7 +62,7 @@ def test_authentication_csrf_and_private_configuration(notice):
     for bad in [{},{'Origin':'https://other.test','X-CSRF-Token':headers['X-CSRF-Token']},{'Origin':headers['Origin']}]:
         assert client.post('/api/admin/notifications',headers=bad,json=body()).status_code==403
     data=client.get('/api/admin/notifications/options').json()
-    assert data['destinations']==[{'id':'test','label':'ISOLATED PRIVATE TEST','test_only':True}]
+    assert data['destinations']==[{'id':'test','label':'ISOLATED PRIVATE TEST','test_only':True,'opted_in':True}]
     assert TOKEN not in json.dumps(data) and 'chat_id' not in json.dumps(data)
     draft=client.post('/api/admin/notifications',headers=headers,json=body()).json()
     assert approve(client,{},draft).status_code==403
@@ -187,6 +190,8 @@ def test_least_privilege_notification_role_can_audit_but_not_delete(notice):
         admin.execute(sql.SQL('GRANT CONNECT ON DATABASE {} TO {}').format(sql.Identifier(db.url.database),sql.Identifier(role)))
         admin.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {}').format(sql.Identifier(role)))
         admin.execute(sql.SQL('GRANT SELECT,INSERT,UPDATE ON admin_notifications TO {}').format(sql.Identifier(role)))
+        admin.execute(sql.SQL('GRANT SELECT ON telegram_subscriptions TO {}').format(sql.Identifier(role)))
+        admin.execute(sql.SQL('GRANT SELECT,INSERT,UPDATE ON shelter_login_limits TO {}').format(sql.Identifier(role)))
         limited=database_engine(db.url.set(username=role,password=password).render_as_string(hide_password=False))
         n=NotificationStore(limited)
         assert n.history()['total']==1
