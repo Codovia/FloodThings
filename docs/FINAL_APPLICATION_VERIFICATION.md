@@ -1,5 +1,7 @@
 # FloodPulse final application verification
 
+**14 October follow-up:** this page preserves the 13 October audit snapshot. Use [the college demonstration rehearsal](DEMONSTRATION_REHEARSAL_2026_10_14.md) for current PASS/FAIL/NOT TESTED results. The operator reports successful live Telegram receipt on 14 October; read-only inspection independently found one live-mode `accepted` / `telegram_accepted` record (HTTP 200), completed at **22:14:17.242747 IST**, with administrator confirmation and a provider message ID. Recipient-side receipt is operator-reported, not independently viewed. Live administrator authentication remains blocked at the user's request; isolated login/CSRF/logout are freshly rehearsed. No further live alert was sent.
+
 **Audit:** 13 October 2026 (IST). **Target demonstration:** 16 October 2026.
 
 **Baseline commit:** `15841d1f7d53d01318303efe5a4ebf2d02a4543d`, branch `feature/karnataka-data-foundation`.

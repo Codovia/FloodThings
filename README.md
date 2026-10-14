@@ -4,6 +4,8 @@ Current user decision (13 October 2026): **emergency response MVP for demonstrat
 
 [MVP end-to-end readiness](docs/MVP_END_TO_END_READINESS.md) records the verified database upgrade, real-browser reporting/moderation/shelter/navigation journey, live weather and experimental rainfall inference, screenshots and remaining administrator/shelter/Telegram setup dependencies. The isolated demonstration runner is `scripts/verify_mvp_e2e.py`; its fixtures are not operational facilities or incidents.
 
+For the 16 October college presentation, use the [14 October rehearsal checklist](docs/DEMONSTRATION_REHEARSAL_2026_10_14.md): fresh PASS/NOT TESTED results, operator-reported Telegram receipt versus independently verified API acceptance, isolated zero-send opt-out checks, reviewed screenshots, remaining human checks and an eight-minute emergency-response sequence. Live administrator authentication remains blocked pending private password rotation; no additional live alert was sent during rehearsal.
+
 [Phase 12C Groundsource extraction](docs/GROUNDSOURCE_KARNATAKA_EXTRACTION.md)
 verifies **19,854 Karnataka candidate news records**, including **18,194** with
 state-contained geometry and usable reported dates. Coverage uses all 31 fixed

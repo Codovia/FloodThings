@@ -1,0 +1,24 @@
+{
+  "weather_http": 200,
+  "retrieved_at": "2026-10-14T17:01:28.210734+00:00",
+  "current_valid_at": "2026-10-14T22:30:00+05:30",
+  "temperature_c": 26.6,
+  "rain_window_start_IST": "2026-10-14T23:00:00+05:30",
+  "rain_window_end_IST": "2026-10-15T23:00:00+05:30",
+  "rainfall_interval_count": 24,
+  "independent_rainfall_total_mm": 1.4,
+  "source": "Open-Meteo weather model output, not station observations",
+  "forecast_issued_at": null,
+  "indicator_http": 200,
+  "indicator_UI_heading_verified": "Experimental Heavy-Rainfall Indicator",
+  "model_version": "rainfall_logistic_v1",
+  "indicator_prediction": "below_heavy_threshold_predicted",
+  "feature_valid_through_utc": "2026-10-14T17:00:00+00:00",
+  "indicator_horizon": {
+    "hours": 24,
+    "start_utc": "2026-10-14T18:00:00+00:00",
+    "end_utc": "2026-10-15T18:00:00+00:00",
+    "meaning": "Next 24 complete UTC hours, beginning at the next full hour (within one hour of retrieval)."
+  },
+  "no_model_fitting": true
+}

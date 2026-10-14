@@ -1,5 +1,7 @@
 # Citizen GPS/photo reporting — private MVP slice
 
+**14 October college rehearsal:** [current checklist and evidence](DEMONSTRATION_REHEARSAL_2026_10_14.md) records fresh actual-Chrome flood and drainage workflows against isolated PostGIS, including JPEG/PNG upload, consented EXIF, approval/rejection, restricted export and withdrawal. All incidents/coordinates/images were explicit fixtures. Native device GPS and physical camera capture still require human testing; CDP GPS and gallery upload do not prove those hardware paths. No operational reports or training labels were created.
+
 Decision: [13 October emergency MVP](FLOODPULSE_MVP_PRIORITIES.md) authorizes implementation of the formerly documentation-only [reporting sketch](design/floodpulse_wireframes/05_experimental_report_flood.jpg). This supersedes that earlier document's instruction to wait for workflow approval. Existing security and scientific data integrity rules remain.
 
 ## Working path
@@ -22,7 +24,7 @@ Submission UUIDs are idempotent only for unchanged content. Client retries reuse
 
 ## Setup and dependency boundaries
 
-Use existing provisioned admin, `SHELTER_DATABASE_URL`, `SHELTER_PUBLIC_ORIGIN` and HTTPS cookie/CSRF configuration. There are no default passwords. Install the pinned `Pillow==12.3.0` dependency from backend/requirements.txt. Apply additive Alembic revision `0004_citizen_reports` through the already documented **maintenance** connection, after database backup/review. This execution migrated disposable test databases only; it did not migrate the operational database or change the user's environment file.
+Use existing provisioned admin, `SHELTER_DATABASE_URL`, `SHELTER_PUBLIC_ORIGIN` and HTTPS cookie/CSRF configuration. There are no default passwords. Install the pinned `Pillow==12.3.0` dependency from backend/requirements.txt. New isolated deployments must reach current migration head `0006_report_position_provenance`, including `0004_citizen_reports` and subsequent additive migrations, through the documented **maintenance** connection after backup/review. The existing local database is already at head. This rehearsal migrated disposable test databases only; it did not migrate the operational database or change the user's environment file.
 
 Give the separately provisioned application role only these additional table permissions in the intended database (substitute its actual role name):
 

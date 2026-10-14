@@ -6,6 +6,7 @@ from sqlalchemy import select,update
 from app.main import app
 from app.telegram_subscriptions import SubscriptionStore,get_subscriptions
 from app.subscription_schema import subscriptions,subscription_audit
+from app.notification_schema import notifications
 from app.shelter_security import now,digest
 from app.shelter_schema import limits
 from test_notifications_postgres import notice,preview,approve,body
@@ -72,6 +73,28 @@ def test_webhook_readiness_does_not_send_or_expose_secrets(consent,monkeypatch):
     monkeypatch.delenv('TELEGRAM_WEBHOOK_SECRET')
     assert client.get('/api/alerts/subscription').json()['status']=='unavailable'
     assert client.post('/api/telegram/webhook',json={}).status_code==503
+
+
+def test_rehearsal_stop_blocks_pending_and_new_previews_without_any_send(consent):
+    """Signed /stop in isolated PostGIS only; zero sender calls, even after approval."""
+    api,store,sender=consent
+    client=api[0]
+    headers,draft=preview(consent)
+    assert not sender.calls
+    response=intake(consent,command('/stop',40))
+    assert response.status_code==200 and response.json()['processed'] is True
+    assert client.get('/api/admin/notifications/options').json()['destinations'][0]['opted_in'] is False
+    assert approve(client,headers,draft).status_code==409
+    assert client.post('/api/admin/notifications',headers=headers,json=body()).status_code==409
+    assert not sender.calls
+    with api[1].connect() as connection:
+        saved=connection.execute(select(notifications)).mappings().one()
+        assert saved['status']=='draft' and saved['attempted_at'] is None
+        assert saved['confirmed_at'] is None and saved['telegram_message_id'] is None
+        assert connection.execute(select(subscriptions.c.active)).scalar_one() is False
+        events=connection.execute(select(subscription_audit).order_by(subscription_audit.c.command_at,subscription_audit.c.update_id)).mappings().all()
+        assert len(events)==2 and events[-1]['active'] is False
+        assert events[-1]['update_id']==40 and events[-1]['received_at']>=events[-1]['command_at']
 
 
 def test_persistent_global_send_budget_blocks_attempt_before_sender(consent):

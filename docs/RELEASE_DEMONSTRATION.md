@@ -1,17 +1,23 @@
 # FloodPulse release-candidate demonstration
 
-For current coverage and shelter checks, use [CURRENT_CAPABILITIES.md](CURRENT_CAPABILITIES.md).
+For the **16 October 2026 college demonstration**, use the current
+[emergency-response rehearsal checklist](DEMONSTRATION_REHEARSAL_2026_10_14.md).
+The older [capability snapshot](CURRENT_CAPABILITIES.md) retains historical GIS context;
+its earlier future-reporting/Telegram status is superseded by the rehearsal.
 In the shelter directory, choose **Recheck availability for directions** before the
 five-second external link is revealed. A failed check removes destinations. Material
 facility/entrance/capacity/usability changes clear prior admin confirmations. Reconfirm
 the latest information before saving Open/Full. Logout immediately hides private state;
 lost write responses require history review rather than automatic retry.
 
-Verified locally on 10 October 2026. This is a non-commercial college-project
+Original release checkpoint: 10 October 2026; emergency workflow rehearsed again
+on 14 October. This is a non-commercial college-project
 prototype, without affiliation with a disaster-management authority. Weather,
 experimental rainfall classification, historical GIS and administrator-controlled
 directory/messaging functions are separate. Validated flood prediction remains
-unavailable. Telegram live delivery remains **BLOCKED**.
+unavailable. The operator reports live Telegram receipt on 14 October, corroborated
+by one database acceptance at **22:14:17 IST**; this does not authorize another send.
+Persistent administrator authentication remains gated pending private password rotation.
 
 ## Services and initialization
 
@@ -22,12 +28,17 @@ PostgreSQL with PostGIS. The verified local service is the existing
 own privately provisioned database and roles; this guide contains no credentials.
 
 Install through `backend/requirements-dev.txt` and `frontend/package-lock.json`
-using the README procedure. Supply environment configuration through private
-secret management; the application does **not** load `.env` automatically.
+using the README procedure. `./start.sh` now parses the optional root `.env`
+through Python for the four Telegram keys only, requiring user ownership and
+exact `0600` permissions. Explicit environment values win. Database connections
+remain in the separate private launcher profile/environment; direct backend and
+maintenance commands do not automatically load `.env`.
 Never expose passwords in command arguments, screenshots or shell history.
 
-In an authorized maintenance process, set `LOCATION_DIRECTORY_ADMIN_URL` to the
-intended database. From the repository root:
+The existing database is already at `0006_report_position_provenance`. Do not
+rerun setup or change persistent records for this rehearsal. For a **new isolated
+database only**, use the documented backup/maintenance process and privately set
+`LOCATION_DIRECTORY_ADMIN_URL` to that intended isolated database. From the root:
 
 ```bash
 backend/.venv/bin/alembic -c backend/alembic.ini upgrade head
@@ -42,8 +53,10 @@ cd backend
 ```
 
 Provisioning prompts privately for the password twice; no public registration or
-default account exists. Migrations must reach `0003_admin_notifications` after
-`0001_location_directory` and `0002_emergency_shelters`. The v2 import is
+default account exists. New isolated setups must reach migration head `0006`,
+including citizen-report, Telegram-subscription and position-provenance tables.
+For the existing local staff account, use the README's private setup/rotation
+procedure; do not recreate/reset an account as part of the presentation. The v2 import is
 transactional/idempotent: 31 districts, six locality records, five selectable
 points; Kaup stays disabled. See the README for exact least-privilege grants.
 Do not give the public API the maintenance URL. Fresh migration/import and
@@ -65,7 +78,8 @@ The existing workspace profile references its already provisioned role password
 files. It contains no passwords; explicit environment values take precedence.
 The parser checks ownership/permissions, URL-encodes passwords in memory and
 executes no profile text. Missing variables are named without showing values.
-The script does not source `.env`, copy credentials or provision new ones.
+The script parses root `.env` safely without shell `source`/`eval`, copies no
+credentials into source files, and provisions none.
 Prior activation of another virtual environment is unnecessary: the launcher
 selects `backend/.venv`. Safe local defaults are PostgreSQL directory backend, live shelter mode,
 loopback-only non-Secure development cookie and matching origin at port 14180.
@@ -80,16 +94,19 @@ secrets, and the API receives no maintenance URL.
 Open **http://127.0.0.1:14180** or **http://127.0.0.1:14180/admin**;
 backend is **http://127.0.0.1:18050**. Use the script's absolute path from another
 working directory. `--help` lists optional port overrides. A checkout lock and
-port checks reject duplicate/conflicting instances; Ctrl+C stops only owned web
-process groups/children and leaves the database/data intact. Prerequisites are
-Linux Bash, Docker daemon access, `flock`, `setsid`, `timeout`, `curl`, Node/npm,
+port checks reject duplicate/conflicting instances. Ctrl+C/SIGTERM waits for
+verified owned descendants and port release while holding the lock; crashed-run
+recovery requires the private ownership receipt. Unknown listeners are untouched.
+Wait for the terminal prompt before restarting. Prerequisites are
+Linux Bash with `/proc`/pidfd/subreaper support, Docker daemon access, `flock`, `timeout`, `curl`, Node/npm,
 installed frontend packages and `backend/.venv`. PostgreSQL must be the existing
 `floodpulse-sprint6-db` container; no Compose configuration exists in this checkout.
 
 Missing configuration/dependencies/container or schema/import/grants: use the
 separate setup steps, without sharing secret contents. `--check` deliberately
 fails on a stopped database; normal startup can start the existing container.
-Port conflicts: close your own session or select free ports and matching origin.
+Port conflicts name the exact backend/frontend port and safe PID information when
+available. No automatic port change or unrelated-process termination occurs.
 Service failure: inspect private `data/tmp/launcher/{backend,frontend}.log`, not
 public screenshots/log uploads. Failed startup cleans up owned web processes.
 No default administrator is created. Existing research assets remain required
@@ -127,7 +144,22 @@ database/provider readiness. Also check `/api/locations/districts` and
 requires HTTPS, Secure cookies, exact public origin and static-host security
 headers; Vite preview is only the local demonstration server.
 
-## Citizen demonstration
+## Primary emergency-response presentation
+
+Use a separately provisioned, visibly labelled isolated demo database and fresh
+private demonstration account. Run the existing UUID-isolated browser runner for
+rehearsal; it discards its database/roles when finished and is not a persistent
+interactive presentation environment. Never enter fictional incidents or facilities
+in the live database.
+
+Present citizen flood/drainage photo submission → private map moderation → restricted
+approved-evidence export → administrator map-selected shelter entrance and explicit
+verification → public eligible destination → exact-origin/entrance directions.
+Then explain the already accepted Telegram test and isolated `/stop` enforcement;
+do not send another message without new explicit approval. Use
+[the short sequence and manual checks](DEMONSTRATION_REHEARSAL_2026_10_14.md#presentation-sequence-approximately-8-minutes).
+
+## Supporting weather/research walkthrough (optional)
 
 1. Use the shared navigation to open **Weather & AI** (`/weather`). Open
    **Change location → Search districts and localities**, select Udupi then **Kundapur**.
@@ -189,6 +221,13 @@ remove only the disposable demo database, and restore original runtime settings.
 
 ## Telegram
 
+Current evidence: operator-reported recipient receipt on 14 October, independently
+corroborated by a live-mode database acceptance (HTTP 200), composing-admin approval,
+provider-message-ID presence and prior opt-in for an authorized private test destination.
+The rehearsal did not contact Telegram, inspect the private chat or send another
+notification. `/stop` was tested with signed isolated updates and zero sender calls;
+real-chat `/stop` remains a separate operator check. See the current checklist.
+
 Unconfigured Alerts remains disabled and the rest of the app works. Do not
 configure fixture credentials in the application. Real verification requires a
 legitimate bot and preauthorized **private test** destination, privately injected
@@ -218,7 +257,9 @@ docker exec -i -u postgres floodpulse-sprint6-db pg_restore -U postgres --exit-o
 
 Compare migration revision, PostGIS version and every application-table row;
 exercise read APIs before using a restored deployment. The verified release
-backup/isolated restore matched all **12** application tables. Ownership/grants
+backup/isolated restore at the 10 October checkpoint matched **12** application
+tables. The 14 October rehearsal instead compared **18** current application/migration
+table fingerprints read-only; it did not create or restore a new live backup. Ownership/grants
 were deliberately omitted for isolated verification: a deployment must
 reprovision least-privilege roles. A single-database dump does not back up cluster
 roles, private environment configuration, local research files or model assets.
