@@ -13,7 +13,7 @@ case "${1:-}" in
   *) printf 'Unknown option. Use --help.\n' >&2; exit 1 ;;
 esac
 fail() { printf 'FloodPulse: %s\n' "$1" >&2; exit 1; }
-for command in node npm docker flock setsid timeout curl; do
+for command in node npm docker flock timeout curl; do
   command -v "$command" >/dev/null || fail "Missing $command; install project prerequisites separately."
 done
 VENV="$ROOT/backend/.venv"
@@ -35,39 +35,33 @@ RUNTIME="$ROOT/data/tmp/launcher"
 mkdir -p "$RUNTIME"
 exec 9>"$RUNTIME/lock"
 flock -n 9 || fail 'A FloodPulse launcher is already running for this checkout.'
-PIDS=()
-cleanup() {
-  trap '' INT TERM
-  for pid in "${PIDS[@]}"; do kill -TERM -- "-$pid" 2>/dev/null || true; done
-  for ((n=0; n<30; n++)); do
-    alive=false
-    for pid in "${PIDS[@]}"; do kill -0 -- "-$pid" 2>/dev/null && alive=true; done
-    [[ "$alive" == false ]] && break
-    sleep 0.1
-  done
-  for pid in "${PIDS[@]}"; do
-    kill -KILL -- "-$pid" 2>/dev/null || true
-    wait "$pid" 2>/dev/null || true
-  done
-}
-trap cleanup EXIT
-trap 'printf "\nStopping FloodPulse web services; database left running.\n"; exit 130' INT
-trap 'exit 143' TERM
+# Recovery requires the exclusive checkout lock and a private, matching ownership
+# receipt. --check remains read-only and never terminates stale/unrelated services.
+if [[ "${1:-}" != --check ]]; then
+  "$VENV/bin/python" -B "$ROOT/scripts/launcher_processes.py" recover "$ROOT"
+fi
 printf '[1/5] Checking Python, Node and private configuration...\n'
 "$VENV/bin/python" - preflight <<'PY'
-import importlib, os, socket, sys
+import importlib, os, sys
 from pathlib import Path
 sys.path.insert(0, str(Path.cwd() / 'backend'))
+sys.path.insert(0, str(Path.cwd() / 'scripts'))
 for name in ['DATABASE_URL', 'SHELTER_DATABASE_URL']:
     if not os.environ.get(name):
         sys.exit(f'Missing {name}. Configure the private launcher profile data/tmp/launcher/config.json or export this variable; activating a virtual environment does not configure database connections. See README.')
-try:
-    for name in ['fastapi', 'uvicorn', 'httpx', 'sqlalchemy', 'alembic', 'psycopg', 'geoalchemy2', 'numpy', 'sklearn', 'PIL']:
+for name in ['fastapi', 'uvicorn', 'httpx', 'sqlalchemy', 'alembic', 'psycopg', 'geoalchemy2', 'numpy', 'sklearn', 'PIL']:
+    try:
         importlib.import_module(name)
-    from sqlalchemy.engine import make_url
-    from app.shelter_security import SecurityConfig
+    except Exception:
+        sys.exit(f'Python dependency unavailable/incompatible: {name}. Check backend/.venv; no configuration values are printed.')
+try:
     from app.rainfall_outlook import RainfallModel
     RainfallModel()  # Loads/checks the existing artifact; never trains.
+except Exception:
+    sys.exit('Experimental rainfall model artifact unavailable/invalid. Check the original saved model; no training or replacement was attempted.')
+try:
+    from sqlalchemy.engine import make_url
+    from app.shelter_security import SecurityConfig
     ports = [int(os.environ[k]) for k in ['FLOODPULSE_BACKEND_PORT', 'FLOODPULSE_FRONTEND_PORT']]
     assert all(1024 <= p <= 65535 for p in ports) and ports[0] != ports[1]
     urls = [make_url(os.environ[k]) for k in ['DATABASE_URL', 'SHELTER_DATABASE_URL']]
@@ -76,13 +70,13 @@ try:
     assert os.environ['SHELTER_DIRECTORY_MODE'] in ['live', 'demonstration']
     config = SecurityConfig()
     assert not config.secure and config.origin == f'http://127.0.0.1:{ports[1]}'
-    for port in ports:
-        with socket.socket() as sock:
-            sock.bind(('127.0.0.1', port))
-except OSError:
-    sys.exit('Port unavailable or artifact/environment missing. Check configured ports and README prerequisites; no existing process was stopped.')
 except Exception:
-    sys.exit('Python dependencies, model, ports or private configuration invalid. Supply DATABASE_URL/SHELTER_DATABASE_URL for the documented database and matching loopback origin; values are never printed.')
+    sys.exit('Launcher configuration invalid: check distinct numeric ports, private database targets and matching loopback origin. No configuration values are printed.')
+from launcher_processes import ensure_ports_available, LaunchError
+try:
+    ensure_ports_available(dict(zip(('backend', 'frontend'), ports)))
+except LaunchError as error:
+    sys.exit(str(error))  # Only validated port numbers and allowlisted process diagnostics.
 PY
 node --input-type=module <<'JS'
 import fs from 'node:fs'
@@ -152,32 +146,7 @@ finally:
         engine.dispose()
 PY
 [[ "${1:-}" != --check ]] || { printf 'Checks passed. No service was started and no data changed.\n'; exit 0; }
-# Each child owns a new session/process group; close the inherited launcher lock.
-printf '[4/5] Starting FastAPI on loopback...\n'
-setsid env -u LOCATION_DIRECTORY_ADMIN_URL "$VENV/bin/python" -B -m uvicorn app.main:app --app-dir "$ROOT/backend" --host 127.0.0.1 --port "$FLOODPULSE_BACKEND_PORT" >"$RUNTIME/backend.log" 2>&1 9>&- &
-BACKEND_PID=$!; PIDS+=("$BACKEND_PID")
-wait_ready() {
-  local pid=$1 url=$2 label=$3
-  for ((n=0; n<30; n++)); do
-    kill -0 "$pid" 2>/dev/null || fail "$label exited. Inspect its private log in data/tmp/launcher; no log contents are printed automatically."
-    if curl --silent --fail --max-time 2 "$url" >/dev/null 2>&1; then return; fi
-    sleep 1
-  done
-  fail "$label readiness timed out. Inspect its private log in data/tmp/launcher."
-}
-wait_ready "$BACKEND_PID" "http://127.0.0.1:$FLOODPULSE_BACKEND_PORT/api/health" FastAPI
-# Validate actual database-backed read routes, not just process liveness.
-for path in locations/districts shelters; do
-  curl --silent --fail --max-time 10 "http://127.0.0.1:$FLOODPULSE_BACKEND_PORT/api/$path" >/dev/null 2>&1 || fail 'API directory/shelter readiness failed; inspect private configuration and logs.'
-done
-printf '[5/5] Starting React/Vite on loopback...\n'
 export FLOODPULSE_API_TARGET="http://127.0.0.1:$FLOODPULSE_BACKEND_PORT"
-(
-  cd "$ROOT/frontend"
-  exec setsid env -u DATABASE_URL -u SHELTER_DATABASE_URL -u LOCATION_DIRECTORY_ADMIN_URL -u TELEGRAM_BOT_USERNAME -u TELEGRAM_BOT_TOKEN -u TELEGRAM_DESTINATIONS -u TELEGRAM_WEBHOOK_SECRET npm run dev -- --host 127.0.0.1 --port "$FLOODPULSE_FRONTEND_PORT" --strictPort
-) >"$RUNTIME/frontend.log" 2>&1 9>&- &
-FRONTEND_PID=$!; PIDS+=("$FRONTEND_PID")
-wait_ready "$FRONTEND_PID" "$SHELTER_PUBLIC_ORIGIN" React/Vite
-printf '\nApplication: %s\nAdmin:       %s/admin\nBackend:     http://127.0.0.1:%s\n\nPress Ctrl+C to stop FloodPulse. No refresh while the browser is closed.\n' "$SHELTER_PUBLIC_ORIGIN" "$SHELTER_PUBLIC_ORIGIN" "$FLOODPULSE_BACKEND_PORT"
-if wait -n "$BACKEND_PID" "$FRONTEND_PID"; then :; fi
-fail 'A web service exited unexpectedly. Both owned web services will stop; inspect private launcher logs.'
+# Replace Bash with the supervisor; keep fd 9's exclusive lock until all owned
+# descendants and sockets are gone. Child Popen calls close inherited lock fds.
+exec "$VENV/bin/python" -B "$ROOT/scripts/launcher_processes.py" run "$ROOT"

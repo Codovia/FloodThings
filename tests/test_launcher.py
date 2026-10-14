@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import secrets
 import signal
+import socket
 import subprocess
 import sys
 import time
@@ -18,7 +19,7 @@ FAKE = r'''
 import os,sys,time,subprocess
 from pathlib import Path
 root=Path(os.environ['FAKE_ROOT']);kind=Path(sys.argv[0]).name
-if kind=='python' and any(a.endswith('/scripts/launcher_config.py') for a in sys.argv):
+if kind=='python' and any(a.endswith('/scripts/'+name) for a in sys.argv for name in ['launcher_config.py','launcher_processes.py']):
  os.execv(sys.executable,[sys.executable,*sys.argv[2:]])
 with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind=='docker' else '')+'\n')
 if kind=='python' and 'preflight' in sys.argv:
@@ -55,9 +56,26 @@ if label=='backend' and os.environ.get('EXPECT_TELEGRAM_FILE'):
  assert 'LOCATION_DIRECTORY_ADMIN_URL' not in os.environ
 if os.environ.get('FAIL_'+label.upper()):
  print('PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',flush=True);sys.exit(17)
-worker=subprocess.Popen([sys.executable,'-c','import time;time.sleep(120)'])
+worker_code="""
+import os,signal,socket,time,sys
+from pathlib import Path
+root=Path(os.environ['FAKE_ROOT']);label=sys.argv[1]
+if os.environ.get('DETACH_WORKER'):os.setsid()
+if os.environ.get('IGNORE_TERM_WORKER'):signal.signal(signal.SIGTERM,signal.SIG_IGN)
+if os.environ.get('BIND_WORKER'):
+ listener=socket.socket();listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+ listener.bind(('127.0.0.1',int(os.environ['FLOODPULSE_BACKEND_PORT' if label=='backend' else 'FLOODPULSE_FRONTEND_PORT'])));listener.listen()
+(root/(label+'.worker')).touch()
+time.sleep(120)
+"""
+worker=subprocess.Popen([sys.executable,'-c',worker_code,label])
 with (root/'pids').open('a') as f:f.write(str(os.getpid())+'\n'+str(worker.pid)+'\n')
+for _ in range(100):
+ if (root/(label+'.worker')).exists():break
+ time.sleep(.01)
+else:sys.exit(18)
 (root/(label+'.ready')).write_text('ready')
+if label=='frontend' and os.environ.get('EXIT_FRONTEND_PARENT'):sys.exit(19)
 time.sleep(120)
 '''
 
@@ -70,6 +88,7 @@ def project(tmp_path):
     (tmp_path / 'frontend').mkdir()
     scripts = tmp_path / 'scripts'; scripts.mkdir()
     (scripts / 'launcher_config.py').write_bytes((ROOT / 'scripts/launcher_config.py').read_bytes())
+    (scripts / 'launcher_processes.py').write_text((ROOT / 'scripts/launcher_processes.py').read_text().replace('STARTUP_TIMEOUT = 30','STARTUP_TIMEOUT = 2'))
     (envdir / 'activate').write_text(f'export VIRTUAL_ENV={tmp_path}/backend/.venv\n')
     tools = tmp_path / 'bin'; tools.mkdir()
     for name in ['python', 'node', 'npm', 'docker', 'curl', 'sleep']:
@@ -85,7 +104,7 @@ def project(tmp_path):
 
 def run(project, *args, **settings):
     root, env = project
-    result = subprocess.run([str(root / 'start.sh'), *args], env={**env, **settings}, cwd='/', capture_output=True, text=True, timeout=10)
+    result = subprocess.run([str(root / 'start.sh'), *args], env={**env, **settings}, cwd='/', capture_output=True, text=True, timeout=20)
     assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in result.stdout + result.stderr
     return result
 
@@ -203,3 +222,94 @@ def test_start_wait_duplicate_lock_sigint_shutdown_and_existing_database_preserv
         if proc.poll() is None:proc.send_signal(signal.SIGTERM);proc.communicate(timeout=10)
         terminal.close()
         no_orphans(root)
+
+
+def configure_test_ports(project):
+    root, env = project
+    with socket.socket() as backend, socket.socket() as frontend:
+        backend.bind(('127.0.0.1', 0)); frontend.bind(('127.0.0.1', 0))
+        first, second = backend.getsockname()[1], frontend.getsockname()[1]
+    env.update(FLOODPULSE_BACKEND_PORT=str(first), FLOODPULSE_FRONTEND_PORT=str(second),
+               SHELTER_PUBLIC_ORIGIN='http://127.0.0.1:'+str(second), BIND_WORKER='1')
+    return first, second
+
+
+def launch_until_ready(project):
+    root, env = project
+    for name in ('backend.ready','frontend.ready','backend.worker','frontend.worker'):
+        (root/name).unlink(missing_ok=True)
+    terminal = (root/'terminal.log').open('w')
+    proc = subprocess.Popen([str(root/'start.sh')], cwd='/', env=env,
+                            stdout=terminal, stderr=subprocess.STDOUT)
+    terminal.close()
+    try:
+        for _ in range(300):
+            if 'Press Ctrl+C' in (root/'terminal.log').read_text():return proc
+            assert proc.poll() is None, (root/'terminal.log').read_text()
+            time.sleep(.02)
+        pytest.fail('Mocked launcher did not become ready')
+    except BaseException:
+        if proc.poll() is None:proc.send_signal(signal.SIGTERM);proc.wait(timeout=15)
+        raise
+
+
+def assert_released(ports):
+    for port in ports:
+        with socket.socket() as listener:
+            listener.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+            listener.bind(('127.0.0.1',port));listener.listen()
+
+
+@pytest.mark.parametrize('signum',[signal.SIGINT,signal.SIGTERM])
+def test_repeated_restarts_release_groups_detached_descendants_and_ports(project,signum):
+    ports=configure_test_ports(project)
+    root, env=project;env['DETACH_WORKER']='1'
+    for _ in range(3):
+        proc=launch_until_ready(project)
+        try:
+            proc.send_signal(signum);proc.wait(timeout=15)
+            assert proc.returncode==128+signum
+            no_orphans(root);assert_released(ports)
+            assert not (root/'data/tmp/launcher/processes.json').exists()
+            assert run(project,'--check').returncode==0
+        finally:
+            if proc.poll() is None:proc.send_signal(signal.SIGTERM);proc.wait(timeout=15)
+
+
+def test_sigterm_resistant_descendant_is_killed_before_shutdown_finishes(project):
+    ports=configure_test_ports(project);root,env=project
+    env.update(IGNORE_TERM_WORKER='1',DETACH_WORKER='1')
+    proc=launch_until_ready(project)
+    try:
+        proc.send_signal(signal.SIGTERM)
+        duplicate=run(project,'--check')
+        assert duplicate.returncode!=0 and 'already running' in duplicate.stderr
+        proc.wait(timeout=15)
+        assert proc.returncode==143
+        no_orphans(root);assert_released(ports)
+    finally:
+        if proc.poll() is None:proc.kill();proc.wait(timeout=5)
+
+
+def test_hard_killed_launcher_recovers_only_nonce_proven_children_on_restart(project):
+    ports=configure_test_ports(project);root,env=project;env['DETACH_WORKER']='1'
+    first=launch_until_ready(project)
+    first.kill();first.wait(timeout=5)
+    old_pids=[int(p) for p in (root/'pids').read_text().splitlines()]
+    assert any(active(pid) for pid in old_pids)
+    second=launch_until_ready(project)
+    try:
+        assert 'Cleaning up verified children' in (root/'terminal.log').read_text()
+        assert not any(active(pid) for pid in old_pids)
+        second.send_signal(signal.SIGINT);second.wait(timeout=15)
+        assert second.returncode==130
+        no_orphans(root);assert_released(ports)
+    finally:
+        if second.poll() is None:second.send_signal(signal.SIGTERM);second.wait(timeout=15)
+
+
+def test_npm_parent_exit_still_cleans_worker_listener(project):
+    ports=configure_test_ports(project);root,env=project
+    result=run(project,EXIT_FRONTEND_PARENT='1',DETACH_WORKER='1')
+    assert result.returncode!=0
+    no_orphans(root);assert_released(ports)

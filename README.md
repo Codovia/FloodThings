@@ -189,23 +189,40 @@ so prior activation of the root `.venv` is unnecessary.
 
 `./start.sh --check` checks prerequisites **without starting any service**;
 `./start.sh --help` displays usage without requiring configuration. Press
-**Ctrl+C** to stop only the launcher's backend/frontend process groups, including
-their children. PostgreSQL is left running, including when the launcher started
-it. A checkout lock and port checks prevent duplicate/conflicting launches;
-unrelated processes are never terminated.
+**Ctrl+C** (or send SIGTERM to the launcher) to stop its backend/frontend and
+npm/Vite descendants, including descendants which create another session. The
+supervisor requests termination, allows five seconds for graceful shutdown,
+escalates only verified owned processes if necessary, and waits for process/socket
+release before returning. PostgreSQL is left running, including when the launcher
+started it. The exclusive checkout lock stays held through shutdown, so wait for
+the terminal prompt before restarting. No unrelated process is terminated.
 
-Prerequisites: Linux Bash and `docker`, `flock`, `setsid`, `timeout`, `curl`, the
+Normal startup can recover children of a crashed launcher only with the private
+`data/tmp/launcher/processes.json` receipt and matching current-boot, user, checkout,
+process-start and inherited run identity. PID-safe signalling prevents PID reuse
+from targeting another process. Invalid/private-permission failures stop safely;
+legacy or unproven processes require operator investigation and are never killed
+because of their port or command name. `--check` never performs recovery or stops
+processes. The receipt contains process ownership metadata, no database/Telegram
+credentials, and is removed after successful shutdown.
+
+Prerequisites: Linux Bash, readable `/proc`, kernel/Python pidfd and child-subreaper
+support, `docker`, `flock`, `timeout`, `curl`, the
 existing Python environment, supported Node/npm and installed frontend packages.
 The container/volume, PostGIS, migrations and directory import must already have
 been provisioned via the documented maintenance workflow. The launcher does
 **not** install packages, create/reset databases or volumes, migrate/import data,
 provision an admin, create shelters, train ML or download datasets.
 
-Errors identify the failed stage. Missing private configuration, dependencies,
-container, schema/import or role grants require the corresponding README setup;
-a stopped database fails `--check` but normal startup can start it. Port/lock
-conflicts require closing your own prior session or choosing free ports, not
-killing arbitrary processes. Private service logs are in
+Errors distinguish Python dependencies, the saved-model artifact, private launcher
+configuration, occupied ports and database readiness. Port conflicts name the
+configured **backend 18050** or **frontend 14180** (or explicit overrides), with
+PID, UID and an allowlisted executable name when available. Diagnostics never dump
+command arguments or environment variables. Ordinary TCP `TIME_WAIT` after a
+closed connection is not treated as a live listener. Port numbers never change
+automatically. A stopped database fails `--check` but normal startup can start it.
+For an unrelated listener, stop with the diagnostic and resolve it separately;
+do not kill arbitrary processes. Private service logs are in
 `data/tmp/launcher/backend.log` and `frontend.log`; they are not printed
 automatically or committed. Failed startup shuts down owned web processes.
 The [demonstration guide](docs/RELEASE_DEMONSTRATION.md) retains the production
