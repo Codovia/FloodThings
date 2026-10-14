@@ -150,8 +150,9 @@ ignored local `data/tmp/launcher/config.json` profile below. Environment values
 take precedence. The profile references separately provisioned password files;
 passwords are not embedded/copied into the profile, printed or passed as command
 arguments. Profile/password files must be regular, user-owned and owner-only
-(`chmod 600`); symlinks are rejected. The launcher never sources or overwrites
-`.env`, evaluates shell code or creates credentials. Defaults
+(`chmod 600`); symlinks are rejected. The launcher also reads the optional root
+`.env` through Python for Telegram configuration only, as described below. It never
+sources or overwrites `.env`, evaluates shell code or creates credentials. Defaults
 are `LOCATION_DIRECTORY_BACKEND=postgres`, `SHELTER_DIRECTORY_MODE=live`,
 `SHELTER_COOKIE_SECURE=false` for explicit loopback HTTP, and
 `SHELTER_PUBLIC_ORIGIN=http://127.0.0.1:14180`. If already configured, these
@@ -326,7 +327,7 @@ docker run -d --name floodpulse-location-db \
 
 The volume path above applies to PostgreSQL 16; follow the image's documentation for other major versions. Do not point tests at an existing production database. Enable PostGIS through an authorized administrator if it is not already present (`CREATE EXTENSION postgis` in the intended database). The migration checks for it and fails explicitly; it does not install extensions or modify system services.
 
-Install backend requirements into its virtual environment. Supply maintenance credentials only through `LOCATION_DIRECTORY_ADMIN_URL` (or `DATABASE_URL` for the dedicated maintenance process), using the `postgresql+psycopg://` scheme with URL-encoded password characters. `.env.example` documents variable names; the application does not automatically load `.env` files. Never commit actual credentials.
+Install backend requirements into its virtual environment. Supply maintenance credentials only through `LOCATION_DIRECTORY_ADMIN_URL` (or `DATABASE_URL` for the dedicated maintenance process), using the `postgresql+psycopg://` scheme with URL-encoded password characters. `.env.example` documents variable names. The launcher loads only Telegram keys from root `.env`; database/maintenance connections still use the separate private configuration above. Direct backend/maintenance commands do not automatically load `.env`. Never commit actual credentials.
 
 ```bash
 cd backend
@@ -426,13 +427,19 @@ GRANT SELECT, INSERT, UPDATE ON admin_notifications TO floodpulse_shelter_app;
 
 Do not grant public writes, schema ownership or DELETE. Existing admin provisioning, HTTPS same-origin sessions, idle expiry, login rate limits and CSRF configuration remain required. An actual designated operator still needs private provisioning; the production database contains no test administrator or operational notices.
 
-Privately provision a bot using the [official Telegram bot workflow](https://core.telegram.org/bots/tutorial), arrange permission to send to its intended destination, and configure the **backend process environment**:
+Use the actual project bot **FloodPulsebot**, arrange permission to send to its intended destination, and privately configure these four keys in the **project-root `.env`**:
 
+- `TELEGRAM_BOT_USERNAME=FloodPulsebot` (without `@`); this public username is not a token.
 - `TELEGRAM_BOT_TOKEN`: the private BotFather token; never put it in Git, browser configuration, URLs in shell commands, screenshots or logs.
 - `TELEGRAM_DESTINATIONS`: a JSON object mapping stable private aliases to `{ "label": "Operator-facing name", "chat_id": "<NUMERIC_CHAT_ID>", "test_only": false }`. Actual chat IDs are server-only; the admin API returns aliases and labels.
+- `TELEGRAM_WEBHOOK_SECRET`: a private random 32–256 character string using only letters, numbers, underscore or hyphen; the externally registered HTTPS webhook must supply the same secret.
 - An optional private test destination is another entry with `test_only: true` and its positive private-chat ID. Demonstration mode permits **only** such entries; it cannot target a configured public broadcast destination. No fixture bot configuration is loaded in production.
 
-The application does not automatically load `.env`. Keep actual configuration outside the repository, restrict its permissions and rotate a leaked token through Telegram. Do not paste credentials into support requests. Missing/invalid configuration disables the composer with a clear reason; it never triggers automatic network requests or substitute delivery results. Egress requires HTTPS to `api.telegram.org`. This client deliberately avoids token-bearing URL logging, redirects, environment proxies and automatic retries; ensure external APM/network tooling also redacts the Bot API credential path.
+Edit `.env` privately, keep it Git-ignored, and run `chmod 600 .env`. It must be a regular file owned by the current user; symlinks, other permissions, files over 64 KiB, malformed assignments and duplicate keys are refused without printing values. Use one `KEY=value` assignment per line; optional `export`, blank lines and `#` comments are supported. Single quotes preserve literal values; double quotes use JSON string escaping. Enclose the destination JSON in single quotes. Unquoted inline comments require whitespace before `#`. Multiline values, shell execution and variable interpolation are unsupported; expressions remain literal text. Unrelated well-formed keys are ignored and cannot override database/maintenance or Vite settings.
+
+Run `./start.sh --check`, then `./start.sh`; no manual Telegram exports are needed. Explicitly provided environment variables take precedence, including empty values. A missing optional file/key does not create defaults; the backend's existing validation keeps affected Telegram features unavailable when their required configuration is absent/invalid. Restart your existing launcher after editing the file. Telegram keys reach only the backend; token, destinations and webhook secret are explicitly removed from Vite's environment. Direct `uvicorn` invocation still requires its own environment configuration.
+
+Loading configuration does **not** register a webhook, enroll a recipient or send a message. Follow [the opt-in/webhook procedure](docs/TELEGRAM_OPT_IN_MVP.md) separately. Rotate a leaked token through Telegram; never paste credentials into support requests. Egress for an explicitly approved send requires HTTPS to `api.telegram.org`. This client deliberately avoids token-bearing URL logging, redirects, environment proxies and automatic retries; ensure external APM/network tooling also redacts the Bot API credential path.
 
 Operator workflow: sign in → choose an authorized destination → write an informational or emergency notice → optionally select a currently verified Open shelter → **Review exact notification** → verify the complete server-rendered text and destination → check the explicit approval box → **Approve and send once through Telegram**. Do not use experimental ML as evidence for flood claims, shelter availability or evacuation instructions. Review uses plain text, without Markdown/HTML transformations or link previews. Optional shelter details are read from PostgreSQL, omit private notes/contact data, and are checked again before sending. Changed/expired shelter evidence requires a new preview. Preview approval expires after 30 minutes; destination reconfiguration also invalidates it.
 

@@ -7,7 +7,7 @@ ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
 cd "$ROOT"
 case "${1:-}" in
   --help|-h)
-    printf 'Usage: ./start.sh [--check|--help]\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nUses private DATABASE_URL/SHELTER_DATABASE_URL environment or data/tmp/launcher/config.json references. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
+    printf 'Usage: ./start.sh [--check|--help]\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nUses private DATABASE_URL/SHELTER_DATABASE_URL environment or data/tmp/launcher/config.json references; optional root .env loads Telegram keys only (0600). Explicit environment takes precedence. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
     exit 0 ;;
   ''|--check) [[ $# -le 1 ]] || { printf 'Unexpected arguments. Use --help.\n' >&2; exit 1; } ;;
   *) printf 'Unknown option. Use --help.\n' >&2; exit 1 ;;
@@ -20,7 +20,7 @@ VENV="$ROOT/backend/.venv"
 [[ -x "$VENV/bin/python" && -r "$VENV/bin/activate" ]] || fail 'Missing backend/.venv; follow README setup before launching.'
 # shellcheck source=/dev/null
 source "$VENV/bin/activate"
-if [[ "${FLOODPULSE_CONFIG_LOADED:-}" != 1 && ( -z "${DATABASE_URL:-}" || -z "${SHELTER_DATABASE_URL:-}" ) && -f "$ROOT/data/tmp/launcher/config.json" ]]; then
+if [[ "${FLOODPULSE_CONFIG_LOADED:-}" != 1 ]]; then
   exec "$VENV/bin/python" -B "$ROOT/scripts/launcher_config.py" "$ROOT" "$@"
 fi
 printf 'FloodPulse — Starting Application\n'
@@ -174,7 +174,7 @@ printf '[5/5] Starting React/Vite on loopback...\n'
 export FLOODPULSE_API_TARGET="http://127.0.0.1:$FLOODPULSE_BACKEND_PORT"
 (
   cd "$ROOT/frontend"
-  exec setsid env -u DATABASE_URL -u SHELTER_DATABASE_URL -u LOCATION_DIRECTORY_ADMIN_URL -u TELEGRAM_BOT_TOKEN -u TELEGRAM_DESTINATIONS npm run dev -- --host 127.0.0.1 --port "$FLOODPULSE_FRONTEND_PORT" --strictPort
+  exec setsid env -u DATABASE_URL -u SHELTER_DATABASE_URL -u LOCATION_DIRECTORY_ADMIN_URL -u TELEGRAM_BOT_USERNAME -u TELEGRAM_BOT_TOKEN -u TELEGRAM_DESTINATIONS -u TELEGRAM_WEBHOOK_SECRET npm run dev -- --host 127.0.0.1 --port "$FLOODPULSE_FRONTEND_PORT" --strictPort
 ) >"$RUNTIME/frontend.log" 2>&1 9>&- &
 FRONTEND_PID=$!; PIDS+=("$FRONTEND_PID")
 wait_ready "$FRONTEND_PID" "$SHELTER_PUBLIC_ORIGIN" React/Vite

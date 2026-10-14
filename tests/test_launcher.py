@@ -2,6 +2,7 @@
 import os
 import json
 from pathlib import Path
+import secrets
 import signal
 import subprocess
 import sys
@@ -46,7 +47,12 @@ if kind=='curl':
 if kind=='sleep':time.sleep(.03);sys.exit(0)
 label='frontend' if kind=='npm' else 'backend'
 if label=='frontend':
- assert not any(k in os.environ for k in ['DATABASE_URL','SHELTER_DATABASE_URL','LOCATION_DIRECTORY_ADMIN_URL','TELEGRAM_BOT_TOKEN','TELEGRAM_DESTINATIONS'])
+ assert not any(k in os.environ for k in ['DATABASE_URL','SHELTER_DATABASE_URL','LOCATION_DIRECTORY_ADMIN_URL','TELEGRAM_BOT_USERNAME','TELEGRAM_BOT_TOKEN','TELEGRAM_DESTINATIONS','TELEGRAM_WEBHOOK_SECRET'])
+ (root/'frontend.isolated').touch()
+if label=='backend' and os.environ.get('EXPECT_TELEGRAM_FILE'):
+ assert os.environ.get('TELEGRAM_BOT_USERNAME')=='FloodPulsebot'
+ assert all(os.environ.get(k) for k in ['TELEGRAM_BOT_TOKEN','TELEGRAM_DESTINATIONS','TELEGRAM_WEBHOOK_SECRET'])
+ assert 'LOCATION_DIRECTORY_ADMIN_URL' not in os.environ
 if os.environ.get('FAIL_'+label.upper()):
  print('PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',flush=True);sys.exit(17)
 worker=subprocess.Popen([sys.executable,'-c','import time;time.sleep(120)'])
@@ -72,7 +78,8 @@ def project(tmp_path):
     (tmp_path / 'state').write_text('running')
     env = dict(os.environ, PATH=str(tools) + ':' + os.environ['PATH'], FAKE_ROOT=str(tmp_path),
                DATABASE_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', SHELTER_DATABASE_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
-               LOCATION_DIRECTORY_ADMIN_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', TELEGRAM_BOT_TOKEN='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY')
+               LOCATION_DIRECTORY_ADMIN_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', TELEGRAM_BOT_TOKEN='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
+               TELEGRAM_DESTINATIONS='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', TELEGRAM_WEBHOOK_SECRET='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY')
     return tmp_path, env
 
 
@@ -121,6 +128,22 @@ def test_launcher_bootstraps_private_profile_with_no_exported_urls(project):
     result = run(project, '--check', DATABASE_URL='', SHELTER_DATABASE_URL='', FLOODPULSE_CONFIG_LOADED='')
     assert result.returncode == 0 and 'Checks passed' in result.stdout
     assert not (root / 'pids').exists()
+
+
+def test_root_dotenv_reaches_only_backend_even_with_explicit_database_connections(project):
+    root, env = project
+    keys = ['TELEGRAM_BOT_USERNAME', 'TELEGRAM_BOT_TOKEN', 'TELEGRAM_DESTINATIONS', 'TELEGRAM_WEBHOOK_SECRET']
+    for key in keys: env.pop(key, None)
+    values = {key: secrets.token_urlsafe(32) for key in keys}
+    values['TELEGRAM_BOT_USERNAME'] = 'FloodPulsebot'
+    file = root / '.env'
+    file.write_text('\n'.join(f'{key}={value}' for key, value in values.items()))
+    file.chmod(0o600)
+    result = run(project, EXPECT_TELEGRAM_FILE='1', FAIL_FRONTEND='1')
+    assert result.returncode != 0
+    assert (root / 'backend.ready').exists() and (root / 'frontend.isolated').exists()
+    assert all(value not in result.stdout + result.stderr for value in values.values())
+    no_orphans(root)
 
 
 @pytest.mark.parametrize('missing', ['DATABASE_URL', 'SHELTER_DATABASE_URL'])

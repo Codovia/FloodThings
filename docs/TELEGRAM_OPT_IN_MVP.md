@@ -16,8 +16,8 @@ Every new message and audit response is labelled `ADMIN_ALERT`; it is not an `OF
 
 ## Concrete setup
 
-1. Have the intended bot's real username/token and an explicitly consenting authorized private test destination. Provision them privately using the existing `TELEGRAM_BOT_TOKEN` and `TELEGRAM_DESTINATIONS` contract in README; do not commit tokens/chat IDs or invent a bot. No default credentials exist.
-2. Set private `TELEGRAM_WEBHOOK_SECRET` to a random 32–256 character string containing only letters, numbers, underscore or hyphen. Set `TELEGRAM_BOT_USERNAME` to the actual bot username (without `@`). Environment configuration declares readiness, not verified live connectivity.
+1. Use the actual project bot **FloodPulsebot** and an explicitly consenting authorized private test destination. Privately edit the project-root `.env` with `TELEGRAM_BOT_USERNAME=FloodPulsebot`, the real `TELEGRAM_BOT_TOKEN` and `TELEGRAM_DESTINATIONS` JSON contract in README; do not commit tokens/chat IDs or invent a bot. No default credentials exist.
+2. Set private `TELEGRAM_WEBHOOK_SECRET` in the same file to a random 32–256 character string containing only letters, numbers, underscore or hyphen. Apply `chmod 600 .env`, run `./start.sh --check`, then start/restart `./start.sh`. Python automatically reads these four keys only; shell exports are unnecessary, and explicitly supplied environment values win. Configuration declares readiness, not verified live connectivity.
 3. Apply additive Alembic revision `0005_telegram_subscriptions` via the existing maintenance connection, following `0004_citizen_reports`. This execution migrated disposable test databases only. Grant the actual restricted service role:
 
    ```sql
@@ -32,6 +32,18 @@ Every new message and audit response is labelled `ADMIN_ALERT`; it is not an `OF
 
 Official contracts reviewed on 13 October 2026: [Telegram setWebhook and secret_token](https://core.telegram.org/bots/api#setwebhook), [bot deep linking](https://core.telegram.org/bots/features#deep-linking). No claim is made that external configuration has been completed.
 
+## Private launcher loading — 14 October 2026
+
+The optional root `.env` stays ignored by Git and must be a user-owned regular file with exactly `0600` permissions, at most 64 KiB. Python reads it without shell `source`, `eval`, command execution or interpolation. Symlinks, malformed/duplicate assignments, multiline values and insecure files fail startup with credential-free errors. Supported syntax is single-line `KEY=value`, optional `export`, literal single quotes, JSON-escaped double quotes and comments; quote destination JSON with single quotes. Unrelated valid keys are ignored. PostgreSQL credentials still come from the existing separate launcher profile/environment; administrator provisioning, roles and maintenance isolation are unchanged.
+
+Explicit environment values, including empty ones, override file values. Absent keys remain absent; backend configuration validation continues to govern availability. The launcher removes all four Telegram keys from Vite, including `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET`. The backend alone receives them. Direct backend commands do not automatically load this file. No actual credentials are included in examples/tests; configuration tests use ephemeral inert fixtures only.
+
+Neither configuration loading nor `--check` makes a Telegram request, registers `setWebhook`, records consent or sends a notification. An operator must still configure authorized destinations and HTTPS ingress, separately register the matching webhook secret, collect `/start floodpulse` consent, and explicitly review/approve each intended send. Existing `/stop`, CSRF, deduplication, rate limits and notification audit rules remain unchanged.
+
 ## Verification
 
 Real disposable PostGIS tests exercise signed commands, duplicate/stale/spoofed/unlisted updates, opt-out gating before a pending send, re-opt-in, one mocked audited acceptance, no resend, redacted readiness/options and persistent dispatch budget. Existing notification least-privilege tests now include the required read permission for subscription checks and existing rate-bucket permissions. Existing shelter/report workflows also pass after the additive migration. Browser fixture tests cover unavailable/available enrollment UI, exact admin review/approval, uncertain-delivery behavior and Home desktop/mobile fit. Telegram transport is mocked throughout; no actual subscriber delivery is claimed.
+
+14 October configuration slice: **128 focused Python tests passed** (launcher/profile/parser, admin setup, notification protocol and security), plus **15 frontend tests passed** (notifications, opt-in and protected requests). New tests cover missing keys/file, explicit empty overrides, quoted JSON/comments, duplicate/malformed/invalid-UTF-8 values, exact permissions/ownership, symlinks/FIFOs/size bounds, redacted CLI errors and actual child-process environment isolation with mocked services. No genuine credentials are test fixtures. The read-only launcher check passed with ports 18051/14181 and the matching public origin; the default ports were already occupied and no running application was stopped.
+
+Private local inspection confirmed the existing root file is owner-only `0600`, loads all four keys and uses `FloodPulsebot`. At least one configured destination's `chat_id` fails the existing numeric-string contract; the operator must privately supply a legitimate authorized nonzero chat ID as a JSON string (positive for a private test recipient). The file was preserved, not automatically corrected. Token/webhook-secret formats were checked without network authentication. Webhook registration, consent and an explicitly approved live send remain operator steps; no live delivery or bot ownership verification is claimed here.
