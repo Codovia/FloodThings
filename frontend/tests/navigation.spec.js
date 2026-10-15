@@ -25,9 +25,9 @@ test('five routes, direct URLs, back/forward, persistent location and one freshn
  await page.goForward();await expect(page).toHaveURL(/\/shelters$/)
  await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
  await page.clock.fastForward(6*3600000);await expect.poll(requests).toBe(3)
- await nav(page).getByRole('link',{name:'Weather & AI',exact:true}).click();await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(3)
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(3)
  await nav(page).getByRole('link',{name:'Admin',exact:true}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible();await expect(nav(page).getByRole('link',{name:'Admin',exact:true})).toHaveAttribute('aria-current','page')
- for(const [url,title] of [['/','FloodPulse'],['/weather','Weather & AI'],['/flood-map','Flood Map'],['/shelters','Emergency Shelters'],['/admin','Administration']]){
+ for(const [url,title] of [['/','FloodPulse'],['/weather','Weather details'],['/flood-map','Flood Map'],['/shelters','Emergency Shelters'],['/admin','Administration']]){
   await page.goto(url);await expect(page.getByRole('heading',{name:title,exact:true,level:1})).toBeVisible()
  }
 })

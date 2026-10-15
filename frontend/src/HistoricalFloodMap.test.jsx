@@ -105,7 +105,7 @@ describe('historical evidence display', () => {
     await screen.findByText('27 °C')
     fireEvent.click(screen.getByRole('link', {name:'Flood Map',exact:true}))
     await screen.findByText(/Source image: controlled-test-source-2728/)
-    fireEvent.click(screen.getByRole('link', {name:'Weather & AI',exact:true}))
+    act(()=>{window.history.pushState(null,'','/weather');window.dispatchEvent(new PopStateEvent('popstate'))})
     expect(screen.getByText('27 °C')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Refresh weather' })).toBeTruthy()
     expect(screen.getByRole('link', { name: 'Open-Meteo' })).toBeTruthy()

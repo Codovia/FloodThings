@@ -45,7 +45,7 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
   await expect(page.getByText('Not connected',{exact:true})).toBeVisible()
  }else expect(size.height).toBeGreaterThan(viewport.height)
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
- await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Weather & AI',exact:true}).click()
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)

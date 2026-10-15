@@ -14,6 +14,10 @@ FloodPulse's USP is emergency response: citizen alerts, verified shelter adminis
 
 Advance one small P0/P1 vertical slice at a time. State its acceptance test, implement, verify, append results to `update.md`, then commit and push only verified scoped changes. Independently verify the remote hash. Distinguish live evidence from fixtures and report concrete missing dependencies.
 
+## Product decision — 2026-10-16 (supersedes the prediction scope above)
+
+Read [the 4-day plan](docs/FLOODPULSE_4_DAY_PLAN.md). The project is now a **flood and drainage risk prediction and early-alert system with shelter management and navigation**; target demonstration about **19 October 2026**. Risk prediction is a major feature, delivered as a transparent rule-based risk index from real live data (IMD rainfall categories, GloFAS return levels, elevation, historical floods, approved reports), always labelled experimental and never a calibrated flood probability. The Phase 12G NO-GO on training a validated flood-occurrence model still stands. Risk output may *suggest* an alert draft; only an administrator's explicit approval sends it. Research pipeline code is archived in tag `archive/research-2026-10-16`.
+
 ## Security and data integrity
 
 - Preserve all existing security controls, authentication, CSRF, authorization, audit history, provenance, freshness and source-validation rules. Reconcile conflicts explicitly; never silently remove controls.

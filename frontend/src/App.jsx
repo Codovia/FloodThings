@@ -14,7 +14,7 @@ import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.j
 
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
- '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather & AI','Real forecasts for your selected point, with an experimental heavy-rainfall outlook.'],
+ '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather details','Seven-day forecast, rainfall chart and source details for your selected point.'],
  '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],

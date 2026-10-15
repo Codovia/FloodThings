@@ -1,10 +1,12 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export const PAGES = [
-  {path:'/',name:'Home',icon:'home'}, {path:'/weather',name:'Weather & AI',icon:'weather'},
+  {path:'/',name:'Home',icon:'home'},
   {path:'/flood-map',name:'Flood Map',icon:'map'}, {path:'/shelters',name:'Shelters',icon:'shelter'},
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
   {path:'/admin',name:'Admin',icon:'admin'},
+  // Detail page reached from Home only; kept out of the main navigation.
+  {path:'/weather',name:'Weather details',icon:'weather',hidden:true},
 ]
 const currentPath=()=>window.location.pathname.replace(/\/+$/, '') || '/'
 export function usePage(){
@@ -30,6 +32,6 @@ export function AppHeader({path,navigate,mode=null}){
  return <><a className="skip-link" href="#page-content">Skip to page content</a><header className="app-header" onKeyDown={escape}>
  <div className="header-inner"><PageLink to="/" navigate={navigate} className="app-brand" aria-label="FloodPulse Home"><span className="brand-mark"><Icon name="water"/></span><span><strong>FloodPulse{mode==='demonstration'&&<span className="demo-environment-badge">DEMO ONLY</span>}</strong><small>Local information & emergency response</small></span></PageLink>
  <button ref={toggle} className="nav-toggle" type="button" aria-label={expanded?'Close navigation menu':'Open navigation menu'} aria-expanded={expanded} aria-controls="primary-navigation" onClick={()=>setExpanded(v=>!v)}>{expanded?'Close':'Menu'}<span aria-hidden="true">{expanded?'×':'☰'}</span></button>
- <nav id="primary-navigation" className={expanded?'primary-nav expanded':'primary-nav'} aria-label="Main navigation">{PAGES.map(page=><PageLink key={page.path} to={page.path} navigate={navigate} onClick={()=>setExpanded(false)} aria-current={path===page.path?'page':undefined}><Icon name={page.icon}/>{page.name}</PageLink>)}</nav>
+ <nav id="primary-navigation" className={expanded?'primary-nav expanded':'primary-nav'} aria-label="Main navigation">{PAGES.filter(page=>!page.hidden).map(page=><PageLink key={page.path} to={page.path} navigate={navigate} onClick={()=>setExpanded(false)} aria-current={path===page.path?'page':undefined}><Icon name={page.icon}/>{page.name}</PageLink>)}</nav>
  </div></header></>
 }

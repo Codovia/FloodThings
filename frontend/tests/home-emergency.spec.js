@@ -26,7 +26,7 @@ test('automatic GPS uses exact coordinates, browser accuracy and one weather ses
  await locate(page,13.34261,74.74953);await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34261&longitude=74.74953'])
  await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible();await expect(page.getByText('Next-24-hour total unavailable')).toBeVisible()
  expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
- await nav(page).getByRole('link',{name:'Weather & AI',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
  await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>window.__watchCalls)).toBe(0);expect(requests).toHaveLength(1)
  expect(new URL(page.url()).search).toBe('');expect(await page.evaluate(()=>Object.keys(sessionStorage).concat(Object.keys(localStorage)).filter(k=>/gps|latitude|longitude/i.test(k)))).toEqual([])
 })

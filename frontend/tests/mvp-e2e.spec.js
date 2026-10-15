@@ -24,7 +24,7 @@ test('real application: private incident -> moderation -> map shelter -> directi
  const dimensions=await page.evaluate(()=>({width:document.documentElement.scrollWidth,height:document.documentElement.scrollHeight,viewportWidth:innerWidth,viewportHeight:innerHeight}))
  expect(dimensions).toEqual({width:1366,height:768,viewportWidth:1366,viewportHeight:768})
  await page.screenshot({path:evidence+'/01-home.png'})
- await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Weather & AI',exact:true}).click()
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
  await expect(page.getByRole('heading',{name:'Experimental Heavy-Rainfall Indicator'})).toBeVisible()
  if(weather.status()===200&&weatherBody.status==='available'){
   const modelResponse=page.waitForResponse(r=>r.url().includes('/api/ai/rainfall-outlook')&&r.request().method()==='GET',{timeout:30000})

@@ -32,7 +32,7 @@ test('district selection survives all public routes; a historical cell never cha
  await nav.getByRole('link',{name:'Shelters',exact:true}).click()
  await expect(page.getByLabel('Karnataka district',{exact:true})).toHaveValue('nic:udupi.nic.in')
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
- await nav.getByRole('link',{name:'Weather & AI',exact:true}).click()
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
  await expect(page.getByRole('heading',{name:'Bengaluru, Karnataka',exact:true})).toBeVisible();expect(weatherRequests).toBe(1)
  await expect(page.getByRole('button',{name:'Run experimental rainfall model'})).toBeDisabled()
 })

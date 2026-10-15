@@ -49,7 +49,7 @@ export default function RainfallOutlook({ point, weather, freshness, overview=fa
     <p>{point.name} · next 24 complete hours beginning at the next full UTC hour.</p>
     <p>Target: heavy rainfall ≥64.5 mm in 24 hours at the model grid point. Model type: Logistic Regression.</p>
     <p className="notice">Experimental rainfall model, not flood probability or an official warning. Supports only the verified Kundapur and Mangaluru points. Flood prediction remains unavailable.</p>
-    {overview&&<p className="muted">Saved model: rainfall_logistic_v1. View full weather charts and source details on Weather & AI.</p>}
+    {overview&&<p className="muted">Saved model: rainfall_logistic_v1. Full weather charts and source details are under Weather details on Home.</p>}
     {!open && !overview && <p className="muted">Run the saved trained Logistic Regression model using a separate bounded past-hourly Open-Meteo request. No seven-day forecast request is duplicated.</p>}
     {open && !receipt && <p role="status">Usable weather retrieval is required before running the rainfall model.</p>}
     <div aria-live="polite" aria-busy={current.loading}>

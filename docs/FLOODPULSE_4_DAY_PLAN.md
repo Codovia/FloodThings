@@ -1,0 +1,219 @@
+# FloodPulse — Final Project Plan (4 days, 16–19 October 2026)
+
+**Project title:** FloodPulse — Flood & Drainage Risk Prediction and Early-Alert System with Shelter Management and Navigation (Karnataka coastal pilot: Udupi and Dakshina Kannada).
+
+**User decision, 16 October 2026.** Risk prediction is now a major feature, alongside alerts, shelters and navigation. This replaces "prediction is a minimal supporting feature" from the 13 October priorities. All safety and data-integrity rules in [AGENTS.md](../AGENTS.md) still apply.
+
+---
+
+## 1. The product in one picture
+
+```
+ LIVE REAL DATA                     FLOODPULSE                               PEOPLE
+ ───────────────                    ──────────                               ──────
+ Open-Meteo rainfall  ─┐
+ (past 5 d + next 3 d) │      ┌──────────────────────────┐
+ GloFAS river flow  ───┼────▶ │ 1. RISK ENGINE           │── risk map ──▶ Citizen (Home / Flood Map)
+ (1984–today + 7 d)    │      │  Flood risk + Drainage   │
+ Copernicus elevation ─┤      │  risk, per town, hourly  │── HIGH? ─────▶ Admin: "Suggested alert"
+ Historical floods   ──┤      │  + AI heavy-rain model   │                     │ review + approve
+ (2005/2009 GFD)       │      └──────────────────────────┘                     ▼
+ Approved citizen    ──┘      ┌──────────────────────────┐            2. EARLY ALERT (Telegram)
+ reports (drainage)           │ 3. CITIZEN REPORTS       │◀── photo+GPS ── Citizen
+                              │  admin approve/reject    │── approved blockages ──┐
+                              └──────────────────────────┘                        ▼
+                              ┌──────────────────────────┐            4. NAVIGATION to shelter
+                              │ 5. SHELTER MANAGEMENT    │── open shelters ──▶ route that AVOIDS
+                              │  admin pins, capacity    │                     reported flooded spots
+                              └──────────────────────────┘
+```
+
+The demo story in one sentence: **rain is forecast → risk rises → the admin approves an alert → citizens get it on Telegram → they report a flooded road → the admin approves it → navigation routes them to an open shelter around that road.**
+
+---
+
+## 2. Final feature list (minimum, but strong)
+
+| # | Feature | Status today | Work needed |
+|---|---|---|---|
+| F1 | **Flood & Drainage Risk Index**: Low/Moderate/High/Severe for each town, with the reason for each level | Partly built: the inputs exist (weather, GloFAS adapter, historical polygons, reports) | **New** risk engine + API + UI (Day 2) |
+| F2 | **AI heavy-rainfall model** (`rainfall_logistic_v1`) | Works (Kundapur, Mangaluru) | Show it inside the risk card instead of on a separate page |
+| F3 | **Early alerts**: risk High → suggested Telegram alert → admin approves → send | Telegram send, preview, approval and opt-in work | **New**: risk-based suggestion in the admin panel (Day 3) |
+| F4 | **Citizen reports**: GPS + photo → admin approve/reject | Works | Show approved reports on the map; they feed drainage risk |
+| F5 | **Shelter management**: admin pins entrance, capacity, Open/Full/Closed | Works | Minor UI tidy |
+| F6 | **Navigation**: in-app route to the nearest open shelter, avoiding approved flood reports | External Google link only | **New**: OpenRouteService route line (Day 3) |
+| F7 | **Flood Map**: historical floods + live risk + reports + shelters on one map | Historical/drainage layers work | Add risk and report layers |
+| F8 | **Historical replay mode** for the demo (real archived data, e.g. August 2019) | — | **New** (Day 3). October weather may be calm on demo day, and replay shows the system on a real past event |
+
+### Navigation after the cleanup (5 public items + Admin)
+
+**Home · Flood Map · Shelters · Report · Alerts · (Admin)**
+
+The separate *Weather & AI* page is removed. Its 7-day forecast and the AI indicator move into the Home risk card.
+
+---
+
+## 3. The risk model (F1): how it works and why it is honest
+
+There is **no verified flood-outcome dataset** for Karnataka, so we cannot honestly train a "flood yes/no" classifier (Phase 12G NO-GO, retained).
+
+Instead we use a **transparent multi-factor risk index**. This is the standard approach in flood early-warning practice: GloFAS return-period thresholds and IMD rainfall categories. Every factor uses real live data and every threshold has a source.
+
+### Flood risk (river and rain)
+
+| Factor | Real data source | Scoring |
+|---|---|---|
+| Forecast rain, next 24 h | Open-Meteo hourly | IMD categories: <15.6 mm = 0; 15.6–64.4 = 1 (moderate); 64.5–115.5 = 2 (heavy); 115.6–204.4 = 3 (very heavy); ≥204.5 = 4 (extremely heavy) |
+| Antecedent rain, past 5 days | Open-Meteo `past_days=5` | ≥50 mm = +1, ≥150 mm = +2 (saturated ground) — *project-chosen thresholds, documented as such* |
+| River flow signal, next 3 days | GloFAS v4 (nearest 5 km grid cell) vs **that cell's own 1984–2025 annual-maximum record** | ≥ 2-year return level = +2, ≥ 5-year = +3 (the GloFAS return-period method) |
+| Low-lying terrain | Copernicus GLO-90 elevation (Open-Meteo Elevation API) | <10 m = +1 |
+| Historical flood exposure | Global Flood Database 2005 / 2009 Udupi polygons | Point inside a mapped flood cell = +1 |
+| AI heavy-rain model | `rainfall_logistic_v1` (supported points) | Shown alongside as a second opinion, not added to the score |
+
+### Drainage (waterlogging) risk
+
+| Factor | Source | Scoring |
+|---|---|---|
+| Peak hourly rain intensity, next 24 h | Open-Meteo hourly | ≥10 mm/h = +1, ≥20 mm/h = +2 — *project-chosen* |
+| Approved blocked-drain / waterlogging reports within 1 km, last 72 h | FloodPulse moderation database | 1 report = +1, ≥3 = +2 |
+| Low-lying terrain | Copernicus elevation | <10 m = +1 |
+
+**Level:** total 0–1 = Low · 2–3 = Moderate · 4–5 = High · ≥6 = Severe. The UI always shows each factor's contribution and source.
+
+### Labels the UI must always show
+
+- "Experimental risk index — rule-based, not validated against flood outcomes. Not an official warning."
+- River factor: "Nearest GloFAS model grid cell (~5 km); river identity not verified."
+
+### Rule reconciliation (explicit, not silent)
+
+`river_outlook.py` deliberately refuses arbitrary points because no river reach has been reviewed (`APPROVED_REACHES = ()`). The risk engine does **not** change that endpoint. It uses GloFAS only as a *relative anomaly against the same cell's own history*, with the grid-cell label above. This is a weaker claim than "the river at your town will rise". That river-specific claim stays unavailable until a reach is reviewed.
+
+### Validation (shown in the demo; strong marks)
+
+A retrospective **case-study check** uses archived real data (Open-Meteo historical weather + GloFAS history). It computes the index for known flood periods and for a quiet reference period:
+
+- Udupi, September 2005 (GFD 2728)
+- Udupi, Sept–Oct 2009 (GFD 3551)
+- Karnataka coastal floods, August 2019
+
+Results are reported as "the index rose to High/Severe on N of M known flood days". They are **not** reported as accuracy, because no verified negative days exist.
+
+---
+
+## 4. What gets removed
+
+Removed code is preserved in Git tag **`archive/research-2026-10-16`**, so nothing is lost. **No data files under `data/` are deleted.** The `data/` folder is untouched, and the original datasets, model artifact and migrations stay.
+
+| Remove | Count | Why |
+|---|---|---|
+| Research pipeline scripts (Sentinel-1, JRC, hydrology, Groundsource, CWC gauges, label audits, GloFAS pilots, CHIRPS assembly, SOI/LGD checks) | ~45 files in `scripts/` | One-off research, not used by the app |
+| Their tests | ~30 in `backend/tests/`, ~8 in `tests/` | They test removed scripts only |
+| Research reports `docs/phase12*/` and method docs (Sentinel, GloFAS pilot, hydrology closure, target archive, observation feasibility, etc.) | ~60 files | Archived history; summarised in one paragraph in the README |
+| Separate `/weather` page | 1 route | Merged into Home |
+| Repeated disclaimer paragraphs on every page | UI text | Replaced with one short label + an "About this data" expander. Required safety labels stay |
+
+**Kept scripts:**
+
+| Purpose | Files |
+|---|---|
+| App runtime and launchers | `launcher_config`, `launcher_processes`, `full_launcher`, `telegram_webhook_proxy`, `telegram_webhook_setup` |
+| Admin setup | `setup_admin` (+ `.sh`), `verify_admin_login.cjs` |
+| Testing | `verify_mvp_e2e` |
+| Model provenance | `train_rainfall_outlook`, `validate_saved_rainfall` |
+| Location directory | `build_location_directory`, `expand_location_directory` |
+| Flood Map data provenance | `extract_udupi_history/spatial/drainage`, `verify_earth_engine` |
+
+---
+
+## 5. Day-by-day schedule
+
+Each step follows the same loop: acceptance test → build → run the tests → note in `update.md` → commit → push.
+
+### Day 1 — Thu 16 Oct: clean and simplify
+
+| Task | Acceptance test | Who |
+|---|---|---|
+| 1a. Archive tag, remove research scripts/tests/docs | Tag pushed; remaining backend + launcher tests pass; app starts | Claude |
+| 1b. Remove `/weather` page; move the 7-day forecast + AI indicator into Home | Navigation shows 5 items + Admin; `/weather` redirects to `/`; frontend tests pass | Claude |
+| 1c. Short labels instead of long disclaimers | Required labels ("Experimental", "not flood-safe", "user-reported") still visible | Claude |
+| 1d. **Rotate the exposed admin password** (command in §7) | Login works with the new password | **You** |
+| 1e. Get a free OpenRouteService key; put `OPENROUTESERVICE_API_KEY=` in the private root `.env` | Key present (never committed) | **You** (2 minutes at openrouteservice.org) |
+
+### Day 2 — Fri 17 Oct: risk engine (F1, F2, F7)
+
+| Task | Acceptance test |
+|---|---|
+| 2a. `backend/app/risk.py` + `GET /api/risk?locality=` and `GET /api/risk/towns` (all 5 supported towns) | Unit tests with fixture inputs give the expected level for each factor; provider down → `unavailable`, never a guessed level |
+| 2b. GloFAS cell history cache (annual maxima 1984–2025 per town, fetched once, with its SHA-256 recorded) | Return levels reproducible from the cache file |
+| 2c. Home risk card (Flood + Drainage level, factor bars, AI model opinion, 7-day rain) | Browser test at 1366×768 with no page scroll |
+| 2d. Flood Map "Live risk" layer (5 towns coloured by level) + approved-report layer | Layer toggles; legend shows sources |
+
+### Day 3 — Sat 18 Oct: alerts, navigation, replay (F3, F6, F8)
+
+| Task | Acceptance test |
+|---|---|
+| 3a. Hourly risk check → **Suggested alert** card in Admin → Alerts (pre-filled text, area, sources). The admin edits, previews and approves. **Never auto-sends** | Test: a High fixture creates one suggestion; no Telegram call happens without approval; duplicate suggestions are suppressed |
+| 3b. `POST /api/route`: OpenRouteService foot/car route from the chosen origin to the shelter entrance, with `avoid_polygons` = 150 m buffers around approved flood/blocked-road reports from the last 72 h. Route line on the Shelters map. Label: "Avoids N reported flooded spots — not certified flood-safe" | Missing key → feature hidden, Google link remains; quota error → honest message |
+| 3c. Historical replay: admin chooses "Replay 2019-08-09"; the risk engine runs on archived real data and a **REPLAY — HISTORICAL DATA** banner is shown | Replay output never reaches public alerts automatically |
+| 3d. Run the retrospective case-study check; save the result table to `docs/RISK_VALIDATION.md` | Table reproducible by script |
+
+### Day 4 — Sun 19 Oct: freeze, rehearse, report
+
+- Full test run (frontend, backend, PostGIS, Playwright) and production build. **Feature freeze at noon.**
+- Rehearse the 10-minute demo (§6) twice on the presentation laptop and network. Renew the shelter verification with genuine evidence on the day itself (it expires every 24 h).
+- Project report and slides: problem, architecture diagram (§1), risk method (§3), validation table, security, screenshots, limitations, future work.
+
+---
+
+## 6. Demo script (10 minutes, built to score)
+
+1. **Problem (1 min):** coastal Karnataka floods (2019) and urban waterlogging; people lack local risk information, alerts and shelter routes.
+2. **Live risk (2 min):** Home shows a real town with its current risk. Open "Why?" to show each factor and its source, then the AI model's opinion.
+3. **Replay August 2019 (1.5 min):** the same engine on real archived data rises to High/Severe. Show the validation table.
+4. **Early alert (1.5 min):** the admin sees the Suggested alert, edits, previews and approves it; the message arrives on the Telegram test phone.
+5. **Citizen report (1.5 min):** phone camera + GPS, "road flooded" → admin approves → the pin appears on the map, and drainage risk for that area goes up.
+6. **Shelter + navigation (1.5 min):** Shelters → nearest open shelter → in-app route bends around the approved flooded spot, labelled "not certified flood-safe".
+7. **Close (1 min):** security (login, CSRF, audit, private photos), the honest-AI principle and future work (validated labels, CWC gauges, image AI).
+
+---
+
+## 7. Commands
+
+```bash
+# Rotate the admin password (Day 1, your own terminal; never paste the URL into chat)
+cd backend && export LOCATION_DIRECTORY_ADMIN_URL='<private maintenance URL>'
+.venv/bin/python -B -m app.provision_shelter_admin --username YOUR_ADMIN --reset-password
+unset LOCATION_DIRECTORY_ADMIN_URL
+
+# Run
+./start-full.sh --check --telegram && ./start-full.sh --telegram     # Ctrl+C stops it
+# App http://127.0.0.1:14180 · Admin /admin · API http://127.0.0.1:18050
+
+# Test
+cd frontend && npm test && npm run build
+backend/.venv/bin/python -B -m pytest backend/tests tests -q \
+  -k 'not test_real_training_reproduction_chronological_split_and_actual_metrics'
+```
+
+## 8. What we never claim (examiners will ask)
+
+| Never claim | Say instead |
+|---|---|
+| "Predicts floods with X % accuracy" | "Rule-based risk index from real live data, checked against known flood periods. The AI model predicts heavy rain (recall 91.7 %)" |
+| "Safe route" | "Route avoids approved flooded spots; not certified flood-safe" |
+| "Alerts are automatic" | "The system suggests; a human approves every alert" |
+| Citizen photos are truth | They are reviewed evidence, never automatic training labels |
+
+## 9. Real data sources (all free, verified 16 Oct 2026)
+
+| Source | Use | Licence / limit |
+|---|---|---|
+| Open-Meteo Forecast | Rainfall past 5 days + next 3–7 days, hourly | CC BY 4.0, non-commercial free |
+| Open-Meteo Flood (GloFAS v4) | River discharge, 1984–today + forecast | CC BY 4.0; ~5 km grid |
+| Open-Meteo Elevation (Copernicus GLO-90) | Terrain height | Free licence; attribution required |
+| Global Flood Database | 2005/2009 Udupi flood extents | CC BY-NC 4.0 |
+| OpenStreetMap | Map tiles, town locations | ODbL |
+| OpenRouteService | Routing with avoid-polygons | Free key, ~2,000 routes/day |
+| Telegram Bot API | Alerts | Existing private bot configuration |
+| IMD rainfall categories | Risk thresholds | Official IMD/MoES classification |
