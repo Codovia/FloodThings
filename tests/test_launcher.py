@@ -99,6 +99,9 @@ def project(tmp_path):
                DATABASE_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', SHELTER_DATABASE_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
                LOCATION_DIRECTORY_ADMIN_URL='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', TELEGRAM_BOT_TOKEN='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
                TELEGRAM_DESTINATIONS='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY', TELEGRAM_WEBHOOK_SECRET='PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY')
+    # Never depend on the operator's live ports being free, including shutdown
+    # checks in tests which use fake preflight executables.
+    configure_test_ports((tmp_path, env))
     return tmp_path, env
 
 
@@ -211,7 +214,7 @@ def test_start_wait_duplicate_lock_sigint_shutdown_and_existing_database_preserv
         proc.send_signal(signal.SIGINT)
         proc.communicate(timeout=10)
         stdout = (root / 'terminal.log').read_text()
-        assert proc.returncode == 130 and 'Application: http://127.0.0.1:14180' in stdout
+        assert proc.returncode == 130 and 'Application: http://127.0.0.1:' + env['FLOODPULSE_FRONTEND_PORT'] in stdout
         assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in stdout
         assert int((root / 'probes').read_text()) >= 3
         assert (root / 'state').read_text() == 'running'

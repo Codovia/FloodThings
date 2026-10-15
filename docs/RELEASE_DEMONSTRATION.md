@@ -21,6 +21,31 @@ Persistent administrator authentication remains gated pending private password r
 
 ## Services and initialization
 
+### 16 October optional live Telegram launch checklist
+
+- [ ] Stop any known manual app/proxy/tunnel from its own terminal; verify no
+  unrelated service uses 18050, 14180 or 18060. Never terminate by port/name.
+- [ ] Keep the authorized live PostgreSQL configuration and root `.env` private;
+  run `./start-full.sh --check --telegram`. A passing check is local readiness,
+  not a live webhook claim.
+- [ ] Operator deliberately runs `./start-full.sh --telegram` and confirms the
+  summary: local application/admin, public hostname, bot identity, proxy/DNS/TLS
+  ingress and exact webhook registration verified. Stop if an unrelated webhook
+  is reported; authorize any migration separately.
+- [ ] Record that operator-confirmed connection separately from prior delivery
+  evidence. No new live alert is authorized by launcher setup. Use the existing
+  14 October acceptance evidence for the presentation.
+- [ ] Keep invented citizen/shelter workflows in the separate DEMO ONLY database
+  and documented manual two-server runtime; no Telegram secrets there. Live
+  administrator login remains blocked pending private password rotation.
+- [ ] Ctrl+C, wait for prompt/port release. PostgreSQL stays intact; the stopped
+  temporary webhook URL remains registered and offline. Preserve the signed
+  private receipt for the next run.
+
+See [daily usage, safe recovery and Quick Tunnel limits](FULL_SYSTEM_LAUNCHER.md).
+New-launcher live end-to-end status is **NOT TESTED** until deliberately confirmed
+by the operator; isolated fake-provider tests are documented separately.
+
 Use Python 3.12+, the existing `backend/.venv`, Node 22.12+ (or 20.19+) and
 PostgreSQL with PostGIS. The verified local service is the existing
 `floodpulse-sprint6-db` container, loopback port 55436, PostgreSQL 16.4/PostGIS

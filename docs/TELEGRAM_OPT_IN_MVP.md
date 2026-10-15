@@ -18,6 +18,19 @@ Every new message and audit response is labelled `ADMIN_ALERT`; it is not an `OF
 
 ## Concrete setup
 
+**15 October launcher addition:** after private configuration, the operator can
+use `./start-full.sh --check --telegram`, then deliberately run
+`./start-full.sh --telegram` for the maintained restricted proxy, temporary
+Quick Tunnel and ownership-constrained registration. Existing `start.sh` stays
+unchanged. Checks never call Telegram; the explicit start may call only `getMe`,
+`getWebhookInfo` and `setWebhook`, never send an alert. It refuses an unrelated
+registration, keeps pending updates, and preserves its private signed ownership
+receipt across restarts. Ctrl+C closes owned services, not PostgreSQL, and leaves
+the registered temporary URL offline. Read [the complete daily procedure and
+limitations](FULL_SYSTEM_LAUNCHER.md). No live connection using this new launcher
+is claimed; operator confirmation is required. The historical manual steps below
+remain relevant for separately managed HTTPS ingress.
+
 1. Use the actual project bot **FloodPulsebot** and an explicitly consenting authorized private test destination. Privately edit the project-root `.env` with `TELEGRAM_BOT_USERNAME=FloodPulsebot`, the real `TELEGRAM_BOT_TOKEN` and `TELEGRAM_DESTINATIONS` JSON contract in README; do not commit tokens/chat IDs or invent a bot. No default credentials exist.
 2. Set private `TELEGRAM_WEBHOOK_SECRET` in the same file to a random 32–256 character string containing only letters, numbers, underscore or hyphen. Apply `chmod 600 .env`, run `./start.sh --check`, then start/restart `./start.sh`. Python automatically reads these four keys only; shell exports are unnecessary, and explicitly supplied environment values win. Configuration declares readiness, not verified live connectivity.
 3. Apply additive Alembic revision `0005_telegram_subscriptions` via the existing maintenance connection, following `0004_citizen_reports`. This execution migrated disposable test databases only. Grant the actual restricted service role:
@@ -40,7 +53,7 @@ The optional root `.env` stays ignored by Git and must be a user-owned regular f
 
 Explicit environment values, including empty ones, override file values. Absent keys remain absent; backend configuration validation continues to govern availability. The launcher removes all four Telegram keys from Vite, including `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET`. The backend alone receives them. Direct backend commands do not automatically load this file. No actual credentials are included in examples/tests; configuration tests use ephemeral inert fixtures only.
 
-Neither configuration loading nor `--check` makes a Telegram request, registers `setWebhook`, records consent or sends a notification. An operator must still configure authorized destinations and HTTPS ingress, separately register the matching webhook secret, collect `/start floodpulse` consent, and explicitly review/approve each intended send. Existing `/stop`, CSRF, deduplication, rate limits and notification audit rules remain unchanged.
+Neither configuration loading nor `--check` makes a Telegram request, registers `setWebhook`, records consent or sends a notification. An operator must still configure authorized destinations and HTTPS ingress, register the matching webhook secret (either the explicit full-launcher start or a separately authorized setup), collect `/start floodpulse` consent, and explicitly review/approve each intended send. Existing `/stop`, CSRF, deduplication, rate limits and notification audit rules remain unchanged.
 
 Launcher lifecycle follow-up: Ctrl+C/SIGTERM now waits for the owned FastAPI and npm/Vite descendants and their ports before returning. Wait for the terminal prompt, then rerun `./start.sh`; `.env` is parsed again without manual exports. A private process-ownership receipt permits recovery only of proven children from a crashed launcher; unknown port users are not terminated. The supervisor preserves backend-only configuration, strips every `TELEGRAM_*` key and database connection from frontend children, and makes no Telegram requests. Read [launcher shutdown, ownership and port diagnostics](../README.md#one-command-linux-demonstration) before manually investigating a conflict. This change does not validate bot ownership, register a webhook or alter consent/approval/authentication.
 

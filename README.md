@@ -189,6 +189,28 @@ distributed in a clone. Virtual-environment activation only selects Python;
 it does not set database connections. `start.sh` selects `backend/.venv` itself,
 so prior activation of the root `.venv` is unnecessary.
 
+For optional one-terminal Telegram ingress:
+
+```bash
+./start-full.sh --check --telegram
+./start-full.sh --telegram
+```
+
+This separate supervisor invokes unchanged `start.sh`, starts the webhook-only
+proxy on loopback 18060 and an owned Cloudflare Quick Tunnel, checks ingress/bot
+identity and registers only an empty/current/provably owned webhook. It sends no
+alert. Root `.env` stays private 0600; no manual exports are needed. `--check`
+makes no Telegram request or service change. Ctrl+C stops owned web/tunnel
+processes and waits for ports, preserving PostgreSQL and the webhook ownership
+receipt. Registration remains pointing at the stopped temporary URL. Unrelated
+listeners or webhook registrations stop startup safely. Do not run the old manual
+proxy concurrently. See [daily use, stop, ownership, troubleshooting and temporary
+tunnel limitations](docs/FULL_SYSTEM_LAUNCHER.md). Live success requires the
+operator deliberately running the command and confirming its connection. The
+isolated DEMO ONLY two-server procedure remains separate, without Telegram
+credentials. Without `--telegram`, the full launcher starts only the local app;
+existing `start.sh` usage continues unchanged.
+
 `./start.sh --check` checks prerequisites **without starting any service**;
 `./start.sh --help` displays usage without requiring configuration. Press
 **Ctrl+C** (or send SIGTERM to the launcher) to stop its backend/frontend and
@@ -458,7 +480,7 @@ Edit `.env` privately, keep it Git-ignored, and run `chmod 600 .env`. It must be
 
 Run `./start.sh --check`, then `./start.sh`; no manual Telegram exports are needed. Explicitly provided environment variables take precedence, including empty values. A missing optional file/key does not create defaults; the backend's existing validation keeps affected Telegram features unavailable when their required configuration is absent/invalid. Restart your existing launcher after editing the file. Telegram keys reach only the backend; token, destinations and webhook secret are explicitly removed from Vite's environment. Direct `uvicorn` invocation still requires its own environment configuration.
 
-Loading configuration does **not** register a webhook, enroll a recipient or send a message. Follow [the opt-in/webhook procedure](docs/TELEGRAM_OPT_IN_MVP.md) separately. Rotate a leaked token through Telegram; never paste credentials into support requests. Egress for an explicitly approved send requires HTTPS to `api.telegram.org`. This client deliberately avoids token-bearing URL logging, redirects, environment proxies and automatic retries; ensure external APM/network tooling also redacts the Bot API credential path.
+Loading configuration does **not** register a webhook, enroll a recipient or send a message. The optional explicit `./start-full.sh --telegram` performs ownership-constrained webhook setup; follow [the opt-in/webhook procedure](docs/TELEGRAM_OPT_IN_MVP.md) for consent and separately approved sends. Rotate a leaked token through Telegram; never paste credentials into support requests. Egress for an explicitly approved send requires HTTPS to `api.telegram.org`. This client deliberately avoids token-bearing URL logging, redirects, environment proxies and automatic retries; ensure external APM/network tooling also redacts the Bot API credential path.
 
 Operator workflow: sign in → choose an authorized destination → write an informational or emergency notice → optionally select a currently verified Open shelter → **Review exact notification** → verify the complete server-rendered text and destination → check the explicit approval box → **Approve and send once through Telegram**. Do not use experimental ML as evidence for flood claims, shelter availability or evacuation instructions. Review uses plain text, without Markdown/HTML transformations or link previews. Optional shelter details are read from PostgreSQL, omit private notes/contact data, and are checked again before sending. Changed/expired shelter evidence requires a new preview. Preview approval expires after 30 minutes; destination reconfiguration also invalidates it.
 
