@@ -18,8 +18,8 @@ const pageInfo={
  '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
- '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','GPS and optional photo evidence for administrator review.'],
- '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Manage verified shelter assignments and explicitly approved Telegram notifications.'],
+ '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Share what you observed. Location can be selected manually; photos are optional.'],
+ '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Review citizen evidence, manage shelters and control project notifications.'],
 }
 
 export default function App() {

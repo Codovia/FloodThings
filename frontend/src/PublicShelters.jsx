@@ -55,7 +55,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
         <p>{data.shelters.length} of {data.total} available assignments shown. Capacity is reported, not a reservation. Verification expires after {data.verification_valid_hours} hours.</p>
         {!mapTarget&&!overview&&<ShelterMap points={data.shelters} origin={point} label="Verified open shelter entrances" />}
         <ul aria-label="Available shelter destinations" className="shelter-list">{data.shelters.map(s=><li key={s.id}>
-          <h3>{s.name}</h3><p>{s.address} · {s.district_name}</p><p>{s.available_capacity} available / {s.capacity} maximum; {s.occupancy} reported occupants.</p>
+          <h3>{s.name}</h3><p className="status-label">Verified Open entrance · availability can change</p><p>{s.address} · {s.district_name}</p><p>{s.available_capacity} available / {s.capacity} maximum; {s.occupancy} reported occupants.</p>
           <p>Water: {s.water}. Toilets: {s.toilets}. Accessibility: {s.accessibility||'Not reported'}.</p>
           <p>{s.straight_line_km===null?'Straight-line distance unavailable':`${s.straight_line_km} km approximate straight-line distance`}</p>
           <p>Verified {clock(s.verified_at)} · updated {clock(s.updated_at)} · verification expires {clock(s.verification_expires_at)}</p>

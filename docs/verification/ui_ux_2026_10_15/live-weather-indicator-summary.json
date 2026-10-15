@@ -1,0 +1,30 @@
+{
+  "date": "2026-10-15",
+  "environment": "Isolated demonstration database; real Open-Meteo/model requests; explicit reviewed Kundapur locality, no device GPS",
+  "weather_http": 200,
+  "weather_retrieved_at": "2026-10-14T19:00:17.739139+00:00",
+  "current_valid_at": "2026-10-15T00:30:00+05:30",
+  "temperature_c": 26.2,
+  "forecast_next_24_full_hours": {
+    "intervals": 24,
+    "mm": 2.7,
+    "start_IST": "2026-10-15T01:00:00+05:30",
+    "end_IST": "2026-10-16T01:00:00+05:30",
+    "independently_summed": true
+  },
+  "experimental_indicator": {
+    "http": 200,
+    "model": "rainfall_logistic_v1",
+    "model_sha256": "f3fa9b53d7047746f9d26cba8556705fb3fd2328128a236cb4f423575acf4316",
+    "retrieved_at": "2026-10-14T19:00:18.968285+00:00",
+    "prediction": "below_heavy_threshold_predicted",
+    "probability": null,
+    "experimental": true
+  },
+  "limits": [
+    "Weather model output, not station observations",
+    "Heavy-rainfall classification, not flood occurrence/probability",
+    "Earlier provider response failed local-week date validation and correctly returned 503; later live retrieval succeeded",
+    "Future availability is not guaranteed"
+  ]
+}

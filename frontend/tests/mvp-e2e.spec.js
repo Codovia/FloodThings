@@ -13,7 +13,7 @@ test('real application: private incident -> moderation -> map shelter -> directi
  await expect(page.getByText('DEMO ONLY',{exact:true})).toBeVisible()
  await page.getByRole('button',{name:'Search districts and localities'}).click()
  await page.getByLabel('Karnataka district',{exact:true}).selectOption('nic:udupi.nic.in')
- const weatherResponse=page.waitForResponse(r=>r.url().includes('/api/weather?latitude=13.6250993')&&r.request().method()==='GET')
+ const weatherResponse=page.waitForResponse(r=>r.url().includes('/api/weather?latitude=13.6250993')&&r.request().method()==='GET',{timeout:30000})
  await page.getByRole('button',{name:/^Kundapur — Udupi/}).click()
  const weather=await weatherResponse
  const weatherBody=await weather.json()
@@ -26,8 +26,18 @@ test('real application: private incident -> moderation -> map shelter -> directi
  await page.screenshot({path:evidence+'/01-home.png'})
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Weather & AI',exact:true}).click()
  await expect(page.getByRole('heading',{name:'Experimental Heavy-Rainfall Indicator'})).toBeVisible()
- const modelResponse=page.waitForResponse(r=>r.url().includes('/api/ai/rainfall-outlook')&&r.request().method()==='GET')
- await page.getByRole('button',{name:'Run experimental rainfall model'}).click();const model=await modelResponse;await writeFile(evidence+'/indicator.json',JSON.stringify({http:model.status(),body:await model.json()},null,2))
+ if(weather.status()===200&&weatherBody.status==='available'){
+  const modelResponse=page.waitForResponse(r=>r.url().includes('/api/ai/rainfall-outlook')&&r.request().method()==='GET',{timeout:30000})
+  await page.getByRole('button',{name:'Run experimental rainfall model'}).click();const model=await modelResponse;await writeFile(evidence+'/indicator.json',JSON.stringify({http:model.status(),body:await model.json()},null,2))
+ }else{
+  // Unavailable real weather must not block the independently supported response journey.
+  // No inference request is expected without a usable weather receipt.
+  expect(weather.status()).toBe(503);expect(weatherBody.status).toBe('unavailable')
+  await expect(page.getByRole('alert').filter({hasText:'Weather unavailable.'})).toBeVisible()
+  await page.getByRole('button',{name:'Run experimental rainfall model'}).click()
+  await expect(page.getByText('Usable weather retrieval is required before running the rainfall model.')).toBeVisible()
+  await writeFile(evidence+'/indicator.json',JSON.stringify({http:null,status:'NOT TESTED',reason:'Real weather unavailable; no inference request or replacement prediction.'},null,2))
+ }
  await page.screenshot({path:evidence+'/02-experimental-indicator.png',fullPage:true})
  await page.goto('/report')
  await page.getByLabel('Event type').selectOption('flooding')

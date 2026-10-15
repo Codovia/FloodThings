@@ -36,7 +36,7 @@ test('explicit demonstration fixtures render exact entrance, mobile map and no u
 })
 
 test('separate admin area has no public registration and rejects an invalid login',async({page})=>{
- await page.goto('/admin');await expect(page.getByRole('heading',{name:'Shelter administrator',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
+ await page.goto('/admin');await expect(page.getByRole('heading',{name:'Administrator workspace',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
  expect(await page.getByRole('button',{name:/register/i}).count()).toBe(0)
  await page.getByLabel('Username',{exact:true}).fill('not-an-admin');await page.getByLabel('Password',{exact:true}).fill('WRONG ISOLATED TEST PASSWORD')
  await page.getByRole('button',{name:'Sign in'}).click();await expect(page.getByText('Invalid administrator credentials')).toBeVisible();await expect(page.getByLabel('Password',{exact:true})).toHaveValue('')

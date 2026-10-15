@@ -13,6 +13,8 @@ export default function AdminNotifications({ session, request }) {
   const [options, setOptions] = useState(null), [history, setHistory] = useState(null), [offset, setOffset] = useState(0)
   const [destination, setDestination] = useState(''), [kind, setKind] = useState('informational'), [message, setMessage] = useState(''), [shelter, setShelter] = useState('')
   const [preview, setPreview] = useState(null), [approved, setApproved] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(null)
+  const previewHeading = useRef(null)
+  useEffect(() => { if (preview) previewHeading.current?.focus() }, [preview?.id])
   const busyRef = useRef(false), requestId = useRef(null), stopped = useRef(false), controllers = useRef(new Set())
 
   async function call(path, settings = {}, timeout = 15000) {
@@ -63,7 +65,7 @@ export default function AdminNotifications({ session, request }) {
   const enabled = options?.configured && options.destinations.some(d=>d.opted_in!==false)
   return <section className="panel" aria-labelledby="admin-notifications-title">
     <h2 id="admin-notifications-title">Alerts — administrator-controlled Telegram notices</h2>
-    <p>Every notice requires your review and explicit approval. Experimental rainfall outputs never trigger notifications. This prototype is not an official disaster-management service.</p>
+    <ol className="workflow-steps" aria-label="Notification workflow"><li>Choose destination and compose</li><li>Review exact preview</li><li>Approve and send once</li><li>Inspect the result</li></ol><p>Every notice requires your review and explicit approval. Experimental rainfall outputs never trigger notifications. This prototype is not an official disaster-management service.</p>
     {session.mode === 'demonstration' && <p className="notice error">DEMONSTRATION ONLY. Only explicitly configured private test destinations are permitted. Simulated test results do not verify real Telegram delivery.</p>}
     {!options && !error && <p role="status">Loading notification configuration…</p>}
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
@@ -77,8 +79,8 @@ export default function AdminNotifications({ session, request }) {
       <p>Use this selector for shelter details; the database snapshot is checked again before sending. Independently verify all factual claims. Do not invent flood probabilities, shelter availability or evacuation instructions from experimental ML.</p>
       <button disabled={busy || !enabled}>{busy ? 'Working…' : 'Review exact notification'}</button>
     </form>
-    {preview && <div aria-label="Notification preview">
-      <h3>Exact message preview — {preview.destination_label}</h3>
+    {preview && <div className="report-review" aria-label="Notification preview">
+      <h3 ref={previewHeading} tabIndex={-1}>Exact message preview — {preview.destination_label}</h3>
       <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', font: 'inherit' }}>{preview.text}</pre>
       <p role="status">{resultText(preview)}</p>
       {preview.status === 'draft' && <>

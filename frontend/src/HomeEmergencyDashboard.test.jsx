@@ -13,7 +13,8 @@ afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.useRealTimers()})
 it('shows weather and exact unavailable flood wording while removing Home historical/shelter calls and content',async()=>{
  render(<HomeEmergencyDashboard {...props()}/>);await screen.findByText('No verified river-grid association is available for this point.')
  expect(screen.getByRole('heading',{name:'27 °C'})).toBeTruthy();expect(screen.getByText('Validated flood forecast unavailable for this location.')).toBeTruthy();expect(screen.getByText('Next-24-hour total unavailable')).toBeTruthy()
- expect(screen.queryByText(/Historical flood evidence|Verified Open shelters|56 reviewed/)).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
+ expect(screen.queryByText(/Verified Open shelters|56 reviewed/)).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
+ expect(screen.getByRole('link',{name:'Historical flood evidence'}).getAttribute('href')).toBe('/flood-map');expect(screen.getByRole('link',{name:'Report flooding or blocked drainage'})).toBeTruthy()
  expect(fetch).toHaveBeenCalledTimes(1);expect(fetch.mock.calls[0][0]).toBe('/api/river-outlook');expect(mapProps.current.river).toBeNull();expect(mapProps.current.features).toBeUndefined();expect(mapProps.current.shelters).toBeUndefined()
 })
 it('district-only fallback cannot display cached default weather or invent a point',async()=>{
