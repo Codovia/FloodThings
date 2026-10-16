@@ -69,7 +69,7 @@ test('zoom-equivalent reflow and sampled text/control contrast',async({page})=>{
   expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(683)
  }
  await page.setViewportSize({width:1366,height:768});await page.goto('/')
- for(const selector of ['.home-primary-actions .button-link','.home-primary-actions .secondary','.primary-nav a[aria-current]','.home-summary-card h2']){
+ for(const selector of ['.home-primary-actions .button-link','.home-primary-actions .secondary','.primary-nav a[aria-current]','.outlook-card h3']){
   const ratio=await page.locator(selector).first().evaluate(el=>{
    const channels=color=>color.match(/[\d.]+/g).slice(0,3).map(Number)
    const luminance=color=>channels(color).map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0)

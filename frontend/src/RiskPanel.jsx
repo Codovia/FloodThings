@@ -31,22 +31,26 @@ function FactorTable({ title, result }) {
   </div>
 }
 
-export default function RiskPanel({ risk, point }) {
+function Factors({ data }) {
+  return <>
+    <FactorTable title="Flood risk" result={data.flood} />
+    <FactorTable title="Drainage / waterlogging risk" result={data.drainage} />
+    <p className="muted">Levels: {data.level_scale}. Thresholds: IMD rainfall categories and GloFAS-style return levels.</p>
+  </>
+}
+
+export default function RiskPanel({ risk, point, embedded = false }) {
   const { data, loading, error, refresh } = risk
-  return <article className="risk-panel" aria-labelledby="risk-panel-title">
-    <h3 id="risk-panel-title">Why this risk level?</h3>
+  return <article className={'risk-panel' + (embedded ? ' embedded' : '')} aria-labelledby="risk-panel-title">
+    <h3 id="risk-panel-title" className={embedded ? 'visually-hidden' : undefined}>Why this risk level?</h3>
     {!point && <p>Select a location to assess flood and drainage risk.</p>}
     {point && loading && !data && <p role="status">Checking rainfall, river, terrain and reports…</p>}
     {point && error && <p role="status">Risk unavailable: {error} No substitute level is shown.</p>}
     {point && data && <>
       <p className="notice">{data.label}</p>
       {data.rain_window && <p className="muted">Rain window {clock(data.rain_window.start)} – {clock(data.rain_window.end)} · checked {clock(data.retrieved_at)}.{point.kind === 'network' && ' Location is an approximate network estimate.'}</p>}
-      <details className="risk-factor-details"><summary>Show each factor and its source</summary>
-      <FactorTable title="Flood risk" result={data.flood} />
-      <FactorTable title="Drainage / waterlogging risk" result={data.drainage} />
-      <p className="muted">Levels: {data.level_scale}. Thresholds: IMD rainfall categories and GloFAS-style return levels.</p>
-      </details>
-      <button type="button" onClick={refresh} disabled={loading}>Refresh risk</button>
+      {embedded ? <Factors data={data} /> : <details className="risk-factor-details"><summary>Show each factor and its source</summary><Factors data={data} /></details>}
+      {!embedded && <button type="button" onClick={refresh} disabled={loading}>Refresh risk</button>}
     </>}
   </article>
 }

@@ -1983,3 +1983,16 @@ Live result: all 31 Karnataka districts resolved; Udupi Orange today (very heavy
 Verification: backend 678 passed (1 deselected as documented); frontend unit 288/288; production build passed; Playwright 84 passed, 8 skipped, 0 failed. Live Chromium: Home 1366x768 document height 768, no errors; Flood Map official layer rendered with no errors.
 
 Limitations: SACHET alerts are matched to the user's district by district names in the alert text (LGD codes are carried but the directory's LGD codes are unresolved). The IMD layer is IMD's public map service, not the whitelisted API; for production, request IMD API whitelisting. Official warnings are not added into the experimental score.
+
+
+## 2026-10-17 — Home redesign around official warnings and the 24 h predictor
+
+User request: highlight the official IMD warning, NDMA SACHET alerts (Karnataka) and the flood/drainage 24 h predictor on Home together with the Karnataka map; make the map prediction look less like a grid; remove unnecessary boxes and tables.
+
+Acceptance: Home shows three highlighted cards (Official IMD warning, NDMA SACHET alerts · Karnataka, Flood & drainage risk · next 24 h) beside a larger Karnataka map with IMD district colours and soft prediction zones; no tables or seven-day cards on Home; still 1366x768 without page scroll; required labels (official vs experimental, not an official warning, privacy, river status) remain.
+
+Changes: weather moved into the location bar (temperature, conditions, 24 h rain + window); the three summary boxes, seven-day forecast, AI rainfall block (still on /weather), river table and refresh buttons removed from Home; factor tables now open under "Why?" in the risk card; a one-line "Reviewed river outlook" keeps the 13 Oct contract's river status visible. Map: on-map layer box (Official IMD warnings, 24 h prediction, Flood/Drainage), floating legend, user's district dashed; IMD district fills from /api/official/districts; prediction drawn as blurred circles in a separate pane, only Moderate and above shaded ("clear = Low"), grey dots for unavailable. Flood Map statewide risk grid uses the same soft zones, in a pane below evidence polygons so they stay clickable. Mobile: map controls and legend sit below the map.
+
+Fixes found while verifying: a visually hidden heading inside the scroll panel extended the page by 111 px when "Why?" opened (scroll panel is now the positioning context); fit rule now reserves room for the first card, so 200% text falls back to natural scrolling.
+
+Verification: frontend unit 289/289; production build passed; Playwright full suite 84 passed, 8 skipped, 0 failed in two consecutive runs (one earlier run had one intermittent count assertion failure that did not reproduce). Live Chromium with Kundapur: 1366x768 document height 768 before and after opening "Why?"; mobile 390 px stacks cards then map with controls below; no console errors. Backend unchanged since the last full run (678 passed).

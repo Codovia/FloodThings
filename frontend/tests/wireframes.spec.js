@@ -40,8 +40,8 @@ test('district selection survives all public routes; a historical cell never cha
 })
 test('mobile stacks the shared information and map, and exposes honest warning and hazard states',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/')
- await expect(page.locator('.official-summary')).toBeVisible()
- await expect(page.getByText(/do not mean no flood risk/)).toBeVisible()
+ await expect(page.locator('.imd-card')).toBeVisible()
+ await expect(page.getByText(/Choose your town or use your location to see the riskiest spots/)).toBeVisible()
  const left=await page.locator('.workspace-information').boundingBox(),map=await page.locator('.workspace-map').boundingBox()
  expect(map.y).toBeGreaterThan(left.y+left.height-1)
  await page.getByRole('button',{name:'Open navigation menu'}).click();await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Flood Map',exact:true}).click()

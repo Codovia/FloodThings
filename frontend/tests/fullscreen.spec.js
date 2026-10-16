@@ -11,7 +11,7 @@ test('desktop workspaces fit viewport, retain reachable internal panels and excl
    if(path==='/'){
     const frame=await page.getByRole('region',{name:'Karnataka emergency map'}).boundingBox()
     expect(frame.height).toBeGreaterThan(350);await page.getByRole('region',{name:'Karnataka emergency map'}).scrollIntoViewIfNeeded();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
-    await page.getByRole('heading',{name:'Nearby river outlook'}).scrollIntoViewIfNeeded();await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.getByText(/Select a location to check supported river coverage/)).toBeVisible()
+    await page.locator('.home-river-line').scrollIntoViewIfNeeded();await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-river-line')).toContainText('Reviewed river outlook: unavailable')
    }
    if(path==='/flood-map'){const frame=await page.locator('.intelligence-map').boundingBox(),footer=await page.locator('.app-footer').boundingBox();expect(frame.height).toBeGreaterThan(180);expect(frame.y+frame.height).toBeLessThanOrEqual(footer.y)}
    if(path==='/weather'){await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);await page.getByRole('list',{name:'Forecast daily precipitation chart'}).scrollIntoViewIfNeeded();await expect(page.getByRole('button',{name:'Refresh weather'})).toBeEnabled()}

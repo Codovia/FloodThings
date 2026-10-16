@@ -24,7 +24,7 @@ const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 test('automatic GPS uses exact coordinates, browser accuracy and one weather session across routes',async({page})=>{
  const requests=await setup(page);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();expect(requests).toHaveLength(0)
  await locate(page,13.34261,74.74953);await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34261&longitude=74.74953'])
- await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByLabel('Flood and drainage risk')).toBeVisible();await expect(page.getByText('Next-24-hour total unavailable')).toBeVisible()
+ await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeVisible();await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h')
  expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
  await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>window.__watchCalls)).toBe(0);expect(requests).toHaveLength(1)
@@ -45,7 +45,7 @@ test('district-only selection cancels late GPS; verified locality then chooses i
  await page.getByRole('button',{name:/^Kundapur — Udupi/}).click();await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C'})).toBeVisible();expect(requests).toEqual(['?latitude=13.6250993&longitude=74.6915722']);await locate(page,14,75);expect(requests).toHaveLength(1)
 })
 test('provider and tile failure keep Home honest while historical evidence remains on Flood Map',async({page})=>{
- await setup(page);await page.route('**/api/weather?**',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Controlled provider failure'})}));await page.goto('/');await locate(page);await expect(page.getByRole('alert').filter({hasText:'Controlled provider failure'})).toBeVisible();await expect(page.getByRole('heading',{name:'Current weather unavailable.'})).toBeVisible()
+ await setup(page);await page.route('**/api/weather?**',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Controlled provider failure'})}));await page.goto('/');await locate(page);await expect(page.getByRole('alert').filter({hasText:'Controlled provider failure'})).toBeVisible();await expect(page.getByRole('heading',{name:'Current weather unavailable'})).toBeVisible()
  await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByText(/Background tiles are unavailable/)).toBeVisible();await expect(page.locator('.home-flood-map img.leaflet-tile')).toHaveCount(0)
  await expect(page.getByRole('button',{name:'Show historical evidence'})).toHaveCount(0)
  await page.getByRole('link',{name:'Full map',exact:true}).click();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
@@ -53,9 +53,9 @@ test('provider and tile failure keep Home honest while historical evidence remai
 })
 test('Home does not request historical evidence or shelters and retains explicit unknown outcomes',async({page})=>{
  await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})
- await page.goto('/');await expect(page.getByRole('heading',{name:'Nearby river outlook'})).toBeVisible();await expect(page.getByText(/Select a location to check supported river coverage/)).toBeVisible()
+ await page.goto('/');await expect(page.locator('.home-river-line')).toContainText('Reviewed river outlook: unavailable');await expect(page.getByText(/Choose your place to see its official IMD district warning/)).toBeVisible()
  await expect(page.getByText(/reviewed historical cells|Verified Open shelters/)).toHaveCount(0);await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0)
- await expect(page.getByText(/do not mean no flood risk/)).toBeVisible();expect(calls).toEqual([])
+ await expect(page.getByText(/Choose your town or use your location to see the riskiest spots/)).toBeVisible();expect(calls).toEqual([])
 })
 test('Shelters retains its fresh fixture and expiry protection after removal from Home',async({page})=>{
  await setup(page,'denied');let calls=0
@@ -79,5 +79,5 @@ test('reload makes one fresh bounded GPS attempt and stores no location coordina
 })
 
 test('native browser geolocation permission grant automatically selects the controlled GPS fix',async({page})=>{
- const requests=await setup(page,'native');await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.34221,longitude:74.74804,accuracy:40});await page.goto('/');await expect(page.getByRole('heading',{name:'GPS-selected point',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34221&longitude=74.74804']);await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.locator('.home-flood-map path[stroke="#286ba4"]')).toHaveCount(2)
+ const requests=await setup(page,'native');await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.34221,longitude:74.74804,accuracy:40});await page.goto('/');await expect(page.getByRole('heading',{name:'GPS-selected point',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34221&longitude=74.74804']);await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.locator('.home-flood-map path[fill="#286ba4"]')).toHaveCount(2)
 })

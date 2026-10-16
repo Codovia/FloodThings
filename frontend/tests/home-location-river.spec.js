@@ -27,10 +27,10 @@ async function setup(page,{accuracy=40,delayName=false,river='unsupported'}={}){
 test('accepted precise GPS gets a verified fixture name without snapping or duplicate weather calls',async({page})=>{
  const {calls}=await setup(page);await page.goto('/');await expect(page.getByRole('heading',{name:'TEST ONLY GPS town, TEST ONLY context',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible()
  expect(calls.weather).toEqual(['?latitude=13.4&longitude=74.7']);expect(calls.names).toBe(1);expect(calls.rivers).toBe(1);expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
- await expect(page.locator('.official-summary')).toBeVisible()
+ await expect(page.locator('.imd-card')).toBeVisible()
 })
 test('279949-metre GPS accuracy keeps statewide fallback when network provider is unavailable',async({page})=>{
- const {calls}=await setup(page,{accuracy:279949});await page.goto('/');await expect(page.getByRole('heading',{name:'Approximate location — select your town'})).toBeVisible();expect(calls).toEqual({weather:[],names:0,rivers:0});await expect(page.locator('.home-flood-map path[stroke="#286ba4"]')).toHaveCount(0)
+ const {calls}=await setup(page,{accuracy:279949});await page.goto('/');await expect(page.getByRole('heading',{name:'Approximate location — select your town'})).toBeVisible();expect(calls).toEqual({weather:[],names:0,rivers:0});await expect(page.locator('.home-flood-map path[fill="#286ba4"]')).toHaveCount(0)
  await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district',{exact:true}).selectOption('nic:udupi.nic.in');await page.getByRole('button',{name:/^Kundapur — Udupi/}).click();await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(calls.weather).toEqual(['?latitude=13.6250993&longitude=74.6915722'])
 })
 test('manual town overrides a late geocoding response without altering its weather coordinates',async({page})=>{
@@ -38,12 +38,12 @@ test('manual town overrides a late geocoding response without altering its weath
  await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district',{exact:true}).selectOption('nic:udupi.nic.in');await page.getByRole('button',{name:/^Kundapur — Udupi/}).click();release();await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible();expect(calls.weather.at(-1)).toBe('?latitude=13.6250993&longitude=74.6915722');await expect(page.getByRole('heading',{name:'TEST ONLY GPS town, TEST ONLY context',exact:true})).toHaveCount(0)
 })
 test('only verified fixture river cells render model discharge, missing values and geographic limitations',async({page})=>{
- await setup(page,{river:'verified'});await page.goto('/');await page.getByText('River forecast table',{exact:true}).click();await expect(page.locator('table.home-river-table')).toBeVisible();await expect(page.getByText('TEST ONLY river',{exact:true})).toBeVisible();await expect(page.locator('table.home-river-table')).toContainText('Unavailable');await expect(page.getByText(/Not observed water level or a warning/)).toBeVisible()
- await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(1);await expect(page.getByLabel('Flood and drainage risk')).toBeVisible();await expect(page.locator('.official-summary')).toBeVisible()
- await page.clock.fastForward(3600001);await expect(page.locator('table.home-river-table')).toHaveCount(0);await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(0)
+ await setup(page,{river:'verified'});await page.goto('/');await expect(page.locator('.home-river-line')).toContainText('TEST ONLY river (GloFAS v4 model discharge; not observed water level)');await expect(page.locator('table')).toHaveCount(0)
+ await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(1);await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeAttached();await expect(page.locator('.imd-card')).toBeVisible()
+ await page.clock.fastForward(3600001);await expect(page.locator('.home-river-line')).not.toContainText('TEST ONLY river');await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(0)
 })
 test('ambiguous river mapping cannot render a model marker, discharge table or warning',async({page})=>{
- await setup(page,{river:'ambiguous'});await page.goto('/');await expect(page.getByText('River outlook could not be checked.')).toBeVisible();await expect(page.locator('table.home-river-table')).toHaveCount(0);await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(0);await expect(page.locator('.official-summary')).toBeVisible()
+ await setup(page,{river:'ambiguous'});await page.goto('/');await expect(page.locator('.home-river-line')).toContainText('River outlook could not be checked.');await expect(page.locator('table')).toHaveCount(0);await expect(page.locator('.home-flood-map path[stroke="#6951a3"]')).toHaveCount(0);await expect(page.locator('.imd-card')).toBeVisible()
 })
 
 test('kilometre-accuracy GPS loads actual selected-point weather and an approximate client town label',async({page})=>{

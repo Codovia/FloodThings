@@ -1,7 +1,7 @@
 import React from 'react'
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
-import OfficialWarnings, { OfficialSummary } from './OfficialWarnings.jsx'
+import { ImdCard, SachetCard } from './OfficialWarnings.jsx'
 import { validOfficial } from './useRisk.js'
 
 afterEach(cleanup)
@@ -16,27 +16,30 @@ const data = { official: true, label: 'Official warnings as issued — TEST.', g
 const state = d => ({ data: d, loading: false, error: null, refresh: vi.fn() })
 const point = { name: 'Fixture', latitude: 13.6, longitude: 74.7, kind: 'gps', accuracy_m: 20 }
 
-it('validates and shows the IMD five-day strip and active SACHET alerts as issued', () => {
+it('validates and highlights today, then the following IMD days, and active SACHET alerts as issued', () => {
   expect(validOfficial(data)).toBe(true); expect(validOfficial({ ...data, official: false })).toBe(false)
-  render(<OfficialWarnings official={state(data)} point={point} />)
-  const strip = screen.getByRole('list', { name: 'IMD five-day district warnings' })
-  expect(strip.textContent).toMatch(/Orange.*Very heavy rain.*Yellow.*Heavy rain.*Green.*No warning.*Unavailable/)
-  expect(screen.getByText('Names your district')).toBeTruthy(); expect(screen.getByText('TEST ONLY headline over Udupi')).toBeTruthy()
-  render(<OfficialSummary official={state(data)} point={point} />)
-  expect(screen.getByText(/Official IMD warning for/).textContent).toMatch(/Udupi.*Orange.*Very heavy rain.*1 active NDMA SACHET alert in Karnataka/)
+  const { container } = render(<><ImdCard official={state(data)} point={point} /><SachetCard official={state(data)} /></>)
+  expect(container.querySelector('.imd-card').dataset.level).toBe('orange')
+  expect(screen.getByRole('heading', { name: 'Official IMD warning · Udupi' })).toBeTruthy()
+  expect(container.querySelector('.imd-today').textContent).toMatch(/Orange.*Today · Be prepared.*Very heavy rain/)
+  expect(screen.getByRole('list', { name: 'IMD district warnings, next days' }).textContent).toMatch(/Yellow.*Green.*Unavailable.*Green/)
+  expect(screen.getByText('Your district')).toBeTruthy(); expect(screen.getByText('TEST ONLY headline over Udupi')).toBeTruthy()
+  expect(container.querySelector('.sachet-card').dataset.active).toBe('true')
 })
 
 it('never turns a failure or an empty feed into "no warning"', () => {
-  render(<OfficialWarnings official={{ data: null, loading: false, error: 'Risk request timed out.', refresh: vi.fn() }} point={point} />)
+  render(<ImdCard official={{ data: null, loading: false, error: 'Risk request timed out.', refresh: vi.fn() }} point={point} />)
   expect(screen.getByText(/This does not mean there is no warning/)).toBeTruthy()
   cleanup()
   const quiet = { ...data, sachet: { ...data.sachet, alerts: [] }, imd: { status: 'unavailable', message: 'IMD down — TEST. This does not mean there is no warning.' } }
-  render(<OfficialWarnings official={state(quiet)} point={{ ...point, kind: 'network' }} />)
-  expect(screen.getByText(/No active SACHET alert for Karnataka right now \(3 recent messages checked\)/)).toBeTruthy()
+  render(<><ImdCard official={state(quiet)} point={point} /><SachetCard official={state(quiet)} /></>)
+  expect(screen.getByText(/No active alert right now/).textContent).toContain('3 recent messages checked')
   expect(screen.getByText(/IMD down — TEST/)).toBeTruthy()
 })
 
-it('warns that a network-estimate district may be wrong', () => {
-  render(<OfficialWarnings official={state(data)} point={{ ...point, kind: 'network' }} />)
+it('warns that a network-estimate district may be wrong, and asks for a place without one', () => {
+  const { rerender } = render(<ImdCard official={state(data)} point={{ ...point, kind: 'network' }} />)
   expect(screen.getByText(/district may be wrong/)).toBeTruthy()
+  rerender(<ImdCard official={state({ ...data, imd: { status: 'not_requested', message: 'x' } })} point={null} />)
+  expect(screen.getByText(/Choose your place to see its official IMD district warning/)).toBeTruthy()
 })

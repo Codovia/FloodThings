@@ -33,12 +33,15 @@ function useEvidence(url, retry=0){
 }
 
 function IntelligenceGeography({district,history,drainage,shelters,risk,official,point,onPoint,onFeature}){
- const element=useRef(null),map=useRef(null),select=useRef(onPoint),detail=useRef(onFeature)
+ const element=useRef(null),map=useRef(null),select=useRef(onPoint),detail=useRef(onFeature),zoneRenderer=useRef(null)
  const [tileError,setTileError]=useState(false)
  select.current=onPoint;detail.current=onFeature
  useEffect(()=>{
   const view=L.map(element.current,{scrollWheelZoom:false}).setView([15.1,76.1],6);map.current=view
   addBasemap(L, view, () => setTileError(true))
+  // Prediction zones are blurred in their own pane so the statewide grid reads as soft areas, not squares.
+  const pane=view.createPane?.('riskZones');if(pane)pane.style.zIndex=350  // below overlays, so evidence polygons stay clickable
+  zoneRenderer.current=L.svg?.({pane:'riskZones',padding:0.5})
   view.on('click',e=>select.current?.({name:'Selected map point',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
   return()=>{view.remove();map.current=null}
  },[])
@@ -52,9 +55,11 @@ function IntelligenceGeography({district,history,drainage,shelters,risk,official
   if(!map.current)return
   const layers=[]
   const add=layer=>{layer.addTo(map.current);layers.push(layer)}
-  if(risk?.cells){const half=risk.cell_size_degrees/2
+  if(risk?.cells){const radius=risk.cell_size_degrees*111000*0.62,ZONE={moderate:.34,high:.5,severe:.6}
    for(const cell of risk.cells){
-    const box=L.rectangle([[cell.latitude-half,cell.longitude-half],[cell.latitude+half,cell.longitude+half]],{weight:0.4,color:'#ffffff',opacity:0.6,fillColor:LEVEL_COLORS[cell.level]||LEVEL_COLORS.unavailable,fillOpacity:cell.level==='low'?0.38:0.6,bubblingMouseEvents:false})
+    // Moderate+ are shaded soft zones; Low stays clear (but clickable); unavailable shows a grey dot.
+    if(cell.level==='unavailable')add(L.circleMarker([cell.latitude,cell.longitude],{radius:2.5,color:'#8a8f98',weight:1,fillOpacity:.6,interactive:false}))
+    const box=L.circle([cell.latitude,cell.longitude],{renderer:zoneRenderer.current||undefined,radius,stroke:false,fillColor:LEVEL_COLORS[cell.level]||LEVEL_COLORS.unavailable,fillOpacity:ZONE[cell.level]||0.001,bubblingMouseEvents:false})
     const text=document.createElement('span');text.textContent=`Rain risk ${LEVEL_NAMES[cell.level]||'Unavailable'} · next 24 h ${cell.rain_24h_mm??'–'} mm · past 5 days ${cell.rain_5d_mm??'–'} mm · peak ${cell.peak_mmh??'–'} mm/h`
     box.bindTooltip(text);box.on('click',()=>select.current?.({name:`Risk cell ${cell.latitude.toFixed(2)}°N, ${cell.longitude.toFixed(2)}°E`,latitude:cell.latitude,longitude:cell.longitude}));add(box)
    }}
@@ -136,7 +141,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
 </div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
    {loading&&<p role="status">Loading selected map evidence…</p>}
    {layers.official&&<div className="official-district-status"><p><strong>Official IMD warnings today:</strong> {officialDistricts.loading&&!officialDistricts.data?'loading':officialDistricts.error?`unavailable (${officialDistricts.error}). This does not mean there is no warning`:officialDistricts.data?['red','orange','yellow','green'].map(l=>[l,officialDistricts.data.districts.filter(d=>d.days[0]?.level===l).length]).filter(([,n])=>n).map(([l,n])=>`${n} ${l[0].toUpperCase()+l.slice(1)}`).join(' · ')||'no current district bulletins':'unavailable'}.</p><div className="risk-legend" aria-label="Official IMD warning legend">{['red','orange','yellow','green'].map(l=><span key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}>{l[0].toUpperCase()+l.slice(1)}</span>)}</div><p className="muted">District outlines in IMD colours, as issued by the India Meteorological Department (<a href="https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php">source</a>). Red = take action, Orange = be prepared, Yellow = be updated.</p></div>}
-   {layers.risk&&<div className="risk-grid-status"><p><strong>Live rain risk:</strong> {riskGrid.loading&&!riskGrid.data?'loading statewide grid':riskGrid.error?riskGrid.error:riskGrid.data?`${riskGrid.data.cells.filter(c=>['high','severe'].includes(c.level)).length} of ${riskGrid.data.cells.length} cells High or Severe · checked ${new Date(riskGrid.data.retrieved_at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})} IST`:'unavailable'}.</p><div className="risk-legend" aria-label="Rain risk legend">{['low','moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div><p className="muted">{riskGrid.data?.note||'Rain-only ~28 km grid.'} Experimental, not an official warning. Click a cell for the full assessment on Home.</p></div>}
+   {layers.risk&&<div className="risk-grid-status"><p><strong>Live rain risk:</strong> {riskGrid.loading&&!riskGrid.data?'loading statewide grid':riskGrid.error?riskGrid.error:riskGrid.data?`${riskGrid.data.cells.filter(c=>['high','severe'].includes(c.level)).length} of ${riskGrid.data.cells.length} cells High or Severe · checked ${new Date(riskGrid.data.retrieved_at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})} IST`:'unavailable'}.</p><div className="risk-legend zones" aria-label="Rain risk legend">{['moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="muted">clear = Low</span></div><p className="muted">{riskGrid.data?.note||'Rain-only ~28 km grid.'} Experimental, not an official warning. Click a cell for the full assessment on Home.</p></div>}
    {layers.history&&<p className="historical-notice">Historical layer: event-window maximum satellite observations, not current flooding, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>}
    {!!failures.length&&<p role="alert" className="notice error">{failures.map(s=>s.error).join(' · ')} No substitute geometry is shown. <button onClick={()=>{setRetry(n=>n+1);if(layers.shelters)shelters.refresh()}}>Retry map evidence</button></p>}
    <p><strong>{district?.name||'Karnataka statewide view'}</strong> · {directory.data?.total??'Unavailable'} district names; current LGD reconciliation unresolved. Statewide selection does not imply statewide hazard coverage.</p>

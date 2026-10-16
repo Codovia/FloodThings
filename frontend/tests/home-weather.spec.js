@@ -31,18 +31,18 @@ async function setup(page,missing=false){
 for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:1920,height:1080},{width:390,height:844}])test(`current weather and hourly rainfall preserve ${viewport.width}x${viewport.height} workspace`,async({page})=>{
  const calls=await setup(page);await page.setViewportSize(viewport);await page.goto('/')
  await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible()
- await expect(page.getByRole('heading',{name:'Next 24 full forecast hours: 0 mm'})).toBeVisible()
+ await expect(page.getByLabel('Current weather and rain')).toContainText('0 mm rain forecast in the next 24 h')
  await expect(page.getByText(/Humidity: 35%\. Wind: 13.3 km\/h/)).toBeVisible()
- await expect(page.locator('.home-rain-summary')).toContainText('13 Oct 2026, 12:00 pm IST to 14 Oct 2026, 12:00 pm IST')
- await expect(page.getByLabel('Flood and drainage risk')).toBeVisible()
+ await expect(page.locator('.home-rain')).toContainText('(12:00 pm – 12:00 pm)')
+ await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeAttached()
  expect(calls).toHaveLength(1)
  const size=await page.evaluate(()=>({height:document.documentElement.scrollHeight,width:document.documentElement.scrollWidth}));expect(size.width).toBe(viewport.width)
  if(viewport.width>=1100){
   expect(size.height).toBe(viewport.height)
   const map=await page.locator('.home-flood-map').boundingBox();expect(map.height).toBeGreaterThan(300)
-  const cards=await page.locator('.home-summary-card').all();for(const card of cards){const r=await card.boundingBox();expect(r.y+r.height).toBeLessThan(viewport.height)}
-  await page.getByRole('region',{name:'Additional area information'}).focus();await page.keyboard.press('End');expect(await page.evaluate(()=>scrollY)).toBe(0)
-  await expect(page.locator('.official-summary')).toBeVisible()
+  const bar=await page.locator('.home-location-bar').boundingBox();expect(bar.y+bar.height).toBeLessThan(viewport.height)
+  await page.getByRole('region',{name:'Flood outlook details'}).focus();await page.keyboard.press('End');expect(await page.evaluate(()=>scrollY)).toBe(0)
+  await expect(page.locator('.imd-card')).toBeAttached()
  }else expect(size.height).toBeGreaterThan(viewport.height)
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
@@ -51,6 +51,6 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)
 })
 test('one null hour makes the whole total unavailable while keeping valid current weather',async({page})=>{
- await setup(page,true);await page.goto('/');await expect(page.getByRole('heading',{name:'Next-24-hour total unavailable'})).toBeVisible();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByText('Data sources, freshness & privacy',{exact:true}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
- await expect(page.getByLabel('Flood and drainage risk')).toBeVisible()
+ await setup(page,true);await page.goto('/');await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h');await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByText('Data sources, freshness & privacy',{exact:true}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
+ await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeAttached()
 })

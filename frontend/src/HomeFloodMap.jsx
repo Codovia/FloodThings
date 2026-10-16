@@ -6,7 +6,8 @@ import useMapResize from './useMapResize.js'
 import { boundary, KARNATAKA_CENTER } from './homeGeography.js'
 import { PageLink } from './AppNavigation.jsx'
 import { LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
-import { spotLabel, spotInputs } from './RiskAreaDashboard.jsx'
+import { spotLabel, spotInputs, KindToggle } from './RiskAreaDashboard.jsx'
+import { OFFICIAL_COLOURS, MEANING } from './OfficialWarnings.jsx'
 
 function popup(text, label, href, action) {
   const box = document.createElement('div'), p = document.createElement('p'), link = document.createElement('a')
@@ -21,17 +22,25 @@ function choosePopup(lines, label, action) {
   button.addEventListener('click', action); box.append(button); return box
 }
 const KIND_NAME = { flood: 'Flood', drainage: 'Drainage' }
-export default function HomeFloodMap({ fitViewport, point, river, navigate, area = null, kind = 'flood', focus = null, onChoose = () => {} }) {
+// Soft zones: only Moderate and above are shaded; Low stays clear so calm days do not look like a grid.
+const ZONE = { moderate: .32, high: .45, severe: .55 }
+const cap = s => s[0].toUpperCase() + s.slice(1)
+
+export default function HomeFloodMap({ fitViewport, point, river, navigate, area = null, kind = 'flood', onKind = () => {}, focus = null, onChoose = () => {}, districts = null, userDistrict = null }) {
   const gps = point?.kind === 'gps' ? point : null
-  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onChoose }), squares = useRef({}), fitted = useRef(null)
-  const [tileError, setTileError] = useState(false)
+  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onChoose }), zones = useRef({}), fitted = useRef(null), renderer = useRef(null)
+  const [tileError, setTileError] = useState(false), [showOfficial, setShowOfficial] = useState(true), [showRisk, setShowRisk] = useState(true)
   actions.current = { navigate, onChoose }
   useEffect(() => {
-    const view = L.map(element.current, { scrollWheelZoom: false }).setView(KARNATAKA_CENTER, 6); map.current = view
+    const view = L.map(element.current, { scrollWheelZoom: false, zoomControl: false }).setView(KARNATAKA_CENTER, 6); map.current = view
+    L.control.zoom({ position: 'bottomright' }).addTo(view)
     addBasemap(L, view, () => setTileError(true))
-    const outline = L.geoJSON(boundary, { interactive: false, style: { color: '#567c73', weight: 1.5, fillOpacity: 0.025 } }).addTo(view)
+    view.createPane('officialPane').style.zIndex = 390
+    view.createPane('riskZones').style.zIndex = 410
+    renderer.current = L.svg({ pane: 'riskZones', padding: 0.5 })
+    const outline = L.geoJSON(boundary, { interactive: false, style: { color: '#35605a', weight: 1.5, fillOpacity: 0 } }).addTo(view)
     stateBounds.current = outline.getBounds(); view.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false })
-    view.attributionControl.addAttribution('<a href="https://www.geoboundaries.org/">geoBoundaries</a> / DataMeet / Election Commission of India · <a href="https://creativecommons.org/licenses/by/2.5/in/">CC BY 2.5 IN</a>')
+    view.attributionControl.addAttribution('<a href="https://www.geoboundaries.org/">geoBoundaries</a> / DataMeet / Election Commission of India · <a href="https://creativecommons.org/licenses/by/2.5/in/">CC BY 2.5 IN</a> · Warnings: <a href="https://mausam.imd.gov.in/">IMD</a>')
     view.on('click', event => {
       const { lat, lng } = event.latlng
       L.popup().setLatLng(event.latlng).setContent(choosePopup([['p', 'Check the experimental flood and drainage risk for this spot and the area around it.']], 'Check risk here', () => { view.closePopup(); actions.current.onChoose({ name: 'Selected map point', latitude: lat, longitude: lng }) })).openOn(view)
@@ -48,19 +57,32 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate, area
   useEffect(() => {
     if (!map.current) return
     // The first viewport fit changes the canvas after Leaflet's initial bounds.
-    // Refresh its size before framing statewide fallback; selected points stay put.
     map.current.invalidateSize({ pan: false })
     if (!point && stateBounds.current) map.current.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false })
   }, [fitViewport])
+  // Official IMD district warnings (today), shown as issued.
+  useEffect(() => {
+    if (!map.current || !showOfficial || !districts?.districts?.length) return
+    const layer = L.layerGroup()
+    for (const d of districts.districts) {
+      const today = d.days[0], colour = OFFICIAL_COLOURS[today?.level] || '#8a8f98', mine = d.imd_name === userDistrict, alerting = ['orange', 'red'].includes(today?.level)
+      const text = d.status === 'stale' ? `${d.district}: IMD bulletin from ${d.issued_date} is out of date` : `${d.district} · official IMD warning today: ${today?.level ? `${cap(today.level)} (${MEANING[today.level]})` : 'Unavailable'}${today?.warnings?.length ? ' — ' + today.warnings.join(', ') : ''}`
+      L.geoJSON({ type: 'Feature', properties: {}, geometry: d.geometry }, { pane: 'officialPane', bubblingMouseEvents: true,
+        style: { color: mine ? '#17313c' : colour, weight: mine ? 3 : alerting ? 2 : 0.8, opacity: .9, fillColor: colour, fillOpacity: today?.level === 'green' ? 0.05 : alerting ? 0.2 : 0.13, dashArray: mine ? '6 4' : null },
+        onEachFeature: (f, l) => l.bindTooltip(text, { sticky: true }) }).addTo(layer)
+    }
+    layer.addTo(map.current)
+    return () => { if (map.current) map.current.removeLayer(layer) }
+  }, [districts, showOfficial, userDistrict])
   useEffect(() => {
     if (!map.current) return
     const layers = L.layerGroup().addTo(map.current)
     if (gps) {
-      L.circleMarker([gps.latitude, gps.longitude], { bubblingMouseEvents: false, radius: 7, color: '#286ba4', fillOpacity: .9 }).bindPopup(popup(`Actual GPS point · ${Number.isFinite(gps.accuracy_m) ? `browser-reported accuracy ±${Math.round(gps.accuracy_m)} m` : 'accuracy unavailable'}. District unconfirmed.`, 'Report flooding here', '/report', () => actions.current.navigate('/report'))).addTo(layers)
+      L.circleMarker([gps.latitude, gps.longitude], { bubblingMouseEvents: false, radius: 7, color: '#fff', weight: 2, fillColor: '#286ba4', fillOpacity: 1 }).bindPopup(popup(`Actual GPS point · ${Number.isFinite(gps.accuracy_m) ? `browser-reported accuracy ±${Math.round(gps.accuracy_m)} m` : 'accuracy unavailable'}. District unconfirmed.`, 'Report flooding here', '/report', () => actions.current.navigate('/report'))).addTo(layers)
       // Very large uncertainty circles obscure the entire state; report their radius in text instead.
       if (gps.accuracy_m > 0 && gps.accuracy_m <= 10000) L.circle([gps.latitude, gps.longitude], { radius: gps.accuracy_m, color: '#286ba4', weight: 1, fillOpacity: .08, interactive: false }).addTo(layers)
     }
-    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#087e7c', fillOpacity: .9 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : point.kind === 'network' ? 'approximate network estimate; uncertainty unknown' : 'selected point; locality unconfirmed'}.`, 'Report flooding here', '/report', () => actions.current.navigate('/report'))).addTo(layers)
+    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#fff', weight: 2, fillColor: '#087e7c', fillOpacity: 1 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : point.kind === 'network' ? 'approximate network estimate; uncertainty unknown' : 'selected point; locality unconfirmed'}.`, 'Report flooding here', '/report', () => actions.current.navigate('/report'))).addTo(layers)
     if (river?.reach?.verified_grid === true) {
       const grid = river.grid_location
       L.circleMarker([grid.latitude, grid.longitude], { bubblingMouseEvents: false, radius: 7, color: '#6951a3', fillOpacity: .9 }).bindPopup(popup(`${river.reach.name} · verified model cell; daily GloFAS v4 discharge, not a flood boundary or observed water level.`, 'Inspect Flood Map context', '/flood-map', () => actions.current.navigate('/flood-map'))).addTo(layers)
@@ -71,36 +93,52 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate, area
     if (!map.current || !point) return
     map.current.setView([point.latitude, point.longitude], point.kind === 'network' || point.accuracy_m > 10000 ? 8 : point.accuracy_m > 1000 ? 11 : 13, { animate: false })
   }, [point?.latitude, point?.longitude, point?.accuracy_m])
+  // Experimental 24 h prediction: soft blurred zones around each ~5.5 km spot.
   useEffect(() => {
-    squares.current = {}
+    zones.current = {}
     if (!map.current || !area?.cells?.length) return
-    const half = area.cell_size_degrees / 2, layer = L.layerGroup()
+    const radius = area.cell_size_degrees * 111000 * 0.62, layer = L.layerGroup(), frame = []
     for (const cell of area.cells) {
-      const result = cell[kind], color = LEVEL_COLORS[result.level] || LEVEL_COLORS.unavailable
-      const square = L.rectangle([[cell.latitude - half, cell.longitude - half], [cell.latitude + half, cell.longitude + half]],
-        { color, weight: 1, fillColor: color, fillOpacity: result.level === 'low' ? .12 : result.level === 'unavailable' ? .08 : .38, bubblingMouseEvents: false })
+      const result = cell[kind], level = result.level
+      frame.push([cell.latitude, cell.longitude])
       const reasons = result.reasons.length ? `Why: ${result.reasons.join(', ').toLowerCase()}.` : 'No factor adds points.'
-      square.bindPopup(choosePopup([['strong', `${KIND_NAME[kind]} risk: ${LEVEL_NAMES[result.level]}${result.score === null ? '' : ` (score ${result.score} of ${result.max_score})`}`], ['p', spotLabel(cell)], ['p', spotInputs(cell, kind)], ['p', reasons], ['small', 'Experimental index · not an official warning.']],
-        'Full assessment here', () => { map.current?.closePopup(); actions.current.onChoose({ name: spotLabel(cell).replace('Your location', 'Grid spot'), latitude: cell.latitude, longitude: cell.longitude }) }))
-      square.addTo(layer); squares.current[cell.id] = square
+      const content = choosePopup([['strong', `${KIND_NAME[kind]} risk: ${LEVEL_NAMES[level]}${result.score === null ? '' : ` (score ${result.score} of ${result.max_score})`}`], ['p', spotLabel(cell)], ['p', spotInputs(cell, kind)], ['p', reasons], ['small', 'Experimental index for the next 24 hours · not an official warning.']],
+        'Full assessment here', () => { map.current?.closePopup(); actions.current.onChoose({ name: spotLabel(cell).replace('Your location', 'Grid spot'), latitude: cell.latitude, longitude: cell.longitude }) })
+      const zone = ZONE[level]
+        ? L.circle([cell.latitude, cell.longitude], { renderer: renderer.current, radius, stroke: false, fillColor: LEVEL_COLORS[level], fillOpacity: showRisk ? ZONE[level] : 0, bubblingMouseEvents: false, interactive: showRisk })
+        : L.circle([cell.latitude, cell.longitude], { renderer: renderer.current, radius: radius * 0.9, stroke: false, fillColor: '#ffffff', fillOpacity: 0.001, bubblingMouseEvents: false, interactive: showRisk })
+      zone.bindPopup(content); zone.addTo(layer); zones.current[cell.id] = zone
+      if (level === 'unavailable' && showRisk) L.circleMarker([cell.latitude, cell.longitude], { radius: 3, color: '#8a8f98', weight: 1, fillOpacity: .6, interactive: false }).addTo(layer)
     }
     layer.addTo(map.current)
     // Frame each new area once; switching Flood/Drainage keeps the user's current view.
-    if (fitted.current !== area) { fitted.current = area; map.current.fitBounds(layer.getLayers().reduce((b, l) => b.extend(l.getBounds()), L.latLngBounds([])), { padding: [10, 10], animate: false }) }
+    if (fitted.current !== area && frame.length) { fitted.current = area; map.current.fitBounds(L.latLngBounds(frame).pad(0.12), { animate: false }) }
     return () => { if (map.current) map.current.removeLayer(layer) }
-  }, [area, kind])
+  }, [area, kind, showRisk])
   useEffect(() => {
-    const square = focus && squares.current[focus.id]
-    if (!square || !map.current) return
-    map.current.fitBounds(square.getBounds(), { maxZoom: 12, animate: false }); square.openPopup()
+    const zone = focus && zones.current[focus.id]
+    if (!zone || !map.current) return
+    map.current.setView(zone.getLatLng(), Math.max(map.current.getZoom(), 11), { animate: false }); zone.openPopup()
   }, [focus])
   function statewide() { if (stateBounds.current) map.current?.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false }) }
+  const hasArea = area?.cells?.length > 0
   return <section className="panel workspace-map home-map-stage" aria-labelledby="home-map-title">
-    <div className="home-map-toolbar"><div className="home-map-heading"><div><p className="eyebrow">EVIDENCE & ASSISTANCE</p><h2 id="home-map-title">Karnataka Map</h2></div><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
-    <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={()=>point&&map.current?.setView([point.latitude,point.longitude],13,{animate:false})} disabled={!point}>Show selected point</button></div></div>
-    <div ref={element} className="home-flood-map" role="region" aria-label="Karnataka emergency map" />
-    {tileError && <p className="notice home-tile-notice" role="status">{BASEMAP_NOTICE}</p>}
-    <div className="home-map-footer"><ul className="home-map-legend" aria-label="Map legend"><li><i className="gps"/>GPS point</li><li><i className="locality"/>Selected place</li>{river&&<li><i className="river"/>Reviewed river model cell</li>}{area?.cells?.length>0&&<li className="home-map-risk-legend">{KIND_NAME[kind]} risk:{['low','moderate','high','severe'].map(l=><span key={l}><i style={{background:LEVEL_COLORS[l]}}/>{LEVEL_NAMES[l]}</span>)}</li>}</ul>
-    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">Coloured squares are ~5.5 km experimental risk-index spots for the next 24 hours, not flooded areas or official warning zones. Points are locations, not flooded-area polygons. River cells appear only with a verified association. Official warning geometry is unavailable. State outline: simplified 2011 context; border coverage is uncertain.</p></details></div>
+    <div className="home-map-toolbar"><div className="home-map-heading"><h2 id="home-map-title">Karnataka Map</h2><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
+      <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={()=>point&&map.current?.setView([point.latitude,point.longitude],12,{animate:false})} disabled={!point}>Show selected point</button></div></div>
+    <div className="home-map-frame">
+      <div ref={element} className="home-flood-map" role="region" aria-label="Karnataka emergency map" />
+      <div className="map-overlay map-layers" role="group" aria-label="Map layers">
+        <label><input type="checkbox" checked={showOfficial} onChange={e => setShowOfficial(e.target.checked)} /> Official IMD warnings</label>
+        <label><input type="checkbox" checked={showRisk} onChange={e => setShowRisk(e.target.checked)} disabled={!hasArea} /> 24 h prediction</label>
+        {hasArea && showRisk && <KindToggle kind={kind} onKind={onKind} label="Map prediction type" />}
+      </div>
+      <div className="map-overlay map-legend-card" aria-label="Map legend">
+        {showOfficial && <p><span className="legend-title">IMD today</span>{['red', 'orange', 'yellow', 'green'].map(l => <span key={l} className="legend-item"><i className="legend-fill" style={{ background: OFFICIAL_COLOURS[l] }} />{cap(l)}</span>)}</p>}
+        {hasArea && showRisk && <p><span className="legend-title">{KIND_NAME[kind]} 24 h</span>{['moderate', 'high', 'severe'].map(l => <span key={l} className="legend-item"><i className="legend-zone" style={{ background: LEVEL_COLORS[l] }} />{LEVEL_NAMES[l]}</span>)}<span className="legend-item muted">clear = Low</span></p>}
+        <p><span className="legend-item"><i className="legend-dot gps" />GPS point</span><span className="legend-item"><i className="legend-dot locality" />Selected place</span>{river && <span className="legend-item"><i className="legend-dot river" />River model cell</span>}</p>
+      </div>
+      {tileError && <p className="notice home-tile-notice" role="status">{BASEMAP_NOTICE}</p>}
+    </div>
+    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">District colours are official IMD district warnings for today, shown as issued. Shaded zones are FloodPulse's experimental 24-hour risk index around ~5.5 km spots — not flooded areas, probabilities or official warning zones; unshaded spots are Low. Points are locations, not flooded-area polygons. River cells appear only with a verified association. State outline: simplified 2011 context; border coverage is uncertain.</p></details>
   </section>
 }

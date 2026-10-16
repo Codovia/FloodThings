@@ -57,3 +57,5 @@
 .official-alerts li p{margin:2px 0}
 .official-yours{margin-left:6px;font-size:.7rem;background:#165e63;color:#fff;border-radius:999px;padding:0 .5em}
 @media(max-width:520px){.official-days{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.leaflet-riskZones-pane svg{filter:blur(9px);opacity:.95}
+.risk-legend.zones span::before{border-radius:50%;filter:blur(1.5px)}

@@ -4,7 +4,7 @@ import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/reac
 import {readFileSync} from 'node:fs'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 const directory=JSON.parse(readFileSync('../data/reference/karnataka_location_directory_v2/directory.json','utf8'))
-const mock=vi.hoisted(()=>({map:vi.fn(),tileLayer:vi.fn(),geoJSON:vi.fn(),circleMarker:vi.fn(),rectangle:vi.fn(),clicks:[]}))
+const mock=vi.hoisted(()=>({map:vi.fn(),tileLayer:vi.fn(),geoJSON:vi.fn(),circleMarker:vi.fn(),rectangle:vi.fn(),circle:vi.fn(),svg:vi.fn(()=>({})),clicks:[]}))
 vi.mock('leaflet',()=>({default:mock}))
 vi.mock('./DrainageResearchLayers.jsx',()=>({default:()=> <div>Existing drainage rasters remain separate</div>}))
 const props={event_id:2728,grid_row:1,grid_col:2,district:'Udupi',clear_views:2,start_date:'2005-09-14',end_date_inclusive:'2005-09-30',place_name:null,mechanism:{method:'No reviewed source establishes a flood mechanism'},geometry_meaning:'Source-exported observation-qualified raster cell',processing_grid_m:250,observation_quality:'qualified_source_mask_and_clear_views',source:{name:'Global Flood Database V1',url:'https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1',license:'CC BY-NC 4.0',license_url:'https://creativecommons.org/licenses/by-nc/4.0/',conditions:'Attribution and non-commercial use required'},dataset_version:'udupi_flood_spatial_v1',image_id:'GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728',retrieved_at:'2026-10-03T00:00:00Z',limitations:'Historical maximum, not daily occurrence',source_geometry_sha256:'a'.repeat(64)}
@@ -29,6 +29,7 @@ beforeEach(()=>{
  mock.tileLayer.mockReturnValue({addTo:vi.fn().mockReturnThis(),on:vi.fn()})
  mock.circleMarker.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindPopup:vi.fn()})
  mock.rectangle.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindTooltip:vi.fn(),on:vi.fn()})
+ mock.circle.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindTooltip:vi.fn(),on:vi.fn()})
  mock.geoJSON.mockImplementation((data,options)=>{for(const f of data.features||[])options?.onEachFeature?.(f,{bindTooltip:vi.fn(),on:(name,fn)=>mock.clicks.push(fn)});return {addTo:vi.fn().mockReturnThis(),getBounds:()=>({})}})
  vi.stubGlobal('fetch',vi.fn(responses))
 })

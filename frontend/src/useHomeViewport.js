@@ -10,19 +10,20 @@ export default function useHomeViewport() {
     if (!element) return
     const main = element.closest('main')
     if (!main) return
-    const nodes = [document.querySelector('.app-header'), document.querySelector('.app-footer'), main.querySelector('.page-intro'), element.querySelector('.home-location-bar'), element.querySelector('.home-summary-cards'), element.querySelector('.home-essential-status')]
+    const nodes = [document.querySelector('.app-header'), document.querySelector('.app-footer'), main.querySelector('.page-intro'), element.querySelector('.home-location-bar'), element.querySelector('.home-essential-status')]
     let frame
     function measure() {
       cancelAnimationFrame(frame)
       frame = requestAnimationFrame(() => {
         if (innerWidth < 1100 || innerHeight < 740 || nodes.some(n => !n)) { setFits(false); return }
-        const [header, footer, intro, location, cards, essential] = nodes
+        const [header, footer, intro, location, essential] = nodes
         const mainStyle = getComputedStyle(main), introStyle = getComputedStyle(intro), layoutStyle = getComputedStyle(element)
-        const reserved = [header, footer, intro, location, cards].reduce((total, n) => total + n.getBoundingClientRect().height, 0)
+        const reserved = [header, footer, intro, location].reduce((total, n) => total + n.getBoundingClientRect().height, 0)
           + parseFloat(mainStyle.paddingTop) + parseFloat(mainStyle.paddingBottom)
-          + parseFloat(introStyle.marginTop) + parseFloat(introStyle.marginBottom) + 2 * parseFloat(layoutStyle.rowGap)
+          + parseFloat(introStyle.marginTop) + parseFloat(introStyle.marginBottom) + parseFloat(layoutStyle.rowGap)
         const available = innerHeight - reserved
-        setFits(available >= Math.max(320, essential.scrollHeight + 110))
+        // Leave room for the actions plus at least the first outlook card; otherwise use natural page scrolling.
+        setFits(available >= Math.max(420, essential.scrollHeight + 260))
       })
     }
     const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure)
