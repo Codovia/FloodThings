@@ -15,7 +15,7 @@ it('shows weather and exact unavailable flood wording while removing Home histor
  expect(screen.getByRole('heading',{name:'27 °C'})).toBeTruthy();expect(screen.getByRole('heading',{name:'Risk unavailable'})).toBeTruthy();expect(screen.getByText('Next-24-hour total unavailable')).toBeTruthy()
  expect(screen.queryByText(/Verified Open shelters|56 reviewed/)).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
  expect(screen.getByRole('link',{name:'Historical flood evidence'}).getAttribute('href')).toBe('/flood-map');expect(screen.getByRole('link',{name:'Report flooding or blocked drainage'})).toBeTruthy()
- expect(fetch.mock.calls.map(([u])=>u.split('?')[0]).sort()).toEqual(['/api/risk','/api/river-outlook']);expect(mapProps.current.river).toBeNull();expect(mapProps.current.features).toBeUndefined();expect(mapProps.current.shelters).toBeUndefined()
+ expect(fetch.mock.calls.map(([u])=>u.split('?')[0]).sort()).toEqual(['/api/risk','/api/risk/area','/api/river-outlook']);expect(mapProps.current.river).toBeNull();expect(mapProps.current.features).toBeUndefined();expect(mapProps.current.shelters).toBeUndefined()
 })
 it('district-only fallback cannot display cached default weather or invent a point',async()=>{
  const p=props();render(<HomeEmergencyDashboard {...p} point={null} districtId="fixture" district={{name:'Fixture district'}}/>);
@@ -39,7 +39,7 @@ it('shows WMO current conditions, optional fields and a complete hourly total wi
  p.session.data.hourly_precipitation={status:'available',timezone:'Asia/Kolkata',unit:'mm',interval_seconds:3600,interval_semantics:'preceding_hour',source:{name:'Open-Meteo'},intervals:Array.from({length:24},(_,i)=>({start:new Date(begin+i*3600000).toISOString(),end:new Date(begin+(i+1)*3600000).toISOString(),precipitation_mm:.5,unit:'mm'}))}
  render(<HomeEmergencyDashboard {...p}/>);await screen.findByText('No verified river-grid association is available for this point.')
  expect(screen.getByRole('heading',{name:'Next 24 full forecast hours: 12 mm'})).toBeTruthy();expect(screen.getByText(/Humidity: 70%\. Wind: 12 km\/h/)).toBeTruthy();expect(screen.getAllByText(/Slight rain/)).toHaveLength(1)
- expect(screen.getByRole('heading',{name:'Risk unavailable'})).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(2);expect(fetch.mock.calls.some(([u])=>u.startsWith('/api/risk?'))).toBe(true)
+ expect(screen.getByRole('heading',{name:'Risk unavailable'})).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(3);expect(fetch.mock.calls.some(([u])=>u.startsWith('/api/risk?'))).toBe(true)
 })
 it('missing temperature preserves other valid current fields',async()=>{
  const p=props();p.session.data.current.temperature_c=null;p.session.data.current.humidity_percent=70

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 import HomeFloodMap from './HomeFloodMap.jsx'
 import useRiverOutlook, {usableRiver} from './useRiverOutlook.js'
@@ -8,13 +8,15 @@ import DailyForecast, { condition } from './DailyForecast.jsx'
 import RainfallOutlook, { supportsRainfallModel } from './RainfallOutlook.jsx'
 import { classifyCoverage } from './homeGeography.js'
 import useHomeViewport from './useHomeViewport.js'
-import { useRiskPoint } from './useRisk.js'
+import { useRiskPoint, useRiskArea } from './useRisk.js'
+import RiskAreaDashboard from './RiskAreaDashboard.jsx'
 import RiskPanel, { RiskSummary } from './RiskPanel.jsx'
 import './HomeEmergencyDashboard.css'
 export default function HomeEmergencyDashboard({ point, district, districtId, session, location, choosePoint, chooseDistrict, navigate }) {
   const { dashboard, fits } = useHomeViewport()
   const riverSession = useRiverOutlook(point?.kind === 'network' ? null : point)
-  const risk = useRiskPoint(point)
+  const risk = useRiskPoint(point), area = useRiskArea(point)
+  const [kind, setKind] = useState('flood'), [focus, setFocus] = useState(null)
   const river = usableRiver(riverSession.data, point, riverSession.now) ? riverSession.data : null
   const now = Date.now(), weather = point ? session.data : null
   const current = usableCurrent(weather, session.freshness, now)
@@ -36,6 +38,7 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
     <div className="home-main-grid">
       <section className="panel workspace-information home-area-summary" aria-labelledby="home-area-title"><div className="home-essential-status"><h2 id="home-area-title">Local Conditions & Flood Outlook</h2><nav className="home-primary-actions" aria-label="Citizen actions"><PageLink to="/report" navigate={navigate} className="button-link">Report flooding or blocked drainage</PageLink><PageLink to="/shelters" navigate={navigate} className="button-link secondary">Find verified shelters</PageLink><PageLink to="/alerts" navigate={navigate}>Telegram alerts</PageLink><PageLink to="/flood-map" navigate={navigate}>Historical flood evidence</PageLink></nav><p className="home-warning-status">Official warning feed: <strong>Not connected</strong>. This app cannot confirm warning status; follow IMD, KSNDMC and district advice.</p></div>
         <div className="home-area-scroll" role="region" aria-label="Additional area information" tabIndex={0}>
+        <RiskAreaDashboard area={area} point={point} kind={kind} onKind={setKind} onFocus={setFocus} />
         <RiskPanel risk={risk} point={point} />
         {weather && session.freshness === 'fresh' && <article className="home-forecast"><h3>Seven-day forecast</h3><DailyForecast days={weather.forecast} coverage={weather.forecast_coverage} compact /></article>}
         {point && supportsRainfallModel(point) && <RainfallOutlook point={point} weather={weather} freshness={session.freshness} active />}
@@ -48,7 +51,7 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
         {point && <div className="home-detail-links"><button onClick={() => session.refresh(point)} disabled={session.loading}>Refresh weather</button><button onClick={riverSession.refresh} disabled={riverSession.loading}>Refresh river outlook</button></div>}
         </div>
       </section>
-      <HomeFloodMap fitViewport={fits} point={point} river={river} navigate={navigate} />
+      <HomeFloodMap fitViewport={fits} point={point} river={river} navigate={navigate} area={area.data} kind={kind} focus={focus} onChoose={choosePoint} />
     </div>
   </div>
 }

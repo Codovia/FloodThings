@@ -62,7 +62,7 @@ test('fresh before six hours, automatically refreshes when due, manual refresh w
   expect(await cards.locator('time').evaluateAll(nodes => nodes.map(n => n.dateTime))).toEqual(Array.from({ length: 7 }, (_, i) => `2026-10-${String(8 + i).padStart(2, '0')}`))
   await expect(page.getByText('Latitude 13.35°, longitude 74.75°')).toBeVisible()
   await expect(page.getByText('Unavailable — provider does not supply it here')).toBeVisible()
-  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
 })
 
 test('hidden tab reactivation checks stale age, errors retain explicitly stale weather and retries stop after three attempts', async ({ page }) => {

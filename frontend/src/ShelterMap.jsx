@@ -3,6 +3,7 @@ import L from 'leaflet'
 import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import {tileMetadataURL,validatedTileMetadata} from './adminMapProvider.js'
 import useMapResize from './useMapResize.js'
+import { boundary } from './homeGeography.js'
 import 'leaflet/dist/leaflet.css'
 
 export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null}) {
@@ -12,6 +13,8 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
   choose.current=onSelect;inspect.current=onInspect
   useEffect(()=>{
     const view=L.map(container.current,{scrollWheelZoom:false}).setView([15.1,76.1],6)
+    // Open on Karnataka rather than a fixed southern-India view; selections and bounds refine it later.
+    view.fitBounds(L.geoJSON(boundary).getBounds(),{padding:[10,10],maxZoom:7,animate:false})
     map.current=view;layers.current=L.layerGroup().addTo(view)
     view.on('click',e=>choose.current?.({latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
     return ()=>{view.remove();map.current=null;layers.current=null;lastGeometry.current=null}

@@ -11,10 +11,10 @@ export function RiskBadge({ level }) {
 
 export function RiskSummary({ risk, point }) {
   const { data, loading, error } = risk
-  if (!point) return <><p className="eyebrow">FLOOD & DRAINAGE RISK</p><h2>Choose a location</h2><p>Gaps do not mean no flood risk.</p></>
-  if (loading && !data) return <><p className="eyebrow">FLOOD & DRAINAGE RISK</p><h2>Assessing risk…</h2></>
-  if (error || !data) return <><p className="eyebrow">FLOOD & DRAINAGE RISK</p><h2>Risk unavailable</h2><p title={error || undefined}>Gaps do not mean no flood risk.</p></>
-  return <><p className="eyebrow">FLOOD & DRAINAGE RISK</p>
+  if (!point) return <><p className="eyebrow">RISK AT YOUR LOCATION</p><h2>Choose a location</h2><p>Gaps do not mean no flood risk.</p></>
+  if (loading && !data) return <><p className="eyebrow">RISK AT YOUR LOCATION</p><h2>Assessing risk…</h2></>
+  if (error || !data) return <><p className="eyebrow">RISK AT YOUR LOCATION</p><h2>Risk unavailable</h2><p title={error || undefined}>Gaps do not mean no flood risk.</p></>
+  return <><p className="eyebrow">RISK AT YOUR LOCATION</p>
     <h2 className="risk-summary-levels">Flood <RiskBadge level={data.flood.level} /> Drainage <RiskBadge level={data.drainage.level} /></h2>
     <p>Experimental index · not an official warning.</p></>
 }

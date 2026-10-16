@@ -32,8 +32,15 @@ FLOOD_URL = 'https://flood-api.open-meteo.com/v1/flood'
 ELEVATION_URL = 'https://api.open-meteo.com/v1/elevation'
 GRID_STEP = 0.25
 GRID_CHUNK = 20  # ~5 s per provider request; 50 locations reach the shared 10 s timeout.
-GRID_CONCURRENCY = 4
+GRID_CONCURRENCY = 2  # Open-Meteo answers bursts of parallel multi-location calls with 503 "overloaded".
 GRID_TTL = 3 * 3600
+PARTIAL_TTL = 10 * 60  # A partly failed grid is retried soon instead of being served for three hours.
+RETRY_DELAYS = (2, 5)  # Seconds before the second and third attempt of a transient provider failure.
+TRANSIENT = {'provider_unavailable', 'rate_limited', 'timeout', 'network_failure'}
+AREA_STEP = 0.05  # ~5.5 km; the area screen covers a 7 x 7 window (about 33 km across).
+AREA_HALF = 3
+AREA_REPORT_RADIUS_M = 2500
+AREA_PLACE_RADIUS_M = 3000
 POINT_TTL = 30 * 60
 HISTORY_YEARS = (2015, 2024)  # Ten complete years keeps history at ~260 weighted API calls per cell.
 LABEL = 'Experimental risk index — rule-based, not validated against flood outcomes. Not an official warning.'
@@ -114,11 +121,11 @@ def history_factor(history):
                   detail='Satellite-mapped floodwater, September 2005 and September–October 2009.')
 
 
-def reports_factor(count):
+def reports_factor(count, radius_km=1):
+    name = f'Approved flooding/drainage reports within {radius_km:g} km (72 h)'
     if count is None:
-        return factor('reports', 'Approved flooding/drainage reports within 1 km (72 h)', None, 'reports', 0, 2,
-                      'unavailable', 'Report database unavailable.')
-    return factor('reports', 'Approved flooding/drainage reports within 1 km (72 h)', count, 'reports',
+        return factor('reports', name, None, 'reports', 0, 2, 'unavailable', 'Report database unavailable.')
+    return factor('reports', name, count, 'reports',
                   2 if count >= 3 else 1 if count >= 1 else 0, 2, detail='Only administrator-approved reports count.')
 
 
@@ -131,13 +138,13 @@ def summarise(factors):
             'partial': any(f['status'] == 'unavailable' for f in factors), 'factors': factors}
 
 
-def assess(rain, river=None, elevation=None, history=None, reports=None, point_detail=True):
+def assess(rain, river=None, elevation=None, history=None, reports=None, point_detail=True, include_river=True, report_radius_km=1):
     rain24, rain5d, intensity = rain_factors(rain)
     flood = [rain24, rain5d]
     drainage = [{**rain24, 'points': min(rain24['points'], 2), 'max_points': 2}, intensity]
     if point_detail:
-        flood += [river_factor(river), elevation_factor(elevation), history_factor(history)]
-        drainage += [reports_factor(reports), elevation_factor(elevation)]
+        flood += ([river_factor(river)] if include_river else []) + [elevation_factor(elevation), history_factor(history)]
+        drainage += [reports_factor(reports, report_radius_km), elevation_factor(elevation)]
     return {'flood': summarise(flood), 'drainage': summarise(drainage)}
 
 
@@ -230,60 +237,118 @@ def distance_m(lat1, lon1, lat2, lon2):
     return 12742000 * math.asin(math.sqrt(a))
 
 
-def historical_context(latitude, longitude):
-    """True/False within Udupi coverage, None outside it (no data, not zero risk)."""
+def historical_context_many(points):
+    """Per point: True/False within Udupi coverage, None outside it (no data, not zero risk)."""
     from .historical import HistoricalStore, HistoricalUnavailable
     try:
         catalogue, geometries = HistoricalStore().load()
     except HistoricalUnavailable:
-        return None
-    if not inside(catalogue['boundary']['geometry'], latitude, longitude):
-        return None
+        return [None] * len(points)
+    centres = []
     for collection in geometries.values():
         for feature in collection['features']:
             polygons = feature['geometry']['coordinates']
             polygons = [polygons] if feature['geometry']['type'] == 'Polygon' else polygons
             for polygon in polygons:
                 ring = polygon[0]
-                lon_c = sum(p[0] for p in ring[:-1]) / (len(ring) - 1)
-                lat_c = sum(p[1] for p in ring[:-1]) / (len(ring) - 1)
-                if distance_m(latitude, longitude, lat_c, lon_c) <= 1000:
-                    return True
-    return False
+                centres.append((sum(p[1] for p in ring[:-1]) / (len(ring) - 1), sum(p[0] for p in ring[:-1]) / (len(ring) - 1)))
+    boundary = catalogue['boundary']['geometry']
+    return [None if not inside(boundary, lat, lon) else any(distance_m(lat, lon, a, b) <= 1000 for a, b in centres)
+            for lat, lon in points]
 
 
-def approved_report_count(latitude, longitude, radius_m=1000, hours=72):
-    """Count only; never exposes report content. None when the database is unavailable."""
+def historical_context(latitude, longitude):
+    return historical_context_many([(latitude, longitude)])[0]
+
+
+def approved_report_counts(points, radius_m=1000, hours=72):
+    """Counts only; never exposes report content. None when the database is unavailable."""
     from sqlalchemy import text
     from .shelters import shelter_engine, mode
+    query = text("SELECT count(*) FROM citizen_reports WHERE state='APPROVED' AND demonstration=:demo "
+                 "AND event_type IN ('flooding','waterlogging','drainage_blockage') "
+                 "AND reviewed_at > now() - make_interval(hours => :hours) "
+                 "AND ST_DWithin(position::geography, ST_SetSRID(ST_MakePoint(:lon,:lat),4326)::geography, :radius)")
     try:
         engine = shelter_engine()
         with engine.connect().execution_options(postgresql_readonly=True) as c:
-            return c.execute(text(
-                "SELECT count(*) FROM citizen_reports WHERE state='APPROVED' AND demonstration=:demo "
-                "AND event_type IN ('flooding','waterlogging','drainage_blockage') "
-                "AND reviewed_at > now() - make_interval(hours => :hours) "
-                "AND ST_DWithin(position::geography, ST_SetSRID(ST_MakePoint(:lon,:lat),4326)::geography, :radius)"),
-                {'demo': mode() == 'demonstration', 'hours': hours, 'lon': longitude, 'lat': latitude, 'radius': radius_m}).scalar_one()
+            return [c.execute(query, {'demo': mode() == 'demonstration', 'hours': hours, 'lon': lon, 'lat': lat,
+                                      'radius': radius_m}).scalar_one() for lat, lon in points]
     except Exception:  # Database absence must not invent a zero count.
         return None
+
+
+def approved_report_count(latitude, longitude, radius_m=1000, hours=72):
+    counts = approved_report_counts([(latitude, longitude)], radius_m, hours)
+    return None if counts is None else counts[0]
+
+
+COMPASS = ('N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW')
+
+
+def direction(lat1, lon1, lat2, lon2):
+    p = math.pi / 180
+    y = math.sin((lon2 - lon1) * p) * math.cos(lat2 * p)
+    x = math.cos(lat1 * p) * math.sin(lat2 * p) - math.sin(lat1 * p) * math.cos(lat2 * p) * math.cos((lon2 - lon1) * p)
+    return COMPASS[round((math.degrees(math.atan2(y, x)) % 360) / 45) % 8]
+
+
+def area_points(geometry, latitude, longitude, step=AREA_STEP, half=AREA_HALF):
+    """Fixed 0.05 degree lattice around the point (stable for caching); cells outside Karnataka are skipped."""
+    lat0, lon0 = round(latitude / step) * step, round(longitude / step) * step
+    cells = []
+    for i in range(-half, half + 1):
+        for j in range(-half, half + 1):
+            lat, lon = round(lat0 + i * step, 3), round(lon0 + j * step, 3)
+            if inside(geometry, lat, lon):
+                cells.append({'id': f'a{lat:.3f}_{lon:.3f}', 'latitude': lat, 'longitude': lon})
+    return (round(lat0, 3), round(lon0, 3)), cells
+
+
+def directory_places():
+    """Selectable named localities from the active public directory; empty when unavailable."""
+    from .locations import get_store, LocationsUnavailable
+    try:
+        data = get_store().load()
+    except LocationsUnavailable:
+        return []
+    return [{'name': r['name'], 'latitude': r['coordinates']['latitude'], 'longitude': r['coordinates']['longitude']}
+            for r in data['localities'] if r.get('selectable') and r.get('coordinates')]
+
+
+def reasons(result):
+    return [f['name'] for f in sorted(result['factors'], key=lambda f: -f['points']) if f['status'] == 'available' and f['points'] > 0]
 
 
 # ---------- service ----------
 
 class RiskService:
-    def __init__(self, client, cache_dir=None, clock=time.time, geometry=None):
-        self.client, self.clock = client, clock
+    def __init__(self, client, cache_dir=None, clock=time.time, geometry=None, sleep=asyncio.sleep):
+        self.client, self.clock, self.sleep = client, clock, sleep
         self.geometry = geometry or load_boundary()
         self.cells = statewide_grid(self.geometry)
         self.cache_dir = Path(cache_dir or os.environ.get('FLOODPULSE_RISK_CACHE_DIR') or ROOT / 'data/tmp/risk_cache')
         self.grid_cache, self.point_cache, self.elevation_cache, self.river_history = None, {}, {}, {}
         self.grid_lock, self.point_locks = asyncio.Lock(), {}
+        self.area_cache, self.area_locks = {}, {}
 
     def now(self):
         return datetime.fromtimestamp(self.clock(), timezone.utc)
 
+    async def retrying(self, call):
+        """Retry only transient provider failures, with bounded delays; other failures surface at once."""
+        for delay in (*RETRY_DELAYS, None):
+            try:
+                return await call()
+            except SourceFailure as exc:
+                if delay is None or exc.kind not in TRANSIENT:
+                    raise
+                await self.sleep(max(delay, min(exc.retry_seconds or 0, 10)))
+
     async def rain_many(self, points):
+        return await self.retrying(lambda: self._rain_many(points))
+
+    async def _rain_many(self, points):
         payload, _ = await read_json(self.client, FORECAST_URL, rain_params([p['latitude'] for p in points],
                                      [p['longitude'] for p in points]), limit=8 * 1024 * 1024)
         payloads = payload if isinstance(payload, list) else [payload]
@@ -327,7 +392,9 @@ class RiskService:
                     'cell_size_degrees': GRID_STEP, 'cells': cells, 'retrieved_at': retrieved.isoformat(),
                     'fresh_until': (retrieved + timedelta(seconds=GRID_TTL if available else 60)).isoformat(),
                     'sources': [SOURCES['rain'], SOURCES['thresholds']]}
-            self.grid_cache = {'expires': self.clock() + (GRID_TTL if available else 60), 'body': body}
+            ttl = GRID_TTL if available == len(cells) else PARTIAL_TTL if available else 60
+            body['fresh_until'] = (retrieved + timedelta(seconds=ttl)).isoformat()
+            self.grid_cache = {'expires': self.clock() + ttl, 'body': body}
             return body
 
     async def elevation(self, latitude, longitude):
@@ -339,6 +406,79 @@ class RiskService:
             except (SourceFailure, ValueError, KeyError, TypeError, IndexError):
                 return None
         return self.elevation_cache[key]
+
+    async def elevation_many(self, points):
+        """Batch elevation lookup (provider maximum 100 coordinates); None entries when unavailable."""
+        keys = [(round(lat, 2), round(lon, 2)) for lat, lon in points]
+        missing = sorted({k for k in keys if k not in self.elevation_cache})
+        for i in range(0, len(missing), 100):
+            chunk = missing[i:i + 100]
+            try:
+                payload, _ = await self.retrying(lambda: read_json(self.client, ELEVATION_URL, {
+                    'latitude': ','.join(f'{k[0]:.2f}' for k in chunk), 'longitude': ','.join(f'{k[1]:.2f}' for k in chunk)}))
+                values = payload['elevation']
+                if len(values) != len(chunk):
+                    raise ValueError('Elevation count mismatch')
+                for k, v in zip(chunk, values):
+                    self.elevation_cache[k] = number(v, minimum=-500, maximum=9000)
+            except (SourceFailure, ValueError, KeyError, TypeError, IndexError):
+                continue
+        return [self.elevation_cache.get(k) for k in keys]
+
+    async def area(self, latitude, longitude):
+        """Screen the ~33 km window around a point: rain, ground height, history and approved reports per cell.
+
+        River flow is excluded here (one GloFAS history per cell is too costly); it is in the point assessment."""
+        if not inside(self.geometry, latitude, longitude):
+            raise HTTPException(422, 'Point is outside Karnataka')
+        centre, cells = area_points(self.geometry, latitude, longitude)
+        async with self.area_locks.setdefault(centre, asyncio.Lock()):
+            cached = self.area_cache.get(centre)
+            if not (cached and cached['expires'] > self.clock()):
+                retrieved = self.now()
+                rains = []
+                for i in range(0, len(cells), 25):
+                    chunk = cells[i:i + 25]
+                    try:
+                        rains += await self.rain_many(chunk)
+                    except (SourceFailure, ValueError, KeyError, TypeError):
+                        rains += [None] * len(chunk)
+                coords = [(c['latitude'], c['longitude']) for c in cells]
+                elevations = await self.elevation_many(coords)
+                history = await run_in_threadpool(historical_context_many, coords)
+                reports = await run_in_threadpool(approved_report_counts, coords, AREA_REPORT_RADIUS_M)
+                places = await run_in_threadpool(directory_places)
+                scored = []
+                for n, cell in enumerate(cells):
+                    rain = rains[n]
+                    result = assess(rain, None, elevations[n], history[n], None if reports is None else reports[n],
+                                    include_river=False, report_radius_km=AREA_REPORT_RADIUS_M / 1000)
+                    near = min(((distance_m(cell['latitude'], cell['longitude'], p['latitude'], p['longitude']), p['name']) for p in places), default=None)
+                    scored.append({**cell, 'place': near[1] if near and near[0] <= AREA_PLACE_RADIUS_M else None,
+                                   'flood': {k: result['flood'][k] for k in ('level', 'score', 'max_score', 'partial')} | {'reasons': reasons(result['flood'])},
+                                   'drainage': {k: result['drainage'][k] for k in ('level', 'score', 'max_score', 'partial')} | {'reasons': reasons(result['drainage'])},
+                                   'inputs': {'rain_24h_mm': rain and round(rain['next24_mm'], 1), 'rain_5d_mm': rain and round(rain['past5d_mm'], 1),
+                                              'peak_mmh': rain and round(rain['peak_mmh'], 1), 'elevation_m': None if elevations[n] is None else round(elevations[n]),
+                                              'historical_flood': history[n], 'approved_reports': None if reports is None else reports[n]}})
+                available = sum(c['flood']['level'] != 'unavailable' for c in scored)
+                ttl = POINT_TTL if available == len(scored) else PARTIAL_TTL if available else 60
+                window = next((r for r in rains if r), None)
+                cached = {'expires': self.clock() + ttl, 'cells': scored, 'available': available, 'retrieved': retrieved, 'ttl': ttl,
+                          'window': window and {'start': window['window_start'], 'end': window['window_end']}}
+                self.area_cache[centre] = cached
+        out = []
+        for cell in cached['cells']:
+            d = distance_m(latitude, longitude, cell['latitude'], cell['longitude'])
+            out.append({**cell, 'distance_km': round(d / 1000, 1), 'direction': None if d < 500 else direction(latitude, longitude, cell['latitude'], cell['longitude'])})
+        status = 'available' if cached['available'] == len(out) else 'partial' if cached['available'] else 'unavailable'
+        return {'status': status, 'experimental': True, 'official_warning': False, 'label': LABEL, 'kind': 'area_screen',
+                'note': 'Area screen uses rainfall, ground height, mapped historical floods and approved reports. '
+                        'River flow is checked only in the full assessment of a chosen place.',
+                'location': {'latitude': latitude, 'longitude': longitude}, 'cell_size_degrees': AREA_STEP,
+                'rain_window': cached['window'], 'cells': out, 'retrieved_at': cached['retrieved'].isoformat(),
+                'fresh_until': (cached['retrieved'] + timedelta(seconds=cached['ttl'])).isoformat(),
+                'level_scale': '0–1 low · 2–3 moderate · 4–5 high · 6+ severe',
+                'sources': [SOURCES['rain'], SOURCES['elevation'], SOURCES['history'], SOURCES['reports'], SOURCES['thresholds']]}
 
     def history_file(self, key):
         return self.cache_dir / f'glofas_{key[0]:.2f}_{key[1]:.2f}_{HISTORY_YEARS[0]}_{HISTORY_YEARS[1]}.json'
@@ -433,6 +573,14 @@ async def point_risk(latitude: float = Query(..., ge=-90, le=90, allow_inf_nan=F
                      risk: RiskService = Depends(service)):
     body = await risk.point(latitude, longitude)
     return no_store(body, 200 if body['status'] == 'available' else 503)
+
+
+@router.get('/api/risk/area')
+async def area_risk(latitude: float = Query(..., ge=-90, le=90, allow_inf_nan=False),
+                    longitude: float = Query(..., ge=-180, le=180, allow_inf_nan=False),
+                    risk: RiskService = Depends(service)):
+    body = await risk.area(latitude, longitude)
+    return no_store(body, 503 if body['status'] == 'unavailable' else 200)
 
 
 @router.get('/api/risk/grid')

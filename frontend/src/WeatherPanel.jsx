@@ -13,7 +13,7 @@ export default function WeatherPanel({point, selectedPoint, session, overview=fa
         <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">{point.name}</h2></div>
         <button onClick={() => load()} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
       </div>
-      <p className="muted">Point weather · Flood prediction is not available.</p>
+      <p className="muted">Point weather only · flood and drainage risk is on Home (experimental index).</p>
       <div className="weather-freshness" data-freshness={freshness} role="status" aria-label="Weather data freshness">
         <strong>{freshness === 'fresh' ? 'Fresh' : freshness === 'stale' ? 'Stale — previously retrieved information' : freshness === 'refreshing' ? 'Refreshing weather' : 'No weather data available'}</strong>
         {data && <span>Last successful retrieval: {retrievalTime(data.retrieved_at, now) === null ? 'Unavailable — freshness cannot be verified' : formatTime(data.retrieved_at)}</span>}

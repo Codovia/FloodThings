@@ -47,7 +47,7 @@ it('keeps Bengaluru default and replaces weather with selected coordinates, pres
   expect(screen.getByText(/district\/locality identity not verified/)).toBeTruthy()
   expect(screen.getByText('0 mm')).toBeTruthy()
   expect(screen.getAllByText('Unavailable').length).toBeGreaterThan(0)
-  expect(screen.getByText(/Flood prediction is not available/)).toBeTruthy()
+  expect(screen.getByText(/flood and drainage risk is on Home/)).toBeTruthy()
   expect(screen.getByText('Latitude 13.35°, longitude 74.75°')).toBeTruthy()
 })
 

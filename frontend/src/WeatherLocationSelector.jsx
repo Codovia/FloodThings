@@ -62,7 +62,7 @@ export function WeatherPointMap({ point, onSelect, navigationBounds, historical 
   </>
 }
 
-export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false, onDistrict = () => {}, selectedDistrictId, active = true, externalMap = false }) {
+export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelect, mapInitiallyOpen = false, compact = false, overview = false, onDistrict = () => {}, selectedDistrictId, active = true, externalMap = false, chosen = true }) {
   const [editorOpen,setEditorOpen]=useState(false)
   const [showMap, setShowMap] = useState(mapInitiallyOpen)
   const [navigationBounds, setNavigationBounds] = useState(null)
@@ -116,7 +116,7 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     </>
   const mapVisible = overview || showMap
   return <section className={'panel weather-location-selector'+(compact?' compact-location':'')} aria-labelledby="weather-location-title">
-    <div className="location-bar"><div><p className="eyebrow">{overview?'KARNATAKA · SELECTED POINT':'SELECTED POINT'}</p><h2 id="weather-location-title">{compact?'Location & map':'Choose a weather location'}</h2><p className="selected-point-name">{point.name} · {point.latitude}°, {point.longitude}°</p></div>
+    <div className="location-bar"><div><p className="eyebrow">{overview?'KARNATAKA · SELECTED POINT':'SELECTED POINT'}</p><h2 id="weather-location-title">{compact?'Location & map':'Choose a weather location'}</h2><p className="selected-point-name">{chosen ? `${point.name} · ${Number(point.latitude.toFixed(4))}°, ${Number(point.longitude.toFixed(4))}°` : 'No location chosen yet. Use Change location to sort shelters by distance and get directions.'}</p></div>
     {compact&&!overview&&!externalMap&&<button type="button" aria-expanded={showMap} onClick={()=>setShowMap(value=>!value)}>{showMap?'Hide weather map':'Open weather map'}</button>}</div>
     {compact?<details className="location-editor" open={editorOpen}><summary aria-expanded={editorOpen} onClick={e=>{e.preventDefault();setEditorOpen(value=>!value)}}>Change location</summary><div hidden={!editorOpen}><p>Search verified places or request GPS. Point selection does not establish district-wide conditions.</p>{controls}</div></details>:<>{controls}</>}
     {mapVisible&&!externalMap&&<div className="point-map"><WeatherPointMap point={point} onSelect={choose} navigationBounds={navigationBounds}/></div>}

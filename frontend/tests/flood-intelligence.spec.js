@@ -1,7 +1,8 @@
 import {test,expect} from '@playwright/test'
+import {emptyShelterDirectory} from './shelterFixture.js'
 import {readFileSync} from 'node:fs'
 const source=new URL('../../data/processed/udupi_flood_spatial_v1/',import.meta.url)
-test.beforeEach(async({page})=>{await page.route('**/*',route=>{const u=new URL(route.request().url());if(!['127.0.0.1','localhost'].includes(u.hostname))return route.abort();if(u.pathname==='/api/weather')return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Weather intentionally isolated in map test'})});return route.continue()})})
+test.beforeEach(async({page})=>{await page.route('**/*',route=>{const u=new URL(route.request().url());if(!['127.0.0.1','localhost'].includes(u.hostname))return route.abort();if(u.pathname==='/api/weather')return route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Weather intentionally isolated in map test'})});return route.continue()});await emptyShelterDirectory(page)})
 test('31 districts, original GeoJSON, independent layers, details and statewide reset',async({page})=>{
  const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('/flood-map')
  const select=page.getByLabel('Flood Map district',{exact:true});await expect(select.locator('option')).toHaveCount(32)

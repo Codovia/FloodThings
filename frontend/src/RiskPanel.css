@@ -29,3 +29,17 @@
   .intelligence-workspace .intelligence-toolbar fieldset { flex: 1 1 100%; order: 3; }
 }
 .risk-factor-details>summary{cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;margin:6px 0}
+.risk-area-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 10px}
+.risk-area-head h3{margin:0}
+.risk-area-toggle{display:inline-flex;border:1px solid #7897a5;border-radius:8px;overflow:hidden}
+.risk-area-toggle button{border:0;border-radius:0;min-height:30px;padding:4px 12px;font-size:.8125rem;background:#fff;color:#17313c}
+.risk-area-toggle button[aria-pressed="true"]{background:#165e63;color:#fff}
+.risk-area-counts{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:8px 0}
+.risk-area-counts small{color:#546460}
+.risk-area-list{list-style:none;padding:0;margin:4px 0;display:grid;gap:4px}
+.risk-area-list button{display:grid;grid-template-columns:auto 1fr;gap:0 8px;align-items:center;width:100%;text-align:left;background:#f6faf9;color:#17313c;border:1px solid #d7dfdd;border-radius:8px;padding:6px 10px;min-height:0;font-weight:400}
+.risk-area-list strong{font-size:.875rem}
+.risk-area-list small{grid-column:2;color:#546460;font-size:.75rem}
+.risk-area-calm{background:#eef6f0;border-radius:8px;padding:8px 10px}
+.risk-area .risk-area-list button:hover:not(:disabled),.risk-area .risk-area-list button:focus,.risk-area .risk-area-list button:active{background:#e6f2f1;color:#17313c;border-color:#165e63}
+.risk-area .risk-area-toggle button:hover:not(:disabled):not([aria-pressed="true"]){background:#e6f2f1;color:#17313c}

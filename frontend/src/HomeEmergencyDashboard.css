@@ -87,3 +87,7 @@ main.app-content.page-home{flex:none;overflow:visible}
 .page-home .home-warning-status{font-size:.8125rem;margin:4px 0 0;color:#38504b}
 .page-home .home-sources p{margin:6px 0}
 @media(min-width:1100px){.page-home .page-intro.visually-hidden{position:absolute;margin:-1px;padding:0}}
+.page-home .home-map-risk-legend{gap:6px}.page-home .home-map-risk-legend span{display:inline-flex;align-items:center;gap:3px}
+.page-home .home-map-risk-legend i{border-radius:2px}
+.map-popup-action{margin-top:6px;min-height:32px;padding:4px 10px;font-size:.8125rem}
+.page-home .risk-area{padding:10px 0 12px;border-bottom:1px solid #e0e8e5}

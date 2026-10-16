@@ -27,7 +27,7 @@ def make_app(monkeypatch, handler, points=(), shelter=SHELTER):
     monkeypatch.setattr(notifications, 'available_shelter', lambda store, identity: dict(shelter))
     app = FastAPI()
     app.include_router(routing.router)
-    app.dependency_overrides[get_store] = lambda: Store()
+    app.dependency_overrides[routing.store_provider] = lambda: (lambda: Store())
     app.state.http = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     return app
 
@@ -36,6 +36,18 @@ def test_not_configured_keeps_external_link(monkeypatch):
     monkeypatch.delenv('OPENROUTESERVICE_API_KEY', raising=False)
     with TestClient(make_app(monkeypatch, lambda r: httpx.Response(500))) as http:
         assert http.get('/api/route/status').json()['configured'] is False
+        response = http.post('/api/route', json=BODY)
+        assert response.status_code == 503 and response.json()['status'] == 'not_configured'
+
+
+def test_not_configured_is_reported_before_the_shelter_database_is_opened(monkeypatch):
+    monkeypatch.delenv('OPENROUTESERVICE_API_KEY', raising=False)
+    app = make_app(monkeypatch, lambda r: httpx.Response(500))
+
+    def no_database():
+        raise AssertionError('shelter database must not be opened without a routing key')
+    app.dependency_overrides[routing.store_provider] = lambda: no_database
+    with TestClient(app) as http:
         response = http.post('/api/route', json=BODY)
         assert response.status_code == 503 and response.json()['status'] == 'not_configured'
 

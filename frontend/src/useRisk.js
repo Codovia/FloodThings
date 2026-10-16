@@ -44,3 +44,20 @@ export function useRiskPoint(point) {
 export function useRiskGrid(active) {
   return validated(useJson(active ? '/api/risk/grid' : null, 30 * 60 * 1000), validRiskGrid)
 }
+
+const validSummary = s => s && LEVELS.has(s.level) && Array.isArray(s.reasons)
+export const validRiskArea = d => !!d && d.experimental === true && d.official_warning === false && Array.isArray(d.cells) && Number.isFinite(d.cell_size_degrees) &&
+  d.cells.every(c => Number.isFinite(c.latitude) && Number.isFinite(c.longitude) && Number.isFinite(c.distance_km) && validSummary(c.flood) && validSummary(c.drainage))
+
+// Nearby screen around the chosen place. A network estimate is too uncertain to rank spots "around you".
+export function useRiskArea(point) {
+  const ok = point && point.kind !== 'network' && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
+  const url = ok ? '/api/risk/area?' + new URLSearchParams({ latitude: point.latitude.toFixed(5), longitude: point.longitude.toFixed(5) }) : null
+  return validated(useJson(url, 30 * 60 * 1000), validRiskArea)
+}
+
+export const RANK = { severe: 4, high: 3, moderate: 2, low: 1, unavailable: 0 }
+export function rankedSpots(cells, kind) {
+  return [...cells].filter(c => c[kind].level !== 'unavailable')
+    .sort((a, b) => (b[kind].score ?? -1) - (a[kind].score ?? -1) || a.distance_km - b.distance_km)
+}

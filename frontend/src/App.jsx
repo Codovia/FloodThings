@@ -54,7 +54,7 @@ export default function App() {
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
    {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
-     <WeatherLocationSelector point={point} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
+     <WeatherLocationSelector point={point} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>. Weather remains point-specific. {!district?.navigation_bounds&&'Public district navigation bounds are unavailable; no bounds or representative point are invented.'}</p>}
      <div hidden={!weatherPage} className="weather-sections">
       <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false}/>

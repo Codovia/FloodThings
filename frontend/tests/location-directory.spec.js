@@ -52,7 +52,7 @@ test('real district/locality directory selects exact OSM points, recenters Leafl
   await choose(page,'Udupi')
   await expect(page.getByRole('heading',{name:'Udupi, Udupi',exact:true})).toBeVisible()
   await expect(page.getByText(/Requested point: 13.3419169/)).toBeVisible()
-  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
   expect(errors).toEqual([])
 })
 
@@ -80,7 +80,7 @@ test('v2 settlement expansion preserves stable Kundapur identity and cross-distr
   await page.clock.fastForward(60*60*1000); await expect.poll(()=>requests.length).toBe(before+1)
   expect(requests.at(-1)).toContain('latitude=12.8698101&longitude=74.8430082')
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
-  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
 })
 
 test('mobile alias search selects real Mangaluru and disabled Kaup explains unavailable point', async ({ page }) => {

@@ -33,7 +33,7 @@ test('live point risk on Home and the statewide risk grid on Flood Map', async (
   await expect(page.getByRole('heading', { name: 'Why this risk level?' })).toBeVisible()
   await page.getByText('Show each factor and its source', { exact: true }).click()
   await expect(page.getByRole('rowheader', { name: /Forecast rain, next 24 h/ }).first()).toBeVisible()
-  await expect(page.getByText(/Experimental risk index — rule-based/)).toBeVisible()
+  await expect(page.locator('.risk-panel').getByText(/Experimental risk index — rule-based/)).toBeVisible()
   const size = await page.evaluate(() => ({ h: document.documentElement.scrollHeight, w: document.documentElement.scrollWidth }))
   expect(size).toEqual({ h: 768, w: 1366 })
   await page.screenshot({ path: evidence + '/01-home-risk.png' })

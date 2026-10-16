@@ -29,7 +29,7 @@ test('coordinate and Leaflet selection drive weather requests, and source masks/
   await selectPoint(page,13.3419169,74.7473232); await request
   await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
   await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByText('Unavailable', { exact: true })).toBeVisible()
-  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
   await expect(page.getByRole('region', {name:'Weather location selection map'})).toBeVisible()
   const map = page.getByRole('region', { name: 'Weather location selection map' })
   await expect(map.locator('path.leaflet-interactive')).toHaveCount(1)
@@ -81,7 +81,7 @@ test('seven-day forecasts retain order after GPS, map, manual selection and refr
   const refreshed = page.waitForRequest(r => r.url().includes('/api/weather?latitude=14&longitude=75'))
   await page.getByRole('button', { name: 'Refresh weather' }).click(); await refreshed
   await expect(cards).toHaveCount(7)
-  await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
 })
 

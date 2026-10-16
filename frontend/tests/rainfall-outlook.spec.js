@@ -46,7 +46,7 @@ test('PostgreSQL directory, locality switch, model display, seven days and six-h
  await expect.poll(()=>aiCalls).toBe(2)
  await expect(page.getByText(/Mangaluru, Dakshina Kannada · next 24/)).toBeVisible()
  expect(weatherCalls).toBe(3)
- await expect(page.getByText(/Flood prediction is not available/)).toBeVisible()
+ await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
  const before=aiCalls;await page.clock.fastForward(6*60*60*1000-1);expect(aiCalls).toBe(before)
  // No duplicate model call for render/visibility changes while weather is fresh.
  await page.evaluate(()=>{window.dispatchEvent(new Event('focus'));window.dispatchEvent(new Event('online'))});expect(aiCalls).toBe(before)

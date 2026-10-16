@@ -96,9 +96,13 @@ def test_statewide_grid_covers_karnataka():
     assert all(11.5 < c['latitude'] < 18.5 and 74.0 < c['longitude'] < 78.7 for c in cells)
 
 
-def fake_service(handler, cache_dir):
+async def no_wait(seconds):
+    return None
+
+
+def fake_service(handler, cache_dir, sleep=no_wait):
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
-    return client, RiskService(client, cache_dir=cache_dir, clock=lambda: NOW.timestamp())
+    return client, RiskService(client, cache_dir=cache_dir, clock=lambda: NOW.timestamp(), sleep=sleep)
 
 
 def forecast_handler(request):
@@ -108,7 +112,7 @@ def forecast_handler(request):
         body = [hourly(future_mm=4.0, past_mm=0.5) for _ in range(count)]
         return httpx.Response(200, json=body if count > 1 else body[0])
     if url.path == '/v1/elevation':
-        return httpx.Response(200, json={'elevation': [4.0]})
+        return httpx.Response(200, json={'elevation': [4.0] * len(url.params['latitude'].split(','))})
     if url.host == 'flood-api.open-meteo.com':
         if 'start_date' in url.params:
             days = [f'{y}-{d:03d}' for y in range(2015, 2025) for d in range(1, 366)]
@@ -179,6 +183,88 @@ def test_api_routes(tmp_path_factory, monkeypatch):
         assert ok.status_code == 200 and ok.headers['cache-control'] == 'no-store'
         assert http.get('/api/risk', params={'latitude': 19.5, 'longitude': 73.0}).status_code == 422
         assert http.get('/api/risk/grid').status_code == 200
+        area = http.get('/api/risk/area', params={'latitude': 13.34, 'longitude': 74.75})
+        assert area.status_code == 200 and area.json()['kind'] == 'area_screen' and area.headers['cache-control'] == 'no-store'
         denied = http.get('/api/admin/risk/suggestions')
         assert denied.status_code in (401, 403, 503) and 'suggestions' not in denied.json()
+    asyncio.run(client.aclose())
+
+
+def test_grid_retries_transient_overload_then_succeeds(tmp_path_factory):
+    seen, waits = {}, []
+
+    def flaky(request):
+        key = request.url.params.get('latitude', '')
+        seen[key] = seen.get(key, 0) + 1
+        if request.url.path == '/v1/forecast' and seen[key] == 1:
+            return httpx.Response(503, json={'error': True, 'reason': 'The service is overloaded'})
+        return forecast_handler(request)
+
+    async def record(seconds):
+        waits.append(seconds)
+    client, svc = fake_service(flaky, tmp_path_factory.mktemp('risk'), sleep=record)
+    grid = asyncio.run(svc.grid())
+    assert grid['status'] == 'available' and waits and set(waits) == {2}
+    asyncio.run(client.aclose())
+
+
+def test_client_errors_are_not_retried(tmp_path_factory):
+    calls = []
+    client, svc = fake_service(lambda r: calls.append(r) or httpx.Response(400), tmp_path_factory.mktemp('risk'))
+    grid = asyncio.run(svc.grid())
+    assert grid['status'] == 'unavailable' and len(calls) == len(range(0, 256, risk.GRID_CHUNK))
+    asyncio.run(client.aclose())
+
+
+def test_partial_grid_is_cached_briefly(tmp_path_factory):
+    def half(request):
+        lat = float(request.url.params['latitude'].split(',')[0])
+        return httpx.Response(503) if lat < 14 else forecast_handler(request)
+    client, svc = fake_service(half, tmp_path_factory.mktemp('risk'))
+    grid = asyncio.run(svc.grid())
+    assert grid['status'] == 'partial'
+    expires = datetime.fromisoformat(grid['fresh_until']) - datetime.fromisoformat(grid['retrieved_at'])
+    assert expires.total_seconds() == risk.PARTIAL_TTL
+    asyncio.run(client.aclose())
+
+
+def test_area_screen_scores_nearby_cells_without_river(tmp_path_factory, monkeypatch):
+    monkeypatch.setattr(risk, 'approved_report_counts', lambda points, *a, **k: [0] * len(points))
+    monkeypatch.setattr(risk, 'directory_places', lambda: [{'name': 'Fixture town', 'latitude': 13.35, 'longitude': 74.75}])
+    calls = []
+    client, svc = fake_service(lambda r: calls.append(r) or forecast_handler(r), tmp_path_factory.mktemp('risk'))
+    body = asyncio.run(svc.area(13.35, 74.75))
+    assert body['status'] == 'available' and body['experimental'] is True and body['official_warning'] is False
+    assert 0 < len(body['cells']) <= 49 and not any(r.url.host == 'flood-api.open-meteo.com' for r in calls)
+    centre = min(body['cells'], key=lambda c: c['distance_km'])
+    assert centre['place'] == 'Fixture town' and centre['direction'] is None
+    assert {c['direction'] for c in body['cells'] if c['distance_km'] > 1} <= set(risk.COMPASS)
+    # 96 mm heavy rain (2) + 60 mm past (1) + 4 m low-lying (1) = high flood; drainage 2 + 1 = moderate
+    assert centre['flood']['level'] == 'high' and centre['flood']['max_score'] == 8
+    assert centre['flood']['reasons'][0] == 'Forecast rain, next 24 h'
+    assert centre['drainage']['level'] == 'moderate' and centre['inputs']['elevation_m'] == 4
+    first = len(calls)
+    asyncio.run(svc.area(13.36, 74.76))  # same lattice window: cached
+    assert len(calls) == first
+    asyncio.run(client.aclose())
+
+
+def test_area_unavailable_reports_mark_drainage_partial_not_zero(tmp_path_factory, monkeypatch):
+    monkeypatch.setattr(risk, 'approved_report_counts', lambda *a, **k: None)
+    monkeypatch.setattr(risk, 'directory_places', lambda: [])
+    client, svc = fake_service(forecast_handler, tmp_path_factory.mktemp('risk'))
+    cell = asyncio.run(svc.area(13.34, 74.75))['cells'][0]
+    assert cell['drainage']['partial'] is True and cell['inputs']['approved_reports'] is None and cell['place'] is None
+    asyncio.run(client.aclose())
+
+
+def test_area_outage_and_outside_point(tmp_path_factory, monkeypatch):
+    monkeypatch.setattr(risk, 'approved_report_counts', lambda *a, **k: None)
+    monkeypatch.setattr(risk, 'directory_places', lambda: [])
+    client, svc = fake_service(lambda r: httpx.Response(503), tmp_path_factory.mktemp('risk'))
+    body = asyncio.run(svc.area(13.34, 74.75))
+    assert body['status'] == 'unavailable' and all(c['flood']['level'] == 'unavailable' for c in body['cells'])
+    with pytest.raises(Exception) as caught:
+        asyncio.run(svc.area(19.5, 73.0))
+    assert getattr(caught.value, 'status_code', None) == 422
     asyncio.run(client.aclose())

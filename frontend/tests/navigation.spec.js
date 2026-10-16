@@ -1,5 +1,6 @@
 import {selectPoint} from './pointSelection.js'
 import {test,expect} from '@playwright/test'
+import {emptyShelterDirectory} from './shelterFixture.js'
 const stamp='2026-10-10T06:00:00Z'
 async function setup(page){
  let requests=0
@@ -12,6 +13,7 @@ async function setup(page){
   }
   return route.continue()
  })
+ await emptyShelterDirectory(page)
  return ()=>requests
 }
 const nav=page=>page.getByRole('navigation',{name:'Main navigation'})

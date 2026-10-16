@@ -10,6 +10,7 @@ test.beforeEach(async({page})=>{
 })
 
 test('actual PostgreSQL public directory is empty, read-only and leaves weather/manual workflows usable',async({page})=>{
+ test.skip(!process.env.SHELTER_DATABASE_URL,'Needs an isolated, empty PostgreSQL shelter directory (SHELTER_DATABASE_URL)')
  await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
  await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
@@ -23,7 +24,7 @@ test('actual PostgreSQL public directory is empty, read-only and leaves weather/
 
 test('explicit demonstration fixtures render exact entrance, mobile map and no unsafe replacement after failure',async({page})=>{
  const stamp=new Date().toISOString();const data={status:'available',mode:'demonstration',total:1,verification_valid_hours:24,shelters:[{id:'isolated-fixture',name:'DEMONSTRATION ONLY — not a shelter',address:'Isolated fixture',district_id:'nic:udupi.nic.in',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'TEST ONLY',status:'open',verified_at:stamp,updated_at:stamp,verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12,restrictions:'DO NOT TRAVEL',contact:null}]}
- await page.route('**/api/shelters?**',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)}))
+ await page.route('**/api/shelters*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)}))
  await page.setViewportSize({width:390,height:844});await page.goto('/shelters');await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
  await expect(page.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeVisible();await expect(page.getByRole('region',{name:'Verified open shelter entrances'})).toBeVisible()
  await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
@@ -31,16 +32,17 @@ test('explicit demonstration fixtures render exact entrance, mobile map and no u
  await page.getByRole('button',{name:'Recheck availability for directions'}).click();await expect(link).toBeVisible()
  const url=new URL(await link.getAttribute('href'));expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('api')).toBe('1')
  await expect(page.getByText('Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.',{exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
- await page.route('**/api/shelters?**',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled shelter database outage'})}))
+ await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled shelter database outage'})}))
  await page.getByRole('button',{name:'Refresh shelters'}).click();await expect(page.getByText(/Controlled shelter database outage/)).toBeVisible();await expect(link).toHaveCount(0)
 })
 
 test('separate admin area has no public registration and rejects an invalid login',async({page})=>{
+ test.skip(!process.env.SHELTER_DATABASE_URL,'Credential rejection needs the isolated PostgreSQL account store (SHELTER_DATABASE_URL)')
  await page.goto('/admin');await expect(page.getByRole('heading',{name:'Administrator workspace',exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
  expect(await page.getByRole('button',{name:/register/i}).count()).toBe(0)
  await page.getByLabel('Username',{exact:true}).fill('not-an-admin');await page.getByLabel('Password',{exact:true}).fill('WRONG ISOLATED TEST PASSWORD')
  await page.getByRole('button',{name:'Sign in'}).click();await expect(page.getByText('Invalid administrator credentials')).toBeVisible();await expect(page.getByLabel('Password',{exact:true})).toHaveValue('')
- await page.getByRole('link',{name:'Return to citizen dashboard'}).click();await expect(page.getByRole('heading',{name:'FloodPulse',exact:true})).toBeVisible()
+ await page.getByRole('link',{name:'Return to citizen dashboard'}).click();await expect(page).toHaveURL(/\/$/);await expect(page.getByRole('heading',{name:'FloodPulse',exact:true})).toHaveCount(1);await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
 })
 
 test('isolated authenticated admin form uses the real district contract and requires renewed confirmations',async({page})=>{

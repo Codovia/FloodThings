@@ -93,12 +93,19 @@ def route_status():
     return {'configured': bool(os.environ.get('OPENROUTESERVICE_API_KEY')), 'provider': 'openrouteservice'}
 
 
+def store_provider():
+    # Opening the shelter database is deferred until a routing key exists, so an
+    # unconfigured deployment reports "not_configured" rather than a database error.
+    return get_store
+
+
 @router.post('/api/route')
-async def route(payload: RouteInput, request: Request, store=Depends(get_store)):
+async def route(payload: RouteInput, request: Request, provide=Depends(store_provider)):
     key = os.environ.get('OPENROUTESERVICE_API_KEY')
     if not key:
         return JSONResponse(status_code=503, content={'status': 'not_configured',
             'message': 'In-app routing is not configured. Use the external directions link.'})
+    store = provide()
     o = payload.origin
     if not inside(BOUNDARY, o.latitude, o.longitude):
         raise HTTPException(422, 'Origin must be inside Karnataka')

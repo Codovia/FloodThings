@@ -1,4 +1,5 @@
 import {test,expect} from '@playwright/test'
+import {emptyShelterDirectory} from './shelterFixture.js'
 
 // No external services or operational writes in these layout/state tests.
 test.beforeEach(async({page})=>{
@@ -7,6 +8,7 @@ test.beforeEach(async({page})=>{
   if(url.pathname==='/api/weather')return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',retrieved_at:new Date().toISOString(),location:{latitude:+(url.searchParams.get('latitude')||12.9767936),longitude:+(url.searchParams.get('longitude')||77.590082)},grid_location:{latitude:13.25,longitude:74.95},current:{temperature_c:27,humidity_percent:80,precipitation_mm:0,valid_at:new Date().toISOString(),interval_seconds:900},forecast:Array.from({length:7},(_,i)=>({date:`2026-10-${10+i}`,weather_code:61,precipitation_mm:i,temperature_min_c:22,temperature_max_c:29}))})})
   return route.continue()
  })
+ await emptyShelterDirectory(page)
 })
 test('sketches 1-3 have information left and a dominant map right at both desktop sizes',async({page})=>{
  for(const size of [{width:1366,height:768},{width:1920,height:1080}]){

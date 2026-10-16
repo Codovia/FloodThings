@@ -19,7 +19,7 @@ it('explains missing requirements and focuses review and receipt without sending
  expect(fetch).not.toHaveBeenCalled()
  fireEvent.click(screen.getByRole('button',{name:'Submit for private review'}))
  await screen.findByRole('heading',{name:'Report received for private review'})
- expect(document.activeElement).toBe(screen.getByRole('heading',{name:'Report TEST ONLY report'}))
+ await waitFor(()=>expect(document.activeElement).toBe(screen.getByRole('heading',{name:'Report TEST ONLY report'})))
  expect(screen.getByText(/Reloading clears the withdrawal key/)).toBeTruthy()
 })
 it('requires deliberate GPS and review consent before submission; no automatic camera access',async()=>{
