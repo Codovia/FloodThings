@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import './RiskPanel.css'
 
 const stamp = value => value ? new Date(value).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST' : 'Not recorded'
 const resultText = row => ({
@@ -14,6 +15,7 @@ export default function AdminNotifications({ session, request }) {
   const [destination, setDestination] = useState(''), [kind, setKind] = useState('informational'), [message, setMessage] = useState(''), [shelter, setShelter] = useState('')
   const [preview, setPreview] = useState(null), [approved, setApproved] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(null)
   const previewHeading = useRef(null)
+  const [suggested, setSuggested] = useState(null), [suggestError, setSuggestError] = useState(null)
   useEffect(() => { if (preview) previewHeading.current?.focus() }, [preview?.id])
   const busyRef = useRef(false), requestId = useRef(null), stopped = useRef(false), controllers = useRef(new Set())
 
@@ -37,6 +39,13 @@ export default function AdminNotifications({ session, request }) {
     return () => { stopped.current = true; for (const controller of controllers.current) controller.abort() }
   }, [session, offset])
 
+  async function loadSuggestions() {
+    setSuggestError(null)
+    try { const body = await call('/api/admin/risk/suggestions', {}, 60000); if (!Array.isArray(body?.suggestions)) throw Error('Suggestion response could not be validated'); if (!stopped.current) setSuggested(body) }
+    catch (e) { if (!stopped.current) setSuggestError(e.message) }
+  }
+  useEffect(() => { loadSuggestions() }, [session])
+  function applySuggestion(item) { change(setMessage, item.suggested_message); setKind(item.suggested_kind) }
   function change(setter, value) { setter(value); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
   async function operation(action) {
     if (busyRef.current) return
@@ -71,6 +80,18 @@ export default function AdminNotifications({ session, request }) {
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
     {options?.send_limit&&<p>{options.send_limit}. Private recipients must send /start floodpulse to opt in; /stop opts out. Consent is checked again before an attempt.</p>}
     {error && <p role="alert">{error}</p>}
+    <section className="risk-suggestions" aria-labelledby="risk-suggestions-title">
+      <h3 id="risk-suggestions-title">Suggested alerts from the risk engine</h3>
+      <p>Drafts only. Nothing is sent until you edit, preview and approve it.</p>
+      {!suggested && !suggestError && <p role="status">Checking statewide risk…</p>}
+      {suggestError && <p role="status">Risk suggestions unavailable: {suggestError}</p>}
+      {suggested && !suggested.suggestions.length && <p role="status">No grid cell is currently High or Severe. No alert is suggested.</p>}
+      {suggested?.suggestions.length > 0 && <ul className="shelter-list">{suggested.suggestions.map(item => <li key={item.cell_id}>
+        <strong>{item.level.toUpperCase()} · {item.latitude.toFixed(2)}°N, {item.longitude.toFixed(2)}°E · score {item.score}</strong>
+        <p>{item.suggested_message}</p>
+        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item)}>Use as draft</button></li>)}</ul>}
+      <button type="button" disabled={busy} onClick={loadSuggestions}>Refresh suggestions</button>
+    </section>
     <form className="shelter-form" aria-label="Telegram notification composer" onSubmit={review}>
       <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose authorized destination</option>{options?.destinations.map(d => <option key={d.id} value={d.id} disabled={d.opted_in===false}>{d.label}{d.test_only ? ' — private test only' : ''}{d.opted_in===false ? ' — not opted in' : ''}</option>)}</select>
       <label htmlFor="notice-kind">Notification type</label><select id="notice-kind" disabled={busy || !enabled} value={kind} onChange={e => change(setKind, e.target.value)}><option value="informational">Informational</option><option value="emergency">Emergency — independently verified by administrator</option></select>

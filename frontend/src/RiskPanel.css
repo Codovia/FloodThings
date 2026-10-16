@@ -1,0 +1,31 @@
+.risk-badge { display: inline-block; padding: 0 0.5em; border-radius: 999px; color: #fff; font-weight: 700; font-size: 0.85em; line-height: 1.35; }
+.risk-badge[data-level="moderate"] { color: #1f1a00; }
+.risk-summary-levels { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2em 0.45em; }
+.risk-panel h4 { margin: 0.75rem 0 0.35rem; }
+.risk-factors table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+.risk-factors th, .risk-factors td { text-align: left; vertical-align: top; padding: 0.3rem 0.4rem; border-bottom: 1px solid #dde3ea; }
+.risk-factors tbody th { font-weight: 600; }
+.risk-factors tbody th small { display: block; font-weight: 400; color: #5a6470; }
+.risk-panel, .risk-factors { min-width: 0; max-width: 100%; }
+.risk-factors table { table-layout: fixed; }
+.risk-factors th, .risk-factors td { overflow-wrap: anywhere; white-space: normal; }
+.risk-factors thead th:nth-child(2), .risk-factors td:nth-child(2) { width: 30%; }
+.risk-factors thead th:nth-child(3), .risk-factors td:nth-child(3) { width: 16%; }
+.risk-factors tr[data-status="unavailable"] td, .risk-factors tr[data-status="no_data"] td { color: #6b7280; }
+.risk-legend { display: flex; flex-wrap: wrap; gap: 0.4rem 0.8rem; align-items: center; margin: 0.4rem 0; }
+.risk-legend span::before { content: ""; display: inline-block; width: 0.9em; height: 0.9em; margin-right: 0.3em; vertical-align: -0.1em; border-radius: 2px; background: var(--swatch); }
+.route-summary { border-left: 4px solid #1565c0; padding-left: 0.6rem; }
+.route-steps { max-height: 12rem; overflow: auto; font-size: 0.9rem; }
+.risk-suggestions li { border-left: 4px solid #e65100; padding-left: 0.6rem; }
+.risk-factors th small, .risk-factors a { white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+.risk-factors table, .risk-factors thead, .risk-factors tbody, .risk-factors tr { max-width: 100%; }
+/* Flood Map: five layer toggles must not push the desktop map below its minimum height. */
+@media (min-width: 1100px) and (min-height: 740px) {
+  .intelligence-workspace .intelligence-toolbar fieldset { gap: 2px 14px; align-items: center; }
+  .intelligence-workspace .intelligence-toolbar fieldset legend { float: left; margin: 0 6px 0 0; padding: 0; }
+  .intelligence-workspace .intelligence-toolbar fieldset label { min-height: 26px; }
+}
+@media (min-width: 1100px) and (max-width: 1700px) and (min-height: 740px) {
+  .intelligence-workspace .intelligence-toolbar fieldset { flex: 1 1 100%; order: 3; }
+}
+.risk-factor-details>summary{cursor:pointer;font-weight:600;text-decoration:underline;text-underline-offset:3px;margin:6px 0}

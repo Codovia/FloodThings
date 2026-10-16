@@ -6,6 +6,8 @@ import useMapResize from './useMapResize.js'
 import DrainageResearchLayers from './DrainageResearchLayers.jsx'
 import useShelterDirectory, { validShelterDirectory } from './useShelterDirectory.js'
 import { PageLink } from './AppNavigation.jsx'
+import { useRiskGrid, LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
+import './RiskPanel.css'
 
 const mechanismNames={riverine:'Riverine flooding',pluvial_urban_waterlogging:'Pluvial or urban waterlogging',flash:'Flash flooding',coastal:'Coastal flooding',unknown:'Unknown'}
 const EMPTY={type:'FeatureCollection',features:[]}
@@ -29,7 +31,7 @@ function useEvidence(url, retry=0){
  return !url?{data:null,error:null,loading:false}:state.url===url?state:{data:null,error:null,loading:true}
 }
 
-function IntelligenceGeography({district,history,drainage,shelters,point,onPoint,onFeature}){
+function IntelligenceGeography({district,history,drainage,shelters,risk,point,onPoint,onFeature}){
  const element=useRef(null),map=useRef(null),select=useRef(onPoint),detail=useRef(onFeature)
  const [tileError,setTileError]=useState(false)
  select.current=onPoint;detail.current=onFeature
@@ -49,6 +51,12 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
   if(!map.current)return
   const layers=[]
   const add=layer=>{layer.addTo(map.current);layers.push(layer)}
+  if(risk?.cells){const half=risk.cell_size_degrees/2
+   for(const cell of risk.cells){
+    const box=L.rectangle([[cell.latitude-half,cell.longitude-half],[cell.latitude+half,cell.longitude+half]],{weight:0.4,color:'#ffffff',opacity:0.6,fillColor:LEVEL_COLORS[cell.level]||LEVEL_COLORS.unavailable,fillOpacity:cell.level==='low'?0.38:0.6,bubblingMouseEvents:false})
+    const text=document.createElement('span');text.textContent=`Rain risk ${LEVEL_NAMES[cell.level]||'Unavailable'} · next 24 h ${cell.rain_24h_mm??'–'} mm · past 5 days ${cell.rain_5d_mm??'–'} mm · peak ${cell.peak_mmh??'–'} mm/h`
+    box.bindTooltip(text);box.on('click',()=>select.current?.({name:`Risk cell ${cell.latitude.toFixed(2)}°N, ${cell.longitude.toFixed(2)}°E`,latitude:cell.latitude,longitude:cell.longitude}));add(box)
+   }}
   if(history?.boundary)add(L.geoJSON(history.boundary,{style:{color:'#50736e',weight:2,fillOpacity:0.025}}))
   if(history?.geojson)add(L.geoJSON(history.geojson,{bubblingMouseEvents:false,
    style:{color:'#9c3627',weight:1.5,fillColor:'#dc6047',fillOpacity:.75},
@@ -65,7 +73,7 @@ function IntelligenceGeography({district,history,drainage,shelters,point,onPoint
    const text=document.createElement('span');text.textContent=`${shelters.mode==='demonstration'?'DEMONSTRATION ONLY — ':''}${shelter.name} · ${shelter.available_capacity} reported spaces · verified ${shelter.verified_at}`;marker.bindPopup(text);add(marker)
   }
   return()=>{if(map.current)for(const layer of layers)map.current.removeLayer(layer)}
- },[history,drainage,shelters])
+ },[history,drainage,shelters,risk])
  useEffect(()=>{
   if(!map.current||!point)return
   const marker=L.circleMarker([point.latitude,point.longitude],{radius:5,color:'#344b68',fillOpacity:.6}).addTo(map.current)
@@ -93,7 +101,8 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  useEffect(()=>{if(selectedDistrictId!==undefined){setDistrictId(selectedDistrictId);setFeatureId(null)}},[selectedDistrictId])
  useEffect(()=>{if(selectedFeatureId!==undefined)setFeatureId(selectedFeatureId)},[selectedFeatureId])
  function chooseFeature(id){setFeatureId(id);onFeatureChange?.(id)}
- const [layers,setLayers]=useState({history:true,hazards:false,drainage:false,shelters:false})
+ const [layers,setLayers]=useState({risk:true,history:true,hazards:false,drainage:false,shelters:false})
+ const riskGrid=useRiskGrid(layers.risk)
  const directory=useEvidence('/api/flood-map/districts',retry)
  const query=new URLSearchParams(districtId?{district_id:districtId}:{})
  const historicalQuery=new URLSearchParams(query);if(eventId)historicalQuery.set('event_id',eventId)
@@ -113,13 +122,14 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
   <div className="panel intelligence-toolbar">
    <label htmlFor="intelligence-district">Flood Map district</label><select id="intelligence-district" value={districtId} disabled={!directory.data} onChange={e=>{setDistrictId(e.target.value);onDistrictChange?.(e.target.value,directory.data?.items.find(d=>d.id===e.target.value));chooseFeature(null)}}><option value="">Karnataka — statewide evidence</option>{directory.data?.items.map(d=><option key={d.id} value={d.id}>{d.name}</option>)}</select>
    <button onClick={()=>{setDistrictId('');onDistrictChange?.('',null);chooseFeature(null)}}>Return to statewide view</button>
-   <fieldset><legend>Evidence layers</legend>{[['history','Historical Flood Locations'],['hazards','Potential Flood-Prone Zones'],['drainage','Drainage / waterways'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}</fieldset>
+   <fieldset><legend>Evidence layers</legend>{[['risk','Live rain risk (statewide)'],['history','Historical Flood Locations'],['hazards','Potential Flood-Prone Zones'],['drainage','Drainage / waterways'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}</fieldset>
    {layers.history&&<label>Recorded event<select aria-label="Recorded event" value={eventId} onChange={e=>{setEventId(e.target.value);chooseFeature(null)}}><option value="">All reviewed public spatial events</option>{(safeHistory?.events||[]).map(e=><option key={e.event_id} value={e.event_id}>Event {e.event_id} · {e.start_date} – {e.end_date_inclusive}</option>)}</select></label>}
   </div>
-  <div className="intelligence-layout"><div className="intelligence-map-stage">  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} point={point} onPoint={onPoint} onFeature={chooseFeature}/>
+  <div className="intelligence-layout"><div className="intelligence-map-stage">  <IntelligenceGeography district={district} history={safeHistory} drainage={drainage.data} shelters={shownShelters} risk={layers.risk&&riskGrid.data?.cells?riskGrid.data:null} point={point} onPoint={onPoint} onFeature={chooseFeature}/>
   <p className="map-legend"><span className="water-swatch"/>Historical water polygons · dashed blue outline: bounded drainage study · teal circles: verified shelter entrances · small slate circle: selected weather point. No hazard polygons are registered.</p>
-</div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <p className="historical-notice">Historical event-window maximum satellite observations. This is not current flooding, predicted risk, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
+</div><aside className="intelligence-sidebar" aria-label="Map evidence and limitations" tabIndex={0}>  <p className="historical-notice">Historical layer: event-window maximum satellite observations, not current flooding, flooded roads or evacuation advice. No validated district flood-risk classes are available.</p>  <div aria-live="polite" aria-busy={loading} className="intelligence-coverage">
    {loading&&<p role="status">Loading selected map evidence…</p>}
+   {layers.risk&&<div className="risk-grid-status"><p><strong>Live rain risk:</strong> {riskGrid.loading&&!riskGrid.data?'loading statewide grid':riskGrid.error?riskGrid.error:riskGrid.data?`${riskGrid.data.cells.filter(c=>['high','severe'].includes(c.level)).length} of ${riskGrid.data.cells.length} cells High or Severe · checked ${new Date(riskGrid.data.retrieved_at).toLocaleString('en-IN',{timeZone:'Asia/Kolkata'})} IST`:'unavailable'}.</p><div className="risk-legend" aria-label="Rain risk legend">{['low','moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div><p className="muted">{riskGrid.data?.note||'Rain-only ~28 km grid.'} Experimental, not an official warning. Click a cell for the full assessment on Home.</p></div>}
    {!!failures.length&&<p role="alert" className="notice error">{failures.map(s=>s.error).join(' · ')} No substitute geometry is shown. <button onClick={()=>{setRetry(n=>n+1);if(layers.shelters)shelters.refresh()}}>Retry map evidence</button></p>}
    <p><strong>{district?.name||'Karnataka statewide view'}</strong> · {directory.data?.total??'Unavailable'} district names; current LGD reconciliation unresolved. Statewide selection does not imply statewide hazard coverage.</p>
    {district&&!district.navigation_bounds&&<p className="notice">Verified public navigation bounds are unavailable for {district.name}; evidence filtering works, and the map retains its previous view.</p>}

@@ -24,7 +24,7 @@ const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 test('automatic GPS uses exact coordinates, browser accuracy and one weather session across routes',async({page})=>{
  const requests=await setup(page);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();expect(requests).toHaveLength(0)
  await locate(page,13.34261,74.74953);await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(requests).toEqual(['?latitude=13.34261&longitude=74.74953'])
- await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible();await expect(page.getByText('Next-24-hour total unavailable')).toBeVisible()
+ await expect(page.getByText(/Browser-reported accuracy: ±40 m/)).toBeVisible();await expect(page.getByLabel('Flood and drainage risk')).toBeVisible();await expect(page.getByText('Next-24-hour total unavailable')).toBeVisible()
  expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
  await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>window.__watchCalls)).toBe(0);expect(requests).toHaveLength(1)
@@ -55,7 +55,7 @@ test('Home does not request historical evidence or shelters and retains explicit
  await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})
  await page.goto('/');await expect(page.getByRole('heading',{name:'Nearby river outlook'})).toBeVisible();await expect(page.getByText(/Select a location to check supported river coverage/)).toBeVisible()
  await expect(page.getByText(/reviewed historical cells|Verified Open shelters/)).toHaveCount(0);await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0)
- await expect(page.getByText(/Missing forecasts do not mean no flood risk/)).toBeVisible();expect(calls).toEqual([])
+ await expect(page.getByText(/do not mean no flood risk/)).toBeVisible();expect(calls).toEqual([])
 })
 test('Shelters retains its fresh fixture and expiry protection after removal from Home',async({page})=>{
  await setup(page,'denied');let calls=0

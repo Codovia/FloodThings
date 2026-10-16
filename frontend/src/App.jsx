@@ -15,7 +15,7 @@ import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.j
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
  '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather details','Seven-day forecast, rainfall chart and source details for your selected point.'],
- '/flood-map': ['GIS · HISTORICAL EVIDENCE','Flood Map','Explore reviewed satellite flood extents and bounded drainage research layers. These are historical records, not live flooding.'],
+ '/flood-map': ['LIVE RISK · HISTORICAL EVIDENCE','Flood Map','Statewide experimental rain risk (refreshed every 3 hours), plus historical satellite flood extents and drainage layers.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
  '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Share what you observed. Location can be selected manually; photos are optional.'],
@@ -50,7 +50,7 @@ export default function App() {
  return <>
   <AppHeader path={path} navigate={navigate} mode={deploymentMode} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
-   <section className="page-intro"><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
+   <section className={'page-intro'+(path==='/'?' visually-hidden':'')}><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
    {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
@@ -71,6 +71,6 @@ export default function App() {
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
    {!info&&<PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
   </main>
-  <footer className="app-footer"><div><strong>FloodPulse</strong><p>Environmental information and verified response resources.</p></div><div><p>Weather by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p><p>Validated flood prediction is unavailable. Experimental rainfall inference is not a flood probability or an emergency warning.</p></div></footer>
+  <footer className="app-footer"><div><strong>FloodPulse</strong><p>Environmental information and verified response resources.</p></div><div><p>Weather, river (Copernicus GloFAS) and elevation (Copernicus GLO-90) data by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p><p>Risk levels are an experimental rule-based index from live data, not a flood probability or an official warning. Follow IMD, KSNDMC and district advice.</p></div></footer>
  </>
 }

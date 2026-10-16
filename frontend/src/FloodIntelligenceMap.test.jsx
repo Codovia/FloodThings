@@ -4,7 +4,7 @@ import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/reac
 import {readFileSync} from 'node:fs'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 const directory=JSON.parse(readFileSync('../data/reference/karnataka_location_directory_v2/directory.json','utf8'))
-const mock=vi.hoisted(()=>({map:vi.fn(),tileLayer:vi.fn(),geoJSON:vi.fn(),circleMarker:vi.fn(),clicks:[]}))
+const mock=vi.hoisted(()=>({map:vi.fn(),tileLayer:vi.fn(),geoJSON:vi.fn(),circleMarker:vi.fn(),rectangle:vi.fn(),clicks:[]}))
 vi.mock('leaflet',()=>({default:mock}))
 vi.mock('./DrainageResearchLayers.jsx',()=>({default:()=> <div>Existing drainage rasters remain separate</div>}))
 const props={event_id:2728,grid_row:1,grid_col:2,district:'Udupi',clear_views:2,start_date:'2005-09-14',end_date_inclusive:'2005-09-30',place_name:null,mechanism:{method:'No reviewed source establishes a flood mechanism'},geometry_meaning:'Source-exported observation-qualified raster cell',processing_grid_m:250,observation_quality:'qualified_source_mask_and_clear_views',source:{name:'Global Flood Database V1',url:'https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1',license:'CC BY-NC 4.0',license_url:'https://creativecommons.org/licenses/by-nc/4.0/',conditions:'Attribution and non-commercial use required'},dataset_version:'udupi_flood_spatial_v1',image_id:'GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728',retrieved_at:'2026-10-03T00:00:00Z',limitations:'Historical maximum, not daily occurrence',source_geometry_sha256:'a'.repeat(64)}
@@ -19,6 +19,7 @@ function responses(url){
  if(u.pathname==='/api/flood-map/drainage')return reply({status:'unavailable',message:'No reviewed drainage context is available for this district.'})
  if(u.pathname.startsWith('/api/flood-map/features/'))return reply({feature})
  if(u.pathname==='/api/shelters')return reply({status:'available',mode:'live',shelters:[]})
+ if(u.pathname==='/api/risk/grid')return reply({status:'available',experimental:true,cell_size_degrees:0.25,retrieved_at:'2026-10-16T00:00:00Z',note:'Rain-only test grid',cells:[{id:'g1',latitude:13.625,longitude:74.625,level:'moderate',score:2,rain_24h_mm:70,rain_5d_mm:10,peak_mmh:8}]})
  throw Error('Unexpected test request '+url)
 }
 beforeEach(()=>{
@@ -26,6 +27,7 @@ beforeEach(()=>{
  mock.map.mockReturnValue({setView:vi.fn().mockReturnThis(),on:vi.fn(),fitBounds:vi.fn(),removeLayer:vi.fn(),remove:vi.fn()})
  mock.tileLayer.mockReturnValue({addTo:vi.fn().mockReturnThis(),on:vi.fn()})
  mock.circleMarker.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindPopup:vi.fn()})
+ mock.rectangle.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindTooltip:vi.fn(),on:vi.fn()})
  mock.geoJSON.mockImplementation((data,options)=>{for(const f of data.features||[])options?.onEachFeature?.(f,{bindTooltip:vi.fn(),on:(name,fn)=>mock.clicks.push(fn)});return {addTo:vi.fn().mockReturnThis(),getBounds:()=>({})}})
  vi.stubGlobal('fetch',vi.fn(responses))
 })
@@ -43,5 +45,5 @@ it('shelter toggle shows genuine empty state with no fabricated points',async()=
 it('rejects unverified closed shelter responses',async()=>{fetch.mockImplementation(u=>u==='/api/shelters'?reply({mode:'live',shelters:[{status:'closed',latitude:13,longitude:74}]}):responses(u));await start();fireEvent.click(screen.getByLabelText('Verified shelters'));await screen.findByText(/Shelter availability could not be verified/);expect(mock.circleMarker).not.toHaveBeenCalled()})
 it('provider errors show retry without replacement polygons',async()=>{fetch.mockImplementation(u=>u.startsWith('/api/flood-map/historical')?reply({detail:'Historical checksum failed'},false):responses(u));render(<FloodIntelligenceMap/>);await screen.findByRole('alert');expect(screen.getByText(/No substitute geometry/)).toBeTruthy();expect(mock.geoJSON).not.toHaveBeenCalled();expect(screen.getByRole('button',{name:'Retry map evidence'})).toBeTruthy()})
 it('late previous-district response cannot replace current filtering',async()=>{let release;fetch.mockImplementation(u=>u.includes('district_id=nic%3Audupi.nic.in')?new Promise(r=>{release=()=>r({ok:true,json:async()=>history})}):responses(u));await start();fireEvent.change(screen.getByLabelText('Flood Map district'),{target:{value:'nic:udupi.nic.in'}});fireEvent.change(screen.getByLabelText('Flood Map district'),{target:{value:'nic:kolar.nic.in'}});await screen.findByText(/0 eligible/);await act(async()=>release());expect(screen.queryByText(/1 eligible/)).toBeNull()})
-it('request controllers are cleaned up on unmount',()=>{const signals=[];fetch.mockImplementation((u,options)=>{signals.push(options.signal);return new Promise(()=>{})});const {unmount}=render(<FloodIntelligenceMap/>);unmount();expect(signals.length).toBe(2);expect(signals.every(s=>s.aborted)).toBe(true)})
+it('request controllers are cleaned up on unmount',()=>{const signals=[];fetch.mockImplementation((u,options)=>{signals.push(options.signal);return new Promise(()=>{})});const {unmount}=render(<FloodIntelligenceMap/>);unmount();expect(signals.length).toBe(3);expect(signals.every(s=>s.aborted)).toBe(true)})
 it('request timeout is explicit',async()=>{vi.useFakeTimers();fetch.mockImplementation((u,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')))));render(<FloodIntelligenceMap/>);await act(async()=>{await vi.advanceTimersByTimeAsync(15000)});expect(screen.getByRole('alert').textContent).toContain('timed out')})

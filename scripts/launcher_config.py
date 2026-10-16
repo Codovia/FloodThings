@@ -12,6 +12,7 @@ from urllib.parse import quote, urlsplit, urlunsplit
 CONNECTIONS = {'DATABASE_URL', 'SHELTER_DATABASE_URL'}
 TELEGRAM_KEYS = {'TELEGRAM_BOT_USERNAME', 'TELEGRAM_BOT_TOKEN',
                  'TELEGRAM_DESTINATIONS', 'TELEGRAM_WEBHOOK_SECRET'}
+ROUTING_KEYS = {'OPENROUTESERVICE_API_KEY'}  # Backend only; launcher_processes strips it from Vite.
 
 
 def private_file(path, limit, required_mode=None):
@@ -35,7 +36,7 @@ def private_file(path, limit, required_mode=None):
 
 
 def telegram_environment(root, environment):
-    """Read only Telegram keys; no evaluation, interpolation or DB overrides."""
+    """Read only Telegram and routing keys; no evaluation, interpolation or DB overrides."""
     result = dict(environment)
     try:
         contents = private_file(root / '.env', 65536, required_mode=0o600)
@@ -72,7 +73,7 @@ def telegram_environment(root, environment):
             if any(ord(c) < 32 or ord(c) == 127 for c in value):
                 raise ValueError()
             value.encode('utf-8')  # Reject escaped surrogates before exec errors can echo values.
-            if key in TELEGRAM_KEYS:
+            if key in TELEGRAM_KEYS | ROUTING_KEYS:
                 result.setdefault(key, value)  # Explicit empty values also override.
         return result
     except (ValueError, TypeError):

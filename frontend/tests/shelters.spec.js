@@ -18,7 +18,7 @@ test('actual PostgreSQL public directory is empty, read-only and leaves weather/
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.6,longitude:74.8,accuracy:40});await page.getByRole('button',{name:'Use my location'}).click()
  await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
  await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible()
- await expect(page.getByText('Validated flood forecast unavailable for this location.')).toBeVisible()
+ await expect(page.getByLabel('Flood and drainage risk')).toBeVisible()
 })
 
 test('explicit demonstration fixtures render exact entrance, mobile map and no unsafe replacement after failure',async({page})=>{

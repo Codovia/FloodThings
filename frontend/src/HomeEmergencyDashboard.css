@@ -81,3 +81,9 @@ main.app-content.page-home{flex:none;overflow:visible}
  .page-home .home-viewport-fit .home-map-stage{position:relative}
  .page-home .home-viewport-fit .home-tile-notice{position:absolute;left:14px;right:14px;bottom:64px;z-index:700;background:#fff;padding:8px 10px;border:1px solid #7897a5;box-shadow:0 2px 8px #17313c24}
 }
+/* Trimmed Home: actions first, one warning-status line, details collapsed. */
+.page-home .home-primary-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px 12px;margin:4px 0 8px}
+.page-home .home-primary-actions .button-link{text-align:center}
+.page-home .home-warning-status{font-size:.8125rem;margin:4px 0 0;color:#38504b}
+.page-home .home-sources p{margin:6px 0}
+@media(min-width:1100px){.page-home .page-intro.visually-hidden{position:absolute;margin:-1px;padding:0}}

@@ -18,6 +18,8 @@ from .reports import router as reports_router
 from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_outlook import router as river_outlook_router, RiverOutlook
+from .risk import router as risk_router, RiskService
+from .routing import router as routing_router
 
 
 @asynccontextmanager
@@ -27,6 +29,8 @@ async def lifespan(app: FastAPI):
         app.state.weather = OpenMeteoAdapter(client)
         app.state.reverse_geocoder = ReverseGeocoder(client)
         app.state.river_outlook = RiverOutlook(client)
+        app.state.risk = RiskService(client)
+        app.state.http = client
         try:
             yield
         finally:
@@ -46,6 +50,8 @@ app.include_router(reports_router)
 app.include_router(subscriptions_router)
 app.include_router(geocoding_router)
 app.include_router(river_outlook_router)
+app.include_router(risk_router)
+app.include_router(routing_router)
 
 
 @app.exception_handler(RequestValidationError)

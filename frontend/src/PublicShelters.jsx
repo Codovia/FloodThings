@@ -4,6 +4,7 @@ import ShelterMap from './ShelterMap.jsx'
 import useShelterDirectory from './useShelterDirectory.js'
 export { validShelterDirectory } from './useShelterDirectory.js'
 import './Shelters.css'
+import './RiskPanel.css'
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
 export function usableNavigationOrigin(point, now=Date.now()) {
   if (!point || point.kind === 'network' || !Number.isFinite(point.latitude) || Math.abs(point.latitude)>90 || !Number.isFinite(point.longitude) || Math.abs(point.longitude)>180) return null
@@ -12,17 +13,32 @@ export function usableNavigationOrigin(point, now=Date.now()) {
 }
 export default function PublicShelters({point=null,active,overview=false,mapTarget=null,districtId='',navigationBounds=null}) {
   const [open,setOpen]=useState(false),[navigation,setNavigation]=useState(null),[navigationNotice,setNavigationNotice]=useState(null)
+  // Routing availability is learned on the first explicit request, adding no background calls.
+  const [routing,setRouting]=useState(true),[route,setRoute]=useState(null),[routeBusy,setRouteBusy]=useState(false)
   const selectedPoint=point
   point=usableNavigationOrigin(point)
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
   const enabled=active===undefined?open:active
   const selectedKey=useRef(key);selectedKey.current=key
-  useEffect(()=>{selectedKey.current=enabled?key:null;setNavigation(null);setNavigationNotice(null);return()=>{selectedKey.current=null}},[key,enabled])
+  useEffect(()=>{selectedKey.current=enabled?key:null;setNavigation(null);setNavigationNotice(null);setRoute(null);return()=>{selectedKey.current=null}},[key,enabled])
   useEffect(()=>{if(!navigation)return;const timer=setTimeout(()=>setNavigation(null),5000);return()=>clearTimeout(timer)},[navigation])
   const current=useShelterDirectory(point,enabled),source=current.data
   const data=source?{...source,shelters:source.shelters.filter(s=>!districtId||s.district_id===districtId)}:null
-  const map=<><h2>Verified shelter entrances</h2><ShelterMap points={data?.shelters||[]} origin={point} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Only freshly revalidated Open destinations with spare capacity are marked. The selected-point marker is an origin, not a shelter. No markers are invented for missing records.</p></>
+  const map=<><h2>Verified shelter entrances</h2><ShelterMap points={data?.shelters||[]} route={route?.geometry} origin={point} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Only freshly revalidated Open destinations with spare capacity are marked. The selected-point marker is an origin, not a shelter. No markers are invented for missing records.</p></>
   const directions=s=>'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:`${s.latitude},${s.longitude}`,...(point?{origin:`${point.latitude},${point.longitude}`}:{})})
+  async function inAppRoute(shelter,profile='foot-walking'){
+    if(!usableNavigationOrigin(selectedPoint)){setNavigationNotice('Select an adequate starting location before requesting a route.');return}
+    setRouteBusy(true);setRoute(null);setNavigationNotice('Planning a route that avoids approved flood reports…')
+    const requestedKey=key
+    try{
+      const response=await fetch('/api/route',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({shelter_id:shelter.id,profile,origin:{latitude:point.latitude,longitude:point.longitude,accuracy_m:point.kind==='gps'?point.accuracy_m:(point.uncertainty_m||250)}})})
+      const body=await response.json()
+      if(selectedKey.current!==requestedKey)return
+      if(body.status==='not_configured')setRouting(false)
+      if(!response.ok||body.status!=='available'){setNavigationNotice((typeof body.detail==='string'?body.detail:body.message)||'Route unavailable. Use external directions.');return}
+      setRoute({...body,shelterId:shelter.id});setNavigationNotice(null)
+    }catch{setNavigationNotice('Routing request failed. Use external directions.')}finally{setRouteBusy(false)}
+  }
   async function checkDestination(event,shelter) {
     event.preventDefault();setNavigation(null)
     if(!usableNavigationOrigin(selectedPoint)){setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.');return}
@@ -63,6 +79,9 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
           {navigation?.id===s.id&&navigation.key===key&&navigation.url===directions(s)&&Date.now()-navigation.at<5000
             ?<a href={navigation.url} onClick={event=>{if(Date.now()-navigation.at>=5000||!usableNavigationOrigin(selectedPoint)){event.preventDefault();setNavigation(null)}else setNavigation(null)}} target="_blank" rel="noopener noreferrer">{data.mode==='demonstration'?'Inspect demonstration directions (not for travel)':'Open external directions to verified entrance'}</a>
             :<button type="button" onClick={event=>checkDestination(event,s)} disabled={current.loading}>Recheck availability for directions</button>}
+          {routing&&<button type="button" onClick={()=>inAppRoute(s)} disabled={routeBusy||current.loading}>{routeBusy?'Planning route…':'Show walking route on map'}</button>}
+          {route?.shelterId===s.id&&<div className="route-summary" role="status"><p><strong>{(route.distance_m/1000).toFixed(1)} km · about {Math.round(route.duration_s/60)} min walking</strong></p><p className="notice">{route.label}</p>
+            <details><summary>Turn-by-turn directions</summary><ol className="route-steps">{route.steps.map((step,i)=><li key={i}>{step.instruction} ({step.distance_m} m)</li>)}</ol></details><p className="muted">{route.attribution}</p></div>}
         </li>)}</ul>
       </>}
     </div>

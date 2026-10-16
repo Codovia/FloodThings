@@ -55,6 +55,6 @@ test('district view, mobile layout and historical warning remain usable', async 
   await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
   await page.getByRole('button', { name: 'Show district', exact: true }).click()
   await page.getByRole('button', { name: 'Zoom to mapped water', exact: true }).click()
-  await expect(page.getByText(/This is not current flooding/)).toBeVisible()
+  await expect(page.getByText(/not current flooding/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })

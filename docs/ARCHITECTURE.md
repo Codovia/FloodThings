@@ -27,7 +27,7 @@ This document describes how the system is built and why. Branch `floodpulse-v2` 
                          │  reports   ── citizen GPS/photo, moderation, export       │
                          │  shelters  ── admin verification, public directory, auth  │
                          │  notifications/telegram ── preview → approve → send       │
-                         │  routing   ── OpenRouteService with avoid-polygons (Day 3)│
+                         │  routing   ── OpenRouteService with avoid-polygons        │
                          └──────┬──────────────────────────────┬─────────────────────┘
                                 │                              │
                     PostgreSQL 16 + PostGIS            External real data (HTTPS)
@@ -39,11 +39,11 @@ This document describes how the system is built and why. Branch `floodpulse-v2` 
 
 | Feature | Backend | Frontend | Data |
 |---|---|---|---|
-| **Risk prediction** (statewide) | `risk.py` *(new)*, `rainfall_outlook.py` (AI model), `river_outlook.py` | `Home`, `Flood Map` risk layer | Open-Meteo, GloFAS, elevation, GFD history, approved reports |
+| **Risk prediction** (statewide) | `risk.py`, `rainfall_outlook.py` (AI model), `river_outlook.py` | `Home`, `Flood Map` risk layer | Open-Meteo, GloFAS, elevation, GFD history, approved reports |
 | **Early alerts** | `notifications.py`, `telegram_delivery.py`, `telegram_subscriptions.py` | `AdminNotifications`, `AlertSubscription` | Tables `admin_notifications`, `telegram_subscriptions` |
 | **Citizen reports** | `reports.py`, `report_images.py` | `CitizenReport`, `AdminReports` | Tables `citizen_reports`, images, audit |
 | **Shelter management** | `shelters.py`, `shelter_security.py` | `AdminShelters`, `AdminEntranceMap`, `PublicShelters` | Table `emergency_shelters`, audit |
-| **Navigation** | `routing.py` *(new, Day 3)* | `ShelterMap` route line | OpenRouteService |
+| **Navigation** | `routing.py` | `PublicShelters` + `ShelterMap` route line | OpenRouteService (key optional) |
 | Location + weather | `locations.py`, `location_weather.py`, `weather.py` | `useHomeGeolocation`, `LocationDirectorySelector` | Location directory v2 (31 districts) |
 | Flood history map | `flood_map.py`, `historical.py`, `drainage.py` | `FloodIntelligenceMap` | GFD 2005/2009 Udupi extents |
 | Platform | `main.py`, `location_database.py`, `mvp_database.py`, Alembic `0001`–`0006` | `App`, `AppNavigation` | — |
@@ -88,29 +88,40 @@ This document describes how the system is built and why. Branch `floodpulse-v2` 
 - **Return levels.** GloFAS's own flood thresholds are return periods. A 10-year record keeps history downloads at ~260 API calls per river cell. Each cell is cached on disk once.
 - **Rule-based, not trained.** A classifier needs verified flood and no-flood days; Karnataka has none that pass review. A transparent index can be explained factor by factor, which examiners and users can check.
 
-### 4.4 Validation
+### 4.4 API
 
-A retrospective case-study check uses archived real data on known flood periods:
+| Endpoint | Access | Returns |
+|---|---|---|
+| `GET /api/risk?latitude=&longitude=` | public | Point flood + drainage assessment with every factor, source and status; 422 outside Karnataka; 503 when rainfall is unavailable |
+| `GET /api/risk/grid` | public | 256-cell rain-only statewide grid, cached 3 h |
+| `GET /api/admin/risk/suggestions` | admin session | Draft alert texts for High/Severe cells; sends nothing |
+| `POST /api/route` | public | OpenRouteService route avoiding approved reports (count only exposed); `not_configured` without a key |
+
+Measured live on 16 Oct 2026: full grid in ~10 s (13 requests of 20 points, 4 in parallel), then served from cache; a point assessment takes 1–2 s (river history cached on disk per GloFAS cell).
+
+### 4.5 Validation (planned — not yet run)
+
+A retrospective case-study check will use archived real data on known flood periods:
 
 - Udupi, September 2005 and September–October 2009 (GFD events)
 - Karnataka, August 2019
 
-It is reported as "the index reached High/Severe on N of M known flood days". It is not called accuracy, because there are no verified negative days.
+It will be reported as "the index reached High/Severe on N of M known flood days". It is not called accuracy, because there are no verified negative days.
 
-### 4.5 The existing AI model
+### 4.6 The existing AI model
 
 `rainfall_logistic_v1` (logistic regression; predicts ≥64.5 mm/24 h; precision 14.5 %, recall 91.7 %) is trained for Kundapur and Mangaluru only. It is shown as a second opinion at those points and is not part of the score.
 
 ## 5. Early-alert flow
 
 ```
-risk engine (every 3 h) ── cell/point reaches High or Severe
-      └─▶ Suggested alert (draft; area, level, factors, sources)   ← deduplicated per area per 12 h
+statewide grid (cached 3 h) ── cell reaches High or Severe
+      └─▶ Suggested alert in Admin → Alerts (draft text, level, location)   ← computed on request, not stored
             └─▶ Admin edits text → Preview (exact message + recipients) → Approve → Telegram send
                   └─▶ Delivery result + audit record
 ```
 
-Citizens opt in with `/start floodpulse` and opt out with `/stop`. Suggestions never send on their own.
+"Use as draft" only fills the composer. Citizens opt in with `/start floodpulse` and opt out with `/stop`. Suggestions never send on their own; the existing Telegram deduplication, consent recheck and audit apply to every real send.
 
 ## 6. Navigation
 

@@ -8,11 +8,11 @@
 
 | Feature | Citizen sees | Administrator does |
 |---|---|---|
-| **Risk prediction** *(in progress)* | Flood risk and drainage (waterlogging) risk, Low → Severe, for any place in Karnataka, with the reason behind each level | Watches the statewide risk map |
+| **Risk prediction** | Flood risk and drainage (waterlogging) risk, Low → Severe, for any place in Karnataka, with the reason behind each level | Watches the statewide risk map |
 | **Early alerts** | Telegram alerts after opting in (`/start floodpulse`, `/stop`) | Reviews the suggested alert, edits it, previews and approves it |
 | **Citizen reports** | Reports flooding or a blocked drain with GPS + photo | Approves or rejects; approved reports feed drainage risk and routing |
 | **Shelters** | Open, verified shelters with capacity | Pins the entrance on a map and verifies capacity and status (expires after 24 h) |
-| **Navigation** *(in-app route in progress; Google Maps link works)* | Directions to a shelter that avoid approved flooded spots | — |
+| **Navigation** *(in-app route needs a free OpenRouteService key; Google Maps link always works)* | Directions to a shelter that avoid approved flooded spots | — |
 
 Every number comes from a real, timestamped source; if a source fails, the app says *unavailable*. How it all fits together is in **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 

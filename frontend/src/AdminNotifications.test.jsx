@@ -11,6 +11,7 @@ beforeEach(()=>{
  records=[];calls=[];outcome='accepted'
  request=vi.fn(async(path,options={})=>{
   if(path.endsWith('/options'))return config
+  if(path.endsWith('/risk/suggestions'))return {status:'available',suggestions:[],note:'Suggestions only.'}
   if(path.includes('?'))return {notifications:records,total:records.length}
   const body=JSON.parse(options.body);calls.push({path,body})
   if(path.endsWith('/send')){records=[{...row,status:outcome}];return records[0]}
@@ -64,7 +65,7 @@ it('supports verified shelter selection and independent emergency composition',a
 })
 it('cleans up pending requests and timers on unmount',async()=>{
  vi.useFakeTimers();const signals=[];request.mockImplementation((path,settings)=>{signals.push(settings.signal);return new Promise(()=>{})})
- const {unmount}=render(<AdminNotifications session={session} request={request} />);expect(signals).toHaveLength(2);unmount();expect(signals.every(s=>s.aborted)).toBe(true)
+ const {unmount}=render(<AdminNotifications session={session} request={request} />);expect(signals).toHaveLength(3);unmount();expect(signals.every(s=>s.aborted)).toBe(true)
  // Abort-aware fetch settles call() and clears its timer; emulate it in a second render.
  request.mockImplementation((path,settings)=>new Promise((resolve,reject)=>settings.signal.addEventListener('abort',()=>reject(Object.assign(Error(),{name:'AbortError'})))))
  const second=render(<AdminNotifications session={session} request={request} />);await act(async()=>second.unmount());await act(async()=>vi.runAllTimersAsync());expect(vi.getTimerCount()).toBe(0)

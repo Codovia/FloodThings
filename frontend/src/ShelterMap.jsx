@@ -5,7 +5,7 @@ import {tileMetadataURL,validatedTileMetadata} from './adminMapProvider.js'
 import useMapResize from './useMapResize.js'
 import 'leaflet/dist/leaflet.css'
 
-export default function ShelterMap({points=[],origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null}) {
+export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null}) {
   const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect),inspect=useRef(onInspect)
   const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
@@ -35,6 +35,7 @@ export default function ShelterMap({points=[],origin=null,onSelect=null,label='S
   useEffect(()=>{
     if(!map.current)return
     layers.current.clearLayers();const bounds=[]
+    if(route?.coordinates?.length>1){const line=route.coordinates.map(([lon,lat])=>[lat,lon]);L.polyline(line,{color:'#1565c0',weight:5,opacity:.85}).addTo(layers.current);bounds.push(...line)}
     if(origin){L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])}
     for(const point of points){
       const text=document.createElement('span');text.textContent=point.name
@@ -46,7 +47,7 @@ export default function ShelterMap({points=[],origin=null,onSelect=null,label='S
       if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):13,{animate:false})
       else if(bounds.length)map.current.fitBounds(bounds,{padding:[20,20],maxZoom:inspection?18:14,animate:false})
     }
-  },[points,origin,inspection])
+  },[points,origin,inspection,route])
   useEffect(()=>{if(navigationBounds&&map.current)map.current.fitBounds(navigationBounds,{padding:[20,20],animate:false})},[navigationBounds])
   useMapResize(map)
   return <><div ref={container} className="shelter-map" role="region" aria-label={label} />{tileError&&<p className="notice" role="status">{BASEMAP_NOTICE}</p>}</>
