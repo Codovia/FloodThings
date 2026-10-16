@@ -1,8 +1,8 @@
 # Citizen GPS/photo reporting — private MVP slice
 
-**14 October college rehearsal:** [current checklist and evidence](DEMONSTRATION_REHEARSAL_2026_10_14.md) records fresh actual-Chrome flood and drainage workflows against isolated PostGIS, including JPEG/PNG upload, consented EXIF, approval/rejection, restricted export and withdrawal. All incidents/coordinates/images were explicit fixtures. Native device GPS and physical camera capture still require human testing; CDP GPS and gallery upload do not prove those hardware paths. No operational reports or training labels were created.
+**14 October college rehearsal:** current checklist and evidence (archived in tag `archive/research-2026-10-16`) records fresh actual-Chrome flood and drainage workflows against isolated PostGIS, including JPEG/PNG upload, consented EXIF, approval/rejection, restricted export and withdrawal. All incidents/coordinates/images were explicit fixtures. Native device GPS and physical camera capture still require human testing; CDP GPS and gallery upload do not prove those hardware paths. No operational reports or training labels were created.
 
-Decision: [13 October emergency MVP](FLOODPULSE_MVP_PRIORITIES.md) authorizes implementation of the formerly documentation-only [reporting sketch](design/floodpulse_wireframes/05_experimental_report_flood.jpg). This supersedes that earlier document's instruction to wait for workflow approval. Existing security and scientific data integrity rules remain.
+Decision: [13 October emergency MVP](decisions/2026-10-13_MVP_PRIORITIES.md) authorizes implementation of the formerly documentation-only [reporting sketch](design/floodpulse_wireframes/05_experimental_report_flood.jpg). This supersedes that earlier document's instruction to wait for workflow approval. Existing security and scientific data integrity rules remain.
 
 ## Working path
 

@@ -71,7 +71,7 @@ Choose the intended demonstration mode before provisioning:
   database, leave shelter listings empty unless independently authorized and
   verified. A working admin account does not establish genuine shelter availability.
 - Full create/Open/Full/Closed demonstration with invented development fixtures:
-  follow [Safe administrator demonstration](RELEASE_DEMONSTRATION.md#safe-administrator-demonstration)
+  follow Safe administrator demonstration (archived in tag `archive/research-2026-10-16`)
   in a **separate disposable database**, with `SHELTER_DIRECTORY_MODE=demonstration`
   and visibly labelled records. Never seed this live database from old maps/OSM.
 
@@ -97,7 +97,7 @@ authorized later rotation, and revokes existing sessions.
 
 **Isolated-database caveat:** `start.sh` validates the database name
 `floodpulse_directory`; it will reject a differently named demo database. Use
-the release guide's [two-server alternative](RELEASE_DEMONSTRATION.md#start-the-production-build-locally-alternative)
+the release guide's two-server alternative (archived in tag `archive/research-2026-10-16`)
 with both private database URLs pointing to the disposable demo database. The
 launcher profile does not automatically configure those manual commands. Do not
 weaken the launcher guard or mix operational and demonstration records.
@@ -120,7 +120,7 @@ database; normal startup can start only the existing project container. Open
 Press Ctrl+C to stop owned web services and leave PostgreSQL running. Do not
 change to `localhost` while the exact admin origin is configured as `127.0.0.1`.
 
-Follow [Citizen demonstration](RELEASE_DEMONSTRATION.md#citizen-demonstration):
+Follow Citizen demonstration (archived in tag `archive/research-2026-10-16`):
 Kundapur then Mangaluru, seven real forecast cards, freshness and requested/grid
 coordinates, actual experimental rainfall model, historical/GIS layers, empty
 genuine shelter directory and mobile layout. Check internet/firewall access to
@@ -140,7 +140,7 @@ The edited commented template does not activate Telegram. No private destination
 or successful real delivery is verified.
 
 Follow the existing [README Telegram procedure](../README.md#administrator-approved-telegram-notifications)
-and [release Telegram procedure](RELEASE_DEMONSTRATION.md#telegram):
+and release Telegram procedure (archived in tag `archive/research-2026-10-16`):
 
 1. Resolve P0; obtain a legitimate bot from BotFather and arrange a consenting
    private test chat. The user must contact the bot first, per the official

@@ -153,7 +153,7 @@ precipitation **0 mm for 11:30–11:45 IST**. At reference **11:58:26 IST**, exa
 **14 October 12:00 IST**. This is a timestamped sample, not guaranteed future
 availability or evidence of no flooding. Forecast issue time remains unknown.
 
-See [Home browser measurements](HOME_EMERGENCY_DASHBOARD.md). Real viewport and
+See Home browser measurements (archived in tag `archive/research-2026-10-16`). Real viewport and
 full-page PNGs, raw responses, request URLs/parameters, baseline and post-change
 backend receipts are in ignored `data/recovery/home_weather_hourly_v1/`.
 The committed small recorded API-shaped fixture is explicitly test-only and

@@ -6,17 +6,11 @@ Clarify rarely: ask only when the request is truly ambiguous and a guess would b
 
 Output: complete answer with evidence, tested behavior and limitations; end with a concise summary. Tone: calm and direct. Never trade accuracy for brevity; cut filler and repetition.
 
-## Current product decision — 2026-10-13
+## Product decision — 2026-10-16 (supersedes 2026-10-13 sequencing)
 
-Read [the MVP priorities](docs/FLOODPULSE_MVP_PRIORITIES.md), [the priority addendum](AGENTS_MVP_ADDENDUM.md), and [the implementation handoff](CODEX_START_HERE.md) before work. These supersede previous sprint sequencing; the earlier Sprint 13.1 prompt was not executed. Target demonstration: **16 October 2026**.
+Read [ARCHITECTURE](docs/ARCHITECTURE.md), [the 4-day plan](docs/decisions/2026-10-16_4_DAY_PLAN.md) and the still-binding shelter/alert/report/dataset contracts in [the 13 October priorities](docs/decisions/2026-10-13_MVP_PRIORITIES.md) before work. FloodPulse is a **flood and drainage risk prediction and early-alert system for all of Karnataka, with shelter management and navigation**; target demonstration about **19 October 2026**. Risk prediction is a major feature, delivered as a transparent rule-based risk index from real live data (IMD rainfall categories, GloFAS return levels, elevation, historical floods, approved reports), always labelled experimental and never a calibrated flood probability. The Phase 12G NO-GO on training a validated flood-occurrence model still stands; do not wait for CWC. Risk output may *suggest* an alert draft; only an administrator's explicit approval sends it. Research pipeline code is archived in tag `archive/research-2026-10-16`.
 
-FloodPulse's USP is emergency response: citizen alerts, verified shelter administration and navigation, GPS/photo citizen reports, admin moderation, evidence extraction and provenance-aware future datasets. Prediction is a minimal experimental supporting feature. Do not wait for CWC's response; retain the Phase 12G validated-model training NO-GO.
-
-Advance one small P0/P1 vertical slice at a time. State its acceptance test, implement, verify, append results to `update.md`, then commit and push only verified scoped changes. Independently verify the remote hash. Distinguish live evidence from fixtures and report concrete missing dependencies.
-
-## Product decision — 2026-10-16 (supersedes the prediction scope above)
-
-Read [the 4-day plan](docs/FLOODPULSE_4_DAY_PLAN.md). The project is now a **flood and drainage risk prediction and early-alert system with shelter management and navigation**; target demonstration about **19 October 2026**. Risk prediction is a major feature, delivered as a transparent rule-based risk index from real live data (IMD rainfall categories, GloFAS return levels, elevation, historical floods, approved reports), always labelled experimental and never a calibrated flood probability. The Phase 12G NO-GO on training a validated flood-occurrence model still stands. Risk output may *suggest* an alert draft; only an administrator's explicit approval sends it. Research pipeline code is archived in tag `archive/research-2026-10-16`.
+Advance one small vertical slice at a time. State its acceptance test, implement, verify, append results to `update.md`, then commit and push only verified scoped changes. Independently verify the remote hash. Distinguish live evidence from fixtures and report concrete missing dependencies.
 
 ## Security and data integrity
 
