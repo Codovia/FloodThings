@@ -40,7 +40,7 @@ test('district selection survives all public routes; a historical cell never cha
 })
 test('mobile stacks the shared information and map, and exposes honest warning and hazard states',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/')
- await expect(page.getByText('Not connected',{exact:true})).toBeVisible()
+ await expect(page.locator('.official-summary')).toBeVisible()
  await expect(page.getByText(/do not mean no flood risk/)).toBeVisible()
  const left=await page.locator('.workspace-information').boundingBox(),map=await page.locator('.workspace-map').boundingBox()
  expect(map.y).toBeGreaterThan(left.y+left.height-1)

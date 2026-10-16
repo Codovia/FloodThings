@@ -12,6 +12,7 @@ beforeEach(()=>{
  request=vi.fn(async(path,options={})=>{
   if(path.endsWith('/options'))return config
   if(path.endsWith('/risk/suggestions'))return {status:'available',suggestions:[],note:'Suggestions only.'}
+  if(path.endsWith('/official/suggestions'))return {status:'available',note:'Drafts only.',suggestions:[{id:'imd-UDUPI-2026-10-16',district:'Udupi',date:'2026-10-16',level:'orange',warnings:['Very heavy rain'],source:'OFFICIAL_WARNING',suggested_kind:'informational',suggested_message:'TEST ONLY — Official IMD ORANGE warning for Udupi district today.'}]}
   if(path.includes('?'))return {notifications:records,total:records.length}
   const body=JSON.parse(options.body);calls.push({path,body})
   if(path.endsWith('/send')){records=[{...row,status:outcome}];return records[0]}
@@ -65,8 +66,14 @@ it('supports verified shelter selection and independent emergency composition',a
 })
 it('cleans up pending requests and timers on unmount',async()=>{
  vi.useFakeTimers();const signals=[];request.mockImplementation((path,settings)=>{signals.push(settings.signal);return new Promise(()=>{})})
- const {unmount}=render(<AdminNotifications session={session} request={request} />);expect(signals).toHaveLength(3);unmount();expect(signals.every(s=>s.aborted)).toBe(true)
+ const {unmount}=render(<AdminNotifications session={session} request={request} />);expect(signals).toHaveLength(4);unmount();expect(signals.every(s=>s.aborted)).toBe(true)
  // Abort-aware fetch settles call() and clears its timer; emulate it in a second render.
  request.mockImplementation((path,settings)=>new Promise((resolve,reject)=>settings.signal.addEventListener('abort',()=>reject(Object.assign(Error(),{name:'AbortError'})))))
  const second=render(<AdminNotifications session={session} request={request} />);await act(async()=>second.unmount());await act(async()=>vi.runAllTimersAsync());expect(vi.getTimerCount()).toBe(0)
+})
+it('official IMD drafts only fill the composer; nothing is previewed or sent automatically',async()=>{
+ await mount();const button=await screen.findByRole('button',{name:'Use as draft'})
+ expect(screen.getByText(/OFFICIAL IMD ORANGE · Udupi · 2026-10-16/)).toBeTruthy()
+ fireEvent.click(button);expect(screen.getByLabelText('Notification message').value).toBe('TEST ONLY — Official IMD ORANGE warning for Udupi district today.')
+ expect(calls).toHaveLength(0)
 })

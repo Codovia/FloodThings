@@ -16,6 +16,7 @@ export default function AdminNotifications({ session, request }) {
   const [preview, setPreview] = useState(null), [approved, setApproved] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(null)
   const previewHeading = useRef(null)
   const [suggested, setSuggested] = useState(null), [suggestError, setSuggestError] = useState(null)
+  const [officialDrafts, setOfficialDrafts] = useState(null), [officialError, setOfficialError] = useState(null)
   useEffect(() => { if (preview) previewHeading.current?.focus() }, [preview?.id])
   const busyRef = useRef(false), requestId = useRef(null), stopped = useRef(false), controllers = useRef(new Set())
 
@@ -44,7 +45,12 @@ export default function AdminNotifications({ session, request }) {
     try { const body = await call('/api/admin/risk/suggestions', {}, 60000); if (!Array.isArray(body?.suggestions)) throw Error('Suggestion response could not be validated'); if (!stopped.current) setSuggested(body) }
     catch (e) { if (!stopped.current) setSuggestError(e.message) }
   }
-  useEffect(() => { loadSuggestions() }, [session])
+  async function loadOfficial() {
+    setOfficialError(null)
+    try { const body = await call('/api/admin/official/suggestions', {}, 60000); if (!Array.isArray(body?.suggestions)) throw Error('Official suggestion response could not be validated'); if (!stopped.current) setOfficialDrafts(body) }
+    catch (e) { if (!stopped.current) setOfficialError(e.message) }
+  }
+  useEffect(() => { loadSuggestions(); loadOfficial() }, [session])
   function applySuggestion(item) { change(setMessage, item.suggested_message); setKind(item.suggested_kind) }
   function change(setter, value) { setter(value); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
   async function operation(action) {
@@ -80,6 +86,18 @@ export default function AdminNotifications({ session, request }) {
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
     {options?.send_limit&&<p>{options.send_limit}. Private recipients must send /start floodpulse to opt in; /stop opts out. Consent is checked again before an attempt.</p>}
     {error && <p role="alert">{error}</p>}
+    <section className="risk-suggestions official-suggestions" aria-labelledby="official-suggestions-title">
+      <h3 id="official-suggestions-title">Suggested alerts from official IMD warnings</h3>
+      <p>Drafts that relay India Meteorological Department Orange or Red district warnings for today and tomorrow, as issued. Nothing is sent until you edit, preview and approve it.</p>
+      {!officialDrafts && !officialError && <p role="status">Checking official IMD district warnings…</p>}
+      {officialError && <p role="status">Official warnings unavailable: {officialError}. This does not mean there is no warning.</p>}
+      {officialDrafts && !officialDrafts.suggestions.length && <p role="status">No Karnataka district has an IMD Orange or Red warning for today or tomorrow.</p>}
+      {officialDrafts?.suggestions.length > 0 && <ul className="shelter-list">{officialDrafts.suggestions.map(item => <li key={item.id}>
+        <strong>OFFICIAL IMD {item.level.toUpperCase()} · {item.district} · {item.date}</strong>
+        <p>{item.suggested_message}</p>
+        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item)}>Use as draft</button></li>)}</ul>}
+      <button type="button" disabled={busy} onClick={loadOfficial}>Refresh official warnings</button>
+    </section>
     <section className="risk-suggestions" aria-labelledby="risk-suggestions-title">
       <h3 id="risk-suggestions-title">Suggested alerts from the risk engine</h3>
       <p>Drafts only. Nothing is sent until you edit, preview and approve it.</p>

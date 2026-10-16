@@ -61,3 +61,20 @@ export function rankedSpots(cells, kind) {
   return [...cells].filter(c => c[kind].level !== 'unavailable')
     .sort((a, b) => (b[kind].score ?? -1) - (a[kind].score ?? -1) || a.distance_km - b.distance_km)
 }
+
+const OFFICIAL_LEVELS = new Set(['red', 'orange', 'yellow', 'green', null])
+export const validOfficial = d => !!d && d.official === true && d.imd && d.sachet && Array.isArray(d.sachet.alerts) &&
+  (d.imd.status !== 'available' || (Array.isArray(d.imd.days) && d.imd.days.every(x => OFFICIAL_LEVELS.has(x.level) && Array.isArray(x.warnings))))
+
+// Official IMD / NDMA SACHET warnings, displayed as issued. Statewide alerts load even without a place.
+export function useOfficialWarnings(point) {
+  const ok = point && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
+  const url = '/api/official/warnings' + (ok ? '?' + new URLSearchParams({ latitude: point.latitude.toFixed(5), longitude: point.longitude.toFixed(5) }) : '')
+  return validated(useJson(url, 10 * 60 * 1000), validOfficial)
+}
+
+export const validOfficialDistricts = d => !!d && d.official === true && Array.isArray(d.districts) &&
+  d.districts.every(x => typeof x.district === 'string' && x.geometry && Array.isArray(x.days) && x.days.every(day => OFFICIAL_LEVELS.has(day.level)))
+export function useOfficialDistricts(active) {
+  return validated(useJson(active ? '/api/official/districts' : null, 10 * 60 * 1000), validOfficialDistricts)
+}

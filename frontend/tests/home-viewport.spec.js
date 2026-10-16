@@ -26,7 +26,7 @@ for(const viewport of [{width:1366,height:768},{width:1920,height:1080},{width:1
  const needsScroll=await scroll.evaluate(n=>n.scrollHeight>n.clientHeight);if(viewport.height===768)expect(needsScroll).toBe(true)
  await scroll.focus();await page.keyboard.press('End');if(needsScroll)await expect.poll(()=>scroll.evaluate(n=>n.scrollTop)).toBeGreaterThan(0);else expect(await scroll.evaluate(n=>n.scrollTop)).toBe(0)
  expect(await page.evaluate(()=>scrollY)).toBe(0);expect(await page.locator('.home-essential-status').boundingBox()).toEqual(essential)
- await expect(page.getByText('Not connected',{exact:true})).toBeVisible();await bounded(page.getByText('Not connected',{exact:true}),viewport)
+ await expect(page.locator('.official-summary')).toBeVisible();await bounded(page.locator('.official-summary'),viewport)
  await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);expect(await page.evaluate(()=>scrollY)).toBe(0)
  await expect(page.getByText(/Open-Meteo model output, CC BY 4.0/)).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBe(viewport.height)
  await page.getByText('Map sources & limitations',{exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByText(/State outline: simplified 2011 context/)).toBeVisible();await bounded(page.locator('.home-map-limitations'),viewport)
@@ -45,5 +45,5 @@ test('mobile, short screens and enlarged accessibility text keep natural scrolli
  }
  await page.setViewportSize({width:1366,height:768});await page.goto('/');await expect(page.locator('.home-viewport-fit')).toBeVisible()
  await page.evaluate(()=>document.documentElement.style.fontSize='200%');await expect(page.locator('.home-viewport-fit')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeGreaterThan(768);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1366)
- await page.getByText('Not connected',{exact:true}).scrollIntoViewIfNeeded();await expect(page.getByText('Not connected',{exact:true})).toBeVisible()
+ await page.locator('.official-summary').scrollIntoViewIfNeeded();await expect(page.locator('.official-summary')).toBeVisible()
 })

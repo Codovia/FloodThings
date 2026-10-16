@@ -40,6 +40,7 @@ This document describes how the system is built and why. Branch `floodpulse-v2` 
 | Feature | Backend | Frontend | Data |
 |---|---|---|---|
 | **Risk prediction** (statewide) | `risk.py`, `rainfall_outlook.py` (AI model), `river_outlook.py` | `Home`, `Flood Map` risk layer | Open-Meteo, GloFAS, elevation, GFD history, approved reports |
+| **Official warnings** (displayed as issued) | `official.py` (`/api/official/warnings`, `/api/official/districts`, `/api/admin/official/suggestions`) | `OfficialWarnings` on Home, Flood Map IMD layer, Admin official drafts | IMD district-wise warnings (public GeoServer layer; codes from the IMD API reference), NDMA SACHET CAP 1.2 Karnataka RSS |
 | **Early alerts** | `notifications.py`, `telegram_delivery.py`, `telegram_subscriptions.py` | `AdminNotifications`, `AlertSubscription` | Tables `admin_notifications`, `telegram_subscriptions` |
 | **Citizen reports** | `reports.py`, `report_images.py` | `CitizenReport`, `AdminReports` | Tables `citizen_reports`, images, audit |
 | **Shelter management** | `shelters.py`, `shelter_security.py` | `AdminShelters`, `AdminEntranceMap`, `PublicShelters` | Table `emergency_shelters`, audit |

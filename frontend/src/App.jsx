@@ -15,7 +15,7 @@ import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.j
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
  '/weather': ['POINT WEATHER · EXPERIMENTAL AI','Weather details','Seven-day forecast, rainfall chart and source details for your selected point.'],
- '/flood-map': ['LIVE RISK · HISTORICAL EVIDENCE','Flood Map','Statewide experimental rain risk (refreshed every 3 hours), plus historical satellite flood extents and drainage layers.'],
+ '/flood-map': ['OFFICIAL WARNINGS · LIVE RISK · HISTORY','Flood Map','Official IMD district warnings, an experimental statewide rain-risk grid, and historical satellite flood extents and drainage layers.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
  '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Share what you observed. Location can be selected manually; photos are optional.'],

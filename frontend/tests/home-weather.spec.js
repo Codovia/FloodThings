@@ -42,7 +42,7 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
   const map=await page.locator('.home-flood-map').boundingBox();expect(map.height).toBeGreaterThan(300)
   const cards=await page.locator('.home-summary-card').all();for(const card of cards){const r=await card.boundingBox();expect(r.y+r.height).toBeLessThan(viewport.height)}
   await page.getByRole('region',{name:'Additional area information'}).focus();await page.keyboard.press('End');expect(await page.evaluate(()=>scrollY)).toBe(0)
-  await expect(page.getByText('Not connected',{exact:true})).toBeVisible()
+  await expect(page.locator('.official-summary')).toBeVisible()
  }else expect(size.height).toBeGreaterThan(viewport.height)
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})

@@ -1966,3 +1966,20 @@ Changes:
 Not done, needs a decision: approved citizen reports were not added as public map pins. The consent reporters accept states "No public publication or model training is authorized", so publishing them requires a new consent version first. Replay (plan 3c) and the validation table (3d) are not built.
 
 Verification: backend 667 passed (1 deselected as documented); frontend unit 283/283 (CitizenReport file 5/5 repeated runs); production build passed; Playwright full suite 84 passed, 8 skipped (6 pre-existing skips + 2 PostgreSQL-only), 0 failed. Live app: area endpoint 22–31 cells scored in ~2 s; Home driven in Chromium at 1366x768 with Kundapur selected, document height 768, no console errors after start-up (one transient /api/weather 503 while the backend was starting).
+
+
+## 2026-10-16 — Official warnings (IMD, NDMA SACHET) integrated
+
+User request: we cannot predict floods ourselves, so bring in official prediction/warning information and use it in the application.
+
+Research (live, 16 Oct 2026): NDMA SACHET publishes CAP 1.2 alerts per state (Karnataka RSS: https://sachet.ndma.gov.in/cap_public_website/rss/rss_karnataka.xml); messages seen were from IMD Bengaluru via Karnataka SNDMC with severity, expiry and LGD district codes. IMD's documented API (api.imd.gov.in, district-wise warnings) returned HTTP 401 — it needs IP whitelisting via IMD's nodal officer. IMD's public GeoServer layer `imd:district_warnings_india` (used by IMD's own district warning map) is reachable and carries the same fields as the documented API, so the API reference's warning-code and Day colour tables (1 red, 2 orange, 3 yellow, 4 green) are applied; this layer itself is undocumented. CWC's flood forecasting site has no public data API; CWC is a SACHET alert-generating agency. Google Flood Hub's API needs waitlist approval and is not a government source.
+
+Acceptance: official warnings are shown as issued and kept separate from the experimental index; failures read "unavailable — does not mean there is no warning"; expired/cancelled/non-Actual CAP alerts are hidden; old IMD bulletins are not shown as today; admin drafts from official warnings never send without explicit approval.
+
+Changes: `backend/app/official.py` (bounded fetches, DTD/entity-refusing XML parsing, 30 min IMD / 10 min RSS caches, immutable CAP cache, point-in-polygon district lookup, past bulletin days dropped, bulletins ≥2 days old marked stale); `/api/official/warnings`, `/api/official/districts`, admin-only `/api/admin/official/suggestions` (Orange/Red today and tomorrow, source OFFICIAL_WARNING). Home: official one-line status replaces "Official warning feed: Not connected"; "Official warnings" panel (IMD 5-day strip + active SACHET alerts) above the experimental prediction. Flood Map: "Official IMD warnings (today)" layer on by default with counts and legend. Admin: "Suggested alerts from official IMD warnings" fills the composer only. Privacy: access log now strips coordinates from /api/risk, /api/risk/area and /api/official/warnings (previously risk coordinates were logged).
+
+Live result: all 31 Karnataka districts resolved; Udupi Orange today (very heavy rain, thunderstorm), Yellow next three days; statewide 5 Orange · 8 Yellow · 18 Green; 8 admin drafts; SACHET 10 recent messages read, 0 active (3-hour nowcasts expired). Unauthenticated admin suggestions → 401.
+
+Verification: backend 678 passed (1 deselected as documented); frontend unit 288/288; production build passed; Playwright 84 passed, 8 skipped, 0 failed. Live Chromium: Home 1366x768 document height 768, no errors; Flood Map official layer rendered with no errors.
+
+Limitations: SACHET alerts are matched to the user's district by district names in the alert text (LGD codes are carried but the directory's LGD codes are unresolved). The IMD layer is IMD's public map service, not the whitelisted API; for production, request IMD API whitelisting. Official warnings are not added into the experimental score.
