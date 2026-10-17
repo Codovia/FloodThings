@@ -98,3 +98,24 @@ def test_full_shelter_and_bad_origins_are_refused(monkeypatch):
         assert http.post('/api/route', json=outside).status_code == 422
         vague = {**BODY, 'origin': {**BODY['origin'], 'accuracy_m': 5000}}
         assert http.post('/api/route', json=vague).status_code == 422
+
+
+@pytest.mark.parametrize('value, status', [
+    (None, 'not_configured'),
+    ('', 'not_configured'),
+    ('not-a-google-key', 'invalid_configuration'),
+    ('AIza' + 'T' * 35, 'available'),  # TEST FIXTURE ONLY — shape of a key, not a real credential
+])
+def test_embed_key_is_reported_only_when_configured_and_well_formed(monkeypatch, value, status):
+    if value is None:
+        monkeypatch.delenv('GOOGLE_MAPS_EMBED_API_KEY', raising=False)
+    else:
+        monkeypatch.setenv('GOOGLE_MAPS_EMBED_API_KEY', value)
+    with TestClient(make_app(monkeypatch, lambda r: httpx.Response(500))) as http:
+        response = http.get('/api/navigation/embed')
+        body = response.json()
+        assert response.status_code == 200 and body['status'] == status
+        assert response.headers['cache-control'] == 'no-store'
+        assert ('embed_key' in body) == (status == 'available')
+        if value and status != 'available':
+            assert value not in response.text

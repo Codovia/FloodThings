@@ -57,3 +57,18 @@
 .shelter-actions button.secondary{background:#fff;color:#165e63;border:1px solid #165e63}
 .shelter-actions button.secondary:hover:not(:disabled),.shelter-actions button.secondary[aria-pressed="true"]{background:#e6f2f1;color:#165e63}
 .shelter-safety{font-size:.875rem;padding:6px 10px;border-left:4px solid #d9822b;background:#fff8ef;border-radius:4px}
+/* In-app navigation panel (replaces the shelter map while navigating) */
+.shelter-navigation{display:flex;flex-direction:column;gap:8px;height:100%;min-height:0;overflow:auto}
+.shelter-navigation-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.shelter-navigation-head .eyebrow{margin:0}
+.shelter-navigation-head h2{margin:2px 0 0;font-size:1.1rem}
+.shelter-navigation-head button.secondary,.shelter-navigation-head button{flex-shrink:0;min-height:34px;padding:6px 12px;font-size:.8125rem;background:#fff;color:#165e63;border:1px solid #165e63}
+.shelter-navigation>.notice,.shelter-navigation>p{margin:0}
+.shelter-navigation-bar{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:8px}
+.shelter-navigation-bar p{margin:0}
+.shelter-navigation-frame{display:block;width:100%;flex:1 1 0;min-height:200px;border:1px solid #d7dfdd;border-radius:10px}
+.shelter-navigation .shelter-map{flex:1 1 240px;min-height:240px;height:auto}
+.shelter-navigation-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
+.shelter-navigation-actions>a,.shelter-navigation-actions>button{min-height:40px;padding:8px 16px;font-weight:700}
+.shelter-navigation-actions p{margin:0;flex:1 1 220px;font-size:.8125rem}
+@media (max-width:700px){.shelter-navigation-frame{min-height:380px}.shelter-navigation{height:auto}}

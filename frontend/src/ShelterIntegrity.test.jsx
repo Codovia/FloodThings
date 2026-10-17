@@ -38,7 +38,7 @@ it('successful directions revalidation requires a second explicit navigation act
  render(<PublicShelters point={point} active/>);await screen.findByText('DEMONSTRATION ONLY fixture')
  expect(screen.queryByRole('link',{name:/Inspect demonstration directions/})).toBeNull()
  fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
- await screen.findByText(/Availability rechecked/);expect(fetch).toHaveBeenCalledTimes(2)
+ await screen.findByText(/Availability rechecked/);expect(fetch.mock.calls.filter(([u])=>String(u).startsWith('/api/shelters'))).toHaveLength(2)
  const link=screen.getByRole('link',{name:/Inspect demonstration directions/});expect(new URL(link.href).searchParams.get('destination')).toBe('13.5,74.7')
 })
 it('navigation permission expires after five seconds and cannot be reused',async()=>{

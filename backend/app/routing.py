@@ -8,10 +8,11 @@ import asyncio
 import json
 import math
 import os
+import re
 from typing import Literal
 
 import httpx
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import text
@@ -91,6 +92,22 @@ async def post_json(client, url, body, key):
 @router.get('/api/route/status')
 def route_status():
     return {'configured': bool(os.environ.get('OPENROUTESERVICE_API_KEY')), 'provider': 'openrouteservice'}
+
+
+GOOGLE_EMBED_KEY = re.compile(r'^AIza[0-9A-Za-z_-]{35}$')
+
+
+@router.get('/api/navigation/embed')
+def navigation_embed(response: Response):
+    # A Maps Embed API key is public by design (it appears in the iframe URL); Google
+    # recommends restricting it to this site's HTTP referrers. Never reported unless well formed.
+    response.headers['Cache-Control'] = 'no-store'
+    key = os.environ.get('GOOGLE_MAPS_EMBED_API_KEY', '').strip()
+    if not key:
+        return {'status': 'not_configured', 'message': 'In-app Google route preview is not configured.'}
+    if not GOOGLE_EMBED_KEY.match(key):
+        return {'status': 'invalid_configuration', 'message': 'The configured Google Maps Embed key is not well formed.'}
+    return {'status': 'available', 'provider': 'Google Maps Embed API', 'embed_key': key}
 
 
 def store_provider():

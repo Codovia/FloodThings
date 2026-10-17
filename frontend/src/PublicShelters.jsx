@@ -2,6 +2,7 @@ import OfficialHelp from './OfficialHelp.jsx'
 import React,{useEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
 import ShelterMap from './ShelterMap.jsx'
+import ShelterNavigation from './ShelterNavigation.jsx'
 import useShelterDirectory from './useShelterDirectory.js'
 export { validShelterDirectory } from './useShelterDirectory.js'
 import './Shelters.css'
@@ -17,6 +18,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const [open,setOpen]=useState(false),[navigation,setNavigation]=useState(null),[navigationNotice,setNavigationNotice]=useState(null)
   // Routing availability is learned on the first explicit request, adding no background calls.
   const [routing,setRouting]=useState(true),[route,setRoute]=useState(null),[routeBusy,setRouteBusy]=useState(false)
+  const [navTarget,setNavTarget]=useState(null),[travelMode,setTravelMode]=useState('walking')
   const [selected,setSelected]=useState(null),[locating,setLocating]=useState(false),[locateError,setLocateError]=useState(null)
   const selectedPoint=point
   point=usableNavigationOrigin(point)
@@ -32,7 +34,11 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const focus=ordered.find(s=>s.id===selected)||null
   function select(id,scroll=false){setSelected(id);if(scroll)document.getElementById('shelter-'+id)?.scrollIntoView?.({block:'nearest',behavior:'smooth'})}
   const pins=ordered.map((s,i)=>({...s,label:String(i+1),name:`${i+1}. ${s.name} · ${s.available_capacity} places free`,tone:s.available_capacity<Math.max(10,s.capacity*0.15)?'limited':'ok'}))
-  const map=<><h2>Verified shelter entrances</h2><ShelterMap points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
+  const navListed=!!navTarget&&!!data?.shelters.some(s=>s.id===navTarget.id&&s.latitude===navTarget.latitude&&s.longitude===navTarget.longitude)
+  const navLink=navTarget&&navigation?.id===navTarget.id&&navigation.key===key&&Date.now()-navigation.at<5000?navigation.url:null
+  const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
+  useEffect(()=>{if(navTarget)document.getElementById('shelter-navigation-title')?.scrollIntoView?.({block:window.matchMedia?.('(max-width:700px)').matches?'start':'nearest',behavior:'smooth'})},[navTarget?.id])
+  const map=navigator_||<><h2>Verified shelter entrances</h2><ShelterMap points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
   function locate(){
     if(!onLocate)return
     if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');return}
@@ -63,6 +69,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
     const found=latest?.shelters.find(s=>s.id===shelter.id&&s.latitude===shelter.latitude&&s.longitude===shelter.longitude)
     if(!found){setNavigationNotice('This destination could not be revalidated. No directions were opened. Check the current directory.');return}
     setNavigation({id:found.id,key:requestedKey,url:directions(found),at:Date.now()})
+    setNavTarget(found)
     setNavigationNotice('Availability rechecked. Select directions again within five seconds to open external navigation. Reported conditions and road access may still change.')
   }
   return <section className={overview?"panel shelters-overview":"panel shelters-panel"} aria-labelledby="public-shelters-title">
@@ -79,7 +86,8 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
       {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
       {data?.shelters.length>0&&<>
         <p className="shelter-summary"><strong>{data.shelters.length} open {data.shelters.length===1?'shelter':'shelters'} with free space</strong>{data.retrieved_at&&<> · checked {clock(data.retrieved_at)}</>}</p>
-        {!mapTarget&&!overview&&<ShelterMap points={pins} origin={point} focus={focus} onInspect={p=>select(p.id,true)} label="Verified open shelter entrances" />}
+        {!mapTarget&&!overview&&navigator_}
+        {!mapTarget&&!overview&&!navigator_&&<ShelterMap points={pins} origin={point} focus={focus} onInspect={p=>select(p.id,true)} label="Verified open shelter entrances" />}
         <ol aria-label="Available shelter destinations" className="shelter-list">{ordered.map((s,i)=>{
           const used=Math.min(100,Math.round(100*(s.capacity-s.available_capacity)/Math.max(1,s.capacity)))
           return <li key={s.id} id={'shelter-'+s.id} className={'shelter-card'+(selected===s.id?' selected':'')}>
