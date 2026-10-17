@@ -52,7 +52,7 @@ test('kilometre-accuracy GPS loads actual selected-point weather and an approxim
  await page.route('https://api.bigdatacloud.net/**',route=>route.fulfill({json:{city:'TEST ONLY approximate town',countryCode:'IN',lookupSource:'coordinates',latitude:13.4,longitude:74.7}}))
  await page.goto('/');await expect(page.getByRole('heading',{name:'TEST ONLY approximate town',exact:true})).toBeVisible()
  await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible();expect(calls.weather).toEqual(['?latitude=13.4&longitude=74.7'])
- await expect(page.getByText(/Approximate provider town label/)).toBeVisible()
+ await expect(page.getByText(/Town name is approximate \(BigDataCloud\)/)).toBeVisible()
 })
 test('coarse GPS can use a clearly marked network estimate for weather but never river context',async({page})=>{
  const {calls}=await setup(page,{accuracy:279949})

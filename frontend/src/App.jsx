@@ -10,6 +10,7 @@ import AdminShelters from './AdminShelters.jsx'
 import CitizenReport from './CitizenReport.jsx'
 import AlertSubscription from './AlertSubscription.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
+import HowItWorks from './HowItWorks.jsx'
 import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.js'
 
 const pageInfo={
@@ -19,6 +20,7 @@ const pageInfo={
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
  '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Share what you observed. Location can be selected manually; photos are optional.'],
+ '/how-it-works': ['PREDICTION · AI · EVIDENCE','How FloodPulse predicts','How the flood and drainage risk is calculated, what the machine-learning experiments showed, and where AI is used.'],
  '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Review citizen evidence, manage shelters and control project notifications.'],
 }
 
@@ -42,7 +44,7 @@ export default function App() {
  const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
  const publicPage=path !== '/admin' && !!pageInfo[path]
- const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'
+ const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'
  const sheltersPage=path==='/shelters'
  const info=pageInfo[path]
  function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
@@ -68,9 +70,10 @@ export default function App() {
     {path==='/flood-map'&&<FloodIntelligenceMap point={selectedPoint} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
    </div>}
    {path==='/alerts'&&<AlertSubscription navigate={navigate}/>}
+   {path==='/how-it-works'&&<HowItWorks navigate={navigate}/>}
    {path==='/report'&&<CitizenReport/>}
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
-   {!info&&<PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}
+   {!info&&<nav className="not-found" aria-label="Suggested pages"><PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink><PageLink to="/flood-map" navigate={navigate}>Flood Map</PageLink><PageLink to="/shelters" navigate={navigate}>Shelters</PageLink><PageLink to="/report" navigate={navigate}>Report an incident</PageLink></nav>}
   </main>
   <footer className="app-footer"><div><strong>FloodPulse</strong><p>Environmental information and verified response resources.</p></div><div><p>Weather, river (Copernicus GloFAS) and elevation (Copernicus GLO-90) data by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.</p><p>Risk levels are an experimental rule-based index from live data, not a flood probability or an official warning. Follow IMD, KSNDMC and district advice.</p></div></footer>
  </>

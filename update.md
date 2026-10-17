@@ -2184,3 +2184,13 @@ Unchanged: consent text, retention, USER_REPORTED until moderation, explicit rev
 Verification: frontend unit 312/312 (new test: time shortcut, depth/road line in the submitted description, place label, checklist, receipt reset); build passed; Playwright 83 passed + updated ui-ux keyboard order (emergency links → GPS camera → Event type) with reports and mvp-e2e specs 5 passed, 2 skipped. Live Chromium desktop (GPS) and phone (manual map inside step 2, "Same street ±50 m"), place lookup answered by a fixture and submissions intercepted so nothing was stored; no page errors.
 
 Follow-up after the demonstration: store depth and road usability as proper columns (additive migration) instead of a description prefix.
+
+## 2026-10-18 — Pre-demo audit: "How it works" page, app identity, plainer wording
+
+User request: check the UI/UX and features before hosting and the demonstration (now 22 October), list improvements and implement the feasible ones.
+
+Audit (every route, 1366x768 and 390 px phone, live data): no page errors (only the expected unauthenticated admin-session 401); no horizontal overflow. Gaps: nothing explained the prediction or the AI work (the question the guide and panel will ask); browser title still "Karnataka weather", no icon, not installable on phones; Home location line used jargon; 404 had a full-width button and no suggestions; on Admin login the footer floated mid-screen.
+
+Changes: new "How it works" page in the main menu (`/how-it-works`): pipeline, the seven risk factors with thresholds, the Phase 5.8 benchmark (six methods, ROC-AUC on 2022–23, floods caught), why no ML model beat the rainfall rule, the deployed rainfall model's fact sheet, the path to a real flood model, data sources — figures taken from the archived Phase 5.8 report and the model metadata; Home links to it. `index.html`: descriptive title and meta description, SVG icon, 192/512 px PNG icons, web app manifest (add to home screen). Home location messages in plain words ("Your device location (±20 m). Town name is approximate (BigDataCloud); district not verified."). 404 offers Home, Flood Map, Shelters and Report. Footer at the bottom on short scrolling pages.
+
+Verification: frontend unit 312/312 (navigation test now expects seven menu links; geolocation messages updated); build passed (icons and manifest in dist); Playwright 82 passed + the two home-emergency specs updated for the new wording, re-run with home-location-river and navigation specs: 24 passed. Live Chromium: new page fits at 1366, 1280 and 390 px with no sideways scroll.

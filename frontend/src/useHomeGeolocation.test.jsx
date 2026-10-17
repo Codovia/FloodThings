@@ -78,7 +78,7 @@ it('manual choice aborts pending geocoding and rejects even an ignored-abort lat
  expect(selected).toHaveBeenCalledTimes(1);expect(h.result.current.status).toBe('manual');expect(h.result.current.gps).toBeNull()
 })
 it('disabled naming leaves accepted precise GPS and makes manual naming available',async()=>{
- const h=mount();await act(async()=>success(position()));expect(selected).toHaveBeenCalledTimes(1);expect(h.result.current.gps.name).toBe('GPS-selected point');expect(h.result.current.message).toContain('Place naming is unavailable')
+ const h=mount();await act(async()=>success(position()));expect(selected).toHaveBeenCalledTimes(1);expect(h.result.current.gps.name).toBe('GPS-selected point');expect(h.result.current.message).toContain('The place name is unavailable')
 })
 it('times out naming without discarding the accepted weather coordinates',async()=>{
  fetch.mockImplementation((_,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')))))
@@ -93,7 +93,7 @@ it.each([150,1200,8000])('accepts ±%s m for approximate weather without treatin
 it('automatically names a live browser fix through the permitted client provider',async()=>{
  fetch.mockImplementation(async url=>({ok:true,json:async()=>url==='/api/location/provider'?{provider:'BigDataCloud'}:{city:'TEST ONLY city',countryCode:'IN',lookupSource:'coordinates',latitude:13.34,longitude:74.74}}))
  const h=mount();await act(async()=>success(position(13.34,74.74,1200)))
- expect(h.result.current.gps.name).toBe('TEST ONLY city');expect(h.result.current.message).toContain('Approximate provider town label')
+ expect(h.result.current.gps.name).toBe('TEST ONLY city');expect(h.result.current.message).toContain('Town name is approximate (BigDataCloud)')
  expect(fetch.mock.calls[1][0]).toContain('latitude=13.34');expect(fetch.mock.calls.some(([u])=>u==='/api/location/reverse')).toBe(false)
 })
 it('a coarse browser fix uses a separately attributed network point without sending coarse coordinates',async()=>{

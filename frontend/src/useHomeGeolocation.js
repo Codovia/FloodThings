@@ -75,20 +75,20 @@ export default function useHomeGeolocation(active, manualRevision, hasSelection,
             if (accuracy > MAX_CITY_ACCURACY_M) { finish('Approximate weather point accepted; accuracy cannot support a town label. Select your town.', coverage); return }
             const named = await clientName(gps, job)
             if (pending.current !== job || !live.current || job.revision !== manualRevision.current) return
-            finish(); setState({ status: coverage, message: `Approximate provider town label · BigDataCloud · browser uncertainty ±${Math.round(accuracy)} m. District unverified.`, gps: named }); select.current(named); return
+            finish(); setState({ status: coverage, message: `Your device location (±${Math.round(accuracy)} m). Town name is approximate (BigDataCloud); district not verified.`, gps: named }); select.current(named); return
           }
           const response = await fetch('/api/location/reverse', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ latitude: gps.latitude, longitude: gps.longitude, accuracy_m: accuracy }), signal: job.controller.signal })
           const body = await response.json()
           if (pending.current !== job || !live.current || job.revision !== manualRevision.current || job.controller.signal.aborted) return
           if (response.ok && body.status === 'available' && body.accuracy_supported === true && body.geometry_verification === 'provider_locality_polygon_covers_accuracy' && body.source?.provider === 'MapTiler' && typeof body.name === 'string' && body.name.trim() && body.name.length <= 322) {
             const named = { ...gps, name: body.name, name_source: body.source, name_feature_id: body.feature_id, provider_context_label: body.context_label, administrative_identity_status: body.administrative_identity_status }
-            finish(); setState({ status: coverage, message: `Provider place label · Browser-reported accuracy: ±${Math.round(accuracy)} m. District filter unchanged.`, gps: named }); select.current(named)
+            finish(); setState({ status: coverage, message: `Your device location (±${Math.round(accuracy)} m). Place name is approximate; your district filter is unchanged.`, gps: named }); select.current(named)
           } else {
-            finish(); setState({ status: coverage, message: `Browser-reported accuracy: ±${Math.round(accuracy)} m. Place naming is unavailable; select your town.` + (coverage === 'outside' ? ' Your location is outside Karnataka.' : coverage === 'uncertain' ? ' Border coverage uncertain.' : ''), gps })
+            finish(); setState({ status: coverage, message: `Your device location (±${Math.round(accuracy)} m). The place name is unavailable; search for your town to name it.` + (coverage === 'outside' ? ' Your location is outside Karnataka.' : coverage === 'uncertain' ? ' Border coverage uncertain.' : ''), gps })
           }
         } catch {
           if (pending.current === job && live.current && job.revision === manualRevision.current) {
-            finish(); setState({ status: coverage, message: `Browser-reported accuracy: ±${Math.round(accuracy)} m. Place naming is unavailable; select your town.` + (coverage === 'outside' ? ' Your location is outside Karnataka.' : coverage === 'uncertain' ? ' Border coverage uncertain.' : ''), gps })
+            finish(); setState({ status: coverage, message: `Your device location (±${Math.round(accuracy)} m). The place name is unavailable; search for your town to name it.` + (coverage === 'outside' ? ' Your location is outside Karnataka.' : coverage === 'uncertain' ? ' Border coverage uncertain.' : ''), gps })
           }
         } })()
       }, error => networkFallback(error?.code === 1 ? 'Location permission was denied. Search for a place instead.' : error?.code === 3 ? 'Location request timed out. Search for a place or try again.' : 'Location could not be determined. Search for a place instead.', error?.code === 1 ? 'denied' : error?.code === 3 ? 'timeout' : 'unavailable'), { enableHighAccuracy: true, timeout: GPS_TIMEOUT_MS, maximumAge: 0 })
