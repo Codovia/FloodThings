@@ -115,3 +115,6 @@
 .route-steps-details summary{cursor:pointer;font-weight:600}
 .shelter-navigation>*{flex-shrink:0}
 .shelter-navigation>.shelter-map,.shelter-navigation>.shelter-navigation-frame{flex-shrink:1}
+.shelter-pick-start{margin:4px 0 8px}
+.shelter-pick-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;margin:6px 0;border-radius:8px;background:#fff1dc;border:2px solid #d9822b}
+.shelter-pick-banner button{min-height:32px;padding:4px 12px}

@@ -4,7 +4,7 @@ import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/reac
 import PublicShelters from './PublicShelters.jsx'
 import AdminShelters from './AdminShelters.jsx'
 // The admin entrance map's click handler is exposed so tests can simulate a map selection.
-vi.mock('./ShelterMap.jsx',()=>({default:({label,onSelect})=>{if(onSelect&&label==='Administrator entrance selection map')globalThis.__adminMapSelect=onSelect;return <div role="region" aria-label={label} />}}))
+vi.mock('./ShelterMap.jsx',()=>({default:({label,onSelect})=>{if(onSelect&&label==='Administrator entrance selection map')globalThis.__adminMapSelect=onSelect;if(label==='Verified open shelter entrances')globalThis.__shelterMapSelect=onSelect;return <div role="region" aria-label={label} />}}))
 const point={name:'Test origin',latitude:13.6,longitude:74.8}
 const row={id:'isolated-test',name:'DEMONSTRATION ONLY fixture',address:'Never a real shelter',district_id:'nic:udupi.nic.in',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'Fixture information',status:'open',verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12.4,restrictions:'DO NOT TRAVEL',contact:null}
 const list=(rows=[row],mode='demonstration')=>({status:'available',mode,shelters:rows,total:rows.length,verification_valid_hours:24})
@@ -134,4 +134,16 @@ it('an imprecise location never produces directions and says how to fix it',asyn
  const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate} nearestRequest={1}/>);await waitFor(()=>expect(onLocate).toHaveBeenCalled())
  rerender(<PublicShelters point={gpsPoint(900)} active onLocate={onLocate} nearestRequest={1}/>)
  expect(await screen.findByText(/too uncertain \(±900 m\) for directions/)).toBeTruthy();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
+})
+it('when GPS is refused, the start can be clicked on the shelter map and directions continue',async()=>{
+ const onLocate=vi.fn();stubGps(null)
+ const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(row.name)
+ expect(globalThis.__shelterMapSelect).toBeNull()  // map clicks do nothing until the user chooses to pick a start
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Choose my start on the map'}))
+ expect(screen.getAllByText('Click your starting point on the map.').length).toBeGreaterThan(0)
+ act(()=>{globalThis.__shelterMapSelect({latitude:13.36,longitude:74.76})})
+ expect(onLocate).toHaveBeenCalledWith({name:'Start point chosen on the map',latitude:13.36,longitude:74.76,kind:'map',uncertainty_m:50})
+ rerender(<PublicShelters point={{name:'Start point chosen on the map',latitude:13.36,longitude:74.76,kind:'map',uncertainty_m:50}} active onLocate={onLocate}/>)
+ expect(await screen.findByRole('heading',{name:'Directions to '+row.name})).toBeTruthy()
 })

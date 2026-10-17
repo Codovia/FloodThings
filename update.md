@@ -2136,3 +2136,15 @@ Acceptance: the navigation panel offers "Avoids reported flooding" (default; Ope
 Fixed during verification: the route-source switch was squashed to zero height in the fixed-height desktop panel (flex shrink); a refused location dropped the original "adequate starting location" explanation (caught by shelter-integrity.spec) — both now shown.
 
 Verification: frontend unit 306/306 (new: flood-aware route first, option hidden when unconfigured, auto-locate then directions, Home nearest request, imprecise location refused); build passed; Playwright full run 83 passed + the corrected shelter-integrity spec re-run with shelters/home specs 23 passed, 2 skipped (8 skipped in the full run are PostgreSQL-only). Live Chromium desktop and 390 px phone: Home → Use my location → Go to nearest open shelter → Shelters directions panel with the OpenRouteService route (6.9 km, ~83 min walking); no page errors.
+
+## 2026-10-17 — Shelters: "Get directions" works on laptops (choose start on the map)
+
+User report: Get directions on the Shelters page is not working.
+
+Reproduced live (app unchanged since 4bf738b): precise GPS (±25 m) opened the directions panel with the OpenRouteService route; location refused → "Location unavailable or permission denied"; Wi-Fi-level accuracy (±800 m, typical for laptops) → "too uncertain". Both refusals come from the existing navigation-origin rule (GPS ≤ 100 m and ≤ 5 min, or an explicitly chosen point), which is kept. The page's only fallback was the collapsed "Change location" control, which on Shelters has no map (5 searchable localities or typed coordinates), so laptops had no practical way to get directions.
+
+Acceptance: when location is refused or too imprecise, a "Choose my start on the map" button appears; it enables a one-time start-point click on the shelter map (map clicks do nothing otherwise), the chosen point is labelled "Start point chosen on the map", and directions continue automatically with the usual availability recheck. This uses the already documented option "Choose a starting point on the map", so no safety rule is relaxed.
+
+Verification: frontend unit 307/307 (new test: refusal → choose on map → directions; map inert until requested); build passed; Playwright 84 passed, 8 skipped. Live Chromium: desktop with ±800 m location → fallback → 2.1 km / 25 min walking route; phone with location refused → fallback → 0.7 km / 9 min route; no page errors.
+
+Data issue observed (not changed): the live public shelter shows test text in Restrictions ("awrg") and Approved contact; the administrator should correct it.

@@ -19,6 +19,8 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   // Routing availability is learned on the first explicit request, adding no background calls.
   const [routing,setRouting]=useState(true),[route,setRoute]=useState(null),[routeBusy,setRouteBusy]=useState(false)
   const [pending,setPending]=useState(null),locateTried=useRef(false)
+  // When GPS is refused or imprecise, the start can be clicked on the shelter map instead.
+  const [retryTarget,setRetryTarget]=useState(null),[pickingStart,setPickingStart]=useState(null)
   const [navTarget,setNavTarget]=useState(null),[travelMode,setTravelMode]=useState('walking')
   const [selected,setSelected]=useState(null),[locating,setLocating]=useState(false),[locateError,setLocateError]=useState(null)
   const selectedPoint=point
@@ -39,7 +41,14 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const navLink=navTarget&&navigation?.id===navTarget.id&&navigation.key===key&&Date.now()-navigation.at<5000?navigation.url:null
   const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
   useEffect(()=>{if(navTarget)document.getElementById('shelter-navigation-title')?.scrollIntoView?.({block:window.matchMedia?.('(max-width:700px)').matches?'start':'nearest',behavior:'smooth'})},[navTarget?.id])
-  const map=navigator_||<><h2>Verified shelter entrances</h2><ShelterMap points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
+  function startPicking(){setPickingStart(retryTarget||'nearest');setNavigationNotice('Click your starting point on the map.');requestAnimationFrame(()=>document.querySelector('.shelter-pick-banner')?.scrollIntoView?.({block:'center',behavior:'smooth'}))}
+  function pickStart(p){
+    const target=pickingStart;setPickingStart(null);setRetryTarget(null)
+    onLocate?.({name:'Start point chosen on the map',latitude:p.latitude,longitude:p.longitude,kind:'map',uncertainty_m:50})
+    locateTried.current=true;setPending(target);setNavigationNotice('Start point set. Rechecking availability for directions…')
+  }
+  const pickBanner=pickingStart&&<div className="shelter-pick-banner" role="status"><strong>Click your starting point on the map.</strong> <button type="button" className="secondary" onClick={()=>{setPickingStart(null);setNavigationNotice(null)}}>Cancel</button></div>
+  const map=navigator_||<><h2>Verified shelter entrances</h2>{pickBanner}<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
   function locate(onFail){
     if(!onLocate)return
     if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');onFail?.();return}
@@ -64,7 +73,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   // Directions need a precise start: ask for location first, then continue automatically.
   function needLocation(target){
     locateTried.current=true;setPending(target);setNavigationNotice('Finding your location for directions… allow location access if your browser asks.')
-    locate(()=>{setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.')})
+    locate(()=>{setRetryTarget(target);setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.')})
   }
   const handledNearest=useRef(0)  // each Home "nearest shelter" press is handled once
   useEffect(()=>{if(nearestRequest>handledNearest.current&&enabled){handledNearest.current=nearestRequest;locateTried.current=false;setPending('nearest')}},[nearestRequest,enabled])
@@ -72,13 +81,13 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
     if(!pending||!enabled)return
     if(!point){
       if(!locateTried.current&&onLocate&&!locating)needLocation(pending)
-      else if(locateTried.current&&!locating&&selectedPoint){setPending(null);setNavigationNotice(`Your location is too uncertain${Number.isFinite(selectedPoint.accuracy_m)?` (±${Math.round(selectedPoint.accuracy_m)} m)`:''} for directions. Try again outdoors, or choose your town with "Change location".`)}
-      else if(!onLocate){setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions.')}
+      else if(locateTried.current&&!locating&&selectedPoint){setRetryTarget(pending);setPending(null);setNavigationNotice(`Your location is too uncertain${Number.isFinite(selectedPoint.accuracy_m)?` (±${Math.round(selectedPoint.accuracy_m)} m)`:''} for directions. Choose your start on the map instead, or try again outdoors.`)}
+      else if(!onLocate){setRetryTarget(pending);setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions.')}
       return
     }
     if(current.loading||!data||data.shelters.some(s=>s.straight_line_km===null))return  // wait for distances from this start point
     const target=pending==='nearest'?ordered[0]:ordered.find(s=>s.id===pending.id)
-    setPending(null);locateTried.current=false
+    setPending(null);setRetryTarget(null);locateTried.current=false
     if(!target){setNavigationNotice(pending==='nearest'?'No verified open shelter with free places is available right now. Call 112 or 080-1070 for help.':'This shelter is no longer listed as available.');return}
     select(target.id);void checkDestination({preventDefault(){}},target)
   },[pending,enabled,point?.latitude,point?.longitude,selectedPoint,locating,current.loading,data])
@@ -105,12 +114,14 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
       {current.loading&&<p role="status">Checking shelter directory…</p>}
       {current.error&&<p role="alert">{current.error}. No substitute destinations are shown.</p>}
       {navigationNotice&&<p role="status" className="shelter-navigation-notice">{navigationNotice}</p>}
+      {retryTarget&&!pickingStart&&onLocate&&<button type="button" className="shelter-pick-start" onClick={startPicking}>Choose my start on the map</button>}
       {data?.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated test assignments, not actual emergency shelters. Do not travel to these points.</strong></p>}
       {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
       {data?.shelters.length>0&&<>
         <p className="shelter-summary"><strong>{data.shelters.length} open {data.shelters.length===1?'shelter':'shelters'} with free space</strong>{data.retrieved_at&&<> · checked {clock(data.retrieved_at)}</>}</p>
         {!mapTarget&&!overview&&navigator_}
-        {!mapTarget&&!overview&&!navigator_&&<ShelterMap points={pins} origin={point} focus={focus} onInspect={p=>select(p.id,true)} label="Verified open shelter entrances" />}
+        {!mapTarget&&!overview&&!navigator_&&pickBanner}
+        {!mapTarget&&!overview&&!navigator_&&<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} origin={point} focus={focus} onInspect={p=>select(p.id,true)} label="Verified open shelter entrances" />}
         <ol aria-label="Available shelter destinations" className="shelter-list">{ordered.map((s,i)=>{
           const used=Math.min(100,Math.round(100*(s.capacity-s.available_capacity)/Math.max(1,s.capacity)))
           return <li key={s.id} id={'shelter-'+s.id} className={'shelter-card'+(selected===s.id?' selected':'')}>
