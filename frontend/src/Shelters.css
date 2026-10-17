@@ -110,3 +110,8 @@
 .admin-place-lookup{margin:6px 0;padding:8px 10px;border-radius:8px;border:1px solid #cfe0ea;background:#f4f9fc}
 .admin-place-lookup p{margin:3px 0}
 .admin-place-note{font-weight:700;color:#8a4b00}
+.shelter-route-source{align-self:flex-start}
+.shelter-navigation .route-summary p{margin:2px 0}
+.route-steps-details summary{cursor:pointer;font-weight:600}
+.shelter-navigation>*{flex-shrink:0}
+.shelter-navigation>.shelter-map,.shelter-navigation>.shelter-navigation-frame{flex-shrink:1}

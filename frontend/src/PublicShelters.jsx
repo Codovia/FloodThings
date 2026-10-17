@@ -14,10 +14,11 @@ export function usableNavigationOrigin(point, now=Date.now()) {
   if (point.kind === 'gps' && (!Number.isFinite(point.accuracy_m) || point.accuracy_m>100 || point.accuracy_m<0 || !Number.isFinite(point.gps_timestamp) || point.gps_timestamp>now || now-point.gps_timestamp>300000)) return null
   return point
 }
-export default function PublicShelters({point=null,active,overview=false,mapTarget=null,districtId='',navigationBounds=null,onLocate=null}) {
+export default function PublicShelters({point=null,active,overview=false,mapTarget=null,districtId='',navigationBounds=null,onLocate=null,nearestRequest=0}) {
   const [open,setOpen]=useState(false),[navigation,setNavigation]=useState(null),[navigationNotice,setNavigationNotice]=useState(null)
   // Routing availability is learned on the first explicit request, adding no background calls.
   const [routing,setRouting]=useState(true),[route,setRoute]=useState(null),[routeBusy,setRouteBusy]=useState(false)
+  const [pending,setPending]=useState(null),locateTried=useRef(false)
   const [navTarget,setNavTarget]=useState(null),[travelMode,setTravelMode]=useState('walking')
   const [selected,setSelected]=useState(null),[locating,setLocating]=useState(false),[locateError,setLocateError]=useState(null)
   const selectedPoint=point
@@ -39,12 +40,12 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
   useEffect(()=>{if(navTarget)document.getElementById('shelter-navigation-title')?.scrollIntoView?.({block:window.matchMedia?.('(max-width:700px)').matches?'start':'nearest',behavior:'smooth'})},[navTarget?.id])
   const map=navigator_||<><h2>Verified shelter entrances</h2><ShelterMap points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
-  function locate(){
+  function locate(onFail){
     if(!onLocate)return
-    if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');return}
+    if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');onFail?.();return}
     setLocating(true);setLocateError(null)
     navigator.geolocation.getCurrentPosition(r=>{setLocating(false);onLocate({name:'Your GPS location',latitude:r.coords.latitude,longitude:r.coords.longitude,accuracy_m:r.coords.accuracy,gps_timestamp:r.timestamp,kind:'gps'})},
-      ()=>{setLocating(false);setLocateError('Location unavailable or permission denied. Use "Change location" to choose your place.')},{enableHighAccuracy:true,timeout:10000,maximumAge:0})
+      ()=>{setLocating(false);setLocateError('Location unavailable or permission denied. Use "Change location" to choose your place.');onFail?.()},{enableHighAccuracy:true,timeout:10000,maximumAge:0})
   }
   const directions=s=>'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:`${s.latitude},${s.longitude}`,...(point?{origin:`${point.latitude},${point.longitude}`}:{})})
   async function inAppRoute(shelter,profile='foot-walking'){
@@ -60,8 +61,30 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
       setRoute({...body,shelterId:shelter.id});setNavigationNotice(null)
     }catch{setNavigationNotice('Routing request failed. Use external directions.')}finally{setRouteBusy(false)}
   }
+  // Directions need a precise start: ask for location first, then continue automatically.
+  function needLocation(target){
+    locateTried.current=true;setPending(target);setNavigationNotice('Finding your location for directions… allow location access if your browser asks.')
+    locate(()=>{setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.')})
+  }
+  const handledNearest=useRef(0)  // each Home "nearest shelter" press is handled once
+  useEffect(()=>{if(nearestRequest>handledNearest.current&&enabled){handledNearest.current=nearestRequest;locateTried.current=false;setPending('nearest')}},[nearestRequest,enabled])
+  useEffect(()=>{
+    if(!pending||!enabled)return
+    if(!point){
+      if(!locateTried.current&&onLocate&&!locating)needLocation(pending)
+      else if(locateTried.current&&!locating&&selectedPoint){setPending(null);setNavigationNotice(`Your location is too uncertain${Number.isFinite(selectedPoint.accuracy_m)?` (±${Math.round(selectedPoint.accuracy_m)} m)`:''} for directions. Try again outdoors, or choose your town with "Change location".`)}
+      else if(!onLocate){setPending(null);setNavigationNotice('Select an adequate starting location before requesting directions.')}
+      return
+    }
+    if(current.loading||!data||data.shelters.some(s=>s.straight_line_km===null))return  // wait for distances from this start point
+    const target=pending==='nearest'?ordered[0]:ordered.find(s=>s.id===pending.id)
+    setPending(null);locateTried.current=false
+    if(!target){setNavigationNotice(pending==='nearest'?'No verified open shelter with free places is available right now. Call 112 or 080-1070 for help.':'This shelter is no longer listed as available.');return}
+    select(target.id);void checkDestination({preventDefault(){}},target)
+  },[pending,enabled,point?.latitude,point?.longitude,selectedPoint,locating,current.loading,data])
   async function checkDestination(event,shelter) {
     event.preventDefault();setNavigation(null)
+    if(!usableNavigationOrigin(selectedPoint)&&onLocate&&!pending){needLocation(shelter);return}
     if(!usableNavigationOrigin(selectedPoint)){setNavigationNotice('Select an adequate starting location before requesting directions. Network estimates and stale or imprecise GPS fixes cannot be used.');return}
     setNavigationNotice('Rechecking destination availability…')
     const requestedKey=key,latest=await current.refresh()
@@ -92,7 +115,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
           const used=Math.min(100,Math.round(100*(s.capacity-s.available_capacity)/Math.max(1,s.capacity)))
           return <li key={s.id} id={'shelter-'+s.id} className={'shelter-card'+(selected===s.id?' selected':'')}>
           <div className="shelter-card-head"><span className="shelter-num" aria-hidden="true">{i+1}</span><h3>{s.name}</h3>{i===0&&point&&s.straight_line_km!==null&&<span className="shelter-nearest">Nearest</span>}</div>
-          <p className="shelter-distance">{s.straight_line_km===null?'Straight-line distance unavailable':`${s.straight_line_km} km approximate straight-line distance`}</p>
+          <p className="shelter-distance">{s.straight_line_km===null?'Straight-line distance unavailable':`${Number(s.straight_line_km).toFixed(1)} km approximate straight-line distance`}</p>
           <p className="shelter-address">{s.address} · {s.district_name}</p>
           <div className="shelter-capacity" data-tone={pins[i].tone}><p><strong>{s.available_capacity} available</strong> of {s.capacity} places · {s.occupancy} reported occupants</p><div className="capacity-bar" role="img" aria-label={`${used}% of places taken`}><span style={{width:used+'%'}}/></div></div>
           <ul className="shelter-facilities" aria-label="Facilities"><li data-value={s.water}>Water: {s.water}</li><li data-value={s.toilets}>Toilets: {s.toilets}</li><li>Accessibility: {s.accessibility||'Not reported'}</li></ul>

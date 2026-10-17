@@ -14,7 +14,7 @@ import './HomeEmergencyDashboard.css'
 
 const hour = value => new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', hour: 'numeric', minute: '2-digit' }).format(new Date(value))
 
-export default function HomeEmergencyDashboard({ point, district, districtId, session, location, choosePoint, chooseDistrict, navigate }) {
+export default function HomeEmergencyDashboard({ point, district, districtId, session, location, choosePoint, chooseDistrict, navigate, onNearestShelter = null }) {
   const { dashboard, fits } = useHomeViewport()
   const riverSession = useRiverOutlook(point?.kind === 'network' ? null : point)
   const risk = useRiskPoint(point), area = useRiskArea(point), official = useOfficialWarnings(point), districts = useOfficialDistricts(true)
@@ -43,7 +43,7 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
     <div className="home-main-grid">
       <section className="panel workspace-information home-area-summary" aria-labelledby="home-area-title">
         <div className="home-essential-status"><h2 id="home-area-title">Local Conditions & Flood Outlook</h2>
-          <nav className="home-primary-actions" aria-label="Citizen actions"><PageLink to="/report" navigate={navigate} className="button-link">Report flooding or blocked drainage</PageLink><PageLink to="/shelters" navigate={navigate} className="button-link secondary">Find verified shelters</PageLink></nav></div>
+          <nav className="home-primary-actions" aria-label="Citizen actions"><PageLink to="/report" navigate={navigate} className="button-link">Report flooding or blocked drainage</PageLink>{onNearestShelter ? <button type="button" className="button-link secondary" onClick={onNearestShelter}>Go to nearest open shelter</button> : <PageLink to="/shelters" navigate={navigate} className="button-link secondary">Find verified shelters</PageLink>}</nav></div>
         <div className="home-area-scroll" role="region" aria-label="Flood outlook details" tabIndex={0}>
           <ImdCard official={official} point={point} />
           <SachetCard official={official} />

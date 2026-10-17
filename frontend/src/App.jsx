@@ -32,6 +32,7 @@ export default function App() {
  const [districtId,setDistrictId]=useState(''),[district,setDistrict]=useState(null)
  const [evidenceFeature,setEvidenceFeature]=useState(null)
  const [shelterMapTarget,setShelterMapTarget]=useState(null)
+ const [nearestRequest,setNearestRequest]=useState(0)
  const [contextVisible,setContextVisible]=useState(true)
  const weatherPage=path==='/' || path==='/weather'
  const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_WEATHER_ACCURACY_M)
@@ -51,7 +52,7 @@ export default function App() {
   <AppHeader path={path} navigate={navigate} mode={deploymentMode} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
    <section className={'page-intro'+(['/','/flood-map','/admin'].includes(path)?' visually-hidden':'')}><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
-   {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
+   {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate} onNearestShelter={()=>{setNearestRequest(n=>n+1);navigate('/shelters')}}/> }
    {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
      <WeatherLocationSelector point={point} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
@@ -60,7 +61,7 @@ export default function App() {
       <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false}/>
       <RainfallOutlook point={point} weather={session.data} freshness={session.freshness} overview={false} active={weatherPage}/>
      </div>
-     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} active={sheltersPage} overview={false} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
+     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} nearestRequest={nearestRequest} active={sheltersPage} overview={false} mapTarget={path==='/shelters'?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>
     {path==='/weather'&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{contextVisible&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={null}/>}<p className="map-legend">Selected point: {point.name}.  District filtering and point weather remain separate.</p></section>}
     {path==='/shelters'&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}

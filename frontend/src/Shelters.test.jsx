@@ -112,3 +112,26 @@ it('a map click fills district, empty name and address from the place lookup, ne
  expect(fetch.mock.calls.some(([u])=>String(u).startsWith('/api/admin/place?latitude=13.350000&longitude=74.780000'))).toBe(true)
  expect(screen.getByRole('link',{name:'© OpenStreetMap contributors'})).toBeTruthy()
 })
+const gpsPoint=(accuracy=20)=>({name:'Your GPS location',latitude:13.34,longitude:74.74,accuracy_m:accuracy,gps_timestamp:Date.now(),kind:'gps'})
+function stubGps(result){const getCurrentPosition=vi.fn((ok,fail)=>result?ok(result):fail({code:1}));vi.stubGlobal('navigator',{...navigator,geolocation:{getCurrentPosition}});vi.stubGlobal('isSecureContext',true);return getCurrentPosition}
+it('"Get directions" without a location asks for it, then rechecks and opens directions automatically',async()=>{
+ const onLocate=vi.fn();stubGps({coords:{latitude:13.34,longitude:74.74,accuracy:20},timestamp:Date.now()})
+ const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(row.name)
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
+ expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:20}));expect(screen.getByText(/Finding your location for directions/)).toBeTruthy()
+ rerender(<PublicShelters point={gpsPoint()} active onLocate={onLocate}/>)
+ expect(await screen.findByRole('heading',{name:'Directions to '+row.name})).toBeTruthy()
+ expect(fetch.mock.calls.filter(([u])=>String(u).startsWith('/api/shelters?latitude=13.34')).length).toBeGreaterThanOrEqual(2)  // directory rechecked from the new start point
+})
+it('the Home "nearest open shelter" request opens directions to the nearest shelter',async()=>{
+ const far={...row,id:'far',name:'DEMONSTRATION ONLY far fixture',straight_line_km:30},near={...row,id:'near',name:'DEMONSTRATION ONLY near fixture',straight_line_km:2.1}
+ fetch.mockImplementation(()=>reply(list([far,near])))
+ render(<PublicShelters point={gpsPoint()} active onLocate={vi.fn()} nearestRequest={1}/>)
+ expect(await screen.findByRole('heading',{name:'Directions to '+near.name})).toBeTruthy()
+})
+it('an imprecise location never produces directions and says how to fix it',async()=>{
+ const onLocate=vi.fn();stubGps({coords:{latitude:13.34,longitude:74.74,accuracy:900},timestamp:Date.now()})
+ const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate} nearestRequest={1}/>);await waitFor(()=>expect(onLocate).toHaveBeenCalled())
+ rerender(<PublicShelters point={gpsPoint(900)} active onLocate={onLocate} nearestRequest={1}/>)
+ expect(await screen.findByText(/too uncertain \(±900 m\) for directions/)).toBeTruthy();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
+})

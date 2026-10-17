@@ -26,6 +26,7 @@ it('shows the Google route in-app when configured, and starts navigation only wi
   config({ status: 'available', embed_key: KEY })
   const { default: Nav } = await import('./ShelterNavigation.jsx')
   const p = props(); const { rerender } = render(<Nav {...p} />)
+  fireEvent.click(screen.getByRole('button', { name: 'Google route' }))
   const frame = await screen.findByTitle('Google Maps route to the shelter')
   expect(new URL(frame.src).searchParams.get('mode')).toBe('walking')
   expect(screen.queryByRole('link', { name: 'Start navigation in Google Maps' })).toBeNull()
@@ -44,4 +45,23 @@ it('falls back to the app map without a key and stops when the shelter is no lon
   expect(screen.queryByTitle('Google Maps route to the shelter')).toBeNull(); expect(screen.getByRole('region', { name: 'Start point and shelter entrance' })).toBeTruthy()
   rerender(<Nav {...p} listed={false} link={base} />)
   expect(screen.getByRole('alert').textContent).toMatch(/no longer listed/); expect(screen.queryByRole('link', { name: /Start navigation/ })).toBeNull()
+})
+
+it('shows the flood-aware route first, with distance, avoided reports, safety label and steps', async () => {
+  const route = { status: 'available', geometry: { type: 'LineString', coordinates: [[74.74, 13.34], [74.7, 13.5]] }, distance_m: 7260, duration_s: 5220, steps: [{ instruction: 'TEST step: head north', distance_m: 120 }], avoided_reports: 1, label: 'Route avoids 1 approved flooding/blocked-drain report area(s) from the last 72 hours. It is NOT certified flood-safe: check road closures and follow local authorities.', attribution: '© openrouteservice.org by HeiGIT | Map data © OpenStreetMap contributors' }
+  vi.stubGlobal('fetch', vi.fn(async (url, options) => ({ ok: true, json: async () => url === '/api/route' ? route : { status: 'not_configured' } })))
+  const { default: Nav } = await import('./ShelterNavigation.jsx')
+  render(<Nav {...props({ origin: { ...origin, kind: 'gps', accuracy_m: 25 } })} />)
+  expect(await screen.findByText(/7.3 km · about 87 min walking/)).toBeTruthy()
+  expect(screen.getByText(/avoids 1 reported flood area$/)).toBeTruthy(); expect(screen.getByText(/NOT certified flood-safe/)).toBeTruthy()
+  expect(screen.getByText('TEST step: head north (120 m)')).toBeTruthy(); expect(screen.getByRole('region', { name: 'Flood-aware route to the shelter' })).toBeTruthy()
+  const [, options] = fetch.mock.calls.find(([u]) => u === '/api/route'); const body = JSON.parse(options.body)
+  expect(body).toEqual({ shelter_id: 'fixture', profile: 'foot-walking', origin: { latitude: 13.34, longitude: 74.74, accuracy_m: 25 } })
+})
+
+it('hides the flood-aware option when routing is not configured and shows Google directly', async () => {
+  vi.stubGlobal('fetch', vi.fn(async url => ({ ok: url !== '/api/route', json: async () => url === '/api/route' ? { status: 'not_configured', message: 'In-app routing is not configured.' } : { status: 'available', embed_key: KEY } })))
+  const { default: Nav } = await import('./ShelterNavigation.jsx')
+  render(<Nav {...props()} />)
+  expect(await screen.findByTitle('Google Maps route to the shelter')).toBeTruthy(); expect(screen.queryByRole('button', { name: 'Avoids reported flooding' })).toBeNull()
 })
