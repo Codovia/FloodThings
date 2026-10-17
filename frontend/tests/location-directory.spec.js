@@ -76,8 +76,9 @@ test('v2 settlement expansion preserves stable Kundapur identity and cross-distr
   await map.scrollIntoViewIfNeeded(); await expect(map.locator('path.leaflet-interactive')).toBeInViewport()
   expect(await map.evaluate(el=>{const a=el.getBoundingClientRect(),b=el.querySelector('path.leaflet-interactive').getBoundingClientRect();return Math.abs((a.left+a.right-b.left-b.right)/2)<3&&Math.abs((a.top+a.bottom-b.top-b.bottom)/2)<3})).toBe(true)
   await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
-  const before=requests.length; await page.clock.fastForward(5*60*60*1000); expect(requests.length).toBe(before)
-  await page.clock.fastForward(60*60*1000); await expect.poll(()=>requests.length).toBe(before+1)
+  // Current conditions are re-fetched 60 minutes after their valid time, for the selected point only.
+  const before=requests.length; await page.clock.fastForward(60*60*1000-1); expect(requests.length).toBe(before)
+  await page.clock.fastForward(1); await expect.poll(()=>requests.length).toBe(before+1)
   expect(requests.at(-1)).toContain('latitude=12.8698101&longitude=74.8430082')
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
   await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()

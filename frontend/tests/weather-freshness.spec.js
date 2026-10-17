@@ -4,8 +4,10 @@ import { expect, test } from '@playwright/test'
 // Browser-only fixtures and deterministic clocks; no provider calls or files.
 const START = new Date('2026-10-08T06:00:00Z')
 const SIX_HOURS = 6 * 60 * 60 * 1000
+// Current reading 61 minutes before START: already past the hourly current-conditions
+// refresh, so these tests isolate the six-hour forecast cycle.
 const payload = (point, retrieved) => ({ status: 'available', location: point, retrieved_at: retrieved,
-  current: { temperature_c: 27, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: '2026-10-08T11:30:00+05:30', stale: false },
+  current: { temperature_c: 27, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: '2026-10-08T10:29:00+05:30', stale: false },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(8 + i).padStart(2, '0')}`, weather_code: 61, precipitation_mm: i, temperature_min_c: 20, temperature_max_c: 30 })),
   forecast_coverage: { valid_days: 7, missing_dates: [], start_date: '2026-10-08' },
   grid_location: { latitude: 13.35, longitude: 74.75 }, forecast_issued_at: null,

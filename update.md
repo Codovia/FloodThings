@@ -1996,3 +1996,15 @@ Changes: weather moved into the location bar (temperature, conditions, 24 h rain
 Fixes found while verifying: a visually hidden heading inside the scroll panel extended the page by 111 px when "Why?" opened (scroll panel is now the positioning context); fit rule now reserves room for the first card, so 200% text falls back to natural scrolling.
 
 Verification: frontend unit 289/289; production build passed; Playwright full suite 84 passed, 8 skipped, 0 failed in two consecutive runs (one earlier run had one intermittent count assertion failure that did not reproduce). Live Chromium with Kundapur: 1366x768 document height 768 before and after opening "Why?"; mobile 390 px stacks cards then map with controls below; no console errors. Backend unchanged since the last full run (678 passed).
+
+## 2026-10-17 — Home current weather disappeared after 90 minutes
+
+User report: current weather not showing in the Home weather box.
+
+Cause: Home shows current conditions only while their valid time is at most 90 minutes old, but the weather session re-fetched only every six hours. In a tab left open, the box read "Current weather unavailable" for roughly 4.5 of every 6 hours. Live check on 17 Oct: `/api/weather` returned current conditions normally (no backend cache), and fresh page loads via GPS, network estimate and map point all showed the temperature, so only elapsed time triggered it.
+
+Acceptance: current conditions are re-fetched 60 minutes after their valid time (never closer than 15 minutes apart), so they are replaced before the 90-minute limit; a provider whose current time stops advancing falls back to the six-hour cycle instead of polling; the six-hour forecast freshness rules are unchanged.
+
+Changes: `useWeatherSession.js` (CURRENT_REFRESH_MS, CURRENT_MIN_GAP_MS). Tests: two new unit tests (hourly refresh; no polling for a stuck reading); three unit tests and `weather-freshness.spec.js` use a reading already older than 60 minutes to keep isolating the six-hour cycle; `location-directory.spec.js` now expects the hourly refresh for the selected point.
+
+Verification: frontend unit 291/291; production build passed; Playwright 82 passed + the 2 adjusted specs re-run passed (12/12 in those files), 8 skipped.

@@ -3,6 +3,11 @@ import { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
 
 export const FRESHNESS_MS = 6 * 60 * 60 * 1000
 export const RETRY_DELAYS_MS = [30 * 60 * 1000, 60 * 60 * 1000]
+// Current conditions are shown for at most 90 minutes after their valid time,
+// so fetch again after 60 minutes (never sooner than 15 minutes apart) instead
+// of leaving "current weather unavailable" until the six-hour forecast refresh.
+export const CURRENT_REFRESH_MS = 60 * 60 * 1000
+export const CURRENT_MIN_GAP_MS = 15 * 60 * 1000
 const REQUEST_TIMEOUT_MS = 15000
 const keyOf = point => `${point.latitude}:${point.longitude}`
 const TRANSIENT_FAILURES = new Set(['network_failure', 'timeout', 'rate_limited', 'provider_unavailable'])
@@ -110,6 +115,9 @@ export default function useWeatherSession(selectedPoint, enabled = true) {
         // Unknown retrieval age stays stale. Delay the next attempt to avoid a
         // successful-but-clockless response causing an immediate request loop.
         state.nextAt = time === null ? Date.now() + FRESHNESS_MS : time + FRESHNESS_MS
+        const currentValid = Date.parse(body.current?.valid_at)
+        // A reading that is already old (provider not advancing) keeps the six-hour cycle: no polling loop.
+        if (Number.isFinite(currentValid) && currentValid + CURRENT_REFRESH_MS > Date.now()) state.nextAt = Math.min(state.nextAt, Math.max(currentValid + CURRENT_REFRESH_MS, Date.now() + CURRENT_MIN_GAP_MS))
         // An old backend response also gets a bounded cooldown, never a loop.
         if (state.nextAt <= Date.now()) state.nextAt = Date.now() + RETRY_DELAYS_MS[0]
       } catch (err) {

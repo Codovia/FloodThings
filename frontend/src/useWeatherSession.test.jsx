@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { act, cleanup, renderHook } from '@testing-library/react'
-import useWeatherSession, { FRESHNESS_MS, RETRY_DELAYS_MS, freshnessOf, retrievalTime } from './useWeatherSession.js'
+import useWeatherSession, { CURRENT_MIN_GAP_MS, CURRENT_REFRESH_MS, FRESHNESS_MS, RETRY_DELAYS_MS, freshnessOf, retrievalTime } from './useWeatherSession.js'
 import { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
 
 const BASE = new Date('2026-10-08T06:00:00Z')
@@ -14,6 +14,8 @@ const fixture = (point = DEFAULT_POINT, retrieved = new Date().toISOString(), te
 // pad fixture dates, never production dates.
 const body = (...args) => { const result = fixture(...args); result.forecast.forEach(d => { d.date = d.date.replace(/-(\d)$/, '-0$1') }); return result }
 const reply = json => ({ ok: true, json: async () => json })
+// Current reading 90 minutes before BASE: isolates the six-hour cycle from the hourly current refresh.
+const oldReading = json => ({ ...json, current: { ...json.current, valid_at: '2026-10-08T10:00:00+05:30' } })
 const flush = () => act(async () => { await Promise.resolve(); await Promise.resolve() })
 const advance = ms => act(async () => { await vi.advanceTimersByTimeAsync(ms) })
 const event = (name, target = window) => act(() => target.dispatchEvent(new Event(name)))
@@ -42,7 +44,7 @@ it('loads default immediately with fresh backend clock, preserving seven dates/g
   expect(result.current.data.forecast_issued_at).toBeNull()
 })
 it('uses backend retrieval age, not mount time, and automatically refreshes at six hours exactly', async () => {
-  fetch.mockResolvedValueOnce(reply(body(DEFAULT_POINT, new Date(BASE.getTime() - 60 * 60 * 1000).toISOString())))
+  fetch.mockResolvedValueOnce(reply(oldReading(body(DEFAULT_POINT, new Date(BASE.getTime() - 60 * 60 * 1000).toISOString()))))
   const { result } = renderHook(() => useWeatherSession(null)); await flush()
   await advance(5 * 60 * 60 * 1000 - 1)
   expect(fetch).toHaveBeenCalledTimes(1); expect(result.current.freshness).toBe('fresh')
@@ -100,6 +102,7 @@ it('changing location aborts the old request; an ignored abort cannot overwrite 
   expect(result.current.data.location).toEqual(UDUPI)
 })
 it('failed automatic refresh preserves stale data with bounded 30/60-minute retries, then stops', async () => {
+  fetch.mockResolvedValueOnce(reply(oldReading(body(UDUPI))))
   const { result } = renderHook(() => useWeatherSession(UDUPI)); await flush()
   fetch.mockResolvedValue({ ok: false, json: async () => ({ message: 'Provider unavailable' }) })
   await advance(FRESHNESS_MS)
@@ -186,6 +189,7 @@ it('clock changes are checked on activation without scheduling a duplicate reque
 })
 
 it('pauses background timers on an inactive route and reuses a still-fresh receipt',async()=>{
+ fetch.mockResolvedValueOnce(reply(oldReading(body(DEFAULT_POINT))))
  const {result,rerender}=renderHook(({enabled})=>useWeatherSession(null,enabled),{initialProps:{enabled:true}})
  await flush();const receipt=result.current.data.retrieved_at
  rerender({enabled:false});expect(vi.getTimerCount()).toBe(0)
@@ -230,4 +234,15 @@ it('classifies a successful HTTP response with no weather status as invalid sche
  fetch.mockResolvedValue({ok:true,status:200,json:async()=>({})})
  const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
  expect(result.current.failureKind).toBe('invalid_response');expect(result.current.retryAt).toBeNull();expect(result.current.data).toBeNull()
+})
+
+it('refreshes current conditions 60 minutes after their valid time, before Home hides them at 90 minutes',async()=>{
+ const {result}=renderHook(()=>useWeatherSession(UDUPI));await flush()
+ await advance(CURRENT_REFRESH_MS-1);expect(fetch).toHaveBeenCalledTimes(1)
+ await advance(1);expect(fetch).toHaveBeenCalledTimes(2);expect(result.current.freshness).toBe('fresh')
+})
+it('a provider that stops advancing the current time falls back to the six-hour cycle instead of polling',async()=>{
+ renderHook(()=>useWeatherSession(UDUPI));await flush()
+ await advance(CURRENT_REFRESH_MS);expect(fetch).toHaveBeenCalledTimes(2)
+ await advance(FRESHNESS_MS-CURRENT_MIN_GAP_MS);expect(fetch).toHaveBeenCalledTimes(2)
 })
