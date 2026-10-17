@@ -12,7 +12,7 @@ from urllib.parse import quote, urlsplit, urlunsplit
 CONNECTIONS = {'DATABASE_URL', 'SHELTER_DATABASE_URL'}
 TELEGRAM_KEYS = {'TELEGRAM_BOT_USERNAME', 'TELEGRAM_BOT_TOKEN',
                  'TELEGRAM_DESTINATIONS', 'TELEGRAM_WEBHOOK_SECRET'}
-ROUTING_KEYS = {'OPENROUTESERVICE_API_KEY'}  # Backend only; launcher_processes strips it from Vite.
+ROUTING_KEYS = {'OPENROUTESERVICE_API_KEY', 'GOOGLE_MAPS_EMBED_API_KEY'}  # Backend only; launcher_processes strips them from Vite.
 
 
 def private_file(path, limit, required_mode=None):

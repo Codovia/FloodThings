@@ -2080,3 +2080,13 @@ Changes: backend `GET /api/navigation/embed` (reads optional `GOOGLE_MAPS_EMBED_
 Verification: backend 682 passed (4 new embed-configuration tests), 1 deselected as documented; frontend unit 299/299 (3 new navigation tests; one directory-revalidation test now counts only `/api/shelters` calls because the panel makes a one-time configuration request); build passed; Playwright 84 passed, 8 skipped. Live Chromium with labelled fixtures: no-key path shows the fallback map and a working launch link (travelmode=walking, dir_action=navigate), which reverts to "Recheck and start navigation" after five seconds; keyed path verified with a fake key-shaped fixture and a local placeholder intercepting the Google embed request, so no request reached Google. Restarted app: `/api/navigation/embed` → not_configured.
 
 Limitations: a real Google route preview needs your Google Cloud key (Maps Embed API enabled, HTTP-referrer restricted). Google routes are generic and not flood-aware. An intermittent `HistoricalFloodMap.test.jsx` deep-equality failure occurred once in a full run and passed 3/3 in isolation and in the next full run.
+
+## 2026-10-17 — Launcher now loads GOOGLE_MAPS_EMBED_API_KEY from the private .env
+
+Found while preparing the user's setup checklist: `scripts/launcher_config.py` reads only an allowlist of keys from the root `.env` (Telegram keys and `OPENROUTESERVICE_API_KEY`). The previous slice documented `GOOGLE_MAPS_EMBED_API_KEY` in `.env`, which would have been silently ignored.
+
+Acceptance: the key loads from a private 0600 `.env` like the routing key, explicit environment still wins, and the key is stripped from the Vite process environment (the browser receives it only through `/api/navigation/embed`).
+
+Changes: `ROUTING_KEYS` and `launcher_processes.SECRET_KEYS` include `GOOGLE_MAPS_EMBED_API_KEY`; new test `test_routing_keys_load_from_private_dotenv_and_are_stripped_from_vite` (key-shaped fixtures only).
+
+Verification: launcher tests 79 passed (test_launcher_config, test_launcher, test_full_launcher).

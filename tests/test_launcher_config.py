@@ -235,3 +235,17 @@ def test_helper_loads_dotenv_even_when_database_connections_are_already_exported
     result = subprocess.run([sys.executable, '-B', str(ROOT / 'scripts/launcher_config.py'), str(root), '--check'],
                             cwd='/', env=env, capture_output=True, text=True, timeout=5)
     assert result.returncode == 0 and result.stdout == 'ready\n'
+
+
+def test_routing_keys_load_from_private_dotenv_and_are_stripped_from_vite(tmp_path, monkeypatch):
+    # TEST FIXTURE ONLY — key-shaped strings, not credentials.
+    file = tmp_path / '.env'
+    file.write_text("OPENROUTESERVICE_API_KEY='test-ors'\nGOOGLE_MAPS_EMBED_API_KEY='AIza" + 'T' * 35 + "'\n")
+    file.chmod(0o600)
+    result = config.telegram_environment(tmp_path, {})
+    assert result == {'OPENROUTESERVICE_API_KEY': 'test-ors', 'GOOGLE_MAPS_EMBED_API_KEY': 'AIza' + 'T' * 35}
+    monkeypatch.syspath_prepend(str(ROOT / 'scripts'))
+    processes_spec = importlib.util.spec_from_file_location('launcher_processes_under_test', ROOT / 'scripts/launcher_processes.py')
+    launcher_processes = importlib.util.module_from_spec(processes_spec)
+    processes_spec.loader.exec_module(launcher_processes)
+    assert {'OPENROUTESERVICE_API_KEY', 'GOOGLE_MAPS_EMBED_API_KEY'} <= launcher_processes.SECRET_KEYS
