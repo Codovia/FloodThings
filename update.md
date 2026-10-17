@@ -2148,3 +2148,13 @@ Acceptance: when location is refused or too imprecise, a "Choose my start on the
 Verification: frontend unit 307/307 (new test: refusal → choose on map → directions; map inert until requested); build passed; Playwright 84 passed, 8 skipped. Live Chromium: desktop with ±800 m location → fallback → 2.1 km / 25 min walking route; phone with location refused → fallback → 0.7 km / 9 min route; no page errors.
 
 Data issue observed (not changed): the live public shelter shows test text in Restrictions ("awrg") and Approved contact; the administrator should correct it.
+
+## 2026-10-17 — Opt-in host allowance for a temporary phone test
+
+User request: test the application on a mobile phone.
+
+Findings: phone browsers expose geolocation only in a secure context (HTTPS or localhost), so plain Wi-Fi access (http://192.168…) cannot test "Use my location" or directions. A Cloudflare quick tunnel (cloudflared already installed) gives a temporary HTTPS address. Vite 7 rejects unknown Host headers by default, and citizen report submission and administrator login require the configured SHELTER_PUBLIC_ORIGIN.
+
+Change: `frontend/vite.config.js` reads optional `FLOODPULSE_ALLOWED_HOSTS` (comma-separated, e.g. `.trycloudflare.com`); empty by default, so behaviour is unchanged unless explicitly enabled. The launcher already passes non-secret variables to Vite. No tunnel was started.
+
+Verification: frontend unit 307/307; build passed; config reviewed.
