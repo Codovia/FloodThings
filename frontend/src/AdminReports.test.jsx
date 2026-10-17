@@ -26,3 +26,12 @@ it('prioritizes report evidence, discloses technical metadata and preserves expl
  expect(screen.getByText(/does not certify a flood/)).toBeTruthy()
  expect(screen.getByText('Retention maintenance').closest('details').open).toBe(false)
 })
+it('shows in-app GPS camera capture details and the IMD district in plain words',async()=>{
+ const {default:AdminReports}=await import('./AdminReports.jsx')
+ const report={id:'cap1',event_type:'flooding',state:'SUBMITTED',received_at:'2026-10-18T06:00:30Z',observed_at:'2026-10-18T06:00:00Z',description:'TEST FIXTURE GPS camera report',latitude:13.34,longitude:74.74,accuracy_m:12,accuracy_kind:'BROWSER_REPORTED',position_source:'BROWSER_GPS',revision:1,image_metadata:{format:'JPEG',width:1920,height:1080,vision_model:'unavailable',flags:[],capture:{source:'IN_APP_GPS_CAMERA',client_reported:true,captured_at:'2026-10-18T06:00:00Z',gps_fix_at:'2026-10-18T05:59:56Z',gps_fix_gap_s:4,gps_accuracy_m:12,flags:[]},district:{name:'Udupi',source:'IMD district boundary (map service)'}}}
+ const request=vi.fn(async()=>({reports:[report],total:1,mode:'live'}))
+ render(<AdminReports request={request} active/>)
+ fireEvent.click(await screen.findByRole('button',{name:'flooding · SUBMITTED'}))
+ expect(screen.getByText(/In-app GPS camera photo/).closest('p').textContent).toMatch(/GPS ±12 m, fix 4 s from the photo · no timing flags/)
+ expect(screen.getByText(/District: Udupi \(IMD district boundary/)).toBeTruthy()
+})

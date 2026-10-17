@@ -23,3 +23,22 @@
 .report-snippet{font-size:.9rem;color:#17313c}
 .moderation-detail{border:2px solid #165e63;border-radius:10px;padding:10px 12px;margin-bottom:12px;background:#fff}
 #report-filter{width:100%;padding:8px;border:1px solid #7897a5;border-radius:6px;margin:4px 0 8px}
+/* GPS camera */
+.gps-photo-card{display:flex;flex-wrap:wrap;align-items:center;gap:10px;justify-content:space-between;padding:12px;border:2px solid #165e63;border-radius:10px;background:#eef7f6;margin-bottom:8px}
+.gps-photo-card h3{margin:0 0 2px;font-size:1rem}.gps-photo-card p{margin:0;font-size:.875rem}
+.gps-photo-card.done{background:#e6f4ea;border-color:#2e7d4f}
+.gps-photo-thumb{width:84px;height:64px;object-fit:cover;border-radius:6px}
+.gps-camera{position:fixed;inset:0;z-index:2000;background:#0b1416;color:#fff;display:flex;flex-direction:column;padding:10px;gap:8px}
+.gps-camera-view{position:relative;flex:1;min-height:0;display:flex;align-items:center;justify-content:center;background:#000;border-radius:10px;overflow:hidden}
+.gps-camera-view video,.gps-camera-view img{width:100%;height:100%;object-fit:contain}
+.gps-camera-stamp{position:absolute;left:8px;right:8px;bottom:8px;padding:8px 10px;border-radius:8px;background:rgba(0,0,0,.6);font-size:.8125rem;line-height:1.4;font-weight:600}
+.gps-camera-badge{position:absolute;top:8px;left:8px;padding:3px 10px;border-radius:999px;font-weight:700;font-size:.8125rem;background:#555}
+.gps-camera-badge.ok{background:#2e7d4f}.gps-camera-badge.weak{background:#c46a12}
+.gps-camera-actions{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.gps-camera-actions button{min-height:44px;padding:8px 16px}
+.gps-camera-actions .gps-camera-shutter{min-width:200px;font-size:1rem}
+.gps-camera-actions .secondary{background:transparent;color:#fff;border:1px solid #fff}
+.gps-camera-error{background:#5c1a14;padding:8px 10px;border-radius:8px;margin:0}
+.gps-camera-hint{background:#4a3410;padding:6px 10px;border-radius:8px;margin:0;font-size:.875rem}
+.gps-camera-note{margin:0;font-size:.75rem;opacity:.8;text-align:center}
+.report-capture{padding:6px 10px;border-radius:8px;background:#e6f4ea}

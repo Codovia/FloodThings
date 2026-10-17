@@ -3,6 +3,8 @@ import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import CitizenReport from './CitizenReport.jsx'
 vi.mock('./ShelterMap.jsx',()=>({default:()=> <div>Report map fixture</div>}))
+// The camera itself is tested in GpsCamera.test.jsx; here a fake hands over a captured shot.
+vi.mock('./GpsCamera.jsx',()=>({default:({onCapture})=><button type="button" onClick={()=>onCapture(globalThis.__gpsShot)}>Fake capture</button>}))
 let gps
 beforeEach(()=>{vi.stubGlobal('isSecureContext',true);gps=vi.fn(yes=>yes({coords:{latitude:13.4,longitude:74.7,accuracy:1200},timestamp:Date.now()}));Object.defineProperty(navigator,'geolocation',{configurable:true,value:{getCurrentPosition:gps}});vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({id:'TEST ONLY report',state:'SUBMITTED',source:'USER_REPORTED',received_at:new Date().toISOString(),message:'Private fixture receipt'})})))})
 afterEach(()=>{cleanup();vi.unstubAllGlobals();delete navigator.geolocation})
@@ -52,4 +54,18 @@ it('manual reporting records a declared radius and source without requesting GPS
  fireEvent.click(screen.getByRole('button',{name:'Place manual incident point'}));expect(screen.getByRole('button',{name:'Review report'}).disabled).toBe(true)
  fireEvent.change(screen.getByLabelText('Estimated uncertainty radius (m)'),{target:{value:'250'}});fireEvent.change(screen.getByLabelText('What did you see?'),{target:{value:'TEST ONLY manual drainage observation'}});fireEvent.click(screen.getByLabelText(/I consent to private admin review/));fireEvent.click(screen.getByRole('button',{name:'Review report'}));fireEvent.click(screen.getByRole('button',{name:'Submit for private review'}));await screen.findByText(/Report TEST ONLY report/)
  const body=JSON.parse(fetch.mock.calls[0][1].body);expect(body.position_source).toBe('USER_SELECTED_MAP');expect(body.gps_at).toBeNull();expect(body.accuracy_m).toBe(250);expect(gps).not.toHaveBeenCalled()
+})
+it('a GPS photo fills location and time, and the capture is sent only while the location is that photo\'s own fix',async()=>{
+ const shot={name:'gps-photo-test.jpg',mime:'image/jpeg',base64:'VEVTVA==',preview:'blob:test',place:'TEST Place',capture:{source:'IN_APP_GPS_CAMERA',captured_at:new Date(Date.now()-2000).toISOString()},fix:{latitude:13.34,longitude:74.74,accuracy_m:15,gps_at:new Date(Date.now()-3000).toISOString()}}
+ globalThis.__gpsShot=shot
+ render(<CitizenReport/>)
+ fireEvent.click(screen.getByRole('button',{name:'Open GPS camera'}))
+ fireEvent.click(await screen.findByRole('button',{name:'Fake capture'}))
+ expect(screen.getByRole('heading',{name:'GPS photo recorded'})).toBeTruthy();expect(screen.getByText(/GPS photo recorded · location ±15 m/)).toBeTruthy()
+ fireEvent.change(screen.getByLabelText('What did you see?'),{target:{value:'TEST ONLY knee-deep water on road'}})
+ fireEvent.click(screen.getByLabelText(/I own or have permission/));fireEvent.click(screen.getByLabelText(/I consent to private admin review/))
+ fireEvent.click(screen.getByRole('button',{name:'Review report'}));fireEvent.click(screen.getByRole('button',{name:'Submit for private review'}))
+ await waitFor(()=>expect(fetch).toHaveBeenCalled())
+ const body=JSON.parse(fetch.mock.calls.find(([u])=>u==='/api/reports')[1].body)
+ expect(body).toMatchObject({latitude:13.34,longitude:74.74,accuracy_m:15,position_source:'BROWSER_GPS',gps_at:shot.fix.gps_at,photo_mime:'image/jpeg',capture:shot.capture})
 })

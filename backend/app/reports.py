@@ -26,6 +26,22 @@ MAX_BODY = 7 * 1024 * 1024
 RATE_SALT = secrets.token_bytes(32)
 
 
+def capture_record(payload, received):
+    captured, fix = payload.capture.captured_at, payload.gps_at
+    gap = abs((captured - fix).total_seconds())
+    flags = [*(['CAPTURE_GPS_GAP_OVER_60S'] if gap > 60 else []),
+             *(['CAPTURE_TIME_OUT_OF_RANGE'] if not received - timedelta(minutes=10) <= captured <= received + timedelta(seconds=5) else [])]
+    return {'source': payload.capture.source, 'client_reported': True, 'captured_at': captured.isoformat(),
+            'gps_fix_at': fix.isoformat(), 'gps_fix_gap_s': round(gap), 'gps_accuracy_m': payload.accuracy_m, 'flags': flags}
+
+
+class Capture(BaseModel):
+    """In-app GPS camera capture: client-reported, cross-checked against the GPS fix and receipt time."""
+    model_config = ConfigDict(extra='forbid')
+    source: Literal['IN_APP_GPS_CAMERA']
+    captured_at: datetime
+
+
 class ReportInput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True, allow_inf_nan=False)
     request_id: uuid.UUID
@@ -44,6 +60,7 @@ class ReportInput(BaseModel):
     metadata_consent: bool = Field(default=False, strict=True)
     photo_base64: str | None = Field(default=None, max_length=7000000)
     photo_mime: Literal['image/jpeg','image/png'] | None = None
+    capture: Capture | None = None
 
     @field_validator('observed_at', 'gps_at', 'location_selected_at')
     @classmethod
@@ -65,6 +82,12 @@ class ReportInput(BaseModel):
             raise ValueError('Photo requires MIME and upload rights confirmation')
         return self
 
+
+    @model_validator(mode='after')
+    def capture_needs_live_photo(self):
+        if self.capture and (not self.photo_base64 or self.position_source != 'BROWSER_GPS' or self.gps_at is None):
+            raise ValueError('GPS camera capture requires a photo and a browser GPS fix')
+        return self
 
 class ReviewInput(BaseModel):
     model_config = ConfigDict(extra='forbid', str_strip_whitespace=True)
@@ -120,7 +143,7 @@ class ReportStore:
                 else:
                     c.execute(limits.insert().values(key=key,window_start=start,attempts=1))
 
-    def submit(self, payload):
+    def submit(self, payload, district=None):
         timestamp = now()
         fingerprint = hashlib.sha256(payload.model_dump_json().encode()).hexdigest()
         # Serialize duplicate UUIDs; the same content returns the original receipt.
@@ -140,6 +163,10 @@ class ReportStore:
             if photo and payload.position_source=='USER_SELECTED_MAP':
                 flags=photo['metadata']['flags']
                 photo['metadata']['flags']=[f.replace('COARSE_SUBMITTED_GPS','COARSE_USER_ESTIMATED_LOCATION') for f in flags]+['USER_SELECTED_LOCATION']
+            if photo and payload.capture:
+                photo['metadata']['capture'] = capture_record(payload, timestamp)
+            if photo and district:
+                photo['metadata']['district'] = district
             identity = str(uuid.uuid4())
             values = dict(id=identity, request_id=str(payload.request_id), payload_sha256=fingerprint,
                 withdrawal_hash=digest(payload.withdrawal_secret), source='USER_REPORTED',
@@ -239,6 +266,21 @@ def options():
     return {'consent_version':CONSENT_VERSION,'photo_limit_bytes':5*1024*1024,'image_retention_days':7,'report_retention_days':30,'public_publication':False,'vision_model':'unavailable'}
 
 
+async def report_district(request, latitude, longitude):
+    """District from IMD's cached district boundaries; no third-party request with citizen coordinates."""
+    service = getattr(request.app.state, 'official', None)
+    if service is None:
+        return None
+    from .official import statewide
+    from .risk import inside
+    try:
+        districts, _ = await statewide(service)
+    except Exception:
+        return None
+    match = next((d for d in districts or [] if inside(d['geometry'], latitude, longitude)), None)
+    return {'name': match['district'], 'source': 'IMD district boundary (map service)'} if match else None
+
+
 @router.post('/api/reports', status_code=201)
 async def submit(request:Request, store=Depends(get_report_store)):
     SecurityConfig().same_origin(request)
@@ -258,7 +300,7 @@ async def submit(request:Request, store=Depends(get_report_store)):
         payload=ReportInput.model_validate_json(raw)
     except (ValidationError,ValueError):
         raise HTTPException(422,'Invalid report; check consent, timestamps, GPS and photo fields') from None
-    return await run_in_threadpool(execute,store.submit,payload)
+    return await run_in_threadpool(execute,store.submit,payload,await report_district(request,payload.latitude,payload.longitude) if payload.photo_base64 else None)
 
 
 @router.post('/api/reports/{identity}/withdraw')
