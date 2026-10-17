@@ -49,7 +49,7 @@ test('provider and tile failure keep Home honest while historical evidence remai
  await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByText(/Background tiles are unavailable/)).toBeVisible();await expect(page.locator('.home-flood-map img.leaflet-tile')).toHaveCount(0)
  await expect(page.getByRole('button',{name:'Show historical evidence'})).toHaveCount(0)
  await page.getByRole('link',{name:'Full map',exact:true}).click();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
- await page.getByLabel('Historical evidence cell (keyboard alternative)',{exact:true}).selectOption({index:1});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
+ await page.getByLabel('Mapped flood cell',{exact:true}).selectOption({index:1});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
 })
 test('Home does not request historical evidence or shelters and retains explicit unknown outcomes',async({page})=>{
  await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})

@@ -2034,3 +2034,19 @@ Tests: alert unit tests now forbid subscriber links outside the official section
 Verification: frontend unit 292/292; Playwright full suite 84 passed, 8 skipped; home-location-river.spec 28/28 over four repeats. Live Chromium: "Why?" 0 tables closed, 2 open, document height 768; Report, Shelters, Alerts screenshots checked; no page errors.
 
 Limitations: phone numbers are from public reports, not an official machine-readable directory; recheck before the demonstration. The Shelters directory is still empty until an administrator verifies real shelters.
+
+## 2026-10-17 — Flood Map made user friendly ("check a place")
+
+User report: the Flood Map page is not user friendly.
+
+Findings (live walkthrough): clicking the map only moved a small dot — no answer about that place; no instruction on what to do; jargon ("Recorded event", "Historical evidence cell (keyboard alternative)", "eligible historical cells", "raster cells", "Zoom to mapped water", "statewide evidence"); a "Potential Flood-Prone Zones" toggle that switches on an empty layer; past-flood controls in the top toolbar; the default Bengaluru weather point drawn as if the user had chosen it.
+
+Acceptance: one instruction ("Tap any place on the map…"); a tap/click anywhere (including on risk areas) opens a map popup and a "Checked place" card with the official IMD warning for the district polygon containing the point, the experimental 24 h rain risk of the covering grid area, past floods mapped within 5 km, and buttons for the full check on Home and shelters; every part states when it is unavailable and never implies safety from missing data; plain-language controls; past-flood tools in their own section; no empty layer; still 1366x768 without page scroll.
+
+Changes: `FloodIntelligenceMap.jsx` — `inGeometry` (ray casting with holes) and `placeCheck`; toolbar = instruction + "Go to district" (+ "Show all Karnataka" when filtered); layer box "Show on map" grouped Today (Official IMD warnings, Rain risk next 24 h) / Background (Past floods (satellite), Drains (Udupi study), Verified shelters); "Potential Flood-Prone Zones" toggle and its request removed — the statement that no verified dataset exists moved to "Sources and limitations" (not required by the 13 Oct contract or the 16 Oct plan); "Past floods" section with "Recorded flood" (named by month and dates) and "Mapped flood cell"; "Show district" button removed (the district select already zooms); IMD summary always loaded for the place check, the layer switch only controls map colours and legend. `App.jsx` passes only a user-chosen point to the Flood Map. CSS: place card, prompt card, popup, no focus rectangle on polygons, two-column layers on phones.
+
+Tests: label renames in 11 test files; hazard tests now assert no flood-prone toggle, no hazards request, and the visible absence statement; new `FloodPlaceCheck.test.jsx` (hole handling, covering area, 5 km count, unknown when data is missing).
+
+Verification: frontend unit 294/294; build passed; Playwright 83 passed + risk-features re-run passed after its wording update, 8 skipped. Live: desktop click in Dakshina Kannada → Orange (very heavy rain), rain risk Low 1.9 mm, no past floods mapped; phone click at 13.61°N 75.05°E (Shivamogga) → 24 mapped Udupi cells within 5 km, confirmed independently from the API (nearest 2.6 km). Document height 768 at 1366x768; no page errors.
+
+Limitations: past-flood records exist only for parts of Udupi (two GFD events); the place check uses IMD's district polygons, not verified administrative identity; rain risk is the ~28 km statewide grid — "Full check on Home" gives the point assessment.

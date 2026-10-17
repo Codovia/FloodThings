@@ -22,6 +22,6 @@ test('name-only district selection persists into Flood Map without inventing a w
  let requests=0;page.on('request',r=>{if(new URL(r.url()).pathname==='/api/weather')requests++})
  await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible();await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:kodagu.nic.in')
  await expect(page.getByRole('status',{name:'District locality results'})).toContainText('No verified localities');const before=requests
- await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByLabel('Flood Map district',{exact:true})).toHaveValue('nic:kodagu.nic.in');await expect(page.getByText(/0 eligible historical cells/)).toBeVisible();expect(requests).toBe(before)
- await page.getByRole('button',{name:'Return to statewide view'}).click();await expect(page.getByLabel('Flood Map district',{exact:true})).toHaveValue('')
+ await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByLabel('Go to district',{exact:true})).toHaveValue('nic:kodagu.nic.in');await expect(page.getByText(/No past floods are mapped for this district/)).toBeVisible();expect(requests).toBe(before)
+ await page.getByRole('button',{name:'Show all Karnataka'}).click();await expect(page.getByLabel('Go to district',{exact:true})).toHaveValue('')
 })

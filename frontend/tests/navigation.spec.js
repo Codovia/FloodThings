@@ -21,7 +21,7 @@ const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 test('five routes, direct URLs, back/forward, persistent location and one freshness lifecycle',async({page})=>{
  const requests=await setup(page);await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click();await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
  await selectPoint(page,13.34,74.74);await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
- await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByText(/56 eligible historical cells/)).toBeVisible();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
+ await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByText(/56 mapped flood cells/)).toBeVisible();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.goBack();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await page.goForward();await expect(page).toHaveURL(/\/shelters$/)
@@ -38,8 +38,8 @@ test('mobile menu, keyboard, layer toggles and maps remain usable after routing'
  await setup(page);await page.setViewportSize({width:390,height:844});await page.goto('/')
  await expect(nav(page)).not.toBeVisible();const menu=page.getByRole('button',{name:'Open navigation menu'});await menu.focus();await page.keyboard.press('Enter');await expect(nav(page)).toBeVisible();await page.keyboard.press('Escape');await expect(menu).toBeFocused()
  await menu.click();await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(nav(page)).not.toBeVisible();await expect(page.getByRole('heading',{name:'Flood Map',exact:true})).toBeFocused()
- await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56);await page.getByLabel('Historical Flood Locations', {exact:true}).uncheck();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(0);await page.getByLabel('Historical Flood Locations', {exact:true}).check();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
- await page.getByLabel('Drainage / waterways',{exact:true}).check();await page.getByRole('button',{name:'Show research layers'}).click();await expect(page.getByRole('region',{name:'Udupi drainage research geography'})).toBeVisible()
+ await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56);await page.getByLabel('Past floods (satellite)', {exact:true}).uncheck();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(0);await page.getByLabel('Past floods (satellite)', {exact:true}).check();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
+ await page.getByLabel('Drains (Udupi study)',{exact:true}).check();await page.getByRole('button',{name:'Show research layers'}).click();await expect(page.getByRole('region',{name:'Udupi drainage research geography'})).toBeVisible()
  for(const url of ['/','/weather','/flood-map','/shelters','/admin']){await page.goto(url);await expect(page.getByRole('heading',{level:1})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)}
 })
 

@@ -44,8 +44,8 @@ test('live point risk on Home and the statewide risk grid on Flood Map', async (
   const grid = await gridResponse
   const gridBody = await grid.json()
   expect(grid.status()).toBe(200); expect(gridBody.cells).toHaveLength(256)
-  await expect(page.getByRole('checkbox', { name: 'Live rain risk (statewide)' })).toBeChecked()
-  await expect(page.getByText(/of 256 cells High or Severe/)).toBeVisible()
+  await expect(page.getByRole('checkbox', { name: 'Rain risk, next 24 h' })).toBeChecked()
+  await expect(page.getByText(/(of 256 areas High or Severe|all 256 areas Low or unavailable)/)).toBeVisible()
   await expect(page.getByLabel('Rain risk legend')).toBeVisible()
   expect(await page.locator('.intelligence-map path.leaflet-interactive').count()).toBeGreaterThanOrEqual(256)
   await page.screenshot({ path: evidence + '/02-flood-map-risk-grid.png' })
