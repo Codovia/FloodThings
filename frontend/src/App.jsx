@@ -50,7 +50,7 @@ export default function App() {
  return <>
   <AppHeader path={path} navigate={navigate} mode={deploymentMode} />
   <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
-   <section className={'page-intro'+(path==='/'?' visually-hidden':'')}><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
+   <section className={'page-intro'+(path==='/'||path==='/flood-map'?' visually-hidden':'')}><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate}/> }
    {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">

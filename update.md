@@ -2008,3 +2008,13 @@ Acceptance: current conditions are re-fetched 60 minutes after their valid time 
 Changes: `useWeatherSession.js` (CURRENT_REFRESH_MS, CURRENT_MIN_GAP_MS). Tests: two new unit tests (hourly refresh; no polling for a stuck reading); three unit tests and `weather-freshness.spec.js` use a reading already older than 60 minutes to keep isolating the six-hour cycle; `location-directory.spec.js` now expects the hourly refresh for the selected point.
 
 Verification: frontend unit 291/291; production build passed; Playwright 82 passed + the 2 adjusted specs re-run passed (12/12 in those files), 8 skipped.
+
+## 2026-10-17 — Flood Map: map-first layout
+
+User request: review every page; keep what is needed and improve it.
+
+Acceptance: at 1366x768 the Flood Map fits without page scroll with the map as the dominant element showing all of Karnataka; layer toggles and legend sit on the map; the sidebar opens with today's state summary (IMD counts plus the districts under Yellow/Orange/Red, live rain-risk counts, historical summary); all required notices (official vs experimental, not current flooding, no hazard dataset, navigation-bounds and shelter notices, CC BY-NC attribution) stay visible; zoomed historical polygons remain clickable.
+
+Changes: page intro visually hidden (heading still exposed to assistive technology); toolbar reduced to district, statewide reset and recorded event; "Map layers" box and legend (IMD today, rain risk 24 h, historical floodwater, drainage, shelters, selected point) float on the map; zoom control bottom-right; Karnataka fitted with 0.25 zoom steps (whole-number zoom left the state at zoom 5, mostly neighbouring states); "Zoom to mapped water" pads around the overlays (a polygon under the layer box was unclickable — caught by flood-intelligence.spec). Long provenance text moved into "Sources and limitations"; mobile places the layer box and legend below the map.
+
+Verification: frontend unit 291/291; Playwright flood-intelligence, historical-map, risk-features, drainage-research, fullscreen, navigation, ui-repair, ui-ux and wireframes specs: 28 passed, 1 skipped. Live Chromium 1366x768 document height 768; mobile 390 px stacks toolbar, map, layers, legend and summary; no page errors.
