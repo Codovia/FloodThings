@@ -19,3 +19,41 @@
 .official-help p{margin:6px 0 0;font-size:.8125rem}
 .alert-steps{margin:12px 0 0;padding-left:1.4em;display:grid;gap:4px}
 .alert-official{margin-top:16px}.alert-official ul{padding-left:1.2em;display:grid;gap:4px}
+
+/* Public shelters: nearest-first cards linked to numbered map pins */
+.shelters-panel .panel-heading h2{margin:0}
+.shelter-origin{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;margin:8px 0;border-radius:8px;background:#eef6fb}
+.shelter-origin p{margin:0;flex:1 1 200px}
+.shelter-origin button{min-height:36px;padding:6px 12px}
+.shelter-summary{margin:8px 0}
+.shelter-list{list-style:none;padding:0;margin:8px 0;display:grid;gap:10px}
+.shelter-card{border:1px solid #d7dfdd;border-radius:10px;padding:10px 12px;background:#fff}
+.shelter-card.selected{border-color:#165e63;box-shadow:0 0 0 2px #165e63 inset}
+.shelter-card p{margin:3px 0}
+.shelter-card-head{display:flex;align-items:center;gap:8px}
+.shelter-card-head h3{margin:0;font-size:1rem;flex:1}
+.shelter-num{flex:0 0 26px;height:26px;border-radius:50%;background:#165e63;color:#fff;display:grid;place-items:center;font-weight:800;font-size:.8125rem}
+.shelter-nearest{font-size:.75rem;font-weight:700;color:#0b5132;background:#dff3e6;border-radius:999px;padding:1px 8px}
+.shelter-distance{font-weight:700;color:#15395f}
+.shelter-address{color:#4c5f5b;font-size:.875rem}
+.shelter-capacity{margin:6px 0}
+.capacity-bar{height:8px;border-radius:999px;background:#e3ebe9;overflow:hidden;margin-top:3px}
+.capacity-bar span{display:block;height:100%;background:#2e7d4f}
+.shelter-capacity[data-tone="limited"] .capacity-bar span{background:#d9822b}
+.shelter-capacity[data-tone="limited"] strong{color:#9a4d00}
+.shelter-facilities{list-style:none;padding:0;margin:4px 0;display:flex;flex-wrap:wrap;gap:4px}
+.shelter-facilities li{font-size:.8125rem;padding:1px 8px;border-radius:999px;background:#f2f5f4;border:1px solid #d7dfdd}
+.shelter-facilities li[data-value="yes"]{background:#e6f4ea;border-color:#b9dcc4}
+.shelter-facilities li[data-value="no"]{background:#fdecea;border-color:#f2c1bb}
+.shelter-restrictions{font-weight:600;color:#8a2d1e}
+.shelter-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.shelter-actions>*{min-height:36px;padding:6px 12px;font-size:.875rem}
+.shelter-navigation-notice{padding:6px 10px;border-radius:8px;background:#fff8e1}
+.shelter-pin{background:none;border:0}
+.shelter-pin-shape{width:30px;height:30px;display:grid;place-items:center;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#1b625d;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.35);box-sizing:border-box}
+.shelter-pin-shape span{transform:rotate(45deg);color:#fff;font-weight:800;font-size:13px;line-height:1}
+.shelter-pin.limited .shelter-pin-shape{background:#c46a12}
+.shelter-list .shelter-card{padding:10px 12px;margin:0}
+.shelter-actions button.secondary{background:#fff;color:#165e63;border:1px solid #165e63}
+.shelter-actions button.secondary:hover:not(:disabled),.shelter-actions button.secondary[aria-pressed="true"]{background:#e6f2f1;color:#165e63}
+.shelter-safety{font-size:.875rem;padding:6px 10px;border-left:4px solid #d9822b;background:#fff8ef;border-radius:4px}

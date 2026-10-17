@@ -16,7 +16,7 @@ it('loads on demand and encodes exact entrance while announcing demonstration an
  expect(screen.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeTruthy()
  expect(screen.getByText(/8 available/)).toBeTruthy();expect(screen.getByText(/12.4 km approximate straight-line/)).toBeTruthy()
  expect(screen.queryByRole('link',{name:/Inspect demonstration directions/})).toBeNull()
- fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}))
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
  const url=new URL((await screen.findByRole('link',{name:/Inspect demonstration directions/})).href)
  expect(url.hostname).toBe('www.google.com');expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('origin')).toBe('13.6,74.8');expect(screen.getByText(/not verified flood-safe/)).toBeTruthy()
 })
@@ -78,6 +78,24 @@ it('malformed district contract stays an explicit error rather than crashing or 
 
 it.each([{kind:'network',accuracy_m:null},{kind:'gps',accuracy_m:1200,gps_timestamp:Date.now()},{kind:'gps',accuracy_m:40,gps_timestamp:0}])('does not send an uncertain/stale weather point as the routing origin',async properties=>{
  render(<PublicShelters point={{...point,...properties}} active/>);await screen.findByText(row.name)
- fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}));await screen.findByText(/Select an adequate starting location before requesting directions. Network estimates/)
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}));await screen.findByText(/Select an adequate starting location before requesting directions. Network estimates/)
  expect(screen.queryByRole('link',{name:/directions/})).toBeNull();expect(fetch).toHaveBeenCalledTimes(1)
+})
+it('lists the nearest shelter first with a number and a Nearest badge, linked to the map',async()=>{
+ const far={...row,id:'far',name:'DEMONSTRATION ONLY far fixture',straight_line_km:30},near={...row,id:'near',name:'DEMONSTRATION ONLY near fixture',straight_line_km:2.1,available_capacity:3}
+ fetch.mockImplementation(()=>reply(list([far,near])));render(<PublicShelters point={point} active />)
+ await screen.findByText(near.name);const items=screen.getByRole('list',{name:'Available shelter destinations'}).querySelectorAll(':scope > li')
+ expect([...items].map(li=>li.querySelector('h3').textContent)).toEqual([near.name,far.name])
+ expect(items[0].textContent).toContain('Nearest');expect(items[1].textContent).not.toContain('Nearest')
+ expect(screen.getByText('2 open shelters with free space')).toBeTruthy()
+ fireEvent.click(screen.getAllByRole('button',{name:'Show on map'})[1]);expect(items[1].className).toContain('selected')
+})
+it('"Use my location" passes a timestamped GPS point to the app and never guesses on failure',async()=>{
+ const onLocate=vi.fn(),position={coords:{latitude:13.34,longitude:74.74,accuracy:25},timestamp:Date.now()}
+ const getCurrentPosition=vi.fn(ok=>ok(position));vi.stubGlobal('navigator',{...navigator,geolocation:{getCurrentPosition}});vi.stubGlobal('isSecureContext',true)
+ render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
+ fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
+ expect(onLocate).toHaveBeenCalledWith({name:'Your GPS location',latitude:13.34,longitude:74.74,accuracy_m:25,gps_timestamp:position.timestamp,kind:'gps'})
+ getCurrentPosition.mockImplementation((ok,fail)=>fail({code:1}));onLocate.mockClear()
+ fireEvent.click(screen.getByRole('button',{name:'Use my location'}));expect(onLocate).not.toHaveBeenCalled();expect(screen.getByText(/permission denied/)).toBeTruthy()
 })

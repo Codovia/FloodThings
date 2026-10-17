@@ -99,7 +99,7 @@ test('real application: private incident -> moderation -> map shelter -> directi
  // Explicitly select the starting locality after reload; no silent default/IP origin.
  await page.getByText('Change location',{exact:true}).click()
  await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
- await page.getByRole('button',{name:'Recheck availability for directions'}).click()
+ await page.getByRole('button',{name:'Get directions'}).click()
  const directions=page.getByRole('link',{name:'Inspect demonstration directions (not for travel)'});await expect(directions).toBeVisible()
  const url=new URL(await directions.getAttribute('href'));expect(url.searchParams.get('origin')).toBe('13.6250993,74.6915722');expect(url.searchParams.get('destination')).toBe(destination.join(','))
  await directions.scrollIntoViewIfNeeded()

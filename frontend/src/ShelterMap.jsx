@@ -6,7 +6,7 @@ import useMapResize from './useMapResize.js'
 import { boundary } from './homeGeography.js'
 import 'leaflet/dist/leaflet.css'
 
-export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null}) {
+export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null,focus=null}) {
   const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect),inspect=useRef(onInspect)
   const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
@@ -46,15 +46,18 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
     if(origin){L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])}
     for(const point of points){
       const text=document.createElement('span');text.textContent=point.name
-      L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'}).bindTooltip(text).on('click',()=>inspect.current?.(point)).addTo(layers.current);bounds.push([point.latitude,point.longitude])
+      // Numbered pins (label is the list position, digits only) link the map to the shelter list.
+      const marker=point.label&&L.divIcon&&L.marker?L.marker([point.latitude,point.longitude],{icon:L.divIcon({className:'shelter-pin '+(point.tone==='limited'?'limited':'ok'),html:'<div class="shelter-pin-shape"><span>'+String(point.label).replace(/\D/g,'')+'</span></div>',iconSize:[30,30],iconAnchor:[15,30],tooltipAnchor:[0,-26]}),keyboard:true,title:point.name}):L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'})
+      marker.bindTooltip(text).on('click',()=>inspect.current?.(point)).addTo(layers.current);bounds.push([point.latitude,point.longitude])
     }
     const geometry=JSON.stringify([bounds,inspection])
     if(geometry!==lastGeometry.current){
       lastGeometry.current=geometry
       if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):13,{animate:false})
-      else if(bounds.length)map.current.fitBounds(bounds,{padding:[20,20],maxZoom:inspection?18:14,animate:false})
+      else if(bounds.length)map.current.fitBounds(bounds,{paddingTopLeft:[20,40],paddingBottomRight:[20,20],maxZoom:inspection?18:14,animate:false})
     }
   },[points,origin,inspection,route])
+  useEffect(()=>{if(focus&&map.current)map.current.setView([focus.latitude,focus.longitude],15,{animate:true})},[focus?.id,focus?.latitude,focus?.longitude])
   useEffect(()=>{if(navigationBounds&&map.current)map.current.fitBounds(navigationBounds,{padding:[20,20],animate:false})},[navigationBounds])
   useMapResize(map)
   return <><div ref={container} className="shelter-map" role="region" aria-label={label} />{tileError&&<p className="notice" role="status">{BASEMAP_NOTICE}</p>}</>

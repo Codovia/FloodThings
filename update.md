@@ -2050,3 +2050,19 @@ Tests: label renames in 11 test files; hazard tests now assert no flood-prone to
 Verification: frontend unit 294/294; build passed; Playwright 83 passed + risk-features re-run passed after its wording update, 8 skipped. Live: desktop click in Dakshina Kannada → Orange (very heavy rain), rain risk Low 1.9 mm, no past floods mapped; phone click at 13.61°N 75.05°E (Shivamogga) → 24 mapped Udupi cells within 5 km, confirmed independently from the API (nearest 2.6 km). Document height 768 at 1366x768; no page errors.
 
 Limitations: past-flood records exist only for parts of Udupi (two GFD events); the place check uses IMD's district polygons, not verified administrative identity; rain risk is the ~28 km statewide grid — "Full check on Home" gives the point assessment.
+
+## 2026-10-17 — Shelters page: nearest-first list linked to numbered map pins
+
+User request: check the Shelters page, work out how to improve it, and implement.
+
+Findings (live, with labelled DEMONSTRATION fixtures because the operational directory is empty): the first shelter appeared about 1,100 px down the left panel, below emergency numbers, caveats and status text; each shelter was six lines of prose; map markers were anonymous circles with no link to the list; the main action read "Recheck availability for directions"; there was no "Use my location" on the page, so distances usually were not sorted.
+
+Acceptance: "Open shelters near you" heading with the starting point and a "Use my location" button at the top; list ordered nearest first, numbered, with a "Nearest" badge; compact cards (distance, free places with a capacity bar — amber when few remain, water/toilets/access chips, verification age, restrictions); numbered pins match the list, clicking a pin highlights its card and "Show on map" focuses the pin; the revalidation-before-directions control is unchanged but the button reads "Get directions"; all safety texts remain visible (demonstration banner, exact capacity/flood-safe sentence, official emergency numbers, limitations).
+
+Changes: `PublicShelters.jsx` (layout, ordering, selection, GPS via `onLocate` producing the same timestamped GPS point shape as Home, so the existing 100 m / 5 min navigation-origin rule still applies); `ShelterMap.jsx` (optional numbered `divIcon` pins with digits-only labels, falling back to circles; `focus` prop; top padding so pins are not clipped); `App.jsx` passes `onLocate`; `Shelters.css`.
+
+Tests: two new unit tests (nearest-first order, badge, selection; GPS point shape and no guess on permission failure); "Get directions" rename in tests.
+
+Verification: frontend unit 296/296; build passed; Playwright 83 passed + shelters/shelter-integrity/mvp-e2e re-run 4 passed, 3 skipped (PostgreSQL-only), after restoring the exact safety sentence the spec pins. Live Chromium with fixtures: GPS origin "±30 m", 1.2/6.8/7.5 km ordering, pin 3 click selects card 3, 1366x768 without page scroll; no page errors.
+
+Limitations: the live directory is still empty until administrators verify real shelters; distances are straight-line; walking routes need the OpenRouteService key.

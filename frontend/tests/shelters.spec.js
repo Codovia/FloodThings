@@ -29,7 +29,7 @@ test('explicit demonstration fixtures render exact entrance, mobile map and no u
  await expect(page.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeVisible();await expect(page.getByRole('region',{name:'Verified open shelter entrances'})).toBeVisible()
  await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
  const link=page.getByRole('link',{name:'Inspect demonstration directions (not for travel)'});await expect(link).toHaveCount(0)
- await page.getByRole('button',{name:'Recheck availability for directions'}).click();await expect(link).toBeVisible()
+ await page.getByRole('button',{name:'Get directions'}).click();await expect(link).toBeVisible()
  const url=new URL(await link.getAttribute('href'));expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('api')).toBe('1')
  await expect(page.getByText('Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.',{exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled shelter database outage'})}))

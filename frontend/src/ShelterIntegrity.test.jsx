@@ -31,22 +31,22 @@ it('hidden routes stop polling and returning to the page revalidates',async()=>{
 })
 it('directions are prevented when the latest directory no longer includes that entrance',async()=>{
  render(<PublicShelters point={point} active/>);await screen.findByText('DEMONSTRATION ONLY fixture')
- fetch.mockImplementation(()=>reply(list([])));fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}));await screen.findByText(/destination could not be revalidated/)
+ fetch.mockImplementation(()=>reply(list([])));fireEvent.click(screen.getByRole('button',{name:'Get directions'}));await screen.findByText(/destination could not be revalidated/)
  expect(screen.queryByRole('link',{name:/directions/})).toBeNull()
 })
 it('successful directions revalidation requires a second explicit navigation action',async()=>{
  render(<PublicShelters point={point} active/>);await screen.findByText('DEMONSTRATION ONLY fixture')
  expect(screen.queryByRole('link',{name:/Inspect demonstration directions/})).toBeNull()
- fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}))
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
  await screen.findByText(/Availability rechecked/);expect(fetch).toHaveBeenCalledTimes(2)
  const link=screen.getByRole('link',{name:/Inspect demonstration directions/});expect(new URL(link.href).searchParams.get('destination')).toBe('13.5,74.7')
 })
 it('navigation permission expires after five seconds and cannot be reused',async()=>{
  vi.useFakeTimers();render(<PublicShelters point={point} active/>);await act(async()=>{})
- fireEvent.click(screen.getByRole('button',{name:'Recheck availability for directions'}));await act(async()=>{})
+ fireEvent.click(screen.getByRole('button',{name:'Get directions'}));await act(async()=>{})
  expect(screen.getByRole('link',{name:/Inspect demonstration directions/})).toBeTruthy()
  await act(async()=>{await vi.advanceTimersByTimeAsync(5000)})
- expect(screen.queryByRole('link',{name:/directions/})).toBeNull();expect(screen.getByRole('button',{name:'Recheck availability for directions'})).toBeTruthy()
+ expect(screen.queryByRole('link',{name:/directions/})).toBeNull();expect(screen.getByRole('button',{name:'Get directions'})).toBeTruthy()
 })
 it('uncooperative directory requests time out without fabricated destinations or retry loops',async()=>{
  vi.useFakeTimers();fetch.mockImplementation(()=>new Promise(()=>{}));const {unmount}=render(<PublicShelters active/>)
