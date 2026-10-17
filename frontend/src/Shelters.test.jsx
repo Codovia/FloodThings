@@ -3,7 +3,8 @@ import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import PublicShelters from './PublicShelters.jsx'
 import AdminShelters from './AdminShelters.jsx'
-vi.mock('./ShelterMap.jsx',()=>({default:({label})=><div role="region" aria-label={label} />}))
+// The admin entrance map's click handler is exposed so tests can simulate a map selection.
+vi.mock('./ShelterMap.jsx',()=>({default:({label,onSelect})=>{if(onSelect&&label==='Administrator entrance selection map')globalThis.__adminMapSelect=onSelect;return <div role="region" aria-label={label} />}}))
 const point={name:'Test origin',latitude:13.6,longitude:74.8}
 const row={id:'isolated-test',name:'DEMONSTRATION ONLY fixture',address:'Never a real shelter',district_id:'nic:udupi.nic.in',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'Fixture information',status:'open',verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12.4,restrictions:'DO NOT TRAVEL',contact:null}
 const list=(rows=[row],mode='demonstration')=>({status:'available',mode,shelters:rows,total:rows.length,verification_valid_hours:24})
@@ -98,4 +99,16 @@ it('"Use my location" passes a timestamped GPS point to the app and never guesse
  expect(onLocate).toHaveBeenCalledWith({name:'Your GPS location',latitude:13.34,longitude:74.74,accuracy_m:25,gps_timestamp:position.timestamp,kind:'gps'})
  getCurrentPosition.mockImplementation((ok,fail)=>fail({code:1}));onLocate.mockClear()
  fireEvent.click(screen.getByRole('button',{name:'Use my location'}));expect(onLocate).not.toHaveBeenCalled();expect(screen.getByText(/permission denied/)).toBeTruthy()
+})
+it('a map click fills district, empty name and address from the place lookup, never overwriting typed text',async()=>{
+ const place={status:'available',district:{name:'Udupi',aliases:['Udupi'],source:'IMD district boundary (map service)'},name:{value:'TEST FIXTURE hall',source:'OpenStreetMap'},address:{value:'TEST Road, Manipal, Udupi, Karnataka 576101',source:'OpenStreetMap'},messages:[],attribution:'Place and address suggestion: © OpenStreetMap contributors, ODbL 1.0 (via Nominatim).'}
+ adminFetch();const base=fetch.getMockImplementation();fetch.mockImplementation((url,options={})=>String(url).startsWith('/api/admin/place')?reply(place):base(url,options))
+ render(<AdminShelters />);await login();await waitFor(()=>expect(screen.getByRole('button',{name:'Save shelter assignment'}).disabled).toBe(false))
+ fireEvent.change(screen.getByLabelText('Facility address'),{target:{value:'Typed by admin'}})
+ const select=globalThis.__adminMapSelect;expect(typeof select).toBe('function');await act(async()=>{select({latitude:13.35,longitude:74.78})})
+ await screen.findByText(/From the map point/)
+ expect(screen.getByLabelText('Facility name').value).toBe('TEST FIXTURE hall');expect(screen.getByLabelText('Facility address').value).toBe('Typed by admin')
+ expect(screen.getByLabelText('Shelter district').value).toBe('nic:udupi.nic.in');expect(screen.getByRole('button',{name:'Use this address'})).toBeTruthy()
+ expect(fetch.mock.calls.some(([u])=>String(u).startsWith('/api/admin/place?latitude=13.350000&longitude=74.780000'))).toBe(true)
+ expect(screen.getByRole('link',{name:'© OpenStreetMap contributors'})).toBeTruthy()
 })

@@ -27,6 +27,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
   const [adminTab,setAdminTab]=useState('shelters')
   const [workspaceDistrict,setWorkspaceDistrict]=useState(''),[view,setView]=useState('all')
   const formRef=useRef(null),formHeading=useRef(null)
+  const [lookup,setLookup]=useState(null),lookupSequence=useRef(0),latestForm=useRef(null)
   const [username,setUsername]=useState(''),[password,setPassword]=useState('')
   const busyRef=useRef(false),loadSequence=useRef(0),operationSequence=useRef(0)
   function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setWorkspaceDistrict('');setUsername('');setPassword('');setNotice(null);setAdminTab('shelters')}
@@ -48,9 +49,28 @@ export default function AdminShelters({embedded=false,onHome=null}){
   }
   useEffect(()=>{const generation=requests.generation();if(session)load(session,offset).catch(e=>{if(requests.current(generation)&&e.name!=='AbortError')setError(e.message)})},[session,offset])
   function field(key,value){setForm(f=>({...f,[key]:value,...(materialFields.has(key)&&f[key]!==value?{verification:blank().verification}:{})}))}
+  latestForm.current=form
+  // Map click: suggest district, facility name and address for this entrance (administrator confirms).
+  async function lookupPlace(point){
+    const sequence=++lookupSequence.current
+    setLookup({status:'loading'})
+    try{
+      const data=await request('/api/admin/place?'+new URLSearchParams({latitude:point.latitude.toFixed(6),longitude:point.longitude.toFixed(6)}))
+      if(sequence!==lookupSequence.current)return
+      if(data.status!=='available'){setLookup({status:'outside',message:data.message});return}
+      const aliases=(data.district?.aliases||[]).map(a=>a.toLowerCase())
+      const district=districts.find(d=>aliases.includes(d.name.toLowerCase()))
+      const current=latestForm.current,notes=[]
+      if(district&&current.district_id&&current.district_id!==district.id)notes.push(`District changed to ${district.name} to match the map point.`)
+      if(district)field('district_id',district.id)
+      if(data.name?.value&&!current.name.trim())field('name',data.name.value)
+      if(data.address?.value&&!current.address.trim())field('address',data.address.value)
+      setLookup({status:'done',data,district,notes})
+    }catch(e){if(sequence===lookupSequence.current&&e.name!=='AbortError')setLookup({status:'error',message:e.message})}
+  }
   function verify(key,value){setForm(f=>({...f,verification:{...f.verification,[key]:value}}))}
   function open(row,section){edit(row);requestAnimationFrame(()=>{(section==='verify'?document.getElementById('shelter-verification'):formRef.current)?.scrollIntoView?.({block:'start',behavior:'smooth'});formHeading.current?.focus({preventScroll:true})})}
-  function edit(row){setEditing(row.id);setHistory(null);setNotice(null);setForm({...blank(),...Object.fromEntries(Object.keys(blank()).filter(k=>k!=='verification').map(k=>[k,row[k]??blank()[k]])),latitude:row.latitude??'',longitude:row.longitude??'',capacity:String(row.capacity),occupancy:String(row.occupancy),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})}
+  function edit(row){setLookup(null);lookupSequence.current++;setEditing(row.id);setHistory(null);setNotice(null);setForm({...blank(),...Object.fromEntries(Object.keys(blank()).filter(k=>k!=='verification').map(k=>[k,row[k]??blank()[k]])),latitude:row.latitude??'',longitude:row.longitude??'',capacity:String(row.capacity),occupancy:String(row.occupancy),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})}
   async function operation(fn){if(busyRef.current)return;const sequence=++operationSequence.current;busyRef.current=true;setBusy(true);setError(null);try{await fn()}catch(e){if(requests.mounted()&&sequence===operationSequence.current&&e.name!=='AbortError')setError(e.message)}finally{if(sequence===operationSequence.current){busyRef.current=false;if(requests.mounted())setBusy(false)}}}
   function signOut(){const auth=session;requests.cancel();busyRef.current=false;clearPrivate();void operation(async()=>{await request('/api/admin/logout',{method:'POST'},auth);requests.cancel();setNotice('Signed out')})}
   async function login(e){e.preventDefault();await operation(async()=>{try{const data=await request('/api/admin/login',{method:'POST',headers:{'X-FloodPulse-Login':'1'},body:JSON.stringify({username,password})},null);setSession(data);setNotice('Signed in')}finally{setPassword('')}})}
@@ -102,6 +122,22 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <label>Entrance latitude<input type="number" step="any" min={-90} max={90} value={form.latitude} onChange={e=>field('latitude',e.target.value)} /></label>
         <label>Entrance longitude<input type="number" step="any" min={-180} max={180} value={form.longitude} onChange={e=>field('longitude',e.target.value)} /></label>
         <p className={'admin-entrance-status'+(entrance.length?' set':'')} role="status">{entrance.length?`Entrance pin set at ${Number(form.latitude).toFixed(5)}, ${Number(form.longitude).toFixed(5)} — shown on the map.`:'No entrance pin yet — click the exact entrance on the map, or type its coordinates.'}</p>
+        {lookup&&<div className="admin-place-lookup" role="status" aria-live="polite">
+          {lookup.status==='loading'&&<p>Looking up the place name, address and district for this point…</p>}
+          {lookup.status==='outside'&&<p className="notice">{lookup.message}</p>}
+          {lookup.status==='error'&&<p className="notice">Place lookup failed ({lookup.message}). Type the name, address and district manually.</p>}
+          {lookup.status==='done'&&<>
+            <p><strong>From the map point:</strong> {lookup.district?`District ${lookup.district.name}`:'District not found — choose it manually'}{lookup.data.name?` · ${lookup.data.name.value}`:lookup.data.nearby?` · nearest named place: ${lookup.data.nearby.value} (${lookup.data.nearby.distance_m} m away — is this the facility?)`:''}{lookup.data.address?` · ${lookup.data.address.value}`:''}</p>
+            {lookup.notes.map(n=><p key={n} className="admin-place-note">{n}</p>)}
+            <div className="admin-card-actions">
+              {lookup.data.name&&form.name!==lookup.data.name.value&&<button type="button" className="secondary" onClick={()=>field('name',lookup.data.name.value)}>Use this name</button>}
+              {!lookup.data.name&&lookup.data.nearby&&form.name!==lookup.data.nearby.value&&<button type="button" className="secondary" onClick={()=>field('name',lookup.data.nearby.value)}>Use “{lookup.data.nearby.value}” ({lookup.data.nearby.distance_m} m away)</button>}
+              {lookup.data.address&&form.address!==lookup.data.address.value&&<button type="button" className="secondary" onClick={()=>field('address',lookup.data.address.value)}>Use this address</button>}
+            </div>
+            {lookup.data.messages.map(m=><p key={m} className="muted">{m}</p>)}
+            <p className="muted">Suggestions only — check them on site. District: {lookup.district?lookup.data.district.source:'—'}. Name and address: <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">© OpenStreetMap contributors</a>, ODbL 1.0, via Nominatim.</p>
+          </>}
+        </div>}
         <p className="muted">Placing a marker does not verify a facility. Leave both blank while Pending if unknown.</p>
         </fieldset><fieldset className="form-section"><legend>2. Capacity, facilities and contact</legend><label>Maximum capacity<input required type="number" min={1} max={100000} step={1} value={form.capacity} onChange={e=>field('capacity',e.target.value)} /></label>
         <label>Current occupancy<input required type="number" min={0} max={Number(form.capacity)||100000} step={1} value={form.occupancy} onChange={e=>field('occupancy',e.target.value)} /></label>
@@ -116,7 +152,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
         <button disabled={busy||!districts.length}>{busy?'Saving…':'Save shelter assignment'}</button>
       </form>
       </div>
-      <AdminEntranceMap entrance={entrance} selectedDistrictId={workspaceDistrict} onDistrict={row=>setWorkspaceDistrict(row?.id||'')} navigationBounds={workspace?.navigation_bounds} onSelect={point=>setForm(f=>({...f,latitude:String(point.latitude),longitude:String(point.longitude),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}}))} />
+      <AdminEntranceMap entrance={entrance} selectedDistrictId={workspaceDistrict} onDistrict={row=>setWorkspaceDistrict(row?.id||'')} navigationBounds={workspace?.navigation_bounds} onSelect={point=>{setForm(f=>({...f,latitude:point.latitude.toFixed(6),longitude:point.longitude.toFixed(6),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}}));void lookupPlace(point)}} />
       </div>
     </>}
   </Container>

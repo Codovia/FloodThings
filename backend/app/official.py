@@ -61,10 +61,10 @@ class OfficialUnavailable(Exception):
     pass
 
 
-async def read_bounded(client, url, params=None, limit=4 * 1024 * 1024, timeout=20):
+async def read_bounded(client, url, params=None, limit=4 * 1024 * 1024, timeout=20, headers=None):
     try:
         async with asyncio.timeout(timeout):
-            async with client.stream('GET', url, params=params) as response:
+            async with client.stream('GET', url, params=params, headers=headers) as response:
                 if not response.is_success:
                     raise OfficialUnavailable(f'HTTP {response.status_code}')
                 raw = bytearray()

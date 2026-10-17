@@ -20,6 +20,7 @@ from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_outlook import router as river_outlook_router, RiverOutlook
 from .risk import router as risk_router, RiskService
 from .official import router as official_router, OfficialService
+from .admin_place import router as admin_place_router, PlaceLookup
 from .routing import router as routing_router
 
 
@@ -32,6 +33,7 @@ async def lifespan(app: FastAPI):
         app.state.river_outlook = RiverOutlook(client)
         app.state.risk = RiskService(client)
         app.state.official = OfficialService(client)
+        app.state.place_lookup = PlaceLookup(client)
         app.state.http = client
         try:
             yield
@@ -54,6 +56,7 @@ app.include_router(geocoding_router)
 app.include_router(river_outlook_router)
 app.include_router(risk_router)
 app.include_router(official_router)
+app.include_router(admin_place_router)
 app.include_router(routing_router)
 
 

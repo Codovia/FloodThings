@@ -107,3 +107,6 @@
 .admin-entrance-status.set{background:#e6f4ea;color:#0b5132}
 @media(max-width:600px){.admin-filters{grid-template-columns:1fr}}
 .admin-shell .admin-tabs .admin-tab-badge{align-self:center;min-height:30px;padding:2px 10px;border-radius:999px;background:#fdecea;color:#8a2d1e;border:1px solid #f2c1bb;font-size:.8125rem;font-weight:700;cursor:pointer}
+.admin-place-lookup{margin:6px 0;padding:8px 10px;border-radius:8px;border:1px solid #cfe0ea;background:#f4f9fc}
+.admin-place-lookup p{margin:3px 0}
+.admin-place-note{font-weight:700;color:#8a4b00}

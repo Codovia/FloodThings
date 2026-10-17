@@ -26,7 +26,7 @@ class CoordinateAccessLog(logging.Filter):
         args = record.args
         if isinstance(args, tuple) and len(args) == 5 and isinstance(args[2], str):
             path = args[2].split('?', 1)[0]
-            if path in {'/api/weather', '/api/ai/rainfall-outlook', '/api/shelters', '/api/risk', '/api/risk/area', '/api/official/warnings'}:
+            if path in {'/api/weather', '/api/ai/rainfall-outlook', '/api/shelters', '/api/risk', '/api/risk/area', '/api/official/warnings', '/api/admin/place'}:
                 record.args = (*args[:2], path, *args[3:])
         return True
 
