@@ -57,6 +57,10 @@ cd backend && .venv/bin/python -B -m app.provision_shelter_admin --username NAME
 
 **In-app Google route preview (optional).** Add `GOOGLE_MAPS_EMBED_API_KEY=` to the private `.env` — a Google Cloud key with the *Maps Embed API* enabled (free, unlimited requests). The key is visible in the page by design, so restrict it to your site's HTTP referrers in Google Cloud. Without it, the navigation panel shows the start point and shelter on the app map, and "Start navigation in Google Maps" still works (Maps URLs need no key).
 
+## Host it (Azure or any Linux server)
+
+One server runs the database, the app and automatic HTTPS with Docker: `cd deploy && ./setup.sh`. Step-by-step Azure for Students guide: **[docs/AZURE_HOSTING.md](docs/AZURE_HOSTING.md)**.
+
 ## Test
 
 ```bash

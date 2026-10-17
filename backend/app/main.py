@@ -1,3 +1,4 @@
+import os
 from contextlib import asynccontextmanager
 
 import httpx
@@ -129,3 +130,9 @@ async def ai_rainfall_outlook(
             "message": str(exc), "location": {"latitude": latitude, "longitude": longitude},
             "prediction": None, "probability": None, "model_version": "rainfall_logistic_v1",
             "flood_prediction_status": "not_available"})
+
+
+# Production: serve the built frontend from the same origin. Registered last so API routes win.
+if os.environ.get("FLOODPULSE_STATIC_DIR"):
+    from .static_site import mount_frontend
+    mount_frontend(app, os.environ["FLOODPULSE_STATIC_DIR"])
