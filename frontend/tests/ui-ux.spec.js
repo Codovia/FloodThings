@@ -50,7 +50,9 @@ test('keyboard navigation, disclosure focus and enlarged-text reflow remain usab
  for(let n=0;n<15&&!await report.evaluate(el=>el===document.activeElement);n++)await page.keyboard.press('Tab')
  await expect(report).toBeFocused();await page.keyboard.press('Enter')
  await expect(page.locator('h1')).toBeFocused();await expect(page).toHaveTitle('Report an incident · FloodPulse')
- // The GPS camera is the first, fastest path; the form fields follow it in reading order.
+ // Emergency numbers come first, then the GPS camera (fastest path), then the form fields, in reading order.
+ await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'112'})).toBeFocused()
+ await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'080-1070'})).toBeFocused()
  await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Open GPS camera'})).toBeFocused()
  await page.keyboard.press('Tab');await expect(page.getByLabel('Event type')).toBeFocused()
  await page.setViewportSize({width:1366,height:768})
