@@ -1,3 +1,4 @@
+import OfficialHelp from './OfficialHelp.jsx'
 import React,{useEffect,useRef,useState} from 'react'
 import {createPortal} from 'react-dom'
 import ShelterMap from './ShelterMap.jsx'
@@ -53,6 +54,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   return <section className={overview?"panel shelters-overview":"panel"} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">ADMINISTRATOR-REPORTED AVAILABILITY</p><h2 id="public-shelters-title">Emergency shelter directory</h2></div><button onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
     {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
+    <OfficialHelp prominent={!!data&&!data.shelters.length}/>
     {selectedPoint && !point && <p role="status">Your weather location is too uncertain or its GPS fix is stale for a navigation origin. Select an adequate starting location before requesting directions.</p>}
     <p className="muted">Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.</p>
     <details className="shelter-usage"><summary>Availability and safe navigation limitations</summary><p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed. This prototype is not affiliated with a disaster-management authority.</p>

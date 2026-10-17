@@ -10,3 +10,12 @@
 .shelter-form label:has(input[type=checkbox]) { display: block; }
 .shelter-form fieldset { display: grid; gap: 12px; min-width: 0; border: 1px solid #688681; }
 .shelter-form :focus-visible, .admin-shell button:focus-visible, .shelter-list a:focus-visible { outline: 3px solid #286fba; outline-offset: 3px; }
+
+.official-help{margin:12px 0;padding:10px 12px;border:1px solid #d7dfdd;border-left:5px solid #b3261e;border-radius:8px;background:#fff}
+.official-help.prominent{background:#fff4f2}
+.official-help h3{margin:0 0 6px;font-size:1rem}
+.official-help ul{list-style:none;padding:0;margin:0;display:grid;gap:4px}
+.official-help a{font-weight:800;font-size:1.1rem;margin-right:6px}
+.official-help p{margin:6px 0 0;font-size:.8125rem}
+.alert-steps{margin:12px 0 0;padding-left:1.4em;display:grid;gap:4px}
+.alert-official{margin-top:16px}.alert-official ul{padding-left:1.2em;display:grid;gap:4px}

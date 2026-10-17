@@ -66,7 +66,7 @@ export default function App() {
     {path==='/shelters'&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}
     {path==='/flood-map'&&<FloodIntelligenceMap point={point} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
    </div>}
-   {path==='/alerts'&&<AlertSubscription/>}
+   {path==='/alerts'&&<AlertSubscription navigate={navigate}/>}
    {path==='/report'&&<CitizenReport/>}
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
    {!info&&<PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink>}

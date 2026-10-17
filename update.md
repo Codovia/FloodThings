@@ -2018,3 +2018,19 @@ Acceptance: at 1366x768 the Flood Map fits without page scroll with the map as t
 Changes: page intro visually hidden (heading still exposed to assistive technology); toolbar reduced to district, statewide reset and recorded event; "Map layers" box and legend (IMD today, rain risk 24 h, historical floodwater, drainage, shelters, selected point) float on the map; zoom control bottom-right; Karnataka fitted with 0.25 zoom steps (whole-number zoom left the state at zoom 5, mostly neighbouring states); "Zoom to mapped water" pads around the overlays (a polygon under the layer box was unclickable — caught by flood-intelligence.spec). Long provenance text moved into "Sources and limitations"; mobile places the layer box and legend below the map.
 
 Verification: frontend unit 291/291; Playwright flood-intelligence, historical-map, risk-features, drainage-research, fullscreen, navigation, ui-repair, ui-ux and wireframes specs: 28 passed, 1 skipped. Live Chromium 1366x768 document height 768; mobile 390 px stacks toolbar, map, layers, legend and summary; no page errors.
+
+## 2026-10-17 — Report, Shelters, Alerts and Weather page review
+
+Page review verdict: all six pages are needed. Home, Flood Map, Shelters, Report, Alerts and Admin are the product's citizen and operator flows. Weather details is kept but had no route from Home since the seven-day forecast left it.
+
+Acceptance: Report and Shelters maps open on Karnataka rather than India; Report shows a sticky, taller map with a plain instruction for placing the point; Shelters and Alerts show verified official emergency numbers, prominently when no verified shelter is open; Alerts never presents a subscriber link unless configured and points to official warning sources; Home links to the seven-day forecast; "Why?" factor tables render only when opened.
+
+Research (17 Oct 2026): 112 is India's Emergency Response Support System number, live in Karnataka since November 2019 for police, fire, ambulance and disasters (Deccan Herald / The News Minute launch reports, factly.in ERSS explainer). 080-1070 (toll-free) is the Karnataka State Emergency Operation Centre, Revenue Department (Disaster Management), listed in 2021 and 2023 government statements. Undated flood-season WhatsApp/control-room numbers were not used.
+
+Changes: `OfficialHelp.jsx` (112, 080-1070, tel: links); `ShelterMap.jsx` 0.25 zoom steps and a post-layout Karnataka refit when no points or district bounds apply (affects Report, Shelters and Admin maps); `CitizenReport.jsx` map hint and side-by-side location buttons, sticky map; `AlertSubscription.jsx` three-step "how alerts work" and "Official warnings you can use now" (Home, NDMA SACHET, IMD district warnings); Home weather line "7-day forecast" link; `RiskAreaDashboard.jsx` renders factor tables only after "Why?" opens — this fixes the intermittent `home-location-river.spec` table-count failure noted in the previous entry (tables appeared inside the closed section when risk data arrived).
+
+Tests: alert unit tests now forbid subscriber links outside the official section and any t.me/unapproved link anywhere (previously "no links at all"); new test for official sources and numbers.
+
+Verification: frontend unit 292/292; Playwright full suite 84 passed, 8 skipped; home-location-river.spec 28/28 over four repeats. Live Chromium: "Why?" 0 tables closed, 2 open, document height 768; Report, Shelters, Alerts screenshots checked; no page errors.
+
+Limitations: phone numbers are from public reports, not an official machine-readable directory; recheck before the demonstration. The Shelters directory is still empty until an administrator verifies real shelters.

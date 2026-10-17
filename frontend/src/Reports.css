@@ -10,3 +10,8 @@
 .report-workspace pre,.admin-shell pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:.8125rem;max-height:360px;overflow:auto}
 .report-workspace code{overflow-wrap:anywhere;font-size:.8125rem}
 @media(max-width:900px){.report-workspace{grid-template-columns:minmax(0,1fr)}}
+#report-location-map{position:sticky;top:12px}
+#report-location-map .shelter-map{height:min(460px,60vh)}
+.report-map-hint{margin:0 0 8px;padding:6px 10px;border-radius:8px;background:#eef6fb;font-weight:600;font-size:.9rem}
+.report-form fieldset>.report-actions button{flex:1 1 200px}
+@media(max-width:900px){#report-location-map{position:static}}

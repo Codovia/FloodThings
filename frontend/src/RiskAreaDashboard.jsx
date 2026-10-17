@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { LEVEL_NAMES, rankedSpots } from './useRisk.js'
 import RiskPanel, { RiskBadge } from './RiskPanel.jsx'
 
@@ -28,6 +28,7 @@ export function KindToggle({ kind, onKind, label = 'Risk type' }) {
 
 export default function RiskAreaDashboard({ area, risk = null, point, kind, onKind, onFocus }) {
   const { data, loading, error, refresh } = area
+  const [why, setWhy] = useState(false)  // factor tables render only once "Why?" is opened
   let body
   if (!point) body = <p>Choose your town or use your location to see the riskiest spots around you.</p>
   else if (point.kind === 'network') body = <p>Your location is only a network estimate. Use your location or search your town to rank nearby spots.</p>
@@ -49,8 +50,8 @@ export default function RiskAreaDashboard({ area, risk = null, point, kind, onKi
     <header><h3 id="risk-area-title">Flood & drainage risk · next 24 h</h3><span className="source-tag experimental">Experimental</span></header>
     <KindToggle kind={kind} onKind={onKind} />
     {body}
-    {risk && point && <details className="risk-why"><summary>Why? At your location: {risk.data ? <>Flood <RiskBadge level={risk.data.flood.level} /> Drainage <RiskBadge level={risk.data.drainage.level} /></> : risk.loading ? 'checking…' : 'unavailable'}</summary>
-      <RiskPanel risk={risk} point={point} embedded /></details>}
+    {risk && point && <details className="risk-why" onToggle={e => setWhy(e.currentTarget.open)}><summary>Why? At your location: {risk.data ? <>Flood <RiskBadge level={risk.data.flood.level} /> Drainage <RiskBadge level={risk.data.drainage.level} /></> : risk.loading ? 'checking…' : 'unavailable'}</summary>
+      {why && <RiskPanel risk={risk} point={point} embedded />}</details>}
     <p className="muted fine">Rule-based index from rainfall, ground height, mapped past floods and approved reports — not a flood probability or an official warning.</p>
   </article>
 }

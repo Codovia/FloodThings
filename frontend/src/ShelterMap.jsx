@@ -10,14 +10,18 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
   const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect),inspect=useRef(onInspect)
   const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
-  choose.current=onSelect;inspect.current=onInspect
+  const boundsRef=useRef(navigationBounds)
+  choose.current=onSelect;inspect.current=onInspect;boundsRef.current=navigationBounds
   useEffect(()=>{
-    const view=L.map(container.current,{scrollWheelZoom:false}).setView([15.1,76.1],6)
+    const view=L.map(container.current,{scrollWheelZoom:false,zoomSnap:0.25}).setView([15.1,76.1],6)
     // Open on Karnataka rather than a fixed southern-India view; selections and bounds refine it later.
     view.fitBounds(L.geoJSON(boundary).getBounds(),{padding:[10,10],maxZoom:7,animate:false})
     map.current=view;layers.current=L.layerGroup().addTo(view)
     view.on('click',e=>choose.current?.({latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
-    return ()=>{view.remove();map.current=null;layers.current=null;lastGeometry.current=null}
+    // The map may be portalled into a stage that is sized after mount: fit Karnataka again unless
+    // points or district bounds have already taken over the view.
+    const settle=setTimeout(()=>{if(map.current===view&&!boundsRef.current&&(!lastGeometry.current||lastGeometry.current.startsWith('[[]'))){view.invalidateSize?.();view.fitBounds(L.geoJSON(boundary).getBounds(),{padding:[10,10],maxZoom:7,animate:false})}},250)
+    return ()=>{clearTimeout(settle);view.remove();map.current=null;layers.current=null;lastGeometry.current=null}
   },[])
   useEffect(()=>{
     if(!map.current)return

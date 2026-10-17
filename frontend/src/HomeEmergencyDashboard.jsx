@@ -35,7 +35,7 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
       {point && <div className="home-weather-line" aria-label="Current weather and rain">
         <h2 className="home-temp">{weatherStatus}</h2>
         <p>{extras}{current && <small> · valid {clock(current.valid_at)}</small>}</p>
-        <p className="home-rain"><strong>{rainfall ? `${Number(rainfall.mm.toFixed(1))} mm` : 'Unavailable'}</strong> rain forecast in the next 24 h{rainfall && <small> ({hour(rainfall.start)} – {hour(rainfall.end)})</small>}</p>
+        <p className="home-rain"><strong>{rainfall ? `${Number(rainfall.mm.toFixed(1))} mm` : 'Unavailable'}</strong> rain forecast in the next 24 h{rainfall && <small> ({hour(rainfall.start)} – {hour(rainfall.end)})</small>} · <PageLink to="/weather" navigate={navigate}>7-day forecast</PageLink></p>
         {session.error && <p role="alert">{session.error}</p>}
       </div>}
       <div className="home-location-actions"><button onClick={location.request} disabled={location.status === 'requesting'}>Use my location</button><LocationDirectorySelector onChoose={choosePoint} onDistrict={chooseDistrict} selectedDistrictId={districtId} collapseOnChoose /></div>
