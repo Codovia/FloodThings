@@ -2090,3 +2090,17 @@ Acceptance: the key loads from a private 0600 `.env` like the routing key, expli
 Changes: `ROUTING_KEYS` and `launcher_processes.SECRET_KEYS` include `GOOGLE_MAPS_EMBED_API_KEY`; new test `test_routing_keys_load_from_private_dotenv_and_are_stripped_from_vite` (key-shaped fixtures only).
 
 Verification: launcher tests 79 passed (test_launcher_config, test_launcher, test_full_launcher).
+
+## 2026-10-17 — Administrator panel made easier to use
+
+User request: understand the Admin panel, list how to make it user friendly, and implement it.
+
+Findings (walkthrough with labelled admin fixtures served in the browser; no real credentials used): no overview of what needs attention; an Open shelter whose verification had expired showed only "Unavailable to public" with no reason (the real shelter would silently disappear at expiry); every row had two full-width buttons repeating the facility name; "Edit" filled a form ~1,500 px below with no scroll; no quick re-verify; no feedback on whether an entrance pin was set; notification composer below the suggestion lists and "Use as draft" filled an off-screen box; report queue without counts, filter or description, with the selected report's evidence below the queue and the map pin not focused; duplicated page titles.
+
+Acceptance: all existing controls unchanged (session, CSRF, verification checklist and evidence, material-change reset, 24 h expiry, Pending-first creation, explicit preview/approve/send-once, audit). Shelter workspace shows counts (visible / need attention / full / closed), a "Show" filter, compact cards with status label, a plain reason for public visibility (expires in N h; expired N h ago — re-verify; pending; full; closed), occupancy bar, and Edit / History / Re-verify buttons; Edit scrolls to the form and focuses its heading, Re-verify scrolls to the verification checklist, "Stop editing" exits; the entrance pin status is shown; a badge beside the tabs opens the shelters needing attention. Notifications: compose and send on the left, suggested drafts on the right, "Use as draft" focuses the message and states the draft's source, compact history with status labels. Reports: counts, a "Show" filter, waiting reports listed first, description snippets with age and accuracy, evidence panel beside the map with the selected pin focused, pagination only when needed.
+
+Changes: `AdminShelters.jsx` (`shelterState` derives explanations only from server fields; falls back to verified_at + 24 h if a row lacks the expiry), `AdminNotifications.jsx`, `AdminReports.jsx`, `App.jsx` (admin page intro visually hidden), CSS. Accessible names used by tests and assistive technology are kept ("Edit <name>", "Audit <name>", "waterlogging · SUBMITTED", tab names).
+
+Also fixed: `HistoricalFloodMap.test.jsx` race (waited for source text that can render before the geometry redraw) — now waits for the redraw; 3 consecutive full unit runs passed.
+
+Verification: frontend unit 300/300 ×3 (new `AdminShelterState.test.jsx`); build passed; Playwright 84 passed, 8 skipped (PostgreSQL-only, including end-to-end admin flows — not run here). Live Chromium with fixtures: counts 1 visible / 2 need attention / 1 full / 0 closed; reasons rendered for all four states; Re-verify scrolls to the checklist; "Use as draft" fills and focuses the message; selecting a report opens its evidence beside the map; no page errors.

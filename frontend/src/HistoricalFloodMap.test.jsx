@@ -53,8 +53,9 @@ describe('historical evidence display', () => {
     await screen.findByText(/Source image: controlled-test-source-2728/)
     fireEvent.change(screen.getByRole('combobox'), { target: { value: '3551' } })
     await screen.findByText(/Source image: controlled-test-source-3551/)
+    // The source text can render before the redraw; wait for the replaced geometry itself.
+    await waitFor(() => expect(leaflet.geoJSON.mock.calls.filter(([data]) => data.type === 'FeatureCollection').at(-1)[0]).toEqual(geometry(3551)))
     const drawn = leaflet.geoJSON.mock.calls.filter(([data]) => data.type === 'FeatureCollection')
-    expect(drawn.at(-1)[0]).toEqual(geometry(3551))
     expect(screen.getByText(/Recorded window/).textContent).toContain('2009')
     expect(leaflet.map.mock.results[0].value.removeLayer).toHaveBeenCalled()
   })

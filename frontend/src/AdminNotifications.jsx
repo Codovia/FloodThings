@@ -14,7 +14,8 @@ export default function AdminNotifications({ session, request }) {
   const [options, setOptions] = useState(null), [history, setHistory] = useState(null), [offset, setOffset] = useState(0)
   const [destination, setDestination] = useState(''), [kind, setKind] = useState('informational'), [message, setMessage] = useState(''), [shelter, setShelter] = useState('')
   const [preview, setPreview] = useState(null), [approved, setApproved] = useState(false), [busy, setBusy] = useState(false), [error, setError] = useState(null)
-  const previewHeading = useRef(null)
+  const previewHeading = useRef(null), messageBox = useRef(null)
+  const [draftSource, setDraftSource] = useState(null)
   const [suggested, setSuggested] = useState(null), [suggestError, setSuggestError] = useState(null)
   const [officialDrafts, setOfficialDrafts] = useState(null), [officialError, setOfficialError] = useState(null)
   useEffect(() => { if (preview) previewHeading.current?.focus() }, [preview?.id])
@@ -51,7 +52,10 @@ export default function AdminNotifications({ session, request }) {
     catch (e) { if (!stopped.current) setOfficialError(e.message) }
   }
   useEffect(() => { loadSuggestions(); loadOfficial() }, [session])
-  function applySuggestion(item) { change(setMessage, item.suggested_message); setKind(item.suggested_kind) }
+  function applySuggestion(item, source) {
+    change(setMessage, item.suggested_message); if (item.suggested_kind) setKind(item.suggested_kind); setDraftSource(source)
+    requestAnimationFrame(() => { messageBox.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' }); messageBox.current?.focus({ preventScroll: true }) })
+  }
   function change(setter, value) { setter(value); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
   async function operation(action) {
     if (busyRef.current) return
@@ -76,7 +80,7 @@ export default function AdminNotifications({ session, request }) {
       if (!stopped.current) { setPreview(row); setApproved(false); await load() }
     })
   }
-  function reset() { setMessage(''); setShelter(''); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
+  function reset() { setDraftSource(null); setMessage(''); setShelter(''); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
   const enabled = options?.configured && options.destinations.some(d=>d.opted_in!==false)
   return <section className="panel" aria-labelledby="admin-notifications-title">
     <h2 id="admin-notifications-title">Alerts — administrator-controlled Telegram notices</h2>
@@ -86,34 +90,13 @@ export default function AdminNotifications({ session, request }) {
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
     {options?.send_limit&&<p>{options.send_limit}. Private recipients must send /start floodpulse to opt in; /stop opts out. Consent is checked again before an attempt.</p>}
     {error && <p role="alert">{error}</p>}
-    <section className="risk-suggestions official-suggestions" aria-labelledby="official-suggestions-title">
-      <h3 id="official-suggestions-title">Suggested alerts from official IMD warnings</h3>
-      <p>Drafts that relay India Meteorological Department Orange or Red district warnings for today and tomorrow, as issued. Nothing is sent until you edit, preview and approve it.</p>
-      {!officialDrafts && !officialError && <p role="status">Checking official IMD district warnings…</p>}
-      {officialError && <p role="status">Official warnings unavailable: {officialError}. This does not mean there is no warning.</p>}
-      {officialDrafts && !officialDrafts.suggestions.length && <p role="status">No Karnataka district has an IMD Orange or Red warning for today or tomorrow.</p>}
-      {officialDrafts?.suggestions.length > 0 && <ul className="shelter-list">{officialDrafts.suggestions.map(item => <li key={item.id}>
-        <strong>OFFICIAL IMD {item.level.toUpperCase()} · {item.district} · {item.date}</strong>
-        <p>{item.suggested_message}</p>
-        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item)}>Use as draft</button></li>)}</ul>}
-      <button type="button" disabled={busy} onClick={loadOfficial}>Refresh official warnings</button>
-    </section>
-    <section className="risk-suggestions" aria-labelledby="risk-suggestions-title">
-      <h3 id="risk-suggestions-title">Suggested alerts from the risk engine</h3>
-      <p>Drafts only. Nothing is sent until you edit, preview and approve it.</p>
-      {!suggested && !suggestError && <p role="status">Checking statewide risk…</p>}
-      {suggestError && <p role="status">Risk suggestions unavailable: {suggestError}</p>}
-      {suggested && !suggested.suggestions.length && <p role="status">No grid cell is currently High or Severe. No alert is suggested.</p>}
-      {suggested?.suggestions.length > 0 && <ul className="shelter-list">{suggested.suggestions.map(item => <li key={item.cell_id}>
-        <strong>{item.level.toUpperCase()} · {item.latitude.toFixed(2)}°N, {item.longitude.toFixed(2)}°E · score {item.score}</strong>
-        <p>{item.suggested_message}</p>
-        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item)}>Use as draft</button></li>)}</ul>}
-      <button type="button" disabled={busy} onClick={loadSuggestions}>Refresh suggestions</button>
-    </section>
+    <div className="notify-layout">
+    <div className="notify-compose"><h3>Compose and send</h3>
+    {draftSource && message && <p className="notify-draft-note" role="status">Draft filled from the {draftSource}. Edit it, then review the exact message before sending.</p>}
     <form className="shelter-form" aria-label="Telegram notification composer" onSubmit={review}>
       <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose authorized destination</option>{options?.destinations.map(d => <option key={d.id} value={d.id} disabled={d.opted_in===false}>{d.label}{d.test_only ? ' — private test only' : ''}{d.opted_in===false ? ' — not opted in' : ''}</option>)}</select>
       <label htmlFor="notice-kind">Notification type</label><select id="notice-kind" disabled={busy || !enabled} value={kind} onChange={e => change(setKind, e.target.value)}><option value="informational">Informational</option><option value="emergency">Emergency — independently verified by administrator</option></select>
-      <label>Notification message<textarea required maxLength={3500} disabled={busy || !enabled} value={message} onChange={e => change(setMessage, e.target.value)} /></label>
+      <label>Notification message<textarea ref={messageBox} rows={6} required maxLength={3500} disabled={busy || !enabled} value={message} onChange={e => change(setMessage, e.target.value)} /></label>
       <label htmlFor="notice-shelter">Include currently verified Open shelter</label><select id="notice-shelter" disabled={busy || !enabled} value={shelter} onChange={e => change(setShelter, e.target.value)}><option value="">No shelter information</option>{options?.shelters.map(s => <option key={s.id} value={s.id}>{s.name} — {s.district_name}</option>)}</select>
       <p>Use this selector for shelter details; the database snapshot is checked again before sending. Independently verify all factual claims. Do not invent flood probabilities, shelter availability or evacuation instructions from experimental ML.</p>
       <button disabled={busy || !enabled}>{busy ? 'Working…' : 'Review exact notification'}</button>
@@ -128,10 +111,38 @@ export default function AdminNotifications({ session, request }) {
       </>}
       <button disabled={busy} onClick={reset}>Compose a new notice</button>
     </div>}
-    <h3>Notification history</h3><button disabled={busy} onClick={() => operation(() => load())}>Refresh notification history</button>
+    </div>
+    <div className="notify-suggestions"><h3 className="visually-hidden">Suggested drafts</h3>
+    <section className="risk-suggestions official-suggestions" aria-labelledby="official-suggestions-title">
+      <h3 id="official-suggestions-title">Suggested alerts from official IMD warnings</h3>
+      <p>Drafts that relay India Meteorological Department Orange or Red district warnings for today and tomorrow, as issued. Nothing is sent until you edit, preview and approve it.</p>
+      {!officialDrafts && !officialError && <p role="status">Checking official IMD district warnings…</p>}
+      {officialError && <p role="status">Official warnings unavailable: {officialError}. This does not mean there is no warning.</p>}
+      {officialDrafts && !officialDrafts.suggestions.length && <p role="status">No Karnataka district has an IMD Orange or Red warning for today or tomorrow.</p>}
+      {officialDrafts?.suggestions.length > 0 && <ul className="shelter-list">{officialDrafts.suggestions.map(item => <li key={item.id}>
+        <strong>OFFICIAL IMD {item.level.toUpperCase()} · {item.district} · {item.date}</strong>
+        <p>{item.suggested_message}</p>
+        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item, `official IMD ${item.level} warning for ${item.district}`)}>Use as draft</button></li>)}</ul>}
+      <button type="button" className="secondary" disabled={busy} onClick={loadOfficial}>Refresh official warnings</button>
+    </section>
+    <section className="risk-suggestions" aria-labelledby="risk-suggestions-title">
+      <h3 id="risk-suggestions-title">Suggested alerts from the risk engine</h3>
+      <p>Drafts only. Nothing is sent until you edit, preview and approve it.</p>
+      {!suggested && !suggestError && <p role="status">Checking statewide risk…</p>}
+      {suggestError && <p role="status">Risk suggestions unavailable: {suggestError}</p>}
+      {suggested && !suggested.suggestions.length && <p role="status">No grid cell is currently High or Severe. No alert is suggested.</p>}
+      {suggested?.suggestions.length > 0 && <ul className="shelter-list">{suggested.suggestions.map(item => <li key={item.cell_id}>
+        <strong>{item.level.toUpperCase()} · {item.latitude.toFixed(2)}°N, {item.longitude.toFixed(2)}°E · score {item.score}</strong>
+        <p>{item.suggested_message}</p>
+        <button type="button" disabled={busy || !enabled} onClick={() => applySuggestion(item, `experimental risk suggestion (${item.level})`)}>Use as draft</button></li>)}</ul>}
+      <button type="button" className="secondary" disabled={busy} onClick={loadSuggestions}>Refresh suggestions</button>
+    </section>
+    </div>
+    </div>
+    <div className="admin-section-head notify-history-head"><h3>Notification history</h3><button className="secondary" disabled={busy} onClick={() => operation(() => load())}>Refresh notification history</button></div>
     {history && !history.notifications.length && <p>No notification attempts or previews recorded.</p>}
     {history && <><p>{history.notifications.length} of {history.total} records shown.</p><ul aria-label="Notification history" className="shelter-list">{history.notifications.map(row => <li key={row.id}>
-      <strong>{row.kind} — {row.destination_label}</strong><p>{resultText(row)}</p>
+      <div className="admin-shelter-head"><strong>{row.kind === 'emergency' ? 'Emergency' : 'Informational'} — {row.destination_label}</strong><span className={'notify-status ' + row.status}>{{ draft: 'Preview', sending: 'Sending', accepted: 'Accepted', rejected: 'Rejected', delivery_unknown: 'Uncertain' }[row.status] || row.status}</span></div><p>{resultText(row)}</p>
       <p>Created: {stamp(row.created_at)}. Approved: {stamp(row.confirmed_at)}. Attempt: {stamp(row.attempted_at)}. Result: {stamp(row.completed_at)}.</p>
       <p>Administrator: {row.created_by}. Result code: {row.result_code || 'None'}{row.telegram_error_code ? ' · Telegram code ' + row.telegram_error_code : ''}.</p>
       <details><summary>View recorded message</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', font: 'inherit' }}>{row.text}</pre></details>
