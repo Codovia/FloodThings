@@ -15,7 +15,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from .location_database import database_engine,districts,active
 from .locations import LocationsUnavailable
 from .shelter_schema import admins,sessions,limits,shelters,audit
-from .shelter_security import Login,SecurityConfig,HASHER,password_matches,dummy_hash,digest,csrf_token,now
+from .shelter_security import Login,SecurityConfig,HASHER,password_matches,dummy_hash,digest,csrf_token,now,env_limit
 
 router=APIRouter()
 VERIFICATION_HOURS=24 # Application expiry policy, not an official emergency standard.
@@ -97,7 +97,7 @@ class ShelterStore:
         with self.engine.begin() as c:
             c.execute(text('SELECT pg_advisory_xact_lock(814208)'))
             c.execute(delete(limits).where(limits.c.window_start<start-timedelta(hours=1)))
-            for identity,maximum in [('peer:'+peer,20),('account:'+username,5)]:
+            for identity,maximum in [('peer:'+peer,env_limit('FLOODPULSE_LOGIN_LIMIT_PER_ADDRESS',20)),('account:'+username,env_limit('FLOODPULSE_LOGIN_LIMIT_PER_ACCOUNT',5))]:
                 key=digest(identity);row=c.execute(select(limits).where(limits.c.key==key)).mappings().one_or_none()
                 count=row['attempts'] if row and row['window_start']==start else 0
                 if count>=maximum:blocked=True;break

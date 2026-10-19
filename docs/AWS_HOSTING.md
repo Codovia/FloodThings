@@ -85,7 +85,8 @@ Open `https://floodpulse-smvitm.duckdns.org/`; the certificate is issued on the 
 The same as the Azure guide (`docs/AZURE_HOSTING.md`, step 7): add `https://YOUR-DOMAIN/*` to the
 Google key's website restrictions, point Telegram at the server with
 `docker compose run --rm --no-deps app python -B /app/deploy-tools/telegram_webhook.py`, and add
-and verify shelters again in `/admin`. Everyday commands are also in that guide.
+and verify shelters again in `/admin`. Everyday commands, **daily backups, the uptime monitor and
+limit settings** are also in that guide; set up the daily backup and the uptime monitor before the demo.
 
 ## Cost notes
 

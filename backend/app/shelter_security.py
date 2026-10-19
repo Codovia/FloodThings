@@ -99,3 +99,12 @@ class SecurityConfig:
 
     def clear_cookie(self,response):
         response.delete_cookie(self.cookie,path='/',httponly=True,secure=self.secure,samesite='strict')
+
+
+def env_limit(name, default):
+    """Positive integer threshold from the environment; falls back to the safe default."""
+    try:
+        value = int(os.environ.get(name, default))
+        return value if value > 0 else default
+    except ValueError:
+        return default

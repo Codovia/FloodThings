@@ -13,7 +13,7 @@ function useJson(url, refreshMs) {
     setState(s => ({ url, data: s.url === url ? s.data : null, error: null, loading: true }))
     fetch(url, { signal: controller.signal }).then(async response => {
       const data = await response.json()
-      if (!response.ok && !data?.flood && !data?.cells) throw Error(typeof data?.detail === 'string' ? data.detail : 'Risk assessment unavailable')
+      if (!response.ok && !data?.flood && !data?.cells) throw Error(typeof data?.detail === 'string' ? data.detail : typeof data?.message === 'string' ? data.message : 'Risk assessment unavailable')
       if (active) setState({ url, data, error: null, loading: false })
     }).catch(error => { if (active) setState({ url, data: null, error: error.name === 'AbortError' ? 'Risk request timed out.' : error.message, loading: false }) })
       .finally(() => clearTimeout(timer))

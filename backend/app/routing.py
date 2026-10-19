@@ -5,6 +5,7 @@ best effort and never certifies a route as flood-safe. Without a configured key
 the feature reports `not_configured` and the external Google Maps link remains.
 """
 import asyncio
+from datetime import datetime, timezone
 import json
 import math
 import os
@@ -19,6 +20,7 @@ from sqlalchemy import text
 from starlette.concurrency import run_in_threadpool
 
 from .shelters import get_store, mode
+from .shelter_security import env_limit
 from .risk import inside, load_boundary
 
 router = APIRouter()
@@ -30,6 +32,26 @@ MAX_AVOID = 50
 LIMIT = 2 * 1024 * 1024
 LABEL = 'Route avoids {n} approved flooding/blocked-drain report area(s) from the last 72 hours. It is NOT certified flood-safe: check road closures and follow local authorities.'
 BOUNDARY = load_boundary()
+
+
+class DailyQuota:
+    """Stops calling OpenRouteService before its free daily quota (2,000 directions) runs out.
+    FLOODPULSE_ROUTE_DAILY_LIMIT sets the cap (default 1,500); counts reset at 00:00 UTC."""
+    def __init__(self, clock=None):
+        self.clock = clock or (lambda: datetime.now(timezone.utc).date())
+        self.day, self.used = None, 0
+
+    def take(self):
+        today = self.clock()
+        if today != self.day:
+            self.day, self.used = today, 0
+        if self.used >= env_limit('FLOODPULSE_ROUTE_DAILY_LIMIT', 1500):
+            return False
+        self.used += 1
+        return True
+
+
+ROUTE_QUOTA = DailyQuota()
 
 
 class Origin(BaseModel):
@@ -138,6 +160,9 @@ async def route(payload: RouteInput, request: Request, provide=Depends(store_pro
             'instructions': True}
     if points:
         body['options'] = {'avoid_polygons': {'type': 'MultiPolygon', 'coordinates': [octagon(*p) for p in points]}}
+    if not ROUTE_QUOTA.take():
+        return JSONResponse(status_code=503, content={'status': 'rate_limited',
+            'message': 'Today\'s in-app routing allowance is used up. Use the Google route or external directions.'})
     try:
         status, result = await post_json(request.app.state.http, ORS_URL.format(profile=payload.profile), body, key)
     except (TimeoutError, httpx.HTTPError, ValueError):

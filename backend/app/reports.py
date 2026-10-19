@@ -14,7 +14,7 @@ from sqlalchemy import select, update, delete, func, text
 from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 from .shelters import authorized, shelter_engine, mode
-from .shelter_security import SecurityConfig, now, digest
+from .shelter_security import SecurityConfig, now, digest, env_limit
 from .shelter_schema import limits
 from .report_schema import reports, images, audit
 from .report_position_schema import positions
@@ -130,7 +130,7 @@ class ReportStore:
 
     def reserve(self, peer):
         timestamp = now(); start = timestamp.replace(minute=timestamp.minute//15*15, second=0, microsecond=0)
-        keys = [(digest('report-global'),60), (hmac.new(RATE_SALT,peer.encode(),hashlib.sha256).hexdigest(),5)]
+        keys = [(digest('report-global'),env_limit('FLOODPULSE_REPORT_LIMIT_TOTAL',60)), (hmac.new(RATE_SALT,peer.encode(),hashlib.sha256).hexdigest(),env_limit('FLOODPULSE_REPORT_LIMIT_PER_ADDRESS',5))]
         with self.engine.begin() as c:
             c.execute(text('SELECT pg_advisory_xact_lock(814210)'))
             for key, maximum in keys:

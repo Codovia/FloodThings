@@ -18,3 +18,4 @@ deploy/.env
 *.tif
 *.nc
 *.zip
+deploy/backups

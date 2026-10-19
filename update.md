@@ -2214,3 +2214,35 @@ User report: the Azure for Students offer is not available for their college ema
 Research (18 Oct 2026): AWS accounts created after 15 July 2025 get a Free plan with US$100 credit (+ up to US$100 for onboarding tasks) for 6 months; the old 12-month free t2/t3.micro allowance applies only to older accounts. AWS India accepts Visa, Mastercard, RuPay cards and UPI; sign-up verification charges and refunds ₹2. The official Lightsail pricing page lists three months free on selected bundles including the 2 GB / 2 vCPU plan, one bundle per account, for a limited time.
 
 Change: `docs/AWS_HOSTING.md` (Lightsail Mumbai, Ubuntu 24.04, 2 GB plan, static IP, firewall 22/80/443, DuckDNS name for HTTPS, swap, Docker, then the same `deploy/setup.sh` and `create-admin.sh`); `deploy/env.example` no longer pre-fills an Azure domain; README links both guides. The deployment package itself is cloud-neutral and unchanged.
+
+## 2026-10-19 — 26-point production-readiness audit and fixes
+
+User request: apply a widely shared 26-point production checklist (rate limiting, validation, secrets, dependencies, error leakage, uploads, monitoring, backups, concurrency, performance) where applicable; explain any item that cannot or need not be done.
+
+Audit results (evidence in brackets):
+| # | Check | Result |
+|---|---|---|
+| 1, 21 | Rate limiting | Partly present: admin login 5/account and 20/address per 15 min, reports 5/address and 60 total per 15 min, both PostgreSQL-backed. **Added** per-address limits for public API reads (300/min) and expensive endpoints (area risk, routing, AI outlook, admin place: 30/min). Exponential backoff not added: the existing fixed 15-minute windows are kept to avoid changing tested authentication behaviour. |
+| 2, 3 | API limits / spending caps | **Added** an OpenRouteService daily cap (1,500 of the free 2,000). Google Maps Embed is free and unlimited; Open-Meteo and IMD/SACHET responses are cached. Cloud spending caps are an account setting (AWS/Azure budget alerts, in the hosting guides). |
+| 4, 7, 8, 25 | Errors, failed requests, timeouts, leakage | Present: bounded provider timeouts (10–20 s), frontend aborts at 10–15 s, "unavailable" states everywhere, validation errors on admin/report routes replaced by generic text. **Added** a catch-all handler: visitors get a generic message and an error ID; method, path (no query string, since it can hold coordinates) and the traceback go to the server log. IMD parser errors now say "invalid response". |
+| 5, 6 | Loading / empty states | Present on every page (verified in the 18 Oct audit). |
+| 9 | Duplicate submissions | Present: reports and Telegram notices use request IDs (same content returns the original receipt; changed content is refused); shelters use revision checks; buttons disable while busy. |
+| 10 | Duplicate payments | Not applicable: no payments. |
+| 11, 12, 13 | Queries, indexes, pagination | Present: indexes on shelter status/verification, entrance (GiST), audit history, session expiry, notification history, report position (GiST) and received time; admin lists paginate at 50–100. |
+| 14, 15, 26 | Uploads | Present: photos decoded with Pillow (not trusted by extension), MIME must match content, 5 MiB and 10 megapixel limits, decompression-bomb guard, re-encoded to strip metadata, stored in PostgreSQL behind admin authentication, never executable; 7 MiB request limit; Caddy 8 MB limit; the GPS camera compresses before upload. |
+| 16 | Caching | Present and safe: provider data cached with expiry; admin, shelter and report responses are no-store. |
+| 17 | Uptime monitoring | **Added** `/api/health/ready` (checks the database without revealing details), Docker health check for the app (Caddy waits for it), UptimeRobot instructions. |
+| 18 | Error logging | **Added** server-side error log with IDs; Docker logs capped at 3 × 10 MB per service. |
+| 19 | Simultaneous users | **Tested**: 50 and 100 simultaneous visitors (400 and 800 Home requests) through the HTTPS stack: 0 failures; median 0.8–1.0 s, 95th percentile 4.4–4.8 s (first calls to weather providers); total memory ~270 MB. Script `scripts/load_test.py`. |
+| 20 | Backup restoration | **Added** `deploy/backup.sh` (custom-format dump, private folder, newest 14 kept) and `deploy/restore.sh` (typed confirmation, stops the app, restores in one transaction, re-checks permissions). **Tested**: backup → added a record → restore → record gone, permissions check passed, readiness ok. |
+| 22 | Input validation | Present: every request body uses strict Pydantic models with unknown fields forbidden; numeric ranges on coordinates; the three free-text path parameters are length/allow-list checked. |
+| 23 | Secrets | Clean: tracked files contain only placeholders and variable references; the full git history (all branches, 168 commits) has no Google, Telegram, OpenRouteService, AWS, GitHub or private-key patterns and no `.env` file was ever committed; the built frontend contains only a key-format check, not a key. The Google Embed key is public by design (restricted by website). |
+| 24 | Dependency audit | Clean: `npm audit` 0 vulnerabilities (all and production); `pip-audit` on backend requirements: no known vulnerabilities. |
+
+Security decision reconciled explicitly: the app previously ignored forwarded client addresses. In the hosted stack it now trusts `X-Forwarded-For` only from Caddy's fixed internal address (172.28.0.10); Caddy replaces any client-sent value. Verified: a request through Caddy with a forged `X-Forwarded-For: 203.0.113.99` was logged with the real connection address. Without this, every visitor shared one login and report limit. The laptop launcher is unchanged.
+
+Changes: `backend/app/rate_limit.py`, `main.py` (limiter, error handler, logger, `/api/health/ready`), `routing.py` (daily cap), `shelter_security.env_limit` with configurable login/report thresholds, `official.py` (generic parser error); frontend shows the server's "please wait" message (`useRisk.js`, `FloodIntelligenceMap.jsx`); Playwright test server gets high limits; `deploy/docker-compose.yml` (trusted proxy, fixed network, app health check, log caps, limit settings), `deploy/backup.sh`, `deploy/restore.sh`, `.gitignore`/`.dockerignore` for backups; `scripts/load_test.py`; hosting guides (backups with cron, UptimeRobot, limits table).
+
+Verification: backend 706 passed (new: error handling 3, rate limit 6, static site 2 earlier); frontend unit 312/312; build passed; Playwright 84 passed, 8 skipped; local HTTPS stack rehearsal as described (readiness, forged-address test, 31st expensive request → 429 with Retry-After 60, load tests, backup/restore). Test stack, test `.env` and test backups removed.
+
+Remaining risks: a single worker with in-process limits (fine for one server; multiple servers would need a shared store); per-account login lockout can be triggered by someone guessing an admin username (15-minute window); no malware scanning of photos (they are decoded and re-encoded, never executed or published); provider free-tier limits (Open-Meteo non-commercial terms) apply.

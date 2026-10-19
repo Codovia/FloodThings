@@ -44,7 +44,7 @@ function useEvidence(url, retry=0){
   const timer=setTimeout(()=>{timedOut=true;controller.abort()},15000)
   fetch(url,{signal:controller.signal}).then(async response=>{
    const data=await response.json()
-   if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:'Map evidence request failed')
+   if(!response.ok)throw Error(typeof data.detail==='string'?data.detail:typeof data.message==='string'?data.message:'Map evidence request failed')
    if(active)setState({url,data,error:null,loading:false})
   }).catch(error=>{if(active)setState({url,data:null,error:timedOut?'Map evidence request timed out.':error.message,loading:false})}).finally(()=>clearTimeout(timer))
   return()=>{active=false;clearTimeout(timer);controller.abort()}

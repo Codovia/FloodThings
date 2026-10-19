@@ -54,3 +54,6 @@ coverage/
 playwright-report/
 test-results/
 *.log
+
+# Database backups made on the server
+deploy/backups/

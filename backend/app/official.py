@@ -263,7 +263,7 @@ class OfficialService:
             value = {'features': features, 'retrieved_at': self.now().isoformat(), 'error': None}
             ttl = IMD_TTL
         except (OfficialUnavailable, ValueError, KeyError, TypeError) as exc:
-            value, ttl = {'features': None, 'retrieved_at': self.now().isoformat(), 'error': str(exc) or 'invalid response'}, FAIL_TTL
+            value, ttl = {'features': None, 'retrieved_at': self.now().isoformat(), 'error': str(exc) if isinstance(exc, OfficialUnavailable) else 'invalid response'}, FAIL_TTL
         self.imd_cache = {'expires': self.clock() + ttl, 'value': value}
         return value
 

@@ -1,4 +1,6 @@
+import logging
 import os
+import uuid
 from contextlib import asynccontextmanager
 
 import httpx
@@ -45,6 +47,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="FloodPulse", version="0.1.0", lifespan=lifespan)
+from .rate_limit import install as install_rate_limits
+app.state.rate_limiter = install_rate_limits(app)
 app.include_router(historical_router)
 app.include_router(drainage_router)
 app.include_router(flood_map_router)
@@ -59,6 +63,24 @@ app.include_router(risk_router)
 app.include_router(official_router)
 app.include_router(admin_place_router)
 app.include_router(routing_router)
+
+
+log = logging.getLogger("floodpulse")
+if not log.handlers:
+    _handler = logging.StreamHandler()
+    _handler.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s %(message)s"))
+    log.addHandler(_handler)
+    log.setLevel(logging.INFO)
+
+
+@app.exception_handler(Exception)
+async def unexpected_error(request: Request, exc: Exception):
+    # Full details stay in the server log under an error ID; the visitor sees a generic message.
+    # Only method and path are logged: query strings can contain citizen coordinates.
+    error_id = uuid.uuid4().hex[:12]
+    log.error("unhandled error %s on %s %s", error_id, request.method, request.url.path, exc_info=exc)
+    return JSONResponse(status_code=500, content={"status": "error", "error_id": error_id,
+        "message": "Something went wrong on our side. Please try again; if it keeps happening, quote this error ID."})
 
 
 @app.exception_handler(RequestValidationError)
@@ -93,6 +115,20 @@ def environment_mode():
 @app.get("/api/health")
 def health():
     return {"status": "ok", "service": "floodpulse", "version": "0.1.0"}
+
+
+@app.get("/api/health/ready")
+def ready():
+    """For uptime monitors: also checks the database (no credentials or error details are returned)."""
+    from sqlalchemy import text
+    from .shelters import shelter_engine
+    try:
+        with shelter_engine().connect() as connection:
+            connection.execute(text("SELECT 1"))
+    except Exception:
+        log.warning("readiness check: database unavailable")
+        return JSONResponse(status_code=503, content={"status": "unavailable", "database": "unavailable"}, headers={"Cache-Control": "no-store"})
+    return JSONResponse({"status": "ok", "database": "ok"}, headers={"Cache-Control": "no-store"})
 
 
 @app.get("/api/weather")
