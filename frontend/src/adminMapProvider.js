@@ -3,6 +3,10 @@ export function adminMapSettings(env=import.meta.env) {
   const enabled=env.VITE_ADMIN_MAP_PROVIDER==='maptiler' && env.VITE_ADMIN_MAP_TERMS_ACCEPTED==='true' && !!env.VITE_MAPTILER_PUBLIC_KEY
   return {enabled,publicKey:enabled?env.VITE_MAPTILER_PUBLIC_KEY:null}
 }
+// Settings handed out by the server to signed-in administrators (/api/admin/map-config).
+export function settingsFromConfig(body) {
+  return body?.status==='available' && body.provider==='maptiler' && /^[A-Za-z0-9]{16,64}$/.test(body.public_key||'') ? {enabled:true,publicKey:body.public_key} : null
+}
 export function tileMetadataURL(mode,settings) {
   if(!settings.enabled || !['satellite','hybrid'].includes(mode)) throw Error('Authorized imagery is not configured')
   return `https://api.maptiler.com/maps/${mode}/256/tiles.json?key=${encodeURIComponent(settings.publicKey)}`

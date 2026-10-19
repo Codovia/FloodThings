@@ -1,9 +1,19 @@
 import React,{useEffect,useRef,useState} from 'react'
 import ShelterMap from './ShelterMap.jsx'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
-import {adminMapSettings,buildingSearchURL,validatedSearchResults} from './adminMapProvider.js'
-const settings=adminMapSettings()
+import {adminMapSettings,settingsFromConfig,buildingSearchURL,validatedSearchResults} from './adminMapProvider.js'
+const buildSettings=adminMapSettings()
+// The key normally comes from the server (MAPTILER_PUBLIC_KEY), so no rebuild is needed to enable imagery.
+function useImagerySettings(){
+ const [settings,setSettings]=useState(buildSettings)
+ useEffect(()=>{if(buildSettings.enabled)return;let active=true
+  // Any failure (including a synchronous one) simply leaves imagery off.
+  Promise.resolve().then(()=>fetch('/api/admin/map-config',{credentials:'same-origin'})).then(r=>r?.ok?r.json():null).then(body=>{const s=settingsFromConfig(body);if(active&&s)setSettings(s)}).catch(()=>{})
+  return()=>{active=false}},[])
+ return settings
+}
 export default function AdminEntranceMap({entrance,onSelect,selectedDistrictId,onDistrict=()=>{},navigationBounds=null}) {
+ const settings=useImagerySettings()
  const [mode,setMode]=useState('street'),[reference,setReference]=useState(null),[query,setQuery]=useState(''),[results,setResults]=useState([]),[error,setError]=useState(null),[loading,setLoading]=useState(false)
  const controller=useRef(null),busy=useRef(false),mounted=useRef(true)
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;controller.current?.abort()}},[])

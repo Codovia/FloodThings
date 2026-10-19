@@ -2286,3 +2286,15 @@ Fix (narrow): `official_tls_context()` = certifi's current roots + the bundled e
 Verification: backend 707 passed (new: context contains the root, requires certificates and hostnames, refuses a tampered file); rebuilt image with certifi 2026.10.18: default client fails IMD/SACHET (reproduces the server), official context 200/200, a known-bad self-signed site is still rejected; running that image as the app: `/api/official/warnings` IMD available (Udupi, Green today), SACHET available (10 checked, 1 active), 0 official-source errors logged. Test image removed.
 
 Follow-up: when certifi adds emSign Root TLS CA - G1, the extra root can be removed.
+
+## 2026-10-19 — Admin map: Satellite and Hybrid enabled through a server-provided MapTiler key
+
+User report: in Admin → "Inspect facility & select entrance", only Street map works.
+
+Cause: Satellite, Hybrid and building search were deliberately disabled without a MapTiler configuration, and that configuration was read only from build-time `VITE_*` variables. No key was set; on the hosted server it could not have been set without rebuilding the frontend with build arguments.
+
+Research: MapTiler Cloud's free plan is for non-commercial use and research (100,000 API requests and 5,000 sessions a month, paused until the next month when exhausted). Whether satellite imagery is part of the free cloud plan could not be confirmed; if the provider refuses the tiles, the existing "imagery unavailable" notice is shown and Street map remains.
+
+Change: admin-only `GET /api/admin/map-config` returns `MAPTILER_PUBLIC_KEY` only when well formed (16–64 letters/digits), no-store; `AdminEntranceMap` keeps the build-time settings and otherwise asks the server once (any failure leaves imagery off); launcher loads `MAPTILER_PUBLIC_KEY` from the private `.env` and keeps it out of Vite; compose and env.example pass it; guides explain getting and restricting the key.
+
+Verification: backend 708 passed (new: login required; not_configured / invalid_configuration / available, malformed key never echoed); frontend unit 314/314 (new: server key enables Satellite and Hybrid and is passed to the map; malformed answer keeps them off); the first run showed 18 admin tests failing because their strict fake servers throw synchronously on unknown requests, which the new request did not catch — fixed by catching synchronous failures; build passed; Playwright admin/shelter/UI specs 15 passed, 3 skipped. Not verified with a real MapTiler key (needs the user's account).

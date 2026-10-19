@@ -18,3 +18,15 @@ it('authorized building search navigates a reference and never automatically ass
 it('provider failure yields no invented search results',async()=>{
  state.enabled=true;vi.stubGlobal('fetch',vi.fn(async()=>({ok:false})));render(<AdminEntranceMap entrance={[]} onSelect={vi.fn()}/>);fireEvent.change(screen.getByLabelText('Search place or building name'),{target:{value:'TEST BUILDING'}});fireEvent.click(screen.getByRole('button',{name:'Search building references'}));await waitFor(()=>expect(screen.getByRole('alert')).toBeTruthy());expect(screen.queryByRole('list',{name:'Building reference results'})).toBeNull()
 })
+it('a MapTiler key from the server enables Satellite and Hybrid without a rebuild',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async url=>({ok:true,json:async()=>url==='/api/admin/map-config'?{status:'available',provider:'maptiler',public_key:'TESTONLYmaptilerKey0123'}:{}})))
+ render(<AdminEntranceMap entrance={[]} onSelect={vi.fn()}/>)
+ await waitFor(()=>expect(screen.getByRole('option',{name:'Satellite imagery'}).disabled).toBe(false))
+ expect(screen.getByRole('option',{name:'Satellite Hybrid'}).disabled).toBe(false);expect(state.props.providerSettings).toEqual({enabled:true,publicKey:'TESTONLYmaptilerKey0123'})
+ expect(fetch.mock.calls[0]).toEqual(['/api/admin/map-config',{credentials:'same-origin'}])
+})
+it('an unconfigured or malformed server answer keeps imagery off',async()=>{
+ vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({status:'available',provider:'maptiler',public_key:'bad key!'})})))
+ render(<AdminEntranceMap entrance={[]} onSelect={vi.fn()}/>);await waitFor(()=>expect(fetch).toHaveBeenCalled())
+ expect(screen.getByRole('option',{name:'Satellite imagery'}).disabled).toBe(true)
+})

@@ -131,3 +131,25 @@ def test_a_named_place_away_from_the_click_is_only_offered_never_filled():
     assert body['address']['value'].startswith('Test Main Road')  # street address of the clicked point
     assert [r.url.params['layer'] for r in seen] == ['poi', 'address']
     asyncio.run(client.aclose())
+
+
+def test_map_config_requires_login_and_reports_only_well_formed_keys(monkeypatch):
+    import pytest
+    for value, status in [(None, 'not_configured'), ('short', 'invalid_configuration'), ('bad key with spaces!!', 'invalid_configuration'),
+                          ('TESTONLYmaptilerKey0123', 'available')]:  # TEST FIXTURE ONLY — key-shaped, not a credential
+        if value is None:
+            monkeypatch.delenv('MAPTILER_PUBLIC_KEY', raising=False)
+        else:
+            monkeypatch.setenv('MAPTILER_PUBLIC_KEY', value)
+        app, client, _, _ = make()
+        with TestClient(app) as http:
+            body = http.get('/api/admin/map-config').json()
+        assert body['status'] == status and (('public_key' in body) == (status == 'available'))
+        if value and status != 'available':
+            assert value not in str(body)
+        asyncio.run(client.aclose())
+    app, client, _, _ = make(authorize=False)
+    with TestClient(app) as http:
+        denied = http.get('/api/admin/map-config')
+    assert denied.status_code in (401, 403, 503) and 'public_key' not in denied.text
+    asyncio.run(client.aclose())

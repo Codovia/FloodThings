@@ -108,7 +108,12 @@ Create your administrator account (you type the password privately, 16–128 cha
    docker compose run --rm --no-deps app python -B /app/deploy-tools/telegram_webhook.py
    ```
    Subscribers must send `/start floodpulse` again, because the server has a new database.
-3. **Shelters:** the server starts with an empty directory. Sign in to `/admin`, add each shelter
+3. **Admin map Satellite/Hybrid (optional):** create a free account at <https://cloud.maptiler.com/>,
+   copy the default key (Account → API keys), restrict it to `https://YOUR-DOMAIN/*` (and
+   `http://127.0.0.1:14180/*` for the laptop), put `MAPTILER_PUBLIC_KEY=...` in `deploy/.env`, then
+   run `docker compose up -d app`. The free plan is for non-commercial use and pauses for the rest
+   of the month if its quota runs out.
+4. **Shelters:** the server starts with an empty directory. Sign in to `/admin`, add each shelter
    and verify it (verification lasts 24 hours, so re-verify on demo day).
 
 ## Everyday commands (run in `~/floodpulse/deploy`)

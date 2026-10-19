@@ -7,6 +7,8 @@ visible OpenStreetMap attribution, no automatic/bulk/grid lookups. Results are s
 administrator must confirm; nothing here verifies a facility.
 """
 import asyncio
+import os
+import re
 import json
 import math
 import time
@@ -132,3 +134,19 @@ async def admin_place(request: Request, latitude: float = Query(ge=-90, le=90), 
     if not result['name'] and not any('unavailable right now' in m for m in result['messages']):
         result['messages'].append('No named building is mapped at this exact point; type the facility name.')
     return JSONResponse(result, headers=headers)
+
+
+MAPTILER_KEY = re.compile(r'^[A-Za-z0-9]{16,64}$')
+
+
+@router.get('/api/admin/map-config')
+def admin_map_config(actor=Depends(authorized)):
+    """Satellite/Hybrid imagery and building search for signed-in administrators. A MapTiler key is
+    a public browser key (restrict it to this site's address in MapTiler); never reported unless well formed."""
+    headers = {'Cache-Control': 'no-store'}
+    key = os.environ.get('MAPTILER_PUBLIC_KEY', '').strip()
+    if not key:
+        return JSONResponse({'status': 'not_configured'}, headers=headers)
+    if not MAPTILER_KEY.match(key):
+        return JSONResponse({'status': 'invalid_configuration'}, headers=headers)
+    return JSONResponse({'status': 'available', 'provider': 'maptiler', 'public_key': key}, headers=headers)

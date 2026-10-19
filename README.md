@@ -55,6 +55,8 @@ cd backend && .venv/bin/python -B -m app.provision_shelter_admin --username NAME
 
 **Routing (optional).** Add `OPENROUTESERVICE_API_KEY=` to the private `.env` (free key from openrouteservice.org). Without it, directions open in Google Maps.
 
+**Admin map Satellite/Hybrid and building search (optional).** Add `MAPTILER_PUBLIC_KEY=` (free MapTiler account, browser key restricted to your site) to the private `.env` and restart; signed-in administrators receive it from the server, so no rebuild is needed.
+
 **In-app Google route preview (optional).** Add `GOOGLE_MAPS_EMBED_API_KEY=` to the private `.env` — a Google Cloud key with the *Maps Embed API* enabled (free, unlimited requests). The key is visible in the page by design, so restrict it to your site's HTTP referrers in Google Cloud. Without it, the navigation panel shows the start point and shelter on the app map, and "Start navigation in Google Maps" still works (Maps URLs need no key).
 
 ## Host it (Azure or any Linux server)
