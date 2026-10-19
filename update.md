@@ -2264,3 +2264,13 @@ Server output (user screenshot): from the AWS host over IPv4, IMD 200 (2.0 s), S
 Change: `deploy/setup.sh` detects an existing project network with a different subnet and runs `docker compose down` first (volumes, therefore data, are kept).
 
 Verification (local, test settings): deployed the previous compose file (commit 6dbb9e2) with a marker table, then ran the new setup.sh: it reported the network update, recreated the network as 172.28.0.0/24, all services healthy, least-privilege check passed, marker data still present (42). `check-sources.sh` on that stack: host IPv4/IPv6 and in-container IMD, SACHET, Open-Meteo all 200; hosted `/api/official/warnings` returned IMD and SACHET available. Test stack and settings removed.
+
+## 2026-10-19 — Fix: setup.sh exited silently when an optional setting was absent
+
+User screenshot: after `git pull && ./setup.sh`, the script stopped right after building the image (no network update, old containers still running; check-sources again hit "network has active endpoints").
+
+Cause: `value()` in setup.sh pipes `grep` under `set -euo pipefail`; for a key missing from deploy/.env (here `COMPOSE_PROJECT_NAME`, used by the new network check), grep's "no match" status failed the command substitution and the script exited without a message. The earlier local upgrade test used a test .env that contained `COMPOSE_PROJECT_NAME`, so it did not reveal this. `create-admin.sh` had the same pattern for a missing `MAINTENANCE_PASSWORD` (it would exit before printing "Run ./setup.sh first").
+
+Fix: both lookups tolerate a missing key (`{ grep … || true; }`).
+
+Verification without touching real Docker data (the laptop's real database volume is floodpulse_sprint6_data, so a local project named "floodpulse" was not used): ran setup.sh with a fake `docker` that records calls and reports an old 172.21.0.0/16 network, and an .env like the user's (domain only). Old version: exit 1 after `docker compose build app`, 1 step printed — reproduces the screenshot. Fixed version: exit 0, all steps printed, calls in order build → network inspect → compose down → up db → migrations → import → grants → up app caddy → permission check; passwords and FLOODPULSE_ORIGIN appended to .env.

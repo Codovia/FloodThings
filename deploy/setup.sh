@@ -13,7 +13,8 @@ docker compose version >/dev/null 2>&1 || fail 'Docker Compose plugin is missing
 [[ -f .env ]] || fail 'Create deploy/.env first: cp env.example .env, then set FLOODPULSE_DOMAIN.'
 chmod 600 .env
 
-value() { grep -E "^$1=" .env | tail -1 | cut -d= -f2- | sed -e "s/^['\"]//" -e "s/['\"]$//"; }
+# Prints the setting's value, or nothing when it is absent (never fails the script).
+value() { { grep -E "^$1=" .env || true; } | tail -1 | cut -d= -f2- | sed -e "s/^['\"]//" -e "s/['\"]$//"; }
 [[ -n "$(value FLOODPULSE_DOMAIN)" ]] || fail 'Set FLOODPULSE_DOMAIN in deploy/.env (for example floodpulse-smvitm.centralindia.cloudapp.azure.com).'
 if [[ -z "$(value FLOODPULSE_ORIGIN)" ]]; then
   printf 'FLOODPULSE_ORIGIN=https://%s\n' "$(value FLOODPULSE_DOMAIN)" >> .env
