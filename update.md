@@ -2256,3 +2256,11 @@ Findings: the server is 16.176.0.72, AWS Sydney (ap-southeast-2, AS16509). Both 
 Changes: `official.read_bounded` logs the exact failure (host, exception type, message) server-side while visitors still see "network failure"; `deploy/check-sources.sh` tests IMD, SACHET and Open-Meteo from the server (IPv4 and IPv6) and from inside the app container, and prints recent official-source errors.
 
 Verification: official and error-handling tests 14 passed; script syntax-checked.
+
+## 2026-10-19 — Server check result; setup.sh upgrades the old network automatically
+
+Server output (user screenshot): from the AWS host over IPv4, IMD 200 (2.0 s), SACHET 200 (1.1 s), Open-Meteo 200 — so the government sites do not block the server; IPv6 fails because those hosts have no IPv6 address (curl exit 6, expected). The update itself had failed: the new fixed internal network (172.28.0.0/24) could not replace the existing network while the old containers were attached ("network has active endpoints"), so the old app version kept running and the in-container test could not start.
+
+Change: `deploy/setup.sh` detects an existing project network with a different subnet and runs `docker compose down` first (volumes, therefore data, are kept).
+
+Verification (local, test settings): deployed the previous compose file (commit 6dbb9e2) with a marker table, then ran the new setup.sh: it reported the network update, recreated the network as 172.28.0.0/24, all services healthy, least-privilege check passed, marker data still present (42). `check-sources.sh` on that stack: host IPv4/IPv6 and in-container IMD, SACHET, Open-Meteo all 200; hosted `/api/official/warnings` returned IMD and SACHET available. Test stack and settings removed.

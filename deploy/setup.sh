@@ -28,6 +28,15 @@ done
 say 'Building the FloodPulse image (first time takes a few minutes)'
 docker compose build app
 
+# Servers installed before the fixed internal network (172.28.0.0/24) existed: stop the old
+# containers so Docker can recreate the network. Data lives in volumes and is kept.
+project=$(value COMPOSE_PROJECT_NAME); project=${project:-floodpulse}
+current=$(docker network inspect "${project}_default" --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null || true)
+if [[ -n "$current" && "$current" != 172.28.0.0/24 ]]; then
+  say 'Updating the internal network (containers restart; data is kept)'
+  docker compose down
+fi
+
 say 'Starting the database'
 docker compose up -d --wait db
 
