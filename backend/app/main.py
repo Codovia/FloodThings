@@ -22,7 +22,7 @@ from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_outlook import router as river_outlook_router, RiverOutlook
 from .risk import router as risk_router, RiskService
-from .official import router as official_router, OfficialService
+from .official import router as official_router, OfficialService, official_tls_context
 from .admin_place import router as admin_place_router, PlaceLookup
 from .routing import router as routing_router
 
@@ -35,12 +35,15 @@ async def lifespan(app: FastAPI):
         app.state.reverse_geocoder = ReverseGeocoder(client)
         app.state.river_outlook = RiverOutlook(client)
         app.state.risk = RiskService(client)
-        app.state.official = OfficialService(client)
+        # IMD and NDMA SACHET get their own client with the extra pinned root (see official.py).
+        official_client = httpx.AsyncClient(timeout=httpx.Timeout(10.0), follow_redirects=False, verify=official_tls_context())
+        app.state.official = OfficialService(official_client)
         app.state.place_lookup = PlaceLookup(client)
         app.state.http = client
         try:
             yield
         finally:
+            await official_client.aclose()
             from .location_database import dispose_engine
             dispose_engine()
             dispose_shelter_engine()

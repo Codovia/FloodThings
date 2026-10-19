@@ -168,3 +168,25 @@ def test_district_endpoint_and_admin_suggestions_require_login():
         denied = http.get('/api/admin/official/suggestions')
         assert denied.status_code in (401, 403, 503) and 'suggestions' not in denied.json()
     asyncio.run(client.aclose())
+
+
+def test_official_tls_context_adds_only_the_pinned_emsign_root(monkeypatch, tmp_path):
+    from app.official import official_tls_context, EMSIGN_ROOT
+    context = official_tls_context()
+    subjects = [dict(x[0] for x in c['subject']).get('commonName') for c in context.get_ca_certs()]
+    assert 'emSign Root CA - G1' in subjects
+    assert context.verify_mode.name == 'CERT_REQUIRED' and context.check_hostname
+    # A swapped certificate file is refused (fingerprint pin).
+    import ssl
+    import tempfile
+    from pathlib import Path
+    with tempfile.TemporaryDirectory() as folder:
+        other = Path(folder) / 'other.pem'
+        der = ssl.PEM_cert_to_DER_cert(EMSIGN_ROOT.read_text())
+        other.write_text(ssl.DER_cert_to_PEM_cert(der[:-1] + bytes([der[-1] ^ 1])))
+        monkeypatch.setattr(official, 'EMSIGN_ROOT', other)
+        try:
+            official_tls_context()
+            assert False, 'tampered certificate accepted'
+        except RuntimeError as error:
+            assert 'fingerprint' in str(error)

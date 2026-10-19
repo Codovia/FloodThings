@@ -2274,3 +2274,15 @@ Cause: `value()` in setup.sh pipes `grep` under `set -euo pipefail`; for a key m
 Fix: both lookups tolerate a missing key (`{ grep … || true; }`).
 
 Verification without touching real Docker data (the laptop's real database volume is floodpulse_sprint6_data, so a local project named "floodpulse" was not used): ran setup.sh with a fake `docker` that records calls and reports an old 172.21.0.0/16 network, and an .env like the user's (domain only). Old version: exit 1 after `docker compose build app`, 1 step printed — reproduces the screenshot. Fixed version: exit 0, all steps printed, calls in order build → network inspect → compose down → up db → migrations → import → grants → up app caddy → permission check; passwords and FLOODPULSE_ORIGIN appended to .env.
+
+## 2026-10-19 — Fix: IMD and SACHET failed on the server after certifi 2026.10.18 dropped emSign Root CA - G1
+
+User screenshot (server): curl from the host reached IMD and SACHET (200, with both a python-httpx and a browser User-Agent), but the app logged `ConnectError: [SSL: CERTIFICATE_VERIFY_FAILED] self-signed certificate in certificate chain` for reactjs.imd.gov.in and sachet.ndma.gov.in.
+
+Cause: both sites chain to eMudhra's emSign Root CA - G1 (via EM DV TLS CA - G2A-1 and emSign Root TLS CA - G1). certifi was not pinned; certifi 2026.10.18 (released 18 Oct 2026, 16:21 UTC) no longer contains emSign Root CA - G1 and does not yet contain emSign Root TLS CA - G1. The server built its image on 19 Oct and got 2026.10.18; the laptop image had 2026.7.22, which still includes the root. Reproduced: an image with certifi 2026.10.18 fails both sites with the same error. No public distrust of eMudhra was found (a third-party directory still lists the root as trusted by Apple, Google, Microsoft, Android); the likely reason is the move to TLS-dedicated roots, but this is not confirmed.
+
+Fix (narrow): `official_tls_context()` = certifi's current roots + the bundled emSign Root CA - G1 (`backend/app/certs/emsign-root-ca-g1.pem`), checked against its pinned SHA-256 fingerprint 40:F6:AF:03:…:D0:03:67 (identical in Mozilla's July certifi bundle and in the root SACHET sends), used only by a separate HTTP client for IMD and SACHET; every other request keeps certifi's list. `certifi==2026.10.18` pinned in requirements so laptop and server builds trust the same authorities.
+
+Verification: backend 707 passed (new: context contains the root, requires certificates and hostnames, refuses a tampered file); rebuilt image with certifi 2026.10.18: default client fails IMD/SACHET (reproduces the server), official context 200/200, a known-bad self-signed site is still rejected; running that image as the app: `/api/official/warnings` IMD available (Udupi, Green today), SACHET available (10 checked, 1 active), 0 official-source errors logged. Test image removed.
+
+Follow-up: when certifi adds emSign Root TLS CA - G1, the extra root can be removed.

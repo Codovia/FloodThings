@@ -6,13 +6,17 @@ and lists active Karnataka CAP alerts. Failures are reported as unavailable;
 missing data never means "no warning".
 """
 import asyncio
+import hashlib
 import logging
+import ssl
 import json
 import re
 import time
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from datetime import date, datetime, timedelta, timezone
 
+import certifi
 import httpx
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
@@ -21,6 +25,21 @@ from .risk import inside, load_boundary
 from .shelters import authorized
 
 router = APIRouter()
+# eMudhra's emSign Root CA - G1 issues the certificates of reactjs.imd.gov.in and sachet.ndma.gov.in.
+# certifi 2026.10.18 no longer includes it (the sites' newer emSign Root TLS CA - G1 is not in certifi
+# yet), so requests to these two government hosts only use certifi's roots plus this one root, pinned
+# by its SHA-256 fingerprint. Every other HTTPS request keeps certifi's current list unchanged.
+EMSIGN_ROOT = Path(__file__).resolve().parent / 'certs' / 'emsign-root-ca-g1.pem'
+EMSIGN_ROOT_SHA256 = '40f6af0346a99aa1cd1d555a4e9cce62c7f9634603ee406615833dc8c8d00367'
+
+
+def official_tls_context():
+    pem = EMSIGN_ROOT.read_text()
+    if hashlib.sha256(ssl.PEM_cert_to_DER_cert(pem)).hexdigest() != EMSIGN_ROOT_SHA256:
+        raise RuntimeError('Bundled emSign root certificate does not match its pinned fingerprint')
+    context = ssl.create_default_context(cafile=certifi.where())
+    context.load_verify_locations(cadata=pem)
+    return context
 LOG = logging.getLogger('floodpulse')
 IMD_WFS = 'https://reactjs.imd.gov.in/geoserver/wfs'
 IMD_PARAMS = {'service': 'WFS', 'version': '1.0.0', 'request': 'GetFeature', 'typename': 'imd:district_warnings_india',
