@@ -2246,3 +2246,13 @@ Changes: `backend/app/rate_limit.py`, `main.py` (limiter, error handler, logger,
 Verification: backend 706 passed (new: error handling 3, rate limit 6, static site 2 earlier); frontend unit 312/312; build passed; Playwright 84 passed, 8 skipped; local HTTPS stack rehearsal as described (readiness, forged-address test, 31st expensive request → 429 with Retry-After 60, load tests, backup/restore). Test stack, test `.env` and test backups removed.
 
 Remaining risks: a single worker with in-process limits (fine for one server; multiple servers would need a shared store); per-account login lockout can be triggered by someone guessing an admin username (15-minute window); no malware scanning of photos (they are decoded and re-encoded, never executed or published); provider free-tier limits (Open-Meteo non-commercial terms) apply.
+
+## 2026-10-19 — Production: IMD and SACHET unreachable from the AWS server (diagnosis)
+
+User report: on the hosted site (floodpulse-smvitm.duckdns.org) the official IMD and NDMA SACHET cards say "could not be retrieved (network failure)", while weather and risk work; on the laptop all work.
+
+Findings: the server is 16.176.0.72, AWS Sydney (ap-southeast-2, AS16509). Both government endpoints answered 200 from check-host.net probes in Canada, the UK, the US, Israel, Russia, Serbia, India and Australia, so this is not a country block. The same Docker image run on the laptop (India) fetched SACHET (200, 8 KB) and IMD (200, 717 KB), so the image and code are not at fault. Open-Meteo works from the server, so its network is up. Remaining explanations: the government sites block AWS address ranges (common for .gov.in web firewalls), or an IPv6/route issue specific to the instance. Not yet proven: needs a test on the server.
+
+Changes: `official.read_bounded` logs the exact failure (host, exception type, message) server-side while visitors still see "network failure"; `deploy/check-sources.sh` tests IMD, SACHET and Open-Meteo from the server (IPv4 and IPv6) and from inside the app container, and prints recent official-source errors.
+
+Verification: official and error-handling tests 14 passed; script syntax-checked.

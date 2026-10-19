@@ -6,6 +6,7 @@ and lists active Karnataka CAP alerts. Failures are reported as unavailable;
 missing data never means "no warning".
 """
 import asyncio
+import logging
 import json
 import re
 import time
@@ -20,6 +21,7 @@ from .risk import inside, load_boundary
 from .shelters import authorized
 
 router = APIRouter()
+LOG = logging.getLogger('floodpulse')
 IMD_WFS = 'https://reactjs.imd.gov.in/geoserver/wfs'
 IMD_PARAMS = {'service': 'WFS', 'version': '1.0.0', 'request': 'GetFeature', 'typename': 'imd:district_warnings_india',
               'srsname': 'EPSG:4326', 'outputFormat': 'application/json', 'bbox': '74.0,11.5,78.6,18.5'}  # lon/lat order
@@ -75,7 +77,9 @@ async def read_bounded(client, url, params=None, limit=4 * 1024 * 1024, timeout=
                 return bytes(raw)
     except (TimeoutError, httpx.TimeoutException):
         raise OfficialUnavailable('timeout') from None
-    except httpx.HTTPError:
+    except httpx.HTTPError as exc:
+        # Visitors see only "network failure"; the server log keeps the exact cause (host only, no query).
+        LOG.warning('official source %s unreachable: %s: %s', httpx.URL(url).host, type(exc).__name__, str(exc)[:200])
         raise OfficialUnavailable('network failure') from None
 
 
