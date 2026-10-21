@@ -23,7 +23,7 @@ it('loads on demand and encodes exact entrance while announcing demonstration an
 })
 it('no-location/no-shelter never invents availability',async()=>{
  fetch.mockImplementation(()=>reply(list([],'live')));render(<PublicShelters />);open();await screen.findByText('No currently verified open shelters are available in this directory.')
- expect(fetch.mock.calls[0][0]).toBe('/api/shelters');expect(screen.getByText(/No starting location/)).toBeTruthy();expect(screen.queryByRole('link',{name:/directions/})).toBeNull()
+ expect(fetch.mock.calls[0][0]).toBe('/api/shelters');fireEvent.click(screen.getByRole('button',{name:'Limitations'}));expect(screen.getByText(/No starting location/)).toBeTruthy();fireEvent.click(screen.getByRole('button',{name:'Close'}));expect(screen.queryByRole('link',{name:/directions/})).toBeNull()
 })
 it.each(['pending','full','closed','expired','unverified','demo-conflict'])('rejects unavailable destination: %s',async(kind)=>{
  const r={...row};if(['pending','full','closed'].includes(kind))r.status=kind
@@ -85,11 +85,12 @@ it.each([{kind:'network',accuracy_m:null},{kind:'gps',accuracy_m:1200,gps_timest
 it('lists the nearest shelter first with a number and a Nearest badge, linked to the map',async()=>{
  const far={...row,id:'far',name:'DEMONSTRATION ONLY far fixture',straight_line_km:30},near={...row,id:'near',name:'DEMONSTRATION ONLY near fixture',straight_line_km:2.1,available_capacity:3}
  fetch.mockImplementation(()=>reply(list([far,near])));render(<PublicShelters point={point} active />)
- await screen.findByText(near.name);const items=screen.getByRole('list',{name:'Available shelter destinations'}).querySelectorAll(':scope > li')
- expect([...items].map(li=>li.querySelector('h3').textContent)).toEqual([near.name,far.name])
- expect(items[0].textContent).toContain('Nearest');expect(items[1].textContent).not.toContain('Nearest')
+ // One shelter per page (one-screen rule): nearest first, the next one after "Next".
+ await screen.findByText(near.name);const card=()=>screen.getByRole('list',{name:'Available shelter destinations'}).querySelector(':scope > li')
+ expect(card().querySelector('h3').textContent).toBe(near.name);expect(card().textContent).toContain('Nearest')
  expect(screen.getByText('2 open shelters with free space')).toBeTruthy()
- fireEvent.click(screen.getAllByRole('button',{name:'Show on map'})[1]);expect(items[1].className).toContain('selected')
+ fireEvent.click(screen.getByRole('button',{name:'Next ›'}));expect(card().querySelector('h3').textContent).toBe(far.name);expect(card().textContent).not.toContain('Nearest')
+ fireEvent.click(screen.getByRole('button',{name:'Show on map'}));expect(card().className).toContain('selected')
 })
 it('"Use my location" passes a timestamped GPS point to the app and never guesses on failure',async()=>{
  const onLocate=vi.fn(),position={coords:{latitude:13.34,longitude:74.74,accuracy:25},timestamp:Date.now()}

@@ -25,7 +25,7 @@ test('directions are disclosed only after a fresh check and a failure removes de
   await page.getByRole('button', { name: 'Get directions' }).click()
   await expect(page.getByText(/Select an adequate starting location before requesting directions. Network estimates/)).toBeVisible()
   await expect(link).toHaveCount(0)
-  await page.getByText('Change location',{exact:true}).click()
+  await page.getByRole('button',{name:'Change location'}).click()
   await page.getByRole('button',{name:'Search districts and localities'}).click()
   await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()

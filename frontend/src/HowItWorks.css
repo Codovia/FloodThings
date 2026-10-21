@@ -15,11 +15,6 @@
 .how-table tr:last-child td{border-bottom:0}
 .how-table th{background:#eef6f5}
 .how-table td.num{font-variant-numeric:tabular-nums;white-space:nowrap}
-.how-table tr.best td{background:#eef7f0}
-.bar-cell{width:30%;min-width:90px}
-.how-bar{display:block;height:10px;border-radius:99px;background:#e3ebe9;overflow:hidden;margin-top:5px}
-.how-bar i{display:block;height:100%;background:#165e63}
-.how-table tr.best .how-bar i{background:#2e7d4f}
 .how-levels{display:flex;flex-wrap:wrap;gap:6px 14px;margin:6px 0}
 .how-levels span::before{content:"";display:inline-block;width:.9em;height:.9em;margin-right:5px;border-radius:50%;vertical-align:-.1em;background:var(--swatch)}
 .how-card{display:grid;gap:6px;margin:8px 0}

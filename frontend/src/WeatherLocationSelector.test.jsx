@@ -7,7 +7,6 @@ import WeatherLocationSelector from './WeatherLocationSelector.jsx'
 const state = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn(), events: {}, tileEvents: {} }))
 vi.mock('leaflet', () => ({ default: state }))
 vi.mock('./HistoricalFloodMap.jsx', () => ({ default: () => <div>Historical evidence unchanged</div> }))
-vi.mock('./DrainageResearchLayers.jsx', () => ({ default: () => <div>Drainage evidence unchanged</div> }))
 const weather = (point = null, temperature = 27) => ({ status: 'partial', message: 'Some values are unavailable.',
   location: point, current: { temperature_c: temperature, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: '2026-10-08T00:00:00Z', stale: false },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(8 + i).padStart(2, '0')}`, weather_code: 61, precipitation_mm: i === 1 ? null : i + 1, temperature_min_c: 20, temperature_max_c: 30 })),
@@ -30,6 +29,10 @@ beforeEach(() => {
 })
 afterEach(() => { cleanup(); vi.unstubAllGlobals(); vi.useRealTimers() })
 
+// One-screen layout: the forecast is in the "7 days" tab and place controls in the "Change location" popup.
+const forecastList = () => { const tab = screen.queryByRole('tab', { name: '7 days' }); if (tab && tab.getAttribute('aria-selected') !== 'true') fireEvent.click(tab); return screen.getByRole('list', { name: 'Daily weather forecasts' }) }
+const resetButton = () => { if (!screen.queryByRole('button', { name: 'Reset to Bengaluru' })) fireEvent.click(screen.getByRole('button', { name: 'Change location' })); return screen.getByRole('button', { name: 'Reset to Bengaluru' }) }
+
 function coordinates(lat = '13.34', lon = '74.74') {
   const editor=screen.queryByText('Change location')?.closest('details');if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'))
   if (!screen.queryByRole('region', {name:'Weather location selection map'})) fireEvent.click(screen.getByRole('button',{name:'Open weather map'}))
@@ -43,7 +46,7 @@ it('keeps Bengaluru default and replaces weather with selected coordinates, pres
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74'))
   await screen.findByText('Selected map point')
   expect(screen.getByText(/Requested point: 13.34/)).toBeTruthy()
-  expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
+  expect(forecastList().children).toHaveLength(7)
   expect(screen.getByText(/district\/locality identity not verified/)).toBeTruthy()
   expect(screen.getByText('0 mm')).toBeTruthy()
   expect(screen.getAllByText('Unavailable').length).toBeGreaterThan(0)
@@ -125,7 +128,7 @@ it('late old response cannot overwrite a newer selected point', async () => {
 it('reset restores Bengaluru coordinates through the same API flow', async () => {
   render(<App />); await screen.findByText('27 °C'); coordinates()
   await screen.findByText('Selected map point')
-  fireEvent.click(screen.getByRole('button', { name: 'Reset to Bengaluru' }))
+  fireEvent.click(resetButton())
   await waitFor(() => expect(fetch.mock.calls.at(-1)[0]).toContain('latitude=12.9767936&longitude=77.590082'))
 })
 
@@ -150,10 +153,10 @@ it('wrapped basemap longitude becomes the same valid WGS84 point, without a gues
 
 it('repeated reset to the same reference reloads weather instead of leaving a cleared loading state', async () => {
   render(<App />); await screen.findByText('27 °C'); fireEvent.click(screen.getByText('Change location'))
-  fireEvent.click(screen.getByRole('button', { name: 'Reset to Bengaluru' }))
+  fireEvent.click(resetButton())
   await screen.findByText('27 °C')
   const count = fetch.mock.calls.length
-  fireEvent.click(screen.getByRole('button', { name: 'Reset to Bengaluru' }))
+  fireEvent.click(resetButton())
   await waitFor(() => expect(fetch.mock.calls.length).toBe(count + 1))
   await screen.findByText('27 °C')
   expect(screen.getByRole('button', { name: 'Refresh weather' }).disabled).toBe(false)
@@ -163,7 +166,7 @@ it('repeated reset to the same reference reloads weather instead of leaving a cl
 it('refresh and changing a selected point replace the seven-day series', async () => {
   render(<App />); await screen.findByText('27 °C')
   coordinates(); await screen.findByText('Selected map point')
-  await waitFor(() => expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7))
+  await waitFor(() => expect(forecastList().children).toHaveLength(7))
   fetch.mockImplementation(async url => {
     const params = new URL(url, 'http://localhost').searchParams
     const body = weather({ latitude: Number(params.get('latitude')), longitude: Number(params.get('longitude')) })
@@ -175,15 +178,15 @@ it('refresh and changing a selected point replace the seven-day series', async (
   expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=13.34&longitude=74.74')
   coordinates('14', '75'); await screen.findAllByText('17 mm')
   expect(fetch.mock.calls.at(-1)[0]).toBe('/api/weather?latitude=14&longitude=75')
-  expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
+  expect(forecastList().children).toHaveLength(7)
 })
 
 it('compact name controls start collapsed and point selection uses the map',()=>{
  const selected=vi.fn();render(<WeatherLocationSelector compact onSelect={selected}/>);
- expect(screen.getByText('Change location').closest('details').open).toBe(false)
+ expect(screen.queryByRole('dialog')).toBeNull()
  expect(screen.queryByRole('button',{name:'Get point weather'})).toBeNull()
- fireEvent.click(screen.getByText('Change location'));coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Selected map point',latitude:14,longitude:75})
- expect(screen.getByText('Change location').closest('details').open).toBe(true)
+ fireEvent.click(screen.getByRole('button',{name:'Change location'}));expect(screen.getByRole('dialog',{name:'Change location'})).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Close'}));coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Selected map point',latitude:14,longitude:75})
 })
 it('home preview shows the real selectable point map without showing coordinate controls',()=>{
  render(<WeatherLocationSelector compact overview onSelect={vi.fn()}/>);

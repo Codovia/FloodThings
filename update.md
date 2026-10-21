@@ -2298,3 +2298,104 @@ Research: MapTiler Cloud's free plan is for non-commercial use and research (100
 Change: admin-only `GET /api/admin/map-config` returns `MAPTILER_PUBLIC_KEY` only when well formed (16–64 letters/digits), no-store; `AdminEntranceMap` keeps the build-time settings and otherwise asks the server once (any failure leaves imagery off); launcher loads `MAPTILER_PUBLIC_KEY` from the private `.env` and keeps it out of Vite; compose and env.example pass it; guides explain getting and restricting the key.
 
 Verification: backend 708 passed (new: login required; not_configured / invalid_configuration / available, malformed key never echoed); frontend unit 314/314 (new: server key enables Satellite and Hybrid and is passed to the map; malformed answer keeps them off); the first run showed 18 admin tests failing because their strict fake servers throw synchronously on unknown requests, which the new request did not catch — fixed by catching synchronous failures; build passed; Playwright admin/shelter/UI specs 15 passed, 3 skipped. Not verified with a real MapTiler key (needs the user's account).
+
+## 2026-10-20 — Tooling: Chrome DevTools MCP server for live, visible browser testing
+
+Request: set up the Chrome DevTools MCP server so Claude Code can drive feature tests in a visible Chrome window.
+
+Change: project `.mcp.json` registers `chrome-devtools` = `npx -y chrome-devtools-mcp@1.11.0` (pinned; published 15 Oct 2026; Node 22 supported) with a visible (non-headless) window, `--isolated` (temporary profile deleted on close, so no leftover logins or cookies and no access to the personal Chrome profile), `--viewport=1440x900`, `--usageStatistics=false`, `--performanceCrux=false` (page URLs are not sent to Google's CrUX API), and update checks off. `scripts/chrome-for-mcp.sh` launches Chrome: VS Code is installed as a snap here, and its GTK/GIO/gsettings paths (`GSETTINGS_SCHEMA_DIR=/home/pioneer/snap/code/268/...` and others) reach child processes, so Chrome 155 aborted on start (`GLib-GIO-ERROR: Settings schema 'org.gnome.settings-daemon.plugins.xsettings' does not contain a key named 'antialiasing'`). The wrapper restores the host values and runs `/usr/bin/google-chrome-stable`; it changes nothing outside a snap.
+
+Verification (local, against the running dev app at 127.0.0.1:14180): direct Chrome launch from the VS Code environment aborted (exit 134) — reproduced; through the wrapper Chrome stayed up. A stdio MCP client using `.mcp.json`: server 1.11.0, 32 tools; `list_pages` → `navigate_page` to the app → `take_snapshot` returned the "Home · FloodPulse" accessibility tree; `list_console_messages` showed only Vite/React debug and info messages. The server only loads once Claude Code is restarted and the project server is approved.
+
+## 2026-10-20 — Home page browser test through Chrome DevTools MCP (live local app)
+
+Scope: http://127.0.0.1:14180/ driven in a visible, isolated Chrome 155 via `chrome-devtools-mcp` 1.11.0; app started with `./start.sh` (existing local database). Live data, no fixtures; nothing submitted.
+
+Passed: page loads with no console errors and all API calls 200; place search ("Udupi" → 2 matches) and selection; Udupi IMD Yellow warning (official, unmodified) and SACHET "no active alert (10 checked)"; risk list (9 Moderate, 23 Low within ~16 km) with "Why?" factor table and sources; Drainage toggle (all 32 Low, stated correctly); spot → map popup → "Full assessment here"; "Go to nearest open shelter" opens /shelters with the place kept; selection survives Back; emulated GPS in Udupi (13.3409, 74.7421) labelled as device location, district not verified; 390 px mobile: no horizontal scroll, menu opens with 44 px links, Escape closes it and returns focus; Lighthouse (mobile snapshot) Accessibility 100, Best Practices 100.
+
+Found (not fixed):
+- 24 h windows disagree by 30 min: weather header uses the next full IST hour ("1:00 pm – 1:00 pm", also without dates); risk uses the next full UTC hour (`backend/app/risk.py:169`) → "1:30 pm IST – 1:30 pm IST next day".
+- Same spot shows "score 2 of 8" in the map popup and "score 2 of 11" in the full assessment (river points apparently excluded from area spots); not explained on the page.
+- A (0, 0) ±0 m position (produced by the test tool's emulation, not by the app) was accepted as a device location: "Atlantic Ocean", weather for 0,0, three 422s with "Try again" buttons that cannot succeed. Handled honestly (no substituted data), but 0,0 is not rejected as an invalid fix.
+- Lighthouse: risk-spot buttons and the brand link have aria-labels that omit their visible text (label-content-name-mismatch); no robots.txt (SPA returns HTML).
+- Reverse geocoding: request to api.bigdatacloud.net is redirected (307) to api-bdc.io, which receives the coordinates; the privacy text names only BigDataCloud.
+
+## 2026-10-20 — Removed features that are unused or cannot be defended; corrected false claims
+
+Request: remove from the app whatever is unused or cannot be defended to a review panel. Audit done in the live app (Chrome DevTools MCP) and against the code, model metadata and the archived Phase 5.8 report (commit d4cec5c).
+
+Removed (frontend only; backend endpoints, data under `data/`, the `rainfall_logistic_v1` artifact and its loader are kept — the launcher preflight loads the model):
+- Home "Reviewed river outlook" line, its `/api/river-outlook` request and map marker: `APPROVED_REACHES = ()`, so it could only ever say "unavailable". The GloFAS river factor inside "Why?" is unchanged. Deleted `useRiverOutlook.js` (+test).
+- Weather page "Experimental Heavy-Rainfall Indicator" (`RainfallOutlook.jsx` + unit test + `rainfall-outlook.spec.js`): two supported points only; holdout 88 hits vs 519 false alarms (precision 0.145); target is Open-Meteo grid rain. How it works also misstated it ("8,768 daily examples", "88 of 96 heavy-rain days"; metadata: 5,842 + 2,888 = 8,730 six-hourly samples).
+- Flood Map "Drains (Udupi study)" layer and research rasters (`DrainageResearchLayers.jsx` + tests + `drainage-research.spec.js`): Udupi-only, and by its own text does not inform risk. Removed the 56-entry "row …, column …" cell list (cells stay clickable on the map); cell details reduced to district, place, flood dates, satellite views, cell size, source and licence (hashes/IDs stay in the API); research wording (LGD, SOI, observed-zero) removed.
+- How it works: ML benchmark table removed (its 2022–23 test period had 4 flood events); the honest conclusion and reasons stay.
+
+Corrected false or overstated text: "shelters and safe routes" → "routes to them (not certified flood-safe)"; river "2-, 5- and 20-year" → 2- and 5-year at the nearest ~5 km model cell (the code computes only 2 and 5, `risk.py`); "published threshold" → IMD categories where they exist, otherwise project-chosen; past floods now say "two Udupi floods, 2005 and 2009"; training step now requires the reporter's separate consent (the report consent forbids training); Shelters "safe navigation limitations" → "navigation limitations".
+
+Verification: frontend unit 277/277 (29 files); production build passes; Playwright (isolated servers, no DATABASE_URL) fullscreen, flood-intelligence, home-emergency, navigation, wireframes, home-location-river: 31/31. Live check in Chrome: Home makes no river request and shows no river line; Weather makes no `/api/ai/` request; Flood Map offers 4 layers and plain cell details; How it works contains none of the removed claims. Not run: full Playwright suite (incl. `mvp-e2e.spec.js`, edited), backend tests (no backend change). Pre-existing, unrelated: an uncaught "onFail is not a function" from `Shelters.test.jsx`/`PublicShelters.jsx`.
+
+Needs the administrator (data, not code): the public shelter directory shows test entries — "Manipal Pre-University College (MPUC)" with restrictions "awrg" and contact "sadfegfgf : efrgr2354345345", and "shelter 1" (venugopal temple, contact +911234567890). Correct or close them in Admin → Shelters so the audit trail is kept.
+
+## 2026-10-20 — Report page shows the citizen's current location automatically
+
+Request: the Report page must show where the person is now; analyse how the page can improve.
+
+Acceptance test: opening /report requests the browser location once (browser permission prompt first); a "1. Your location" card at the top shows "You are near <place> · GPS accuracy ±N m"; on phones the map appears in that card at street level (zoom 17) with a measured-accuracy circle; refusal or failure guesses nothing and points to "Choose the spot on the map"; a map-chosen spot stays USER_SELECTED_MAP with the citizen's stated radius; the camera never opens by itself; nothing is sent before Review → Submit.
+
+Reconciled control: the previous design (and a unit test) required a deliberate tap before GPS. Changed at the user's request, consistent with Home's automatic GPS: the browser permission prompt still gates access, coordinates stay on the device until submission, the review-consent checkbox is still required, camera access still needs a tap. The BigDataCloud place-name lookup (coordinates sent to BigDataCloud) is now disclosed on the card.
+
+Changes: `CitizenReport.jsx` — automatic location on open and after "Report another incident"; automatic failures shown quietly in the card, button failures still as alerts; location section moved first ("1. Your location", "2. Describe the incident"); buttons "Use my current location"/"Update my location" and "Choose the spot on the map"; a GPS fix older than 9 minutes is refreshed when "Review report" is pressed instead of failing at submit; clearer invalid/old-fix message. `ShelterMap.jsx` — optional `pointZoom` and accuracy ring for points marked `showAccuracy` (Shelters unchanged). `Reports.css` — card styling.
+
+Verification: frontend unit 278/278 (report tests rewritten for automatic location, plus a stale-fix test); build passes; Playwright ui-ux (keyboard order updated), fullscreen, navigation: 15/15. Live Chrome, 390 px with emulated Udupi GPS: card shows "You are near Udupi, Udupi district, Karnataka", map in card at zoom 17, no /api/reports request; map-chosen spot + "Same street" recorded as user-estimated 50 m; desktop 1440 px layout correct. Emulated fixes report ±0 m, so the accuracy ring itself was not seen live. Report specs needing the disposable database (reports, final-application-audit, mvp-e2e) were updated but not run.
+
+Found, not fixed: "Choose photo"/"Take photo" upload the original image; the server rejects more than 10 megapixels (`report_images.py`), so ordinary 12 MP phone photos fail only at submission. The in-app GPS camera already resizes.
+
+## 2026-10-20 — Report page improvements (photo limit bug, shorter form, required problem type)
+
+Request: implement the recommended Report-page improvements. Not done, by decision: Kannada (translation quality cannot be verified here), report status tracking and offline sending (need backend and privacy design).
+
+Changes:
+- Bug fix: gallery photos are prepared on the device (`frontend/src/reportPhoto.js`). A photo within 10 MP and 5 MiB is sent unchanged (embedded time/GPS can still be extracted with consent); an oversized one is redrawn as JPEG ≤10 MP and ≤5 MiB, the page says its embedded time/location could not be kept, the embedded-metadata option is hidden and `metadata_consent` is sent false. Inputs over 30 MB, non-JPEG/PNG and undecodable files are refused with a plain message. Previously a normal 12 MP phone photo passed the 5 MiB check and was rejected by the server only at submission.
+- Photo paths reduced from three to two: in-app GPS camera and "Choose from gallery" (native "Take photo" input removed).
+- Problem type is a required choice of four large options (no silent "Waterlogging" default); readiness says "choose what the problem is".
+- Shorter form: one-sentence introduction; consent checkbox is one line with the same terms in a "Privacy terms" expander (substance unchanged, server consent version unchanged); the duplicate checklist chips removed (one readiness message); duplicate coordinates box removed from the location card (coordinates remain on the review step); phone map 260 px; location buttons side by side; photo preview capped at 160 px.
+
+Verification: frontend unit 285/285 in 30 files (new: `reportPhoto.test.jsx` keep/shrink/limits; report tests for required type, oversized photo note and `metadata_consent:false`, in-limit photo); build passes; Playwright ui-ux (keyboard order now reaches the "Flooding" choice), fullscreen, navigation 10/10. Server check run in-process, no database: a 4000×3000 JPEG is rejected by `extract_image` ("up to 10 megapixels"), the 3651×2738 resized size is accepted. Live Chrome, 390 px: a real 4000×3000 test JPEG became 3651×2738 (10.0 MP, ~1.1 MiB) with the explanatory note; flow reached the review step and was left without submitting (running app uses the configured database; 0 `/api/reports` requests). Phone page height ≈4 screens with the map now always visible (was 3.4 without a map). Report specs needing the disposable database were updated, not run.
+
+## 2026-10-20 — One-screen layout (no scrolling) on laptop 16:9 and phones; page-to-page flow fixes
+
+Request: every page must fit a 16:9 screen with no scrolling (demo before guide and panel); understand and fix the flows between pages. User decisions: target this laptop in a normal Chrome window (page area ~1508×761); nothing scrolls, not even panels (long content becomes tabs/steps/pages); phones too; admin checked after the user logs in.
+
+Acceptance test: every public page, at 1508×761 and 390×700, has no page scroll, no panel with hidden scrolled content, nothing below the screen and nothing past the right edge — in every interaction state checked (maps excluded; they pan). Checked with scripted states in the live app through Chrome DevTools MCP.
+
+Baseline before: laptop — Report +1268 px, How it works +1163, Alerts +144; Flood Map, Shelters, Weather hid 450/767/1612 px in scrolling panels. Phone — every page +1131 to +4111 px.
+
+Approach (frontend only, no backend/data change):
+- `OneScreen.css` (loaded last): app always fills the viewport; compact header; one-line footer that keeps the Open-Meteo CC BY 4.0 credit and the "experimental, not an official warning" line (short wording on phones); page titles kept for screen readers.
+- `ScreenTabs.jsx` (tabs; `mode="phone"` tabs only below 1100 px, `"always"` everywhere; hidden panels stay mounted), `usePaged`/`Pager` (Previous/Next instead of scrolling lists), `Popup.jsx` (accessible dialog for details; Escape/Close return focus; can be opened by page logic), `RouteSteps.jsx` (8 turn-by-turn steps per page).
+- Home: laptop keeps outlook left / map right; phone = place bar, actions, tabs Warnings | Risk | Map (tapping a risk spot opens Map). "Why?", "Data sources & privacy", "Map sources & limitations" are popups ("Why?" has Flood | Drainage | About tabs; title says experimental). Place search opens as a centred panel with 4 results per page (all pages that use it).
+- Flood Map: laptop map + tabs Place | Today | Past floods | Sources; phone adds a Map tab and a "Layers & legend" popup; tapping the map opens Place; flood-cell details are a popup; loading/errors stay visible above the tabs.
+- Shelters: one shelter card per page; phone tabs Shelters | Map | Help (map tab hides the list header while open); compact location line with a "Change location" popup; route summary sits with the map; limitations, shelter details (phone), turn-by-turn, route sources are popups; the limitations link stays available when no shelter is listed.
+- Weather: tabs Now | 7 days | Rain chart | Sources (phone: 4 days per page); point map on laptops only.
+- Report: steps 1 Location → 2 Details → 3 Photo → 4 Review (consent, privacy terms, readiness, review, submit); coordinates/custom radius in a popup; all checks unchanged.
+- Telegram alerts: two sections side by side / two tabs. How it works: five tabs.
+
+Flow fixes: Home map "Report flooding here" on a chosen place now hands that spot to Report as a user-selected spot (never GPS; radius still required); report receipt links to "Find a shelter" and "Back to Home"; Flood Map errors no longer hidden behind a tab. Duplicate "Availability rechecked…" notice removed (the navigation panel explains the five-second link). Not changed, by design: approved citizen reports are not shown on any public map (consent says no publication) — the 16 Oct demo script line "the pin appears on the map" applies to the admin map only.
+
+## 2026-10-21 — One-screen layout: browser specs updated, three layout bugs and a map crash fixed
+
+Acceptance test: the unit suite, the production build and the Playwright suite pass on the one-screen layout, except for the administrator page (not yet converted).
+
+Specs rewritten for tabs, popups and paging (one assertion each where behaviour changed by design): home-emergency, home-weather, risk-features, shelters, ui-repair, ui-ux, wireframes, weather-freshness. Shared helpers in `frontend/tests/oneScreen.js` (`openTab`, `expectOneScreen`, `findLocality`).
+
+Bugs found by the specs and fixed:
+- Phone Flood Map could go blank: Leaflet throws "Invalid LatLng (NaN, NaN)" when a map in an inactive tab (0×0 px) is fitted to bounds, and the error unmounted the page. `frontend/src/leafletHiddenMaps.js` (imported once in `main.jsx`) defers view changes on a hidden map and applies the latest one when the map is shown. Reproduced in 3 of 6 runs before, 0 of 6 after; `leafletHiddenMaps.test.jsx` fails without the guard and passes with it.
+- Phone Shelters map was 0 px tall on its Map tab (an older stacked-layout rule forced the panel to block layout); now fills the tab (512 px at 390×844). Tile-failure notice made compact so it cannot push the map out.
+- Scroll fallback (`useFitGuard`) widened pages to ~565 px on phones because hidden page headings became visible-overflowing; `.visually-hidden` and `.page-intro` are now excluded. The guard now re-measures from scratch on content changes, so a moment of clipping while data loads no longer leaves the page scrolling (scroll position kept if it still must scroll).
+- Phone directions with several stacked notices (demonstration, route failure, tiles unavailable) now fit one screen.
+
+Verification (isolated Playwright servers, no operational database): frontend unit 287/287 in 31 files; build passes; Playwright full run 79 passed, 8 skipped (database-gated), 2 failed — the administrator form test (expected: admin page not yet one-screen; it currently falls back to normal scrolling) and weather-freshness:133 (timing in the test: the panel re-rendered for the new point after the Sources tab was clicked; test now retries, 10/10 passing afterwards). Flaky-under-load checks: navigation:22 5/5, location-weather:61 5/5 after the guard fix, fit-related specs 39/39 over three repeats.
+
+Official sources checked live the same day (not fixtures): IMD WFS (80 features in the Karnataka box, issue of 20 Oct 06 UTC, updated 11:57 UTC) matched the app for Udupi and Mysuru day by day; NDMA SACHET Karnataka RSS reachable, 10 messages, newest CAP alert expired 19 Oct 22:00 IST, so the app's "No active alert" is correct.
+
+Not done yet: administrator page one-screen layout (shelters form, report moderation, Telegram alerts).

@@ -1,3 +1,4 @@
+import { openTab, expectOneScreen } from './oneScreen.js'
 import { test, expect } from '@playwright/test'
 async function setup(page, mode='pending') {
  const requests=[]
@@ -49,11 +50,11 @@ test('provider and tile failure keep Home honest while historical evidence remai
  await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0);await expect(page.getByText(/Background tiles are unavailable/)).toBeVisible();await expect(page.locator('.home-flood-map img.leaflet-tile')).toHaveCount(0)
  await expect(page.getByRole('button',{name:'Show historical evidence'})).toHaveCount(0)
  await page.getByRole('link',{name:'Full map',exact:true}).click();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
- await page.getByLabel('Mapped flood cell',{exact:true}).selectOption({index:1});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
+ await page.getByRole('button',{name:'Zoom to past floods',exact:true}).click();await page.locator('.intelligence-map path[fill="#dc6047"]').first().click({force:true});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
 })
 test('Home does not request historical evidence or shelters and retains explicit unknown outcomes',async({page})=>{
  await setup(page,'denied');const calls=[];page.on('request',r=>{if(/\/api\/(?:shelters|flood-map\/historical)/.test(r.url()))calls.push(r.url())})
- await page.goto('/');await expect(page.locator('.home-river-line')).toContainText('Reviewed river outlook: unavailable');await expect(page.getByText(/Choose your place to see its official IMD district warning/)).toBeVisible()
+ await page.goto('/');await expect(page.locator('.home-river-line')).toHaveCount(0);await expect(page.getByText(/Choose your place to see its official IMD district warning/)).toBeVisible()
  await expect(page.getByText(/reviewed historical cells|Verified Open shelters/)).toHaveCount(0);await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);await expect(page.locator('.home-flood-map path[fill="#dc6047"]')).toHaveCount(0)
  await expect(page.getByText(/Choose your town or use your location to see the riskiest spots/)).toBeVisible();expect(calls).toEqual([])
 })
@@ -65,12 +66,17 @@ test('Shelters retains its fresh fixture and expiry protection after removal fro
  });await page.goto('/');expect(calls).toBe(0);await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toBeVisible();expect(calls).toBe(1)
  await page.clock.fastForward(5001);await expect(page.getByRole('alert').filter({hasText:'Controlled directory outage'})).toBeVisible();await expect(page.getByText('ISOLATED TEST entrance',{exact:true})).toHaveCount(0);expect(calls).toBe(2)
 })
-test('Home has a large 60 percent map on desktop and normal overflow-free mobile scrolling',async({page})=>{
+test('Home has a dominant map on laptops and Warnings/Risk/Map tabs on phones, never scrolling',async({page})=>{
  await setup(page,'denied')
  for(const size of [{width:1366,height:768},{width:1920,height:1080},{width:1600,height:900},{width:390,height:844},{width:320,height:720}]){
-  await page.setViewportSize(size);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();const left=await page.locator('.home-area-summary').boundingBox(),stage=await page.locator('.home-map-stage').boundingBox(),map=await page.locator('.home-flood-map').boundingBox()
-  expect(map.height).toBeGreaterThan(350);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
-  if(size.width>1000){await expect(page.locator('.home-viewport-fit')).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBe(size.height);expect(stage.x).toBeGreaterThan(left.x+left.width);expect(stage.width/(stage.width+left.width)).toBeCloseTo(.6,1)}else{expect(stage.y).toBeGreaterThan(left.y+left.height-1);await page.locator('.home-flood-map').scrollIntoViewIfNeeded();await expect(page.locator('.home-flood-map')).toBeVisible()}
+  await page.setViewportSize(size);await page.goto('/');await expect(page.locator('.home-flood-map')).toBeAttached()
+  if(size.width>1000){
+   const left=await page.locator('.home-essential-status').boundingBox(),stage=await page.locator('.home-map-stage').boundingBox(),main=await page.locator('main').boundingBox()
+   expect(stage.x).toBeGreaterThan(left.x+left.width);expect(stage.width/main.width).toBeGreaterThan(.5);expect((await page.locator('.home-flood-map').boundingBox()).height).toBeGreaterThan(350)
+  }else{
+   await expect(page.getByRole('tab',{name:'Map'})).toBeVisible();await openTab(page,'Map');await expect(page.locator('.home-flood-map')).toBeVisible();expect((await page.locator('.home-flood-map').boundingBox()).height).toBeGreaterThan(200)
+  }
+  await page.waitForTimeout(1600);expect(await expectOneScreen(page),`${size.width}x${size.height}`).toEqual({page:0,width:0,scrolls:0,outside:0})
  }
 })
 

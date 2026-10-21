@@ -7,6 +7,10 @@ import useShelterDirectory from './useShelterDirectory.js'
 export { validShelterDirectory } from './useShelterDirectory.js'
 import './Shelters.css'
 import './RiskPanel.css'
+import ScreenTabs, { useWide, usePaged, Pager } from './ScreenTabs.jsx'
+import Popup from './Popup.jsx'
+import RouteSteps from './RouteSteps.jsx'
+const PER_PAGE=1  // one shelter card per screen (one-screen rule)
 const ago=value=>{const m=Math.max(0,Math.round((Date.now()-Date.parse(value))/60000));return m<1?'just now':m<60?`${m} min ago`:`${Math.round(m/60)} h ago`}
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
 export function usableNavigationOrigin(point, now=Date.now()) {
@@ -23,6 +27,8 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const [retryTarget,setRetryTarget]=useState(null),[pickingStart,setPickingStart]=useState(null)
   const [navTarget,setNavTarget]=useState(null),[travelMode,setTravelMode]=useState('walking')
   const [selected,setSelected]=useState(null),[locating,setLocating]=useState(false),[locateError,setLocateError]=useState(null)
+  // One-screen rule: shelters are paged instead of scrolled; on phones the map and help are tabs.
+  const wide=useWide(),[tab,setTab]=useState('list')
   const selectedPoint=point
   point=usableNavigationOrigin(point)
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
@@ -35,20 +41,22 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   // Nearest first; shelters without a distance keep their directory order at the end.
   const ordered=data?data.shelters.map((s,i)=>[s,i]).sort(([a,i],[b,j])=>(a.straight_line_km??Infinity)-(b.straight_line_km??Infinity)||i-j).map(([s])=>s):[]
   const focus=ordered.find(s=>s.id===selected)||null
-  function select(id,scroll=false){setSelected(id);if(scroll)document.getElementById('shelter-'+id)?.scrollIntoView?.({block:'nearest',behavior:'smooth'})}
+  const paged=usePaged(ordered,PER_PAGE)
+  // A pin on the map opens that shelter's card; "Show on map" on a card switches phones to the map.
+  function select(id,fromMap=false){setSelected(id);const index=ordered.findIndex(s=>s.id===id);if(fromMap){if(index>=0)paged.setPage(Math.floor(index/(PER_PAGE)));setTab('list')}else setTab('map')}
   const pins=ordered.map((s,i)=>({...s,label:String(i+1),name:`${i+1}. ${s.name} · ${s.available_capacity} places free`,tone:s.available_capacity<Math.max(10,s.capacity*0.15)?'limited':'ok'}))
   const navListed=!!navTarget&&!!data?.shelters.some(s=>s.id===navTarget.id&&s.latitude===navTarget.latitude&&s.longitude===navTarget.longitude)
   const navLink=navTarget&&navigation?.id===navTarget.id&&navigation.key===key&&Date.now()-navigation.at<5000?navigation.url:null
   const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
-  useEffect(()=>{if(navTarget)document.getElementById('shelter-navigation-title')?.scrollIntoView?.({block:window.matchMedia?.('(max-width:700px)').matches?'start':'nearest',behavior:'smooth'})},[navTarget?.id])
-  function startPicking(){setPickingStart(retryTarget||'nearest');setNavigationNotice('Click your starting point on the map.');requestAnimationFrame(()=>document.querySelector('.shelter-pick-banner')?.scrollIntoView?.({block:'center',behavior:'smooth'}))}
+  useEffect(()=>{if(navTarget)setTab('map')},[navTarget?.id])
+  function startPicking(){setPickingStart(retryTarget||'nearest');setNavigationNotice('Click your starting point on the map.');setTab('map')}
   function pickStart(p){
     const target=pickingStart;setPickingStart(null);setRetryTarget(null)
     onLocate?.({name:'Start point chosen on the map',latitude:p.latitude,longitude:p.longitude,kind:'map',uncertainty_m:50})
     locateTried.current=true;setPending(target);setNavigationNotice('Start point set. Rechecking availability for directions…')
   }
   const pickBanner=pickingStart&&<div className="shelter-pick-banner" role="status"><strong>Click your starting point on the map.</strong> <button type="button" className="secondary" onClick={()=>{setPickingStart(null);setNavigationNotice(null)}}>Cancel</button></div>
-  const map=navigator_||<><h2>Verified shelter entrances</h2>{pickBanner}<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list. Only freshly revalidated Open destinations with spare capacity are marked; the small dark dot is your starting point, not a shelter. No markers are invented for missing records.</p></>
+  const map=navigator_||<><h2>Verified shelter entrances</h2>{pickBanner}{route&&<div className="route-summary" role="status"><p><strong>{(route.distance_m/1000).toFixed(1)} km · about {Math.round(route.duration_s/60)} min walking to {ordered.find(x=>x.id===route.shelterId)?.name||'the shelter'}</strong> · <Popup label="Turn-by-turn directions" title={`Turn-by-turn directions · ${route.steps.length} steps`}><RouteSteps steps={route.steps}/></Popup></p><p className="notice">{route.label}</p><p className="muted">{route.attribution}</p></div>}<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/><p className="muted">Numbered pins match the list; the small dark dot is your starting point. Only freshly rechecked Open shelters with free places are marked.</p></>
   function locate(onFail){
     if(!onLocate)return
     if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');onFail?.();return}
@@ -67,7 +75,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
       if(selectedKey.current!==requestedKey)return
       if(body.status==='not_configured')setRouting(false)
       if(!response.ok||body.status!=='available'){setNavigationNotice((typeof body.detail==='string'?body.detail:body.message)||'Route unavailable. Use external directions.');return}
-      setRoute({...body,shelterId:shelter.id});setNavigationNotice(null)
+      setRoute({...body,shelterId:shelter.id});setNavigationNotice(null);setTab('map')
     }catch{setNavigationNotice('Routing request failed. Use external directions.')}finally{setRouteBusy(false)}
   }
   // Directions need a precise start: ask for location first, then continue automatically.
@@ -102,56 +110,69 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
     if(!found){setNavigationNotice('This destination could not be revalidated. No directions were opened. Check the current directory.');return}
     setNavigation({id:found.id,key:requestedKey,url:directions(found),at:Date.now()})
     setNavTarget(found)
-    setNavigationNotice('Availability rechecked. Select directions again within five seconds to open external navigation. Reported conditions and road access may still change.')
+    // The navigation panel that opens now explains the five-second link and road-safety limits.
+    setNavigationNotice(null)
   }
-  return <section className={overview?"panel shelters-overview":"panel shelters-panel"} aria-labelledby="public-shelters-title">
+  const limits=<><p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed{data?.shelters.length?` (${data.shelters.length} of ${data.total} assignments shown; verification expires after ${data.verification_valid_hours} hours)`:''}. This prototype is not affiliated with a disaster-management authority.</p>
+    {!point&&<p>No starting location selected. Choose a starting point on the map or an explicitly selected locality before requesting directions.</p>}
+    <p className="notice">Approximate straight-line distance is not road distance. Flooding and road closures may make external routes unsafe. Confirm access and availability with local authorities before travel.</p>
+    <p>"Get directions" rechecks this shelter's availability first; the directions link then stays active for five seconds.</p>
+    {enabled&&<p>Availability: {current.freshness}. Active directories are checked at least every minute; returning to this tab rechecks availability. A network failure removes destinations.</p>}</>
+  const listView=<>
+    {data?.shelters.length>0&&<>
+      <p className="shelter-summary"><strong>{data.shelters.length} open {data.shelters.length===1?'shelter':'shelters'} with free space</strong>{data.retrieved_at&&<> · checked <span className="label-long">{clock(data.retrieved_at)}</span><span className="label-short">{new Date(data.retrieved_at).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',minute:'2-digit'})}</span></>}</p>
+      <ol aria-label="Available shelter destinations" className="shelter-list" start={paged.page*(PER_PAGE)+1}>{paged.items.map((s,j)=>{
+        const i=paged.page*(PER_PAGE)+j
+          const used=Math.min(100,Math.round(100*(s.capacity-s.available_capacity)/Math.max(1,s.capacity)))
+          return <li key={s.id} id={'shelter-'+s.id} className={'shelter-card'+(selected===s.id?' selected':'')}>
+          <div className="shelter-card-head"><span className="shelter-num" aria-hidden="true">{i+1}</span><h3>{s.name}</h3>{i===0&&point&&s.straight_line_km!==null&&<span className="shelter-nearest">Nearest</span>}</div>
+          <p className="shelter-distance">{s.straight_line_km===null?'Straight-line distance unavailable':`${Number(s.straight_line_km).toFixed(1)} km approximate straight-line distance`}</p>
+          {wide&&<p className="shelter-address">{s.address} · {s.district_name}</p>}
+          <div className="shelter-capacity" data-tone={pins[i].tone}><p><strong>{s.available_capacity} available</strong> of {s.capacity} places · {s.occupancy} reported occupants</p><div className="capacity-bar" role="img" aria-label={`${used}% of places taken`}><span style={{width:used+'%'}}/></div></div>
+          {s.restrictions&&<p className="shelter-restrictions">Restrictions: {s.restrictions}</p>}
+          {wide?<>          <ul className="shelter-facilities" aria-label="Facilities"><li data-value={s.water}>Water: {s.water}</li><li data-value={s.toilets}>Toilets: {s.toilets}</li><li>Accessibility: {s.accessibility||'Not reported'}</li></ul>
+          {s.contact&&<p>Approved contact: {s.contact}</p>}
+          <p className="muted">Verified {ago(s.verified_at)} · verification expires {clock(s.verification_expires_at)}</p>
+          </>:<p className="shelter-more"><Popup label="Shelter details: address, facilities, contact" title={s.name}><p>{s.address} · {s.district_name}</p>
+          <ul className="shelter-facilities" aria-label="Facilities"><li data-value={s.water}>Water: {s.water}</li><li data-value={s.toilets}>Toilets: {s.toilets}</li><li>Accessibility: {s.accessibility||'Not reported'}</li></ul>
+          {s.contact&&<p>Approved contact: {s.contact}</p>}
+          <p className="muted">Verified {ago(s.verified_at)} · verification expires {clock(s.verification_expires_at)}</p>
+          </Popup></p>}
+          <div className="shelter-actions">
+          {navigation?.id===s.id&&navigation.key===key&&navigation.url===directions(s)&&Date.now()-navigation.at<5000
+            ?<a className="button-link" href={navigation.url} onClick={event=>{if(Date.now()-navigation.at>=5000||!usableNavigationOrigin(selectedPoint)){event.preventDefault();setNavigation(null)}else setNavigation(null)}} target="_blank" rel="noopener noreferrer">{data.mode==='demonstration'?'Inspect demonstration directions (not for travel)':'Open external directions to verified entrance'}</a>
+            :<button type="button" aria-label="Get directions" onClick={event=>checkDestination(event,s)} disabled={current.loading}><span className="label-long">Get directions</span><span className="label-short">Directions</span></button>}
+          {routing&&<button type="button" className="secondary" aria-label={routeBusy?'Planning route…':'Show walking route on map'} onClick={()=>inAppRoute(s)} disabled={routeBusy||current.loading}>{routeBusy?'Planning route…':<><span className="label-long">Show walking route on map</span><span className="label-short">Walking route</span></>}</button>}
+          <button type="button" className="secondary" aria-label="Show on map" onClick={()=>select(s.id)} aria-pressed={selected===s.id}><span className="label-long">Show on map</span><span className="label-short">On map</span></button>
+          </div>
+
+        </li>})}</ol>
+      <Pager paged={paged} label="More shelters"/>
+      <p className="shelter-safety">Capacity is not a reservation. Directions are not verified flood-safe; confirm access before travel.{wide&&<> <Popup label="Limitations" title="Availability and navigation limitations">{limits}</Popup></>}</p>
+    </>}
+  </>
+  const mapView=navigator_||<>{pickBanner}{route&&<div className="route-summary" role="status"><p><strong>{(route.distance_m/1000).toFixed(1)} km · about {Math.round(route.duration_s/60)} min walking to {ordered.find(x=>x.id===route.shelterId)?.name||'the shelter'}</strong> · <Popup label="Turn-by-turn directions" title={`Turn-by-turn directions · ${route.steps.length} steps`}><RouteSteps steps={route.steps}/></Popup></p><p className="notice">{route.label}</p><p className="muted">{route.attribution}</p></div>}<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} route={route?.geometry} origin={point} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/></>
+  // Phones: while the Map tab is open, the list header steps aside so the map and directions fit.
+  return <section className={(overview?"panel shelters-overview":"panel shelters-panel")+(!wide&&tab==='map'?' map-focus':'')} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">VERIFIED BY ADMINISTRATORS</p><h2 id="public-shelters-title">Open shelters near you</h2></div><button className="secondary" onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
     <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m)`:''}.`}</p>:<p>Set your location to list the nearest shelters first.</p>}
       {onLocate&&<button type="button" onClick={locate} disabled={locating}>{locating?'Finding you…':point?'Update my location':'Use my location'}</button>}</div>
     {locateError&&<p role="status" className="notice">{locateError}</p>}
     {selectedPoint && !point && <p role="status" className="notice">Your location is too uncertain or its GPS fix is stale for directions. Use my location again outdoors, or choose your place with "Change location".</p>}
-    <div aria-live="polite" aria-busy={current.loading}>
+    <div aria-live="polite" aria-busy={current.loading} className="shelter-status">
       {current.loading&&<p role="status">Checking shelter directory…</p>}
       {current.error&&<p role="alert">{current.error}. No substitute destinations are shown.</p>}
       {navigationNotice&&<p role="status" className="shelter-navigation-notice">{navigationNotice}</p>}
       {retryTarget&&!pickingStart&&onLocate&&<button type="button" className="shelter-pick-start" onClick={startPicking}>Choose my start on the map</button>}
       {data?.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated test assignments, not actual emergency shelters. Do not travel to these points.</strong></p>}
       {data&&!data.shelters.length&&<p role="status" className="shelter-empty">No currently verified open shelters are available in this directory.</p>}
-      {data?.shelters.length>0&&<>
-        <p className="shelter-summary"><strong>{data.shelters.length} open {data.shelters.length===1?'shelter':'shelters'} with free space</strong>{data.retrieved_at&&<> · checked {clock(data.retrieved_at)}</>}</p>
-        {!mapTarget&&!overview&&navigator_}
-        {!mapTarget&&!overview&&!navigator_&&pickBanner}
-        {!mapTarget&&!overview&&!navigator_&&<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} origin={point} focus={focus} onInspect={p=>select(p.id,true)} label="Verified open shelter entrances" />}
-        <ol aria-label="Available shelter destinations" className="shelter-list">{ordered.map((s,i)=>{
-          const used=Math.min(100,Math.round(100*(s.capacity-s.available_capacity)/Math.max(1,s.capacity)))
-          return <li key={s.id} id={'shelter-'+s.id} className={'shelter-card'+(selected===s.id?' selected':'')}>
-          <div className="shelter-card-head"><span className="shelter-num" aria-hidden="true">{i+1}</span><h3>{s.name}</h3>{i===0&&point&&s.straight_line_km!==null&&<span className="shelter-nearest">Nearest</span>}</div>
-          <p className="shelter-distance">{s.straight_line_km===null?'Straight-line distance unavailable':`${Number(s.straight_line_km).toFixed(1)} km approximate straight-line distance`}</p>
-          <p className="shelter-address">{s.address} · {s.district_name}</p>
-          <div className="shelter-capacity" data-tone={pins[i].tone}><p><strong>{s.available_capacity} available</strong> of {s.capacity} places · {s.occupancy} reported occupants</p><div className="capacity-bar" role="img" aria-label={`${used}% of places taken`}><span style={{width:used+'%'}}/></div></div>
-          <ul className="shelter-facilities" aria-label="Facilities"><li data-value={s.water}>Water: {s.water}</li><li data-value={s.toilets}>Toilets: {s.toilets}</li><li>Accessibility: {s.accessibility||'Not reported'}</li></ul>
-          {s.restrictions&&<p className="shelter-restrictions">Restrictions: {s.restrictions}</p>}{s.contact&&<p>Approved contact: {s.contact}</p>}
-          <p className="muted">Verified {ago(s.verified_at)} · verification expires {clock(s.verification_expires_at)}</p>
-          <div className="shelter-actions">
-          {navigation?.id===s.id&&navigation.key===key&&navigation.url===directions(s)&&Date.now()-navigation.at<5000
-            ?<a className="button-link" href={navigation.url} onClick={event=>{if(Date.now()-navigation.at>=5000||!usableNavigationOrigin(selectedPoint)){event.preventDefault();setNavigation(null)}else setNavigation(null)}} target="_blank" rel="noopener noreferrer">{data.mode==='demonstration'?'Inspect demonstration directions (not for travel)':'Open external directions to verified entrance'}</a>
-            :<button type="button" onClick={event=>checkDestination(event,s)} disabled={current.loading}>Get directions</button>}
-          {routing&&<button type="button" className="secondary" onClick={()=>inAppRoute(s)} disabled={routeBusy||current.loading}>{routeBusy?'Planning route…':'Show walking route on map'}</button>}
-          <button type="button" className="secondary" onClick={()=>select(s.id)} aria-pressed={selected===s.id}>Show on map</button>
-          </div>
-          {route?.shelterId===s.id&&<div className="route-summary" role="status"><p><strong>{(route.distance_m/1000).toFixed(1)} km · about {Math.round(route.duration_s/60)} min walking</strong></p><p className="notice">{route.label}</p>
-            <details><summary>Turn-by-turn directions</summary><ol className="route-steps">{route.steps.map((step,i)=><li key={i}>{step.instruction} ({step.distance_m} m)</li>)}</ol></details><p className="muted">{route.attribution}</p></div>}
-        </li>})}</ol>
-        <p className="shelter-safety">Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.</p>
-      </>}
     </div>
-    <OfficialHelp prominent={!!data&&!data.shelters.length}/>
+    {/* Laptop: list here, map in the right-hand panel. Phone: Shelters | Map | Help tabs. */}
+    <ScreenTabs className="shelter-tabs" label="Shelter sections" active={tab} onActive={setTab} tabs={[
+      {id:'list',label:'Shelters',content:<>{listView}{wide&&<OfficialHelp prominent={!!data&&!data.shelters.length}/>}{wide&&!(data?.shelters.length>0)&&<p className="shelter-limits"><Popup label="Limitations" title="Availability and navigation limitations">{limits}</Popup></p>}</>},
+      !mapTarget&&{id:'map',label:'Map',content:enabled?<div className="shelter-inline-map">{mapView}</div>:null},
+      !wide&&{id:'help',label:'Help',content:<><OfficialHelp prominent={!!data&&!data.shelters.length}/><p className="shelter-limits"><Popup label="Availability and navigation limitations" title="Availability and navigation limitations">{limits}</Popup></p></>},
+    ]}/>
     {mapTarget&&enabled&&createPortal(map,mapTarget)}
-    <details className="shelter-usage"><summary>Availability and safe navigation limitations</summary><p>Only manually authorized, entrance-verified, usable Open assignments with reported available capacity are listed{data?.shelters.length?` (${data.shelters.length} of ${data.total} assignments shown; verification expires after ${data.verification_valid_hours} hours)`:''}. This prototype is not affiliated with a disaster-management authority.</p>
-    {!point&&<p>No starting location selected. Choose a starting point on the map or an explicitly selected locality before requesting directions.</p>}
-    <p className="notice">Approximate straight-line distance is not road distance. Flooding and road closures may make external routes unsafe. Confirm access and availability with local authorities before travel.</p>
-    <p>"Get directions" rechecks this shelter's availability first; the directions link then stays active for five seconds.</p>
-    {enabled&&<p>Availability: {current.freshness}. Active directories are checked at least every minute; returning to this tab rechecks availability. A network failure removes destinations.</p>}
-    </details>
   </section>
 }

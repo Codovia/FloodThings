@@ -50,11 +50,17 @@ test('keyboard navigation, disclosure focus and enlarged-text reflow remain usab
  for(let n=0;n<15&&!await report.evaluate(el=>el===document.activeElement);n++)await page.keyboard.press('Tab')
  await expect(report).toBeFocused();await page.keyboard.press('Enter')
  await expect(page.locator('h1')).toBeFocused();await expect(page).toHaveTitle('Report an incident · FloodPulse')
- // Emergency numbers come first, then the GPS camera (fastest path), then the form fields, in reading order.
+ // Emergency numbers come first, then the step tabs, then "1. Your location" controls, in reading order.
  await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'112'})).toBeFocused()
  await page.keyboard.press('Tab');await expect(page.getByRole('link',{name:'080-1070'})).toBeFocused()
- await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Open GPS camera'})).toBeFocused()
- await page.keyboard.press('Tab');await expect(page.getByLabel('Event type')).toBeFocused()
+ await page.keyboard.press('Tab');await expect(page.getByRole('tab',{name:'1 Location'})).toBeFocused()
+ await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:/^(Use my current location|Update my location)$/})).toBeFocused()
+ await page.keyboard.press('Tab');await expect(page.getByRole('button',{name:'Choose the spot on the map'})).toBeFocused()
+ // The step's own "Next" button is reachable by keyboard and moves focus-free to the details step.
+ const next=page.getByRole('button',{name:'Next: details ›'})
+ for(let n=0;n<20&&!await next.evaluate(el=>el===document.activeElement);n++)await page.keyboard.press('Tab')
+ await expect(next).toBeFocused();await page.keyboard.press('Enter')
+ await expect(page.getByRole('radio',{name:'Flooding',exact:true})).toBeVisible()
  await page.setViewportSize({width:1366,height:768})
  await page.evaluate(()=>document.documentElement.style.fontSize='200%')
  for(const path of ['/','/report','/admin','/shelters']){

@@ -1,3 +1,4 @@
+import { openTab } from './oneScreen.js'
 import {selectPoint} from './pointSelection.js'
 import { expect, test } from '@playwright/test'
 
@@ -27,7 +28,7 @@ async function setup(page) {
     if (state.fail) return route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable', message: 'Controlled provider outage' }) })
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload(point, state.timestampMissing ? null : timestamp)) })
   })
-  await page.goto('/weather'); await page.getByText('Change location',{exact:true}).click()
+  await page.goto('/weather')
   return state
 }
 const freshness = page => page.getByRole('status', { name: 'Weather data freshness' })
@@ -59,12 +60,13 @@ test('fresh before six hours, automatically refreshes when due, manual refresh w
   await page.getByRole('button', { name: 'Refresh weather' }).click()
   await expect.poll(() => state.requests.length).toBe(3)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
+  await openTab(page, '7 days')
   const cards = page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')
   await expect(cards).toHaveCount(7)
   expect(await cards.locator('time').evaluateAll(nodes => nodes.map(n => n.dateTime))).toEqual(Array.from({ length: 7 }, (_, i) => `2026-10-${String(8 + i).padStart(2, '0')}`))
-  await expect(page.getByText('Latitude 13.35°, longitude 74.75°')).toBeVisible()
+  await openTab(page, 'Sources'); await expect(page.getByText('Latitude 13.35°, longitude 74.75°')).toBeVisible()
   await expect(page.getByText('Unavailable — provider does not supply it here')).toBeVisible()
-  await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
+  await openTab(page,'Now');await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
 })
 
 test('hidden tab reactivation checks stale age, errors retain explicitly stale weather and retries stop after three attempts', async ({ page }) => {
@@ -125,7 +127,7 @@ test('missing retrieval time is explicitly unverified, does not fabricate freshn
   await expect(freshness(page)).toContainText('Unavailable — freshness cannot be verified')
   await activate(page, false); await activate(page, false)
   expect(state.requests).toHaveLength(2)
-  await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
+  await openTab(page, '7 days'); await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
 })
 
 test('switching location during an automatic refresh never renders the old location result', async ({ page }) => {
@@ -139,7 +141,8 @@ test('switching location during an automatic refresh never renders the old locat
 
   await selectPoint(page,13.34,74.74)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await expect(page.getByText(/Requested point: 13.34° latitude, 74.74° longitude/)).toBeVisible()
+  // The panel re-renders for the new point; retry the tab until its Sources text is shown.
+  await expect(async () => { await openTab(page, 'Sources'); await expect(page.getByText(/Requested point: 13.34° latitude, 74.74° longitude/)).toBeVisible({ timeout: 1000 }) }).toPass({ timeout: 15000 })
   release()
   await page.evaluate(() => new Promise(resolve => queueMicrotask(resolve)))
   await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
@@ -147,5 +150,5 @@ test('switching location during an automatic refresh never renders the old locat
   await expect.poll(() => state.requests.length).toBe(4)
   expect(state.requests.slice(-2)).toEqual(['/api/weather?latitude=13.34&longitude=74.74', '/api/weather?latitude=13.34&longitude=74.74'])
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
+  await openTab(page, '7 days'); await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
 })

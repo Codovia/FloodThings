@@ -34,7 +34,7 @@ it('shows the Google route in-app when configured, and starts navigation only wi
   rerender(<Nav {...p} link={base} />)
   expect(new URL(screen.getByRole('link', { name: 'Start navigation in Google Maps' }).href).searchParams.get('dir_action')).toBe('navigate')
   fireEvent.click(screen.getByRole('button', { name: 'Driving' })); expect(p.onMode).toHaveBeenCalledWith('driving')
-  expect(screen.getByText(/not checked for flooding/)).toBeTruthy(); expect(screen.getByText(/sent to Google/)).toBeTruthy()
+  expect(screen.getByText(/not checked for flooding/)).toBeTruthy(); fireEvent.click(screen.getByRole('button', { name: 'Route sources & privacy' })); expect(screen.getByText(/sent to Google/)).toBeTruthy(); fireEvent.click(screen.getByRole('button', { name: 'Close' }))
 })
 
 it('falls back to the app map without a key and stops when the shelter is no longer listed', async () => {
@@ -54,7 +54,7 @@ it('shows the flood-aware route first, with distance, avoided reports, safety la
   render(<Nav {...props({ origin: { ...origin, kind: 'gps', accuracy_m: 25 } })} />)
   expect(await screen.findByText(/7.3 km · about 87 min walking/)).toBeTruthy()
   expect(screen.getByText(/avoids 1 reported flood area$/)).toBeTruthy(); expect(screen.getByText(/NOT certified flood-safe/)).toBeTruthy()
-  expect(screen.getByText('TEST step: head north (120 m)')).toBeTruthy(); expect(screen.getByRole('region', { name: 'Flood-aware route to the shelter' })).toBeTruthy()
+  fireEvent.click(screen.getByRole('button', { name: /Turn-by-turn directions/ })); expect(screen.getByText('TEST step: head north (120 m)')).toBeTruthy(); fireEvent.click(screen.getByRole('button', { name: 'Close' })); expect(screen.getByRole('region', { name: 'Flood-aware route to the shelter' })).toBeTruthy()
   const [, options] = fetch.mock.calls.find(([u]) => u === '/api/route'); const body = JSON.parse(options.body)
   expect(body).toEqual({ shelter_id: 'fixture', profile: 'foot-walking', origin: { latitude: 13.34, longitude: 74.74, accuracy_m: 25 } })
 })

@@ -24,7 +24,7 @@ export default function useHomeGeolocation(active, manualRevision, hasSelection,
   const [state, setState] = useState({ status: 'idle', message: 'Choose a place or allow location access.', gps: null })
   function cancel() {
     if (pending.current) { clearTimeout(pending.current.timer); pending.current.controller?.abort(); pending.current = null }
-    if (live.current) setState(s => ({ ...s, status: 'manual', gps: null, message: 'Using your selected place or district filter. Location access remains optional.' }))
+    if (live.current) setState(s => ({ ...s, status: 'manual', gps: null, message: 'Place you selected. Location access is optional.' }))
   }
   function request() {
     if (!live.current || pending.current) return

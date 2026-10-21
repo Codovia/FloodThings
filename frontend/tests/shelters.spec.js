@@ -1,3 +1,4 @@
+import { openTab, findLocality, expectOneScreen } from './oneScreen.js'
 import {selectPoint} from './pointSelection.js'
 import {expect,test} from '@playwright/test'
 const weather=point=>({status:'available',retrieved_at:new Date().toISOString(),location:point,grid_location:point,current:{temperature_c:27,humidity_percent:80,precipitation_mm:0,interval_seconds:900,valid_at:new Date().toISOString()},prediction_status:'not_available',forecast:Array.from({length:7},(_,i)=>({date:`2026-10-${String(9+i).padStart(2,'0')}`,temperature_min_c:22,temperature_max_c:30,precipitation_mm:i,weather_code:61}))})
@@ -26,12 +27,16 @@ test('explicit demonstration fixtures render exact entrance, mobile map and no u
  const stamp=new Date().toISOString();const data={status:'available',mode:'demonstration',total:1,verification_valid_hours:24,shelters:[{id:'isolated-fixture',name:'DEMONSTRATION ONLY — not a shelter',address:'Isolated fixture',district_id:'nic:udupi.nic.in',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'TEST ONLY',status:'open',verified_at:stamp,updated_at:stamp,verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12,restrictions:'DO NOT TRAVEL',contact:null}]}
  await page.route('**/api/shelters*',r=>r.fulfill({status:200,contentType:'application/json',body:JSON.stringify(data)}))
  await page.setViewportSize({width:390,height:844});await page.goto('/shelters');await expect(page.getByRole('button',{name:'Refresh shelters'})).toBeEnabled();await page.getByRole('button',{name:'Refresh shelters'}).click()
- await expect(page.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeVisible();await expect(page.getByRole('region',{name:'Verified open shelter entrances'})).toBeVisible()
- await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
+ await expect(page.getByText(/DEMONSTRATION ONLY — isolated test assignments/)).toBeVisible();
+ // Phones: the map is its own tab, then back to the list.
+ await openTab(page,'Map');await expect(page.getByRole('region',{name:'Verified open shelter entrances'})).toBeVisible();await openTab(page,'Shelters')
+ await page.getByRole('button',{name:'Change location'}).click();await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await (await findLocality(page,'Kundapur')).click()
  const link=page.getByRole('link',{name:'Inspect demonstration directions (not for travel)'});await expect(link).toHaveCount(0)
  await page.getByRole('button',{name:'Get directions'}).click();await expect(link).toBeVisible()
  const url=new URL(await link.getAttribute('href'));expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('api')).toBe('1')
- await expect(page.getByText('Reported capacity is not a reservation. External directions are not verified flood-safe; confirm availability and road access before travel.',{exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+ // Directions open on the Map tab; the capacity warning is on the Shelters tab.
+ await expect(page.getByText(/Routes are not checked for flooding/)).toBeVisible();expect(await expectOneScreen(page)).toEqual({page:0,width:0,scrolls:0,outside:0})
+ await openTab(page,'Shelters');await expect(page.getByText('Capacity is not a reservation. Directions are not verified flood-safe; confirm access before travel.',{exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled shelter database outage'})}))
  await page.getByRole('button',{name:'Refresh shelters'}).click();await expect(page.getByText(/Controlled shelter database outage/)).toBeVisible();await expect(link).toHaveCount(0)
 })
@@ -69,7 +74,7 @@ test('isolated authenticated admin form uses the real district contract and requ
  await page.getByLabel('Username',{exact:true}).fill('isolated-admin');await page.getByLabel('Password',{exact:true}).fill('ISOLATED TEST PASSWORD');await page.getByRole('button',{name:'Sign in'}).click()
  await expect(page.getByText(/DEMONSTRATION ONLY — isolated database/)).toBeVisible()
  await expect(page.getByRole('option',{name:'Satellite imagery',exact:true})).toBeDisabled();await expect(page.getByRole('option',{name:'Satellite Hybrid',exact:true})).toBeDisabled();await expect(page.getByLabel('Search place or building name')).toBeDisabled()
- await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Udupi —/}).click();await expect(page.getByLabel('Entrance latitude',{exact:true})).toHaveValue('');await expect(page.getByLabel('Entrance longitude',{exact:true})).toHaveValue('');await expect(page.getByText(/This point is not a verified entrance/)).toBeVisible()
+ await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await (await findLocality(page,'Udupi')).click();await expect(page.getByLabel('Entrance latitude',{exact:true})).toHaveValue('');await expect(page.getByLabel('Entrance longitude',{exact:true})).toHaveValue('');await expect(page.getByText(/This point is not a verified entrance/)).toBeVisible()
  await page.getByRole('region',{name:'Administrator entrance selection map'}).click({position:{x:110,y:140}});await expect(page.getByLabel('Entrance latitude',{exact:true})).not.toHaveValue('');await expect(page.getByLabel('Entrance longitude',{exact:true})).not.toHaveValue('');await expect(page.getByRole('checkbox',{name:'This exact entrance has been independently verified'})).not.toBeChecked()
  await page.getByLabel('Facility name',{exact:true}).fill('DEMONSTRATION ONLY — fixture')
  await page.getByLabel('Facility address',{exact:true}).fill('Not an actual emergency shelter')

@@ -1,6 +1,7 @@
 import React from 'react'
 import { LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
 import './RiskPanel.css'
+import ScreenTabs from './ScreenTabs.jsx'
 
 const clock = value => value ? new Intl.DateTimeFormat('en-IN', { timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short' }).format(new Date(value)) + ' IST' : 'unavailable'
 
@@ -37,6 +38,23 @@ function Factors({ data }) {
     <FactorTable title="Drainage / waterlogging risk" result={data.drainage} />
     <p className="muted">Levels: {data.level_scale}. Thresholds: IMD rainfall categories and GloFAS-style return levels.</p>
   </>
+}
+
+// "Why?" popup body: one tab per risk type so each factor table fits the screen without scrolling.
+export function RiskWhy({ risk, point }) {
+  const { data, loading, error } = risk
+  if (!point) return <p>Select a location to assess flood and drainage risk.</p>
+  if (loading && !data) return <p role="status">Checking rainfall, river, terrain and reports…</p>
+  if (error || !data) return <p role="status">Risk unavailable{error ? `: ${error}` : ''}. No substitute level is shown.</p>
+  return <div className="risk-why-body">
+    <ScreenTabs mode="always" label="Risk type" tabs={[
+      { id: 'flood', label: 'Flood', content: <FactorTable title="Flood risk" result={data.flood} /> },
+      { id: 'drainage', label: 'Drainage', content: <FactorTable title="Drainage / waterlogging risk" result={data.drainage} /> },
+      { id: 'about', label: 'About', content: <>
+        <p className="notice">{data.label}</p>
+        {data.rain_window && <p className="muted">Rain window {clock(data.rain_window.start)} – {clock(data.rain_window.end)} · checked {clock(data.retrieved_at)}.{point.kind === 'network' && ' Location is an approximate network estimate.'}</p>}
+        <p className="muted">Levels: {data.level_scale}. Thresholds: IMD rainfall categories where they exist, otherwise project-chosen.</p></> }]} />
+  </div>
 }
 
 export default function RiskPanel({ risk, point, embedded = false }) {

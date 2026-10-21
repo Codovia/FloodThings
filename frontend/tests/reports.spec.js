@@ -6,7 +6,7 @@ test('GPS/photo -> actual private PostGIS -> authenticated pinned moderation -> 
  await page.addInitScript(()=>Object.defineProperty(navigator,'geolocation',{value:{getCurrentPosition:yes=>yes({coords:{latitude:13.4,longitude:74.7,accuracy:40},timestamp:Date.now()})}}))
  await page.goto('/report');await expect(page.getByRole('region',{name:'Citizen report location map'})).toBeVisible()
  await page.getByLabel('What did you see?').fill('DEMONSTRATION ONLY — fixture drainage report, not an incident')
- await page.getByRole('button',{name:'Use GPS for this report'}).click()
+ await page.getByRole('button',{name:'Update my location'}).click()
  await page.locator('input[type=file]').first().setInputFiles({name:'TEST_ONLY.png',mimeType:'image/png',buffer:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGNkqDjBwMDAxMDAwMDAAAAOYgFE3zUoJgAAAABJRU5ErkJggg==','base64')})
  await page.getByLabel(/I own or have permission/).check();await page.getByLabel(/I consent to private admin review/).check()
  await page.getByRole('button',{name:'Review report'}).click();await page.getByRole('button',{name:'Submit for private review'}).click()

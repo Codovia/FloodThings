@@ -1,5 +1,6 @@
 import {test,expect} from '@playwright/test'
 import {emptyShelterDirectory} from './shelterFixture.js'
+import {openTab,expectOneScreen} from './oneScreen.js'
 
 // No external services or operational writes in these layout/state tests.
 test.beforeEach(async({page})=>{
@@ -14,38 +15,45 @@ test('sketches 1-3 have information left and a dominant map right at both deskto
  for(const size of [{width:1366,height:768},{width:1920,height:1080}]){
   await page.setViewportSize(size)
   for(const route of ['/','/weather','/shelters']){
-   await page.goto(route);const information=page.locator('.workspace-information'),map=page.locator('.workspace-map')
+   // Home uses its own status/map grid; Weather and Shelters use the shared workspace.
+   await page.goto(route);const information=page.locator(route==='/'?'.home-essential-status':'.workspace-information'),map=page.locator(route==='/'?'.home-map-stage':'.workspace-map')
    await expect(map).toBeVisible();const left=await information.boundingBox(),right=await map.boundingBox()
-   expect(right.x).toBeGreaterThan(left.x+left.width);expect(right.width).toBeGreaterThan(left.width)
+   expect(right.x).toBeGreaterThan(left.x+left.width);// Weather gives the 7-day forecast the wider column; its map still takes at least 40% of the width.
+   if(route==='/weather')expect(right.width/(left.width+right.width)).toBeGreaterThan(.4);else expect(right.width).toBeGreaterThan(left.width)
    expect(right.height).toBeGreaterThan(350)
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
+   await page.waitForTimeout(1600);expect(await expectOneScreen(page),`${route} ${size.width}`).toEqual({page:0,width:0,scrolls:0,outside:0})
   }
  }
 })
 test('district selection survives all public routes; a historical cell never changes weather coordinates',async({page})=>{
  let weatherRequests=0;page.on('request',r=>{if(new URL(r.url()).pathname==='/api/weather')weatherRequests++})
  await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
- await page.getByText('Change location',{exact:true}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
+ await page.getByRole('button',{name:'Change location'}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
  await page.getByLabel('Karnataka district',{exact:true}).selectOption('nic:udupi.nic.in')
+ await page.getByRole('button',{name:'Close',exact:true}).click()
  const nav=page.getByRole('navigation',{name:'Main navigation'})
  await nav.getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByLabel('Go to district')).toHaveValue('nic:udupi.nic.in')
- await page.getByLabel('Mapped flood cell').selectOption({index:1});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible()
+ await page.getByRole('button',{name:'Zoom to past floods',exact:true}).click();await page.locator('.intelligence-map path[fill="#dc6047"]').first().click({force:true});await expect(page.getByRole('dialog',{name:'Flood evidence details'})).toBeVisible()
  expect(weatherRequests).toBe(1)
+ await page.getByRole('button',{name:'Close',exact:true}).click()
  await nav.getByRole('link',{name:'Shelters',exact:true}).click()
+ await page.getByRole('button',{name:'Change location'}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
  await expect(page.getByLabel('Karnataka district',{exact:true})).toHaveValue('nic:udupi.nic.in')
+ await page.getByRole('button',{name:'Close',exact:true}).click()
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
  await expect(page.getByRole('heading',{name:'Bengaluru, Karnataka',exact:true})).toBeVisible();expect(weatherRequests).toBe(1)
- await expect(page.getByRole('button',{name:'Run experimental rainfall model'})).toBeDisabled()
+ await expect(page.getByRole('button',{name:'Run experimental rainfall model'})).toHaveCount(0)
 })
-test('mobile stacks the shared information and map, and exposes honest warning and hazard states',async({page})=>{
+test('mobile splits Home into Warnings/Risk/Map tabs, and exposes honest warning and hazard states',async({page})=>{
  await page.setViewportSize({width:390,height:844});await page.goto('/')
  await expect(page.locator('.imd-card')).toBeVisible()
- await expect(page.getByText(/Choose your town or use your location to see the riskiest spots/)).toBeVisible()
- const left=await page.locator('.workspace-information').boundingBox(),map=await page.locator('.workspace-map').boundingBox()
- expect(map.y).toBeGreaterThan(left.y+left.height-1)
+ await openTab(page,'Risk');await expect(page.getByText(/Choose your town or use your location to see the riskiest spots/)).toBeVisible()
+ await openTab(page,'Map');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
  await page.getByRole('button',{name:'Open navigation menu'}).click();await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Flood Map',exact:true}).click()
- await page.getByText('Sources and limitations').click()
+ await openTab(page,'Sources')
  await expect(page.getByText('No verified potential flood-prone zone dataset is available, so no flood-prone zones are shown.',{exact:false})).toBeVisible()
- await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
+ // On phones the map is its own tab; past-flood polygons must be drawn once it is shown.
+ await openTab(page,'Map');await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
 })

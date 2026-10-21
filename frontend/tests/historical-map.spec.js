@@ -1,3 +1,4 @@
+import { openTab } from './oneScreen.js'
 import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -24,13 +25,13 @@ test('both event geometries match exported coordinates and Leaflet draws every r
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
   await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
   await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')
-  await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
-  await page.getByText('Sources and limitations').click()
-  await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
+  await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
+  await openTab(page, 'Sources')
+  await expect(page.getByText(/GFD 2728/)).toBeVisible()
   await expect(page.getByRole('link', { name: 'CC BY-NC 4.0', exact: true })).toBeVisible()
   for (const id of [2728, 3551]) {
-    if (id === 3551) await page.getByLabel('Recorded flood').selectOption(String(id))
-    await expect(page.getByText(new RegExp(`Source image:.*DFO_${id}`))).toBeVisible()
+    if (id === 3551) { await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood').selectOption(String(id)); await openTab(page, 'Sources') }
+    await expect(page.getByText(new RegExp(`GFD ${id}`))).toBeVisible()
     const actual = saved(id)
     const response = await page.request.get(`/api/historical-floods/${id}`)
     expect(response.ok()).toBe(true)
@@ -50,10 +51,9 @@ test('district view, mobile layout and historical warning remain usable', async 
   await page.setViewportSize({ width: 390, height: 844 })
   await page.goto('/flood-map')
   await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')
-  await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
-  await page.getByText('Sources and limitations').click()
-  await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
-  await page.getByRole('button', { name: 'Zoom to past floods', exact: true }).click()
-  await expect(page.getByText(/not current flooding/)).toBeVisible()
+  await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
+  await openTab(page, 'Sources'); await expect(page.getByText(/GFD 2728/)).toBeVisible()
+  await openTab(page, 'Map'); await page.getByRole('button', { name: 'Zoom to past floods', exact: true }).click()
+  await openTab(page, 'Past floods'); await expect(page.getByText(/not current flooding/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })

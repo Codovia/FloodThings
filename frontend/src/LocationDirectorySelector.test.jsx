@@ -5,11 +5,13 @@ import userEvent from '@testing-library/user-event'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 import App from './App.jsx'
 import expandedDirectory from '../../data/reference/karnataka_location_directory_v2/directory.json'
+// One-screen layout: weather details are tabs ("7 days", "Sources").
+const openTab = name => { const tab = screen.queryByRole('tab', { name }); if (tab && tab.getAttribute('aria-selected') !== 'true') fireEvent.click(tab) }
+const forecastList = () => { openTab('7 days'); return screen.getByRole('list', { name: 'Daily weather forecasts' }) }
 
 const mapState = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: mapState }))
 vi.mock('./HistoricalFloodMap.jsx', () => ({ default: () => <div>Historical evidence</div> }))
-vi.mock('./DrainageResearchLayers.jsx', () => ({ default: () => <div>Research layers</div> }))
 const districts = [{ id: 'nic:udupi.nic.in', name: 'Udupi', navigation_bounds: [[13,74],[14,75]] }, { id: 'nic:other.nic.in', name: 'Other district', navigation_bounds: null }]
 const places = [1,2].map((id, i) => ({ id: `osm:node:${id}`, name: 'Duplicate fixture', district_id: districts[0].id, selectable: true, coordinate_status: 'verified_osm_place_point',
   coordinates: { latitude: [13.2,13.4][i], longitude: [74.5,74.7][i] }, coordinate_source: { license: 'ODbL 1.0', url: `https://www.openstreetmap.org/node/${id}` }, association_source_url: 'https://udupi.nic.in/en/municipal-administration/' }))
@@ -17,7 +19,8 @@ const missing = { id: 'missing', name: 'Name only', district_id: districts[0].id
 const response = (items) => ({ ok: true, json: async () => ({ status: 'available', items, total: items.length }) })
 const weather = point => ({ status: 'available', location: point, retrieved_at: new Date().toISOString(), current: { temperature_c: 27, valid_at: new Date().toISOString(), interval_seconds: 900 },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(i+8).padStart(2,'0')}`, temperature_max_c: 30, temperature_min_c: 20, precipitation_mm: 1 })), grid_location: { latitude: 13.21, longitude: 74.51 } })
-const open = () => {const editor=screen.queryByText('Change location')?.closest('details');if(editor&&!editor.open)fireEvent.click(screen.getByText('Change location'));fireEvent.click(screen.getByRole('button', { name: 'Search districts and localities' }))}
+// On the Weather/Shelters pages the place search sits inside the "Change location" popup.
+const open = () => {const change=screen.queryByRole('button',{name:'Change location'});if(change&&!screen.queryByRole('dialog',{name:'Change location'}))fireEvent.click(change);fireEvent.click(screen.getByRole('button', { name: 'Search districts and localities' }))}
 const district = async (id = districts[0].id) => { await waitFor(() => expect(screen.getByLabelText('Karnataka district').disabled).toBe(false)); fireEvent.change(screen.getByLabelText('Karnataka district'), { target: { value: id } }) }
 
 beforeEach(() => {
@@ -40,7 +43,7 @@ it('loads directory only on user action and exposes labelled controls and proven
   render(<LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()} />)
   expect(fetch).not.toHaveBeenCalled(); open(); await screen.findByRole('option', { name: 'Udupi' })
   expect(screen.getByLabelText('Search districts or localities')).toBeTruthy()
-  expect(screen.getByRole('link', { name: /OpenStreetMap contributors/ }).getAttribute('href')).toContain('copyright')
+  expect(screen.getByRole('link', { name: /OpenStreetMap/ }).getAttribute('href')).toContain('copyright')
 })
 it('district selection filters localities and navigates without creating a weather point', async () => {
   const choose = vi.fn(), navigate = vi.fn()
@@ -60,7 +63,7 @@ it('duplicate names remain separate source IDs and exact coordinates', async () 
 it('district without geometry or localities reports unavailable coverage', async () => {
   render(<LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()} />); open(); await district(districts[1].id)
   expect((await screen.findByRole('status', { name: 'District locality results' })).textContent).toContain('No verified localities')
-  expect(screen.getByText(/representative point are unavailable/)).toBeTruthy()
+  expect(screen.getByText(/a district alone has no single weather point/)).toBeTruthy()
 })
 it('search is debounced, bounded and district/locality result names are accessible', async () => {
   render(<LocationDirectorySelector onChoose={vi.fn()} onDistrict={vi.fn()} />); open(); await district()
@@ -82,7 +85,7 @@ it('search empty response and failed API permit honest retry without substitutin
 it('keyboard opens search, navigates native district control and selects a locality without traps', async () => {
   const user = userEvent.setup(), choose = vi.fn()
   render(<LocationDirectorySelector onChoose={choose} onDistrict={vi.fn()} />)
-  await user.tab(); expect(document.activeElement.textContent).toBe('Search districts and localities'); await user.keyboard('{Enter}')
+  await user.tab(); expect(document.activeElement.getAttribute('aria-label')).toBe('Search districts and localities'); await user.keyboard('{Enter}')
   await screen.findByRole('option', { name: 'Udupi' }); await user.selectOptions(screen.getByLabelText('Karnataka district'), districts[0].id)
   const button = (await screen.findAllByRole('button', { name: /Duplicate fixture/ }))[0]
   button.focus(); await user.keyboard('{Enter}'); expect(choose).toHaveBeenCalledTimes(1)
@@ -114,7 +117,7 @@ it('locality selection recenters map and changes weather; district navigation ma
   await waitFor(() => expect(fetch.mock.calls.some(([url]) => url === '/api/weather?latitude=13.2&longitude=74.5')).toBe(true))
   await screen.findByText('Duplicate fixture, Udupi')
   expect(mapState.map.mock.results[0].value.setView).toHaveBeenLastCalledWith([13.2,74.5],12, { animate: false })
-  expect(screen.getByRole('list', { name: 'Daily weather forecasts' }).children).toHaveLength(7)
+  expect(forecastList().children).toHaveLength(7)
   expect(screen.getByRole('status', { name: 'Weather data freshness' }).textContent).toContain('Fresh')
   expect(screen.getByText(/Point weather, not locality-wide/)).toBeTruthy()
 })
@@ -123,12 +126,14 @@ it('switching localities during weather request prevents the older point overwri
   const normal = fetch.getMockImplementation()
   fetch.mockImplementation(url => url === '/api/weather?latitude=13.2&longitude=74.5' ? new Promise(resolve => { finishOld = resolve }) : normal(url))
   render(<App />); await screen.findByText('27 °C'); open(); await district()
-  const buttons = await screen.findAllByRole('button', { name: /Duplicate fixture/ }); fireEvent.click(buttons[0]); fireEvent.click(buttons[1])
-  await waitFor(() => expect(screen.getByText(/Requested point: 13.4/)).toBeTruthy())
+  // Choosing a place closes the Change location popup, so the second choice reopens it (still before the first weather reply).
+  fireEvent.click((await screen.findAllByRole('button', { name: /Duplicate fixture/ }))[0]); open(); await district()
+  fireEvent.click((await screen.findAllByRole('button', { name: /Duplicate fixture/ }))[1])
+  await waitFor(() => expect((openTab('Sources'),screen.getByText(/Requested point: 13.4/))).toBeTruthy())
   await screen.findByText('27 °C')
   await act(async () => finishOld({ ok: true, json: async () => ({ ...weather({latitude:13.2,longitude:74.5}), current: {temperature_c:99} }) }))
   expect(screen.queryByText('99 °C')).toBeNull()
-  expect(screen.getByText(/Requested point: 13.4/)).toBeTruthy()
+  expect((openTab('Sources'),screen.getByText(/Requested point: 13.4/))).toBeTruthy()
 })
 it('restricted coordinate provenance cannot trigger weather even if a malformed result claims selectable', async () => {
   const choose = vi.fn(); const malformed = { ...places[0], coordinate_source: { license: 'restricted SOI' } }
@@ -153,7 +158,7 @@ function expandedResponses() {
 it('expanded source directory displays actual coverage, enables Kundapur and explains disabled Kaup', async () => {
   expandedResponses(); const choose = vi.fn()
   render(<LocationDirectorySelector onChoose={choose} onDistrict={vi.fn()} />); open(); await district()
-  expect(screen.getByText(/5 selectable mapped localities across 2 districts/)).toBeTruthy()
+  expect(screen.getByText(/5 localities/)).toBeTruthy()
   const kundapur = await screen.findByRole('button', { name: /^Kundapur —/ })
   fireEvent.click(kundapur)
   expect(choose.mock.calls[0][0]).toMatchObject({locality_id:'udupi-admin:municipality:kundapur',latitude:13.6250993,longitude:74.6915722})
@@ -168,9 +173,9 @@ it('Mangaluru selection uses its retained point and association, preserving seve
   await screen.findByRole('heading',{name:'Mangaluru, Dakshina Kannada'})
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=12.8698101&longitude=74.8430082')).toBe(true))
   expect(mapState.map.mock.results[0].value.setView).toHaveBeenLastCalledWith([12.8698101,74.8430082],12,{animate:false})
-  expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7)
+  expect(forecastList().children).toHaveLength(7)
   expect(screen.getByRole('status',{name:'Weather data freshness'}).textContent).toContain('Fresh')
-  expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
+  openTab('Sources');expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
 })
 
 it('database-specific outage preserves independent GPS weather and seven-day forecasts', async () => {
@@ -184,7 +189,7 @@ it('database-specific outage preserves independent GPS weather and seven-day for
   fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}))
   await screen.findByRole('heading',{name:'GPS-selected point'})
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=14&longitude=75')).toBe(true))
-  expect(screen.getByRole('list',{name:'Daily weather forecasts'}).children).toHaveLength(7)
+  expect(forecastList().children).toHaveLength(7)
 })
 
 it('external district filter is reflected without inventing point weather',async()=>{

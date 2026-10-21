@@ -1,3 +1,4 @@
+import { openTab, expectOneScreen } from './oneScreen.js'
 import {test,expect} from '@playwright/test'
 import {readFileSync} from 'node:fs'
 // Recorded response supplies format/values; routing and GPS are isolated TEST fixtures.
@@ -32,25 +33,25 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
  const calls=await setup(page);await page.setViewportSize(viewport);await page.goto('/')
  await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible()
  await expect(page.getByLabel('Current weather and rain')).toContainText('0 mm rain forecast in the next 24 h')
- await expect(page.getByText(/Humidity: 35%\. Wind: 13.3 km\/h/)).toBeVisible()
- await expect(page.locator('.home-rain')).toContainText('(12:00 pm – 12:00 pm)')
- await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeAttached()
+ // Phones show temperature and rain only; humidity, wind and the time window are laptop details.
+ if(viewport.width>=1100){await expect(page.getByText(/Humidity: 35%\. Wind: 13.3 km\/h/)).toBeVisible();await expect(page.locator('.home-rain')).toContainText('(12:00 pm – 12:00 pm)')}
+ await expect(page.locator('#risk-area-title')).toHaveText('Flood & drainage risk · next 24 h')
  expect(calls).toHaveLength(1)
  const size=await page.evaluate(()=>({height:document.documentElement.scrollHeight,width:document.documentElement.scrollWidth}));expect(size.width).toBe(viewport.width)
  if(viewport.width>=1100){
   expect(size.height).toBe(viewport.height)
   const map=await page.locator('.home-flood-map').boundingBox();expect(map.height).toBeGreaterThan(300)
   const bar=await page.locator('.home-location-bar').boundingBox();expect(bar.y+bar.height).toBeLessThan(viewport.height)
-  await page.getByRole('region',{name:'Flood outlook details'}).focus();await page.keyboard.press('End');expect(await page.evaluate(()=>scrollY)).toBe(0)
-  await expect(page.locator('.imd-card')).toBeAttached()
- }else expect(size.height).toBeGreaterThan(viewport.height)
+  await expect(page.locator('.imd-card')).toBeVisible()
+ }else expect(size.height).toBe(viewport.height)
+ await page.waitForTimeout(1600);expect(await expectOneScreen(page)).toEqual({page:0,width:0,scrolls:0,outside:0})
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
- await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
+ await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(viewport.width>=1100?7:4)
  if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)
 })
 test('one null hour makes the whole total unavailable while keeping valid current weather',async({page})=>{
- await setup(page,true);await page.goto('/');await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h');await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByText('Data sources, freshness & privacy',{exact:true}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
- await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeAttached()
+ await setup(page,true);await page.goto('/');await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h');await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByRole('button',{name:'Data sources & privacy'}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()
+ await expect(page.locator('#risk-area-title')).toHaveText('Flood & drainage risk · next 24 h')
 })

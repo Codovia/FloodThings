@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { expectOneScreen, openTab } from './oneScreen.js'
 // These layout fixtures are isolated HTTP responses, never observations or DB writes.
 test.beforeEach(async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(navigator,'geolocation',{value:{getCurrentPosition:(_yes,no)=>no({code:1})}}))
@@ -13,36 +14,43 @@ test.beforeEach(async({page})=>{
  })
 })
 async function bounded(locator,viewport){const r=await locator.boundingBox();expect(r).not.toBeNull();expect(r.x).toBeGreaterThanOrEqual(0);expect(r.y).toBeGreaterThanOrEqual(0);expect(r.x+r.width).toBeLessThanOrEqual(viewport.width+1);expect(r.y+r.height).toBeLessThanOrEqual(viewport.height+1);return r}
-for(const viewport of [{width:1366,height:768},{width:1920,height:1080},{width:1600,height:900}])test(`Home fits ${viewport.width}x${viewport.height} with internal overflow and fully visible essentials`,async({page})=>{
- await page.setViewportSize(viewport);await page.goto('/');await expect(page.locator('.home-viewport-fit')).toBeVisible()
+const NONE={page:0,width:0,scrolls:0,outside:0}
+// One-screen rule (20 Oct 2026): Home never scrolls at laptop or phone sizes; details open as popups inside the screen.
+for(const viewport of [{width:1366,height:768},{width:1508,height:761},{width:1600,height:900},{width:1920,height:1080}])test(`Home fits ${viewport.width}x${viewport.height} on one screen, with essentials and popups inside it`,async({page})=>{
+ await page.setViewportSize(viewport);await page.goto('/');await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
  expect(await page.evaluate(()=>[innerHeight,document.documentElement.scrollHeight,document.documentElement.scrollWidth])).toEqual([viewport.height,viewport.height,viewport.width])
- for(const selector of ['.app-header','.app-footer','.home-location-bar','.home-area-summary','.home-flood-map','.home-essential-status','.imd-card'])await bounded(page.locator(selector),viewport)
- const left=await bounded(page.locator('.home-area-summary'),viewport),map=await bounded(page.locator('.home-map-stage'),viewport)
- expect(map.width/(map.width+left.width)).toBeCloseTo(.6,2);expect((await page.locator('.home-flood-map').boundingBox()).height).toBeGreaterThan(350)
- await expect(page.locator('.home-flood-map img.leaflet-tile-loaded').first()).toBeVisible()
- const essential=await page.locator('.home-essential-status').boundingBox(),scroll=page.getByRole('region',{name:'Flood outlook details'})
- await page.getByText('Data sources, freshness & privacy',{exact:true}).click()
- const needsScroll=await scroll.evaluate(n=>n.scrollHeight>n.clientHeight);if(viewport.height===768)expect(needsScroll).toBe(true)
- await scroll.focus();await page.keyboard.press('End');if(needsScroll)await expect.poll(()=>scroll.evaluate(n=>n.scrollTop)).toBeGreaterThan(0);else expect(await scroll.evaluate(n=>n.scrollTop)).toBe(0)
- expect(await page.evaluate(()=>scrollY)).toBe(0);expect(await page.locator('.home-essential-status').boundingBox()).toEqual(essential)
- await expect(page.locator('.imd-card')).toBeAttached()
- await expect(page.getByRole('button',{name:'Refresh shelters'})).toHaveCount(0);expect(await page.evaluate(()=>scrollY)).toBe(0)
- await expect(page.getByText(/Open-Meteo model output, CC BY 4.0/)).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBe(viewport.height)
- await page.getByText('Map sources & limitations',{exact:true}).focus();await page.keyboard.press('Enter');await expect(page.getByText(/State outline: simplified 2011 context/)).toBeVisible();await bounded(page.locator('.home-map-limitations'),viewport)
+ for(const selector of ['.app-header','.app-footer','.home-location-bar','.home-essential-status','.imd-card','.sachet-card','.risk-area','.home-flood-map'])await bounded(page.locator(selector),viewport)
+ const main=await page.locator('main').boundingBox(),map=await bounded(page.locator('.home-map-stage'),viewport)
+ expect(map.width/main.width).toBeGreaterThan(.5);expect((await page.locator('.home-flood-map').boundingBox()).height).toBeGreaterThan(300)
+ await page.waitForTimeout(1600);expect(await page.evaluate(()=>document.documentElement.dataset.fit||null)).toBeNull();expect(await expectOneScreen(page)).toEqual(NONE)
+ await page.getByRole('button',{name:'Data sources & privacy'}).click();const sources=page.getByRole('dialog',{name:'Data sources, freshness & privacy'})
+ await expect(sources.getByText(/Open-Meteo model output, CC BY 4.0/)).toBeVisible();await bounded(sources,viewport);await page.keyboard.press('Escape');await expect(sources).toHaveCount(0)
+ await expect(page.getByRole('button',{name:'Data sources & privacy'})).toBeFocused()
+ await page.getByRole('button',{name:'Map sources & limitations'}).click();await expect(page.getByText(/State outline: simplified 2011 context/)).toBeVisible();await bounded(page.getByRole('dialog'),viewport)
+ await page.getByRole('button',{name:'Close',exact:true}).click();expect(await page.evaluate(()=>scrollY)).toBe(0)
 })
 test('Home keeps keyboard name search accessible without moving the desktop document',async({page})=>{
- await page.setViewportSize({width:1366,height:768});await page.goto('/');await expect(page.locator('.home-viewport-fit')).toBeVisible()
+ await page.setViewportSize({width:1366,height:768});await page.goto('/')
  const search=page.getByRole('button',{name:'Search districts and localities'});await search.focus();await page.keyboard.press('Enter')
  await expect(page.getByLabel('Karnataka district',{exact:true})).toBeVisible();await bounded(page.locator('.directory-content'),{width:1366,height:768});expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBe(768)
  await page.getByRole('button',{name:'Close place search'}).click();await expect(page.locator('.directory-content')).toHaveCount(0)
 })
-test('mobile, short screens and enlarged accessibility text keep natural scrolling',async({page})=>{
- for(const viewport of [{width:390,height:844},{width:1366,height:600},{width:1093,height:614}]){
-  await page.setViewportSize(viewport);await page.goto('/');await expect(page.locator('.home-viewport-fit')).toHaveCount(0)
-  expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeGreaterThan(viewport.height);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(viewport.width)
-  await page.getByRole('region',{name:'Karnataka emergency map'}).scrollIntoViewIfNeeded();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
+test('phones fit one screen: Warnings, Risk and Map are tabs',async({page})=>{
+ for(const viewport of [{width:390,height:844},{width:390,height:700}]){
+  await page.setViewportSize(viewport);await page.goto('/');await expect(page.getByRole('tab',{name:'Warnings'})).toBeVisible()
+  for(const tab of ['Warnings','Risk','Map']){await openTab(page,tab);await page.waitForTimeout(400);expect(await expectOneScreen(page),`${viewport.height} ${tab}`).toEqual(NONE)}
+  await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible()
+  expect(await page.evaluate(()=>document.documentElement.dataset.fit||null)).toBeNull()
  }
- await page.setViewportSize({width:1366,height:768});await page.goto('/');await expect(page.locator('.home-viewport-fit')).toBeVisible()
- await page.evaluate(()=>document.documentElement.style.fontSize='200%');await expect(page.locator('.home-viewport-fit')).toHaveCount(0);expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeGreaterThan(768);expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1366)
- await page.locator('.imd-card').scrollIntoViewIfNeeded();await expect(page.locator('.imd-card')).toBeVisible()
+})
+test('very short windows and enlarged text fall back to scrolling instead of hiding content',async({page})=>{
+ // Safety net: content that would be cut off is never hidden; the page scrolls instead.
+ await page.setViewportSize({width:1366,height:420});await page.goto('/')
+ await expect.poll(()=>page.evaluate(()=>document.documentElement.dataset.fit||null)).toBe('scroll')
+ expect(await page.evaluate(()=>document.documentElement.scrollHeight)).toBeGreaterThan(420)
+ await page.getByRole('region',{name:'Karnataka emergency map'}).scrollIntoViewIfNeeded();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeInViewport()
+ await page.setViewportSize({width:1366,height:768});await expect.poll(()=>page.evaluate(()=>document.documentElement.dataset.fit||null)).toBeNull()
+ await page.addInitScript(()=>document.addEventListener('DOMContentLoaded',()=>{document.documentElement.style.fontSize='200%'}));await page.goto('/')
+ await expect.poll(()=>page.evaluate(()=>document.documentElement.dataset.fit||null)).toBe('scroll')
+ await page.locator('.risk-area').scrollIntoViewIfNeeded();await expect(page.locator('.risk-area')).toBeInViewport();expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1366)
 })

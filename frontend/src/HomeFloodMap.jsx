@@ -8,6 +8,7 @@ import { PageLink } from './AppNavigation.jsx'
 import { LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
 import { spotLabel, spotInputs, KindToggle } from './RiskAreaDashboard.jsx'
 import { OFFICIAL_COLOURS, MEANING } from './OfficialWarnings.jsx'
+import Popup from './Popup.jsx'
 
 function popup(text, label, href, action) {
   const box = document.createElement('div'), p = document.createElement('p'), link = document.createElement('a')
@@ -26,11 +27,11 @@ const KIND_NAME = { flood: 'Flood', drainage: 'Drainage' }
 const ZONE = { moderate: .32, high: .45, severe: .55 }
 const cap = s => s[0].toUpperCase() + s.slice(1)
 
-export default function HomeFloodMap({ fitViewport, point, river, navigate, area = null, kind = 'flood', onKind = () => {}, focus = null, onChoose = () => {}, districts = null, userDistrict = null }) {
+export default function HomeFloodMap({ fitViewport, point, navigate, onReportHere = null, area = null, kind = 'flood', onKind = () => {}, focus = null, onChoose = () => {}, districts = null, userDistrict = null }) {
   const gps = point?.kind === 'gps' ? point : null
-  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onChoose }), zones = useRef({}), fitted = useRef(null), renderer = useRef(null)
+  const element = useRef(null), map = useRef(null), stateBounds = useRef(null), actions = useRef({ navigate, onChoose, onReportHere }), zones = useRef({}), fitted = useRef(null), renderer = useRef(null)
   const [tileError, setTileError] = useState(false), [showOfficial, setShowOfficial] = useState(true), [showRisk, setShowRisk] = useState(true)
-  actions.current = { navigate, onChoose }
+  actions.current = { navigate, onChoose, onReportHere }
   useEffect(() => {
     const view = L.map(element.current, { scrollWheelZoom: false, zoomControl: false }).setView(KARNATAKA_CENTER, 6); map.current = view
     L.control.zoom({ position: 'bottomright' }).addTo(view)
@@ -82,13 +83,9 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate, area
       // Very large uncertainty circles obscure the entire state; report their radius in text instead.
       if (gps.accuracy_m > 0 && gps.accuracy_m <= 10000) L.circle([gps.latitude, gps.longitude], { radius: gps.accuracy_m, color: '#286ba4', weight: 1, fillOpacity: .08, interactive: false }).addTo(layers)
     }
-    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#fff', weight: 2, fillColor: '#087e7c', fillOpacity: 1 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : point.kind === 'network' ? 'approximate network estimate; uncertainty unknown' : 'selected point; locality unconfirmed'}.`, 'Report flooding here', '/report', () => actions.current.navigate('/report'))).addTo(layers)
-    if (river?.reach?.verified_grid === true) {
-      const grid = river.grid_location
-      L.circleMarker([grid.latitude, grid.longitude], { bubblingMouseEvents: false, radius: 7, color: '#6951a3', fillOpacity: .9 }).bindPopup(popup(`${river.reach.name} · verified model cell; daily GloFAS v4 discharge, not a flood boundary or observed water level.`, 'Inspect Flood Map context', '/flood-map', () => actions.current.navigate('/flood-map'))).addTo(layers)
-    }
+    if (point && point.kind !== 'gps') L.circleMarker([point.latitude, point.longitude], { bubblingMouseEvents: false, radius: 7, color: '#fff', weight: 2, fillColor: '#087e7c', fillOpacity: 1 }).bindPopup(popup(`${point.name} · ${point.locality_id ? 'reviewed locality point' : point.kind === 'network' ? 'approximate network estimate; uncertainty unknown' : 'selected point; locality unconfirmed'}.`, 'Report flooding here', '/report', () => actions.current.onReportHere ? actions.current.onReportHere(point) : actions.current.navigate('/report'))).addTo(layers)
     return () => { if (map.current) map.current.removeLayer(layers) }
-  }, [point, river])
+  }, [point])
   useEffect(() => {
     if (!map.current || !point) return
     map.current.setView([point.latitude, point.longitude], point.kind === 'network' || point.accuracy_m > 10000 ? 8 : point.accuracy_m > 1000 ? 11 : 13, { animate: false })
@@ -135,10 +132,10 @@ export default function HomeFloodMap({ fitViewport, point, river, navigate, area
       <div className="map-overlay map-legend-card" aria-label="Map legend">
         {showOfficial && <p><span className="legend-title">IMD today</span>{['red', 'orange', 'yellow', 'green'].map(l => <span key={l} className="legend-item"><i className="legend-fill" style={{ background: OFFICIAL_COLOURS[l] }} />{cap(l)}</span>)}</p>}
         {hasArea && showRisk && <p><span className="legend-title">{KIND_NAME[kind]} 24 h</span>{['moderate', 'high', 'severe'].map(l => <span key={l} className="legend-item"><i className="legend-zone" style={{ background: LEVEL_COLORS[l] }} />{LEVEL_NAMES[l]}</span>)}<span className="legend-item muted">clear = Low</span></p>}
-        <p><span className="legend-item"><i className="legend-dot gps" />GPS point</span><span className="legend-item"><i className="legend-dot locality" />Selected place</span>{river && <span className="legend-item"><i className="legend-dot river" />River model cell</span>}</p>
+        <p><span className="legend-item"><i className="legend-dot gps" />GPS point</span><span className="legend-item"><i className="legend-dot locality" />Selected place</span></p>
       </div>
       {tileError && <p className="notice home-tile-notice" role="status">{BASEMAP_NOTICE}</p>}
     </div>
-    <details className="home-map-notes"><summary>Map sources & limitations</summary><p className="home-map-limitations">District colours are official IMD district warnings for today, shown as issued. Shaded zones are FloodPulse's experimental 24-hour risk index around ~5.5 km spots — not flooded areas, probabilities or official warning zones; unshaded spots are Low. Points are locations, not flooded-area polygons. River cells appear only with a verified association. State outline: simplified 2011 context; border coverage is uncertain.</p></details>
+    <p className="home-map-notes"><Popup label="Map sources & limitations" title="Map sources & limitations"><p className="home-map-limitations">District colours are official IMD district warnings for today, shown as issued. Shaded zones are FloodPulse's experimental 24-hour risk index around ~5.5 km spots — not flooded areas, probabilities or official warning zones; unshaded spots are Low. Points are locations, not flooded-area polygons. State outline: simplified 2011 context; border coverage is uncertain.</p></Popup></p>
   </section>
 }

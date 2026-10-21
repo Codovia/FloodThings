@@ -1,5 +1,6 @@
 import React, { useEffect, useId, useState } from 'react'
 import './LocationDirectorySelector.css'
+import { usePaged, Pager } from './ScreenTabs.jsx'
 
 // Abort on replacement/unmount; late directory responses cannot replace a newer query.
 function useDirectory(url, retry) {
@@ -78,17 +79,19 @@ export default function LocationDirectorySelector({ onChoose, onDistrict, select
   }
   const error = districts.error || search.error || localities.error
   const loading = districts.loading || search.loading || localities.loading
+  const searchPage = usePaged(search.data?.items || [], 4), localPage = usePaged(localities.data?.items || [], 4)
   return <div className="location-directory">
-    <button type="button" aria-expanded={open} aria-controls={uid+'-content'} onClick={() => setOpen(v => !v)}>{open ? 'Close place search' : 'Search districts and localities'}</button>
-    {open && <div id={uid+'-content'} className="directory-content">
-      <h3>Find a Karnataka place</h3>
-      <p className="muted">{districts.data?.coverage ? `${districts.data.coverage.district_names} NIC-listed district names; ${districts.data.coverage.selectable_localities} selectable mapped localities across ${districts.data.coverage.districts_with_selectable_localities} districts; ${districts.data.coverage.name_only_localities} name-only records.` : 'Coverage is limited to reviewed place records.'} Current LGD identities remain unresolved. Unreviewed coordinates are never substituted. {districts.data?.dataset_version && `Directory: ${districts.data.dataset_version}.`}</p>
+    <button type="button" aria-expanded={open} aria-controls={uid+'-content'} aria-label={open ? 'Close place search' : 'Search districts and localities'} onClick={() => setOpen(v => !v)}>{open ? 'Close place search' : <><span className="label-long">Search districts and localities</span><span className="label-short">Search places</span></>}</button>
+    {open && <div id={uid+'-content'} className="directory-content" role="group" aria-label="Find a Karnataka place">
+      <div className="directory-head"><h3>Find a Karnataka place</h3><button type="button" className="secondary" onClick={() => setOpen(false)}>Done</button></div>
+      <p className="muted">Only reviewed Karnataka districts and mapped localities are listed{districts.data?.coverage ? ` (${districts.data.coverage.district_names} districts, ${districts.data.coverage.selectable_localities} localities)` : ''}. Unreviewed coordinates are never substituted.</p>
       <label htmlFor={uid+'-search'}>Search districts or localities</label>
       <input id={uid+'-search'} type="search" maxLength={100} value={query} onChange={e => setQuery(e.target.value)} placeholder="For example: Udupi or Karkala" />
       {q && search.data && <>
         <p role="status" aria-label="Place search results">{search.data.total ? `${search.data.total} matching places; showing ${search.data.items.length}.` : 'No matching places in the verified directory. Try another name or select the map.'}</p>
-        <ul aria-label="Place search results">{search.data.items.map(row => <li key={row.id}>{row.kind === 'district'
+        <ul aria-label="Place search results">{searchPage.items.map(row => <li key={row.id}>{row.kind === 'district'
           ? <button type="button" onClick={() => chooseDistrict(row)}>{row.name} — District · filter localities</button> : localityButton(row, 'search')}</li>)}</ul>
+        <Pager paged={searchPage} label="More place results" />
       </>}
       <label htmlFor={uid+'-district'}>Karnataka district</label>
       <select id={uid+'-district'} value={effectiveDistrictId} disabled={!districts.data} onChange={e => chooseDistrict(districts.data?.items.find(d => d.id === e.target.value))}>
@@ -96,17 +99,18 @@ export default function LocationDirectorySelector({ onChoose, onDistrict, select
         {districts.data?.items.map(row => <option key={row.id} value={row.id}>{row.name}</option>)}
       </select>
       {district && <>
-        <p className="notice">{district.name}: district selection filters localities; it does not request district-wide weather. {district.navigation_bounds ? 'Map navigation uses the public geoBoundaries district extent.' : 'Verified public navigation geometry and a representative point are unavailable.'}</p>
+        <p className="notice">{district.name}: choose a locality below for its weather; a district alone has no single weather point.</p>
         <label htmlFor={uid+'-locality'}>Search localities in {district.name}</label>
         <input id={uid+'-locality'} type="search" maxLength={100} value={localQuery} onChange={e => setLocalQuery(e.target.value)} />
         {localities.data && <>
           <p role="status" aria-label="District locality results">{localities.data.total ? `${localities.data.total} locality records; showing ${localities.data.items.length}.` : 'No verified localities match this district and search. Coverage is incomplete; use the map or GPS.'}</p>
-          <ul aria-label="District localities">{localities.data.items.map(row => <li key={row.id}>{localityButton(row)}</li>)}</ul>
+          <ul aria-label="District localities">{localPage.items.map(row => <li key={row.id}>{localityButton(row)}</li>)}</ul>
+          <Pager paged={localPage} label="More localities" />
         </>}
       </>}
       <p role="status" aria-label="Location directory status" aria-live="polite" aria-busy={loading}>{loading ? 'Loading location directory…' : 'Location search ready.'}</p>
       {error && <div role="alert" aria-label="Location directory error"><p>{error}</p><button type="button" onClick={() => setRetry(v => v + 1)}>Retry location search</button></div>}
-      <details className="place-provenance"><summary>Place coverage and provenance</summary><p className="muted">Names: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC government directory</a>. {district && <>Locality association: <a href={district.source_website}>{district.name} District Administration</a>. </>}Place coordinates: <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors · ODbL 1.0</a>. Navigation: <a href="https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/">geoBoundaries / Pathways Data Pvt. Ltd. / lgdirectory.gov.in · ODbL 1.0</a>; existing Udupi CGAZ extent: CC BY 4.0. Points are mapped settlements, not municipal boundaries, gauges or shelters.</p></details>
+      <p className="place-provenance muted">Sources: <a href="https://igod.gov.in/sg/KA/E042/organizations">NIC directory</a>{district && <> · <a href={district.source_website}>{district.name} administration</a></>} · <a href="https://www.openstreetmap.org/copyright">© OpenStreetMap (ODbL)</a> · <a href="https://www.geoboundaries.org/api/current/gbOpen/IND/ADM2/">geoBoundaries (ODbL)</a>. Points are mapped settlements, not boundaries or shelters.</p>
     </div>}
   </div>
 }

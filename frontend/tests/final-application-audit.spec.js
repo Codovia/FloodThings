@@ -10,9 +10,9 @@ test('Chrome drainage GPS/photo -> private real metadata -> rejection -> withdra
  await mkdir(output,{recursive:true,mode:0o700})
  await page.route('**/*',r=>['127.0.0.1','localhost'].includes(new URL(r.request().url()).hostname)?r.continue():r.abort())
  await page.context().grantPermissions(['geolocation']);await page.context().setGeolocation({latitude:13.4,longitude:74.7,accuracy:1250}) // Explicit CDP GPS fixture, not native device evidence.
- await page.goto('/report');await page.getByLabel('Event type').selectOption('drainage_blockage')
+ await page.goto('/report');await page.getByRole('radio',{name:'Drainage blockage',exact:true}).check()
  await page.getByLabel('What did you see?').fill('DEMONSTRATION ONLY — drainage-obstruction report and owned JPEG metadata fixture, not a real incident.')
- await page.getByRole('button',{name:'Use GPS for this report'}).click();await expect(page.getByText(/GPS accuracy ±1250 m/)).toBeVisible()
+ await page.getByRole('button',{name:'Update my location'}).click();await expect(page.locator('.report-location-status')).toContainText('GPS accuracy ±1250 m')
  await page.locator('input[type=file]').first().setInputFiles({name:'DEMONSTRATION_ONLY_owned_metadata_fixture.jpg',mimeType:'image/jpeg',buffer:Buffer.from(ownedJPEG,'base64')})
  await page.getByLabel(/I own or have permission/).check();await page.getByLabel(/Allow private extraction/).check();await page.getByLabel(/I consent to private admin review/).check()
  await page.getByRole('button',{name:'Review report'}).click();await page.getByRole('button',{name:'Submit for private review'}).click()

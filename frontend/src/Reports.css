@@ -61,3 +61,19 @@
 .report-checklist li[data-ok="true"]{background:#e6f4ea;border-color:#b9dcc4;color:#0b5132}
 .report-status{font-size:1rem}
 .report-next{margin-top:14px;padding-top:10px;border-top:1px solid #e0e8e5}
+/* "1. Your location" card: first thing on the form, so citizens confirm where they are before writing. */
+.report-location{border:2px solid #286ba4;border-radius:10px;background:#f2f7fc}
+.report-location-status{margin:4px 0;font-size:1.05rem}
+.report-point{font-size:.85rem}
+/* Problem type: large, required choices instead of a pre-filled dropdown. */
+.report-types{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border:0;padding:0;margin:0 0 8px}
+.report-types legend{font-weight:600;margin-bottom:6px}
+.report-type{display:flex;align-items:center;gap:8px;min-height:44px;padding:8px 12px;border:2px solid #b8c7c6;border-radius:10px;background:#fff;cursor:pointer}
+.report-type.active{border-color:#165e63;background:#eef7f6;font-weight:600}
+.report-consent-terms{margin:4px 0 8px;font-size:.9rem}
+/* On phones the location card holds the map; keep it short enough to see the next step. */
+.report-location .report-map-block .shelter-map{height:min(260px,38vh);margin-block:6px}
+.report-location .report-map-hint{font-weight:400}
+.report-location .report-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.report-location .report-actions button{width:100%;margin:0}
+.report-photo-preview{max-height:160px;width:auto;max-width:100%;object-fit:contain}

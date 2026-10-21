@@ -25,24 +25,13 @@ test('real application: private incident -> moderation -> map shelter -> directi
  expect(dimensions).toEqual({width:1366,height:768,viewportWidth:1366,viewportHeight:768})
  await page.screenshot({path:evidence+'/01-home.png'})
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
- await expect(page.getByRole('heading',{name:'Experimental Heavy-Rainfall Indicator'})).toBeVisible()
- if(weather.status()===200&&weatherBody.status==='available'){
-  const modelResponse=page.waitForResponse(r=>r.url().includes('/api/ai/rainfall-outlook')&&r.request().method()==='GET',{timeout:30000})
-  await page.getByRole('button',{name:'Run experimental rainfall model'}).click();const model=await modelResponse;await writeFile(evidence+'/indicator.json',JSON.stringify({http:model.status(),body:await model.json()},null,2))
- }else{
-  // Unavailable real weather must not block the independently supported response journey.
-  // No inference request is expected without a usable weather receipt.
-  expect(weather.status()).toBe(503);expect(weatherBody.status).toBe('unavailable')
-  await expect(page.getByRole('alert').filter({hasText:'Weather unavailable.'})).toBeVisible()
-  await page.getByRole('button',{name:'Run experimental rainfall model'}).click()
-  await expect(page.getByText('Usable weather retrieval is required before running the rainfall model.')).toBeVisible()
-  await writeFile(evidence+'/indicator.json',JSON.stringify({http:null,status:'NOT TESTED',reason:'Real weather unavailable; no inference request or replacement prediction.'},null,2))
- }
- await page.screenshot({path:evidence+'/02-experimental-indicator.png',fullPage:true})
+ await expect(page.getByRole('heading',{name:'Weather details',level:1})).toBeVisible()
+ await expect(page.getByText('Experimental Heavy-Rainfall Indicator')).toHaveCount(0)
+ await page.screenshot({path:evidence+'/02-weather.png',fullPage:true})
  await page.goto('/report')
- await page.getByLabel('Event type').selectOption('flooding')
+ await page.getByRole('radio',{name:'Flooding',exact:true}).check()
  await page.getByLabel('What did you see?').fill('DEMONSTRATION ONLY — owned image fixture, not a real flood incident.')
- await page.getByRole('button',{name:'Select location manually'}).click()
+ await page.getByRole('button',{name:'Choose the spot on the map'}).click()
  await page.getByLabel('Incident latitude',{exact:true}).fill('13.6250993')
  await page.getByLabel('Incident longitude',{exact:true}).fill('74.6915722')
  await page.getByLabel('Estimated uncertainty radius (m)').fill('250')
@@ -97,7 +86,7 @@ test('real application: private incident -> moderation -> map shelter -> directi
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Shelters',exact:true}).click()
  await expect(page.getByRole('heading',{name:'DEMONSTRATION ONLY — no operational shelter'})).toBeVisible()
  // Explicitly select the starting locality after reload; no silent default/IP origin.
- await page.getByText('Change location',{exact:true}).click()
+ await page.getByRole('button',{name:'Change location'}).click()
  await page.getByRole('button',{name:'Search districts and localities'}).click();await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in');await page.getByRole('list',{name:'District localities'}).getByRole('button',{name:/^Kundapur —/}).click()
  await page.getByRole('button',{name:'Get directions'}).click()
  const directions=page.getByRole('link',{name:'Inspect demonstration directions (not for travel)'});await expect(directions).toBeVisible()

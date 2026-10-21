@@ -6,7 +6,7 @@ import useMapResize from './useMapResize.js'
 import { boundary } from './homeGeography.js'
 import 'leaflet/dist/leaflet.css'
 
-export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null,focus=null}) {
+export default function ShelterMap({points=[],route=null,origin=null,onSelect=null,label='Shelter entrance map',mode='street',providerSettings=null,inspection=false,navigationBounds=null,onInspect=null,focus=null,pointZoom=13}) {
   const container=useRef(null),map=useRef(null),layers=useRef(null),choose=useRef(onSelect),inspect=useRef(onInspect)
   const lastGeometry=useRef(null)
   const [tileError,setTileError]=useState(false)
@@ -45,6 +45,8 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
     if(route?.coordinates?.length>1){const line=route.coordinates.map(([lon,lat])=>[lat,lon]);L.polyline(line,{color:'#1565c0',weight:5,opacity:.85}).addTo(layers.current);bounds.push(...line)}
     if(origin){L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])}
     for(const point of points){
+      // Optional measured-accuracy ring (citizen GPS only); never drawn for estimated radii.
+      if(point.showAccuracy&&point.accuracy_m>0&&point.accuracy_m<=5000)L.circle([point.latitude,point.longitude],{radius:point.accuracy_m,color:'#286ba4',weight:1,fillOpacity:.1,interactive:false}).addTo(layers.current)
       const text=document.createElement('span');text.textContent=point.name
       // Numbered pins (label is the list position, digits only) link the map to the shelter list.
       const marker=point.label&&L.divIcon&&L.marker?L.marker([point.latitude,point.longitude],{icon:L.divIcon({className:'shelter-pin '+(point.tone==='limited'?'limited':'ok'),html:'<div class="shelter-pin-shape"><span>'+String(point.label).replace(/\D/g,'')+'</span></div>',iconSize:[30,30],iconAnchor:[15,30],tooltipAnchor:[0,-26]}),keyboard:true,title:point.name}):L.circleMarker([point.latitude,point.longitude],{radius:8,color:'#1b625d'})
@@ -53,7 +55,7 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
     const geometry=JSON.stringify([bounds,inspection])
     if(geometry!==lastGeometry.current){
       lastGeometry.current=geometry
-      if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):13,{animate:false})
+      if(bounds.length===1)map.current.setView(bounds[0],inspection?Math.max(16,map.current.getZoom?.()||16):pointZoom,{animate:false})
       else if(bounds.length)map.current.fitBounds(bounds,{paddingTopLeft:[20,40],paddingBottomRight:[20,20],maxZoom:inspection?18:14,animate:false})
     }
   },[points,origin,inspection,route])
