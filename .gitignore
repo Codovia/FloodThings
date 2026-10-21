@@ -60,3 +60,6 @@ deploy/backups/
 
 # Public CA root certificate pinned for IMD/SACHET (not a secret; see backend/app/official.py)
 !backend/app/certs/emsign-root-ca-g1.pem
+
+# Claude Code personal settings
+.claude/settings.local.json
