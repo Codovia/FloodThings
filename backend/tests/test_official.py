@@ -8,7 +8,7 @@ from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from app import official
-from app.official import (OfficialService, OfficialUnavailable, active, decode_day, imd_district, names_district,
+from app.official import (OfficialService, OfficialUnavailable, active, decode_day, imd_district, imd_nowcast, names_district,
                           parse_cap, rss_items)
 
 NOW = datetime(2026, 10, 16, 4, 0, tzinfo=timezone.utc)
@@ -18,6 +18,11 @@ IMD_FEATURE = {'type': 'Feature', 'geometry': SQUARE, 'properties': {
     'District': 'UDUPI', 'Date': '2026-10-16', 'UTC': 6, 'updated_at': '2026-10-16T03:20:07Z',
     'Day_1': '16,4', 'Day_2': '2,4', 'Day_3': '1', 'Day_4': '99', 'Day_5': '',
     'Day1_Color': 2, 'Day2_Color': 3, 'Day3_Color': 4, 'Day4_Color': 3, 'Day5_Color': 0}}
+
+# TEST FIXTURE ONLY: IMD district nowcast shape; update_time holds Indian time despite its "Z" (as the live layer does).
+NOWCAST_FEATURE = {'type': 'Feature', 'geometry': SQUARE, 'properties': {
+    'State_District': 'UDUPI', 'Date': '2026-10-16', 'update_time': '2026-10-16T08:45:00Z',
+    'cat1': 0, 'cat2': 2, 'cat4': 4, 'cat6': 6, 'cat9': 0, 'cat16': 'TEST ONLY\nstrong winds along the coast', 'message': '  TEST ONLY  '}}
 
 
 def cap_xml(identifier='IN-1_19', msg_type='Alert', status='Actual', expires='2026-10-16T12:00:00+05:30',
@@ -64,6 +69,26 @@ def test_past_bulletin_days_are_dropped_and_old_bulletins_are_stale():
     assert old['status'] == 'stale' and 'not shown as current' in old['message']
 
 
+def test_nowcast_decodes_published_categories_and_reads_indian_time():
+    body = imd_nowcast([NOWCAST_FEATURE], 13.62, 74.69, NOW)
+    assert body['status'] == 'available' and body['district'] == 'Udupi'
+    assert body['categories'] == ['Light rain (under 5 mm/h)', 'Light thunderstorm (gusts under 40 km/h)', 'Lightning possible (under 30%)']
+    assert body['issued_at'] == '2026-10-16T08:45:00+05:30' and body['valid_until'] == '2026-10-16T11:45:00+05:30'
+    assert body['other'] == 'TEST ONLY strong winds along the coast' and body['message'] == 'TEST ONLY'
+    quiet = {**NOWCAST_FEATURE, 'properties': {**NOWCAST_FEATURE['properties'], 'cat1': 1, 'cat2': 0, 'cat4': '', 'cat6': None, 'cat16': '', 'message': ''}}
+    assert imd_nowcast([quiet], 13.62, 74.69, NOW)['categories'] == []
+    assert imd_nowcast([NOWCAST_FEATURE], 20.0, 80.0, NOW)['status'] == 'not_issued'
+
+
+def test_old_or_future_nowcasts_are_never_current():
+    def at(stamp):
+        return imd_nowcast([{**NOWCAST_FEATURE, 'properties': {**NOWCAST_FEATURE['properties'], 'update_time': stamp}}], 13.62, 74.69, NOW)
+    old = at('2026-10-16T06:20:00Z')  # 3 h 10 min before 09:30 IST
+    assert old['status'] == 'expired' and 'categories' not in old and 'older than three hours' in old['message']
+    assert at('2026-10-16T13:00:00Z')['status'] == 'expired'  # later than now even as IST: unverifiable
+    assert at('not a time')['status'] == 'expired'
+
+
 def test_cap_parsing_and_safety():
     alert = parse_cap(cap_xml())
     assert alert['severity'] == 'Severe' and alert['event'] == 'Heavy rain' and alert['lgd_district_codes'] == ['550']
@@ -93,7 +118,8 @@ def handler_factory(calls, imd_status=200, rss_status=200):
     def handler(request):
         calls.append(str(request.url))
         if request.url.host == 'reactjs.imd.gov.in':
-            return httpx.Response(imd_status, json={'type': 'FeatureCollection', 'features': [IMD_FEATURE]})
+            feature = NOWCAST_FEATURE if request.url.params.get('typename') == 'imd:NowcastWarningDistrict' else IMD_FEATURE
+            return httpx.Response(imd_status, json={'type': 'FeatureCollection', 'features': [feature]})
         if request.url.path.endswith('rss_karnataka.xml'):
             return httpx.Response(rss_status, content=rss_xml(['https://sachet.ndma.gov.in/cap_public_website/FetchXMLFile?identifier=1']))
         if 'FetchXMLFile' in request.url.path:
@@ -113,6 +139,7 @@ def test_service_combines_sources_and_caches():
     body = asyncio.run(svc.warnings(13.62, 74.69))
     assert body['official'] is True and body['imd']['district'] == 'Udupi'
     assert body['sachet']['status'] == 'available' and body['sachet']['alerts'][0]['names_your_district'] is True
+    assert body['nowcast']['status'] == 'available' and body['nowcast']['district'] == 'Udupi'
     first = len(calls)
     asyncio.run(svc.warnings(13.62, 74.69))
     assert len(calls) == first
@@ -124,6 +151,7 @@ def test_failures_are_unavailable_never_no_warning():
     body = asyncio.run(svc.warnings(13.62, 74.69))
     assert body['imd']['status'] == 'unavailable' and 'does not mean there is no warning' in body['imd']['message']
     assert body['sachet']['status'] == 'unavailable' and body['sachet']['alerts'] == []
+    assert body['nowcast']['status'] == 'unavailable' and 'categories' not in body['nowcast']
     asyncio.run(client.aclose())
 
 

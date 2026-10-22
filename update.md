@@ -2422,3 +2422,23 @@ Changes (frontend only; the ±100 m and five-minute rules are unchanged):
 
 Verification: unit 290/290 (new: best fix kept and watch stopped at ±12 m; coarse ±900 m fix → area on map, tap sets the start, no directions opened; expired precise fix refreshed once); build passes. Live app in Chrome with a simulated sequence: ±850 → ±240 → ±15 m ended at "Distances from Your GPS location (GPS ±15 m)"; a ±900 m-only device got the explanation, one accuracy circle and pick mode, still one screen, and a tap inside the circle gave "Distances from Start point chosen on the map", nearest 4.7 km. Playwright shelters/navigation/wireframes/ui-repair/fullscreen/home-emergency: 27 passed, 2 skipped (database-gated), the known admin layout failure; the demonstration-fixture shelter test failed once in four group runs (passed 5/5 alone; error not captured).
 Limitation: a laptop without GPS usually cannot get better than a few hundred metres; tapping the start on the map is the precise path there.
+
+## 2026-10-22 — Official IMD 3-hour nowcast on Home and Weather; survey of IMD weather/cyclone sources
+
+Request: add more official weather information (like the IMD Mausam and NDMA apps), including cyclones, in the same UI. No earlier cyclone-indicator code exists in this repository, its branches, the archive tag or the other checkout (only cyclone *shelters* in a research note).
+
+Source survey (22 Oct, ~18:00 UTC, IMD public GeoServer `reactjs.imd.gov.in`, Karnataka box):
+- `NowcastWarningDistrict` — live (issued 22:29–22:30 IST), MultiPolygon per district, categories documented in IMD's API reference ("District-wise Nowcast", cat1–cat19). Used.
+- `aws_data_layer` (automatic weather stations) — newest Karnataka reading 12 Oct: stale, not used.
+- `subdiv_rainfall_now` — dated 15 Sep: stale, not used. `subdiv_warnings_now` — current, but duplicates the district warnings already shown.
+- `Cyclone_Track_V` — no features at all (whole North Indian Ocean), so its format cannot be verified now; not used. Cyclone alerts still reach the app through NDMA SACHET CAP (already shown) and IMD district warnings.
+- `api.imd.gov.in` (city forecast, current weather, cyclone track/wind/cone) answers `401 API key missing`: missing dependency — an IMD API key (registration with IMD).
+
+Acceptance test: for a point with a current nowcast the app shows IMD's category wording and issue time; a nowcast older than three hours, a future/unparseable time, or a district without one is labelled and never shown as current; both pages stay one screen.
+
+Changes:
+- Backend `official.py`: `/api/official/warnings` gains `nowcast` (same IMD server, district polygon match and cache pattern; 10-min cache; failure → `unavailable`). The layer's `update_time` has a "Z" suffix but holds Indian time (read as UTC it was hours in the future), so it is read as IST and a future time is treated as unverifiable. Validity is three hours: IMD's page does not state it in its HTML; SACHET relays IMD nowcasts as three-hour CAP alerts ("next 3 hours", e.g. 19:00–22:00 IST on 19 Oct). Text fields are cleaned and bounded.
+- Frontend: "Next 3 hours" line in the IMD card on Home and on the Weather page (laptop: under "Now"; phone: its own "IMD" tab). Phones show IMD's category names without the bracketed thresholds (full wording in the tooltip); laptop shows the full wording. Shared card styles now apply to Weather; phone wording shortened for the IMD card title (screen-reader name unchanged), network-location note, SACHET check line and Home links (screen-reader names unchanged).
+
+Verification: live IMD data — Udupi nowcast cat2/cat4/cat6 decoded to "Light rain (under 5 mm/h) · Light thunderstorm (gusts under 40 km/h) · Lightning possible (under 30%)", issued 22:29 IST, matching the raw row; Mysuru cat1 → "No significant weather". Backend 542/542 (new: category decoding and Indian-time reading, expired/future/unparseable times, service integration and failure); unit 291/291; build passes. Chrome on a temporary preview server (new code; the user's running app was left untouched): Home and Weather one screen at 1508×761 and 390×700, Weather phone tabs Now | IMD | 7 days | Rain chart | Sources in one row. Playwright 80 passed, 8 skipped (database-gated), 1 known admin-layout failure.
+Test note: `location-directory.spec.js` "six-hour refresh" previously passed only through a fake-clock quirk — the app also refreshes current conditions an hour after their reading (confirmed without this change: a 2-hour fast-forward made that request). That test now gives its reply a reading 61 min older than retrieval, which is the case the six-hour cycle covers; the neighbouring hourly-refresh test is unchanged.

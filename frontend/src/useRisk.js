@@ -67,9 +67,9 @@ export const validOfficial = d => !!d && d.official === true && d.imd && d.sache
   (d.imd.status !== 'available' || (Array.isArray(d.imd.days) && d.imd.days.every(x => OFFICIAL_LEVELS.has(x.level) && Array.isArray(x.warnings))))
 
 // Official IMD / NDMA SACHET warnings, displayed as issued. Statewide alerts load even without a place.
-export function useOfficialWarnings(point) {
+export function useOfficialWarnings(point, active = true) {
   const ok = point && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
-  const url = '/api/official/warnings' + (ok ? '?' + new URLSearchParams({ latitude: point.latitude.toFixed(5), longitude: point.longitude.toFixed(5) }) : '')
+  const url = !active ? null : '/api/official/warnings' + (ok ? '?' + new URLSearchParams({ latitude: point.latitude.toFixed(5), longitude: point.longitude.toFixed(5) }) : '')
   return validated(useJson(url, 10 * 60 * 1000), validOfficial)
 }
 

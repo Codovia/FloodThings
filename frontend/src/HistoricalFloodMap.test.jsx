@@ -23,6 +23,8 @@ const fixtureFetch = (url) => {
     const id = Number(url.split('/').at(-1))
     return reply({ status: 'available', event: events.find(e => e.event_id === id), floodwater: geometry(id) })
   }
+  // The Weather page also asks for official warnings; this test does not cover them.
+  if (url.startsWith('/api/official/warnings')) return reply({ detail: 'not part of this test' }, false)
   throw new Error(`Unexpected test request: ${url}`)
 }
 

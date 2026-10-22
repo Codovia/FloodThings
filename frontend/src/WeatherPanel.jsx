@@ -3,12 +3,16 @@ import { FRESHNESS_MS, retrievalTime } from './useWeatherSession.js'
 import DailyForecast from './DailyForecast.jsx'
 import RainfallChart from './RainfallChart.jsx'
 import './WeatherFreshness.css'
-import ScreenTabs from './ScreenTabs.jsx'
+import ScreenTabs, { useWide } from './ScreenTabs.jsx'
 import Popup from './Popup.jsx'
+import { ImdCard } from './OfficialWarnings.jsx'
+import { useOfficialWarnings } from './useRisk.js'
 const formatTime = time => time && Number.isFinite(Date.parse(time)) ? new Intl.DateTimeFormat('en-IN', {timeZone:'Asia/Kolkata', dateStyle:'medium', timeStyle:'short'}).format(new Date(time))+' IST' : 'Unavailable'
 const value = (reading, unit) => reading == null ? 'Unavailable' : `${reading} ${unit}`
-export default function WeatherPanel({point, selectedPoint, session, overview=false}) {
+export default function WeatherPanel({point, selectedPoint, session, overview=false, active=true}) {
   const {data,loading,error,freshness,now,retryAt,paused,offline,refresh:load}=session
+  // Official IMD warning and 3-hour nowcast for the same point, next to the model weather.
+  const official = useOfficialWarnings(point, active && !overview), wide = useWide()
   const [tab, setTab] = useState('now')  // kept across refreshes, so a refresh never jumps back to "Now"
   const sources = data && <><p className="muted">Requested point: {point.latitude}° latitude, {point.longitude}° longitude · {point.locality_id ? <><a href={point.coordinate_source_url}>Mapped locality point · OpenStreetMap</a> · <a href={point.association_source_url}>{point.district_name} district association</a>. Point weather, not locality-wide or district-wide conditions.</> : selectedPoint ? 'User-selected coordinates; district/locality identity not verified.' : <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a>}</p><dl className="metadata">
             <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
@@ -48,7 +52,10 @@ export default function WeatherPanel({point, selectedPoint, session, overview=fa
                 <article><p>Relative humidity</p><strong>{value(data.current.humidity_percent, '%')}</strong><small>At 2 metres</small></article>
                 <article><p>Precipitation</p><strong>{value(data.current.precipitation_mm, 'mm')}</strong><small>Preceding {data.current.interval_seconds / 60} minutes</small></article>
               </div>
+              {!overview && wide && <ImdCard official={official} point={point} />}
               <p className="muted">Point weather only · flood and drainage risk is on Home (experimental index).</p></> },
+            // Phones: the official card has its own tab so "Now" still fits one screen.
+            !overview && !wide && { id: 'imd', label: 'IMD', content: <ImdCard official={official} point={point} /> },
             { id: 'days', label: '7 days', content: <DailyForecast days={data.forecast} coverage={data.forecast_coverage} compact={overview} /> },
             !overview && { id: 'chart', label: 'Rain chart', content: <RainfallChart days={data.forecast} /> },
             { id: 'sources', label: 'Sources', content: <div className="weather-source-details">{sources}</div> },

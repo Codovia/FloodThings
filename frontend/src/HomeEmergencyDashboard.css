@@ -33,29 +33,32 @@
 .page-home .link-button:hover:not(:disabled){background:none;color:#073f60}
 
 /* Outlook cards */
-.page-home .outlook-card{border:1px solid #d7dfdd;border-left:5px solid #9fb3ae;border-radius:10px;padding:9px 12px;background:#fbfdfc;min-width:0}
-.page-home .outlook-card header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;padding:0;border:0;background:none;box-shadow:none;position:static;min-height:0}
-.page-home .outlook-card h3{font-size:.9375rem;margin:0;line-height:1.3}
-.page-home .outlook-card p{font-size:.8125rem;line-height:1.4;margin:4px 0}
-.page-home .source-tag{font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 8px;white-space:nowrap}
-.page-home .source-tag.official{background:#17313c;color:#fff}
-.page-home .source-tag.experimental{background:#fff3cd;color:#5c4400;border:1px solid #e6c65c}
-.page-home .imd-card[data-level="red"]{border-left-color:#d32f2f;background:#fff5f5}
-.page-home .imd-card[data-level="orange"]{border-left-color:#ef6c00;background:#fff8f0}
-.page-home .imd-card[data-level="yellow"]{border-left-color:#e3c000;background:#fffde8}
-.page-home .imd-card[data-level="green"]{border-left-color:#43a047}
-.page-home .imd-today{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
-.page-home .imd-today strong{font-size:.9rem}
-.page-home .imd-today span:last-child:not(.official-chip){flex-basis:100%;color:#38504b}
-.page-home .imd-days{list-style:none;display:flex;gap:6px;padding:0;margin:6px 0 0;flex-wrap:wrap}
-.page-home .imd-days li{display:flex;align-items:center;gap:4px;font-size:.72rem;background:#fff;border:1px solid #e0e8e5;border-radius:999px;padding:2px 8px}
-.page-home .imd-days i{width:9px;height:9px;border-radius:50%;display:inline-block}
-.page-home .imd-days small{color:#4b5f5a}
-.page-home .sachet-card[data-active="true"]{border-left-color:#ef6c00}
-.page-home .sachet-card{border-left-color:#17313c}
-.page-home .sachet-alerts{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:6px}
-.page-home .sachet-alerts li{font-size:.8rem;border-top:1px solid #ecf1ef;padding-top:4px}
-.page-home .sachet-alerts li:first-child{border-top:0;padding-top:0}
+:is(.page-home,.page-weather) .outlook-card{border:1px solid #d7dfdd;border-left:5px solid #9fb3ae;border-radius:10px;padding:9px 12px;background:#fbfdfc;min-width:0}
+:is(.page-home,.page-weather) .outlook-card header{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px;padding:0;border:0;background:none;box-shadow:none;position:static;min-height:0}
+:is(.page-home,.page-weather) .outlook-card h3{font-size:.9375rem;margin:0;line-height:1.3}
+:is(.page-home,.page-weather) .outlook-card p{font-size:.8125rem;line-height:1.4;margin:4px 0}
+:is(.page-home,.page-weather) .source-tag{font-size:.66rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;border-radius:999px;padding:1px 8px;white-space:nowrap}
+:is(.page-home,.page-weather) .source-tag.official{background:#17313c;color:#fff}
+:is(.page-home,.page-weather) .source-tag.experimental{background:#fff3cd;color:#5c4400;border:1px solid #e6c65c}
+:is(.page-home,.page-weather) .imd-card[data-level="red"]{border-left-color:#d32f2f;background:#fff5f5}
+:is(.page-home,.page-weather) .imd-card[data-level="orange"]{border-left-color:#ef6c00;background:#fff8f0}
+:is(.page-home,.page-weather) .imd-card[data-level="yellow"]{border-left-color:#e3c000;background:#fffde8}
+:is(.page-home,.page-weather) .imd-card[data-level="green"]{border-left-color:#43a047}
+:is(.page-home,.page-weather) .imd-today{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px}
+:is(.page-home,.page-weather) .imd-today strong{font-size:.9rem}
+:is(.page-home,.page-weather) .imd-today span:last-child:not(.official-chip){flex-basis:100%;color:#38504b}
+:is(.page-home,.page-weather) .imd-days{list-style:none;display:flex;gap:6px;padding:0;margin:6px 0 0;flex-wrap:wrap}
+:is(.page-home,.page-weather) .imd-days li{display:flex;align-items:center;gap:4px;font-size:.72rem;background:#fff;border:1px solid #e0e8e5;border-radius:999px;padding:2px 8px}
+:is(.page-home,.page-weather) .imd-days i{width:9px;height:9px;border-radius:50%;display:inline-block}
+:is(.page-home,.page-weather) .imd-days small{color:#4b5f5a}
+:is(.page-home,.page-weather) .sachet-card[data-active="true"]{border-left-color:#ef6c00}
+:is(.page-home,.page-weather) .sachet-card{border-left-color:#17313c}
+:is(.page-home,.page-weather) .sachet-alerts{list-style:none;padding:0;margin:4px 0 0;display:grid;gap:6px}
+:is(.page-home,.page-weather) .sachet-alerts li{font-size:.8rem;border-top:1px solid #ecf1ef;padding-top:4px}
+:is(.page-home,.page-weather) .sachet-alerts li:first-child{border-top:0;padding-top:0}
+:is(.page-home,.page-weather) .imd-nowcast{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 6px;margin:6px 0 0;padding:4px 8px;border-radius:8px;background:#f1f5f4;font-size:.78rem}
+:is(.page-home,.page-weather) .imd-nowcast[data-active="true"]{background:#fff3e0}
+:is(.page-home,.page-weather) .imd-nowcast small{color:#4b5f5a}
 .page-home .quiet-line small{color:#5c6e69}
 .page-home .risk-area{border-left-color:#e6a700}
 .page-home .risk-area .risk-area-toggle{margin:2px 0 4px}

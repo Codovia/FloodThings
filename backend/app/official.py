@@ -45,11 +45,13 @@ IMD_WFS = 'https://reactjs.imd.gov.in/geoserver/wfs'
 IMD_PARAMS = {'service': 'WFS', 'version': '1.0.0', 'request': 'GetFeature', 'typename': 'imd:district_warnings_india',
               'srsname': 'EPSG:4326', 'outputFormat': 'application/json', 'bbox': '74.0,11.5,78.6,18.5'}  # lon/lat order
 IMD_PAGE = 'https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php'
+NOWCAST_PARAMS = {**IMD_PARAMS, 'typename': 'imd:NowcastWarningDistrict'}
+NOWCAST_PAGE = 'https://mausam.imd.gov.in/responsive/districtWiseNowcastGIS.php'
 IMD_CODES_URL = 'https://api.imd.gov.in/public/api_reference.html'
 SACHET_RSS = 'https://sachet.ndma.gov.in/cap_public_website/rss/rss_karnataka.xml'
 SACHET_PAGE = 'https://sachet.ndma.gov.in/'
 CAP_NS = {'cap': 'urn:oasis:names:tc:emergency:cap:1.2'}
-IMD_TTL, RSS_TTL, FAIL_TTL = 30 * 60, 10 * 60, 60
+IMD_TTL, RSS_TTL, NOWCAST_TTL, FAIL_TTL = 30 * 60, 10 * 60, 10 * 60, 60
 MAX_ALERTS = 15
 LABEL = 'Official warnings as issued by IMD and NDMA SACHET. FloodPulse only displays them and does not change their content.'
 
@@ -149,6 +151,55 @@ def imd_district(features, latitude, longitude, today=None):
                     'days': days, 'source': {'name': 'India Meteorological Department — district-wise warnings', 'url': IMD_PAGE,
                                               'codes': IMD_CODES_URL}}
     return {'status': 'no_district', 'message': 'No IMD warning district contains this point.'}
+
+
+# IMD API reference, "District-wise Nowcast": category fields and their published meanings.
+NOWCAST_CODES = {
+    'cat2': 'Light rain (under 5 mm/h)', 'cat3': 'Light snow', 'cat4': 'Light thunderstorm (gusts under 40 km/h)',
+    'cat5': 'Slight dust storm', 'cat6': 'Lightning possible (under 30%)', 'cat7': 'Moderate rain (5–15 mm/h)',
+    'cat8': 'Moderate snow', 'cat9': 'Moderate thunderstorm (gusts 41–61 km/h)', 'cat10': 'Moderate dust storm',
+    'cat11': 'Lightning likely (30–60%)', 'cat12': 'Heavy rain (over 15 mm/h)', 'cat13': 'Heavy snow',
+    'cat14': 'Severe thunderstorm (gusts 62–87 km/h)', 'cat15': 'Very severe thunderstorm (gusts over 87 km/h)',
+    'cat17': 'Thunderstorm with hail', 'cat18': 'Severe dust storm', 'cat19': 'Lightning very likely (over 60%)',
+}
+# IMD nowcasts cover about the next three hours (SACHET relays them as three-hour CAP alerts).
+NOWCAST_VALID = timedelta(hours=3)
+
+
+def plain(value, limit=300):
+    text = re.sub(r'\s+', ' ', ''.join(c if c.isprintable() else ' ' for c in str(value or ''))).strip()
+    return text[:limit] or None
+
+
+def nowcast_time(value, now):
+    # The layer's update_time carries a "Z" suffix but holds Indian time: read as UTC it lies hours in the
+    # future. It is read as IST, and a time still in the future is treated as unverifiable.
+    try:
+        issued = datetime.strptime(str(value).rstrip('Z'), '%Y-%m-%dT%H:%M:%S').replace(tzinfo=IST)
+    except ValueError:
+        return None
+    return issued if issued <= now + timedelta(minutes=10) else None
+
+
+def imd_nowcast(features, latitude, longitude, now):
+    for feature in features:
+        geometry = feature.get('geometry')
+        if not (geometry and geometry.get('type') in ('Polygon', 'MultiPolygon') and inside(geometry, latitude, longitude)):
+            continue
+        p = feature['properties']
+        name = str(p.get('State_District', '')).strip().upper()
+        district = DISTRICT_NAMES.get(name, [name.title()])[0]
+        issued = nowcast_time(p.get('update_time'), now)
+        source = {'name': 'India Meteorological Department — district-wise nowcast', 'url': NOWCAST_PAGE, 'codes': IMD_CODES_URL}
+        if issued is None or now - issued > NOWCAST_VALID:
+            return {'status': 'expired', 'district': district, 'issued_at': issued.isoformat() if issued else None, 'source': source,
+                    'message': 'No current IMD nowcast for this district (the latest is older than three hours).'}
+        present = lambda key: p.get(key) not in (None, 0, '0', '', False)
+        categories = [label for key, label in NOWCAST_CODES.items() if present(key)]
+        return {'status': 'available', 'district': district, 'issued_at': issued.isoformat(),
+                'valid_until': (issued + NOWCAST_VALID).isoformat(), 'categories': categories,
+                'other': plain(p.get('cat16')) if present('cat16') else None, 'message': plain(p.get('message')), 'source': source}
+    return {'status': 'not_issued', 'message': 'IMD has not issued a nowcast for this district.'}
 
 
 def rounded(coordinates):
@@ -268,7 +319,7 @@ class OfficialService:
     def __init__(self, client, clock=time.time, geometry=None):
         self.client, self.clock = client, clock
         self.geometry = geometry or load_boundary()
-        self.imd_cache = self.rss_cache = None
+        self.imd_cache = self.rss_cache = self.nowcast_cache = None
         self.cap_cache = {}
         self.lock = asyncio.Lock()
 
@@ -276,18 +327,25 @@ class OfficialService:
         return datetime.fromtimestamp(self.clock(), timezone.utc)
 
     async def imd_features(self):
-        if self.imd_cache and self.imd_cache['expires'] > self.clock():
-            return self.imd_cache['value']
+        return await self.wfs('imd_cache', IMD_PARAMS, IMD_TTL)
+
+    async def nowcast_features(self):
+        return await self.wfs('nowcast_cache', NOWCAST_PARAMS, NOWCAST_TTL)
+
+    async def wfs(self, cache, params, ttl_ok):
+        cached = getattr(self, cache)
+        if cached and cached['expires'] > self.clock():
+            return cached['value']
         try:
-            payload = await read_bounded(self.client, IMD_WFS, IMD_PARAMS)
+            payload = await read_bounded(self.client, IMD_WFS, params)
             features = json.loads(payload)['features']
             if not isinstance(features, list):
                 raise ValueError
             value = {'features': features, 'retrieved_at': self.now().isoformat(), 'error': None}
-            ttl = IMD_TTL
+            ttl = ttl_ok
         except (OfficialUnavailable, ValueError, KeyError, TypeError) as exc:
             value, ttl = {'features': None, 'retrieved_at': self.now().isoformat(), 'error': str(exc) if isinstance(exc, OfficialUnavailable) else 'invalid response'}, FAIL_TTL
-        self.imd_cache = {'expires': self.clock() + ttl, 'value': value}
+        setattr(self, cache, {'expires': self.clock() + ttl, 'value': value})
         return value
 
     async def cap(self, link):
@@ -318,7 +376,7 @@ class OfficialService:
         if point and not inside(self.geometry, latitude, longitude):
             raise HTTPException(422, 'Point is outside Karnataka')
         async with self.lock:
-            imd_raw, sachet_raw = await asyncio.gather(self.imd_features(), self.sachet())
+            imd_raw, sachet_raw, nowcast_raw = await asyncio.gather(self.imd_features(), self.sachet(), self.nowcast_features())
         now = self.now()
         if not point:
             imd = {'status': 'not_requested', 'message': 'Choose a place to see its IMD district warning.'}
@@ -327,6 +385,13 @@ class OfficialService:
         else:
             imd = imd_district(imd_raw['features'], latitude, longitude, now.astimezone(IST).date())
         imd['retrieved_at'] = imd_raw['retrieved_at']
+        if not point:
+            nowcast = {'status': 'not_requested', 'message': 'Choose a place to see its IMD nowcast.'}
+        elif nowcast_raw['features'] is None:
+            nowcast = {'status': 'unavailable', 'message': f'IMD nowcast could not be retrieved ({nowcast_raw["error"]}).'}
+        else:
+            nowcast = imd_nowcast(nowcast_raw['features'], latitude, longitude, now)
+        nowcast['retrieved_at'] = nowcast_raw['retrieved_at']
         district = imd.get('imd_name')
         if sachet_raw['alerts'] is None:
             sachet = {'status': 'unavailable', 'message': f'NDMA SACHET alerts could not be retrieved ({sachet_raw["error"]}). This does not mean there is no alert.', 'alerts': []}
@@ -335,7 +400,7 @@ class OfficialService:
             sachet = {'status': 'partial' if sachet_raw['failed'] else 'available', 'alerts': alerts, 'checked_messages': len(sachet_raw['alerts']),
                       'unreadable_messages': sachet_raw['failed']}
         sachet.update(retrieved_at=sachet_raw['retrieved_at'], source={'name': 'NDMA SACHET (Common Alerting Protocol) — Karnataka feed', 'url': SACHET_PAGE, 'feed': SACHET_RSS})
-        return {'label': LABEL, 'official': True, 'imd': imd, 'sachet': sachet, 'generated_at': now.isoformat()}
+        return {'label': LABEL, 'official': True, 'imd': imd, 'nowcast': nowcast, 'sachet': sachet, 'generated_at': now.isoformat()}
 
 
 async def statewide(svc):

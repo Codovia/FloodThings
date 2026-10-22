@@ -39,7 +39,21 @@ it('never turns a failure or an empty feed into "no warning"', () => {
 
 it('warns that a network-estimate district may be wrong, and asks for a place without one', () => {
   const { rerender } = render(<ImdCard official={state(data)} point={{ ...point, kind: 'network' }} />)
-  expect(screen.getByText(/district may be wrong/)).toBeTruthy()
+  expect(screen.getByText('Approximate network location — the district may be wrong.')).toBeTruthy()
   rerender(<ImdCard official={state({ ...data, imd: { status: 'not_requested', message: 'x' } })} point={null} />)
   expect(screen.getByText(/Choose your place to see its official IMD district warning/)).toBeTruthy()
+})
+
+it('shows the IMD 3-hour nowcast in IMD wording, a quiet nowcast plainly, and never an expired one as current', () => {
+  const nowcast = { status: 'available', district: 'Udupi', issued_at: '2026-10-16T08:45:00+05:30', valid_until: '2026-10-16T11:45:00+05:30',
+    categories: ['Light rain (under 5 mm/h)', 'Lightning possible (under 30%)'], other: 'TEST ONLY other warning', message: null }
+  const { container, rerender } = render(<ImdCard official={state({ ...data, nowcast })} point={point} />)
+  const line = container.querySelector('.imd-nowcast')
+  expect(line.dataset.active).toBe('true')
+  expect(line.textContent).toMatch(/Next 3 hours.*Light rain \(under 5 mm\/h\) · Lightning possible \(under 30%\) · TEST ONLY other warning.*IMD nowcast · 8:45 am IST/)
+  rerender(<ImdCard official={state({ ...data, nowcast: { ...nowcast, categories: [], other: null } })} point={point} />)
+  expect(container.querySelector('.imd-nowcast').textContent).toMatch(/Next 3 hours.*No significant weather/)
+  rerender(<ImdCard official={state({ ...data, nowcast: { status: 'expired', district: 'Udupi', issued_at: '2026-10-16T05:00:00+05:30', message: 'No current IMD nowcast for this district (the latest is older than three hours).' } })} point={point} />)
+  expect(container.querySelector('.imd-nowcast').dataset.active).toBe('false')
+  expect(container.querySelector('.imd-nowcast').textContent).toMatch(/older than three hours/); expect(container.textContent).not.toMatch(/No significant weather/)
 })

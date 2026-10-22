@@ -451,3 +451,8 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
  .page-shelters .shelter-navigation .shelter-safety .link-button{min-height:24px;padding:0}
  .page-shelters .shelter-navigation .shelter-map{min-height:110px}
 }
+
+/* Phones: the IMD nowcast line stays compact so the Warnings tab fits one screen. */
+@media (max-width:1099px){
+ :is(.page-home,.page-weather) .imd-nowcast{margin:4px 0 0;padding:3px 6px;font-size:.74rem;line-height:1.3}
+}

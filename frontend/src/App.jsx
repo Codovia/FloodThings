@@ -65,7 +65,7 @@ export default function App() {
      <WeatherLocationSelector point={point} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>.</p>}
      <div hidden={!weatherPage} className="weather-sections">
-      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false}/>
+      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false} active={weatherPage}/>
      </div>
      <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} nearestRequest={nearestRequest} active={sheltersPage} overview={false} mapTarget={path==='/shelters'&&wide?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>

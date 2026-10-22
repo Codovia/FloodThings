@@ -39,6 +39,14 @@ test.beforeEach(async ({ page }) => {
 })
 
 test('real district/locality directory selects exact OSM points, recenters Leaflet, preserves seven days and six-hour refresh', async ({ page }) => {
+  // The six-hour cycle applies when the provider's reading is not advancing: this reply's reading is 61 min older than
+  // retrieval (under the 90-min notice), so the hourly current-conditions refresh (tested below for Kundapur) does not apply.
+  await page.route('**/api/weather*', async route => {
+    const url = new URL(route.request().url()), retrieved = await page.evaluate(() => new Date().toISOString())
+    const point = url.searchParams.has('latitude') ? { latitude: +url.searchParams.get('latitude'), longitude: +url.searchParams.get('longitude') } : null
+    const reply = body(point, retrieved); reply.current.valid_at = new Date(Date.parse(retrieved) - 61 * 60000).toISOString()
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(reply) })
+  })
   const errors = []; page.on('pageerror',e=>errors.push(e.message)); let calls=0
   page.on('request',r=>{ if(new URL(r.url()).pathname==='/api/weather') calls++ })
   await page.goto('/weather'); await expect(page.getByText('27 °C',{exact:true})).toBeVisible(); await open(page)
