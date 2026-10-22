@@ -2399,3 +2399,26 @@ Verification (isolated Playwright servers, no operational database): frontend un
 Official sources checked live the same day (not fixtures): IMD WFS (80 features in the Karnataka box, issue of 20 Oct 06 UTC, updated 11:57 UTC) matched the app for Udupi and Mysuru day by day; NDMA SACHET Karnataka RSS reachable, 10 messages, newest CAP alert expired 19 Oct 22:00 IST, so the app's "No active alert" is correct.
 
 Not done yet: administrator page one-screen layout (shelters form, report moderation, Telegram alerts).
+
+## 2026-10-21 — Telegram alerts diagnosis (read-only; no message sent, no subscriber contacted)
+
+Symptom: Alerts page and admin show Telegram as "not configured", locally and on production.
+
+Causes found:
+- Local: `.vscode/settings.json` has `python.terminal.useEnvFile: true`, so VS Code copies `.env` into new terminals. Its parser keeps `\"` literally inside a double-quoted value, so the terminal's `TELEGRAM_DESTINATIONS` was invalid JSON; the launcher gives the environment precedence over `.env`, and the backend's `TelegramConfig` rejected it, disabling subscriptions and sending. Fixed in the private `.env` (not in Git): the value is now single-quoted; the launcher reads identical values for all four keys and the VS Code parser now gets valid JSON (checked without printing values). Takes effect only when the app is restarted from a new terminal.
+- Bot webhook (read with `getWebhookInfo`): still registered to an expired Cloudflare Quick Tunnel from 18 Oct; last delivery error 18 Oct 20:04 UTC, HTTP 530. No `/start floodpulse` or `/stop` has reached any FloodPulse server since then.
+- Production (`floodpulse-smvitm.duckdns.org/api/alerts/subscription`) also answers "unavailable"; its `deploy/.env` could not be inspected (no SSH access from this laptop).
+
+Follow-up (22 Oct): after the server `deploy/.env` was completed and the bot was pointed at the server, `getWebhookInfo` shows the webhook on `floodpulse-smvitm.duckdns.org` with no error and nothing pending, and production `/api/alerts/subscription` answers `available`. Production also serves the one-screen build (96a63e1).
+
+## 2026-10-22 — Shelters: more precise "Use my location", and a way forward when the fix is coarse
+
+Problem: Shelters took the browser's first location answer, which is usually a coarse Wi-Fi/mobile/IP fix, and refused it for directions (start must be within ±100 m) with a dead-end message; a precise Home fix also expired for directions after five minutes.
+
+Changes (frontend only; the ±100 m and five-minute rules are unchanged):
+- `frontend/src/preciseLocation.js`: watches the position for up to 20 s, keeps the most accurate fix, stops early at ±20 m; a refusal ends the attempt, other errors keep the best fix so far. Falls back to a single request where `watchPosition` is unavailable. Coordinates stay in memory.
+- Shelters button shows live progress ("±240 m, improving…"). A fix still coarser than ±100 m is shown on the map as its measured area (blue circle, framed) and the page enters "Click your starting point on the map" so the exact start can be tapped; the notice says why ("located you only to ±900 m; directions need ±100 m"). A precise but expired GPS start is refreshed once when Shelters opens.
+- Fixed: the "Use my location" button passed its click event as the failure callback, so a failed lookup threw "onFail is not a function". Removed the duplicate "Click your starting point" notice (the map banner says it).
+
+Verification: unit 290/290 (new: best fix kept and watch stopped at ±12 m; coarse ±900 m fix → area on map, tap sets the start, no directions opened; expired precise fix refreshed once); build passes. Live app in Chrome with a simulated sequence: ±850 → ±240 → ±15 m ended at "Distances from Your GPS location (GPS ±15 m)"; a ±900 m-only device got the explanation, one accuracy circle and pick mode, still one screen, and a tap inside the circle gave "Distances from Start point chosen on the map", nearest 4.7 km. Playwright shelters/navigation/wireframes/ui-repair/fullscreen/home-emergency: 27 passed, 2 skipped (database-gated), the known admin layout failure; the demonstration-fixture shelter test failed once in four group runs (passed 5/5 alone; error not captured).
+Limitation: a laptop without GPS usually cannot get better than a few hundred metres; tapping the start on the map is the precise path there.

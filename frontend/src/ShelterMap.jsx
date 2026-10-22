@@ -43,7 +43,15 @@ export default function ShelterMap({points=[],route=null,origin=null,onSelect=nu
     if(!map.current)return
     layers.current.clearLayers();const bounds=[]
     if(route?.coordinates?.length>1){const line=route.coordinates.map(([lon,lat])=>[lat,lon]);L.polyline(line,{color:'#1565c0',weight:5,opacity:.85}).addTo(layers.current);bounds.push(...line)}
-    if(origin){L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])}
+    if(origin){
+      L.circleMarker([origin.latitude,origin.longitude],{radius:5,color:'#365f7e'}).addTo(layers.current);bounds.push([origin.latitude,origin.longitude])
+      // A coarse device fix is drawn as its measured area and framed, so the exact start can be tapped inside it.
+      if(origin.showAccuracy&&origin.accuracy_m>0&&origin.accuracy_m<=20000){
+        L.circle([origin.latitude,origin.longitude],{radius:origin.accuracy_m,color:'#286ba4',weight:1,fillOpacity:.1,interactive:false}).addTo(layers.current)
+        const dLat=origin.accuracy_m/111320,dLng=dLat/Math.max(.2,Math.cos(origin.latitude*Math.PI/180))
+        bounds.push([origin.latitude-dLat,origin.longitude-dLng],[origin.latitude+dLat,origin.longitude+dLng])
+      }
+    }
     for(const point of points){
       // Optional measured-accuracy ring (citizen GPS only); never drawn for estimated radii.
       if(point.showAccuracy&&point.accuracy_m>0&&point.accuracy_m<=5000)L.circle([point.latitude,point.longitude],{radius:point.accuracy_m,color:'#286ba4',weight:1,fillOpacity:.1,interactive:false}).addTo(layers.current)

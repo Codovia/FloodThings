@@ -4,7 +4,7 @@ import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/reac
 import PublicShelters from './PublicShelters.jsx'
 import AdminShelters from './AdminShelters.jsx'
 // The admin entrance map's click handler is exposed so tests can simulate a map selection.
-vi.mock('./ShelterMap.jsx',()=>({default:({label,onSelect})=>{if(onSelect&&label==='Administrator entrance selection map')globalThis.__adminMapSelect=onSelect;if(label==='Verified open shelter entrances')globalThis.__shelterMapSelect=onSelect;return <div role="region" aria-label={label} />}}))
+vi.mock('./ShelterMap.jsx',()=>({default:({label,onSelect,origin})=>{if(onSelect&&label==='Administrator entrance selection map')globalThis.__adminMapSelect=onSelect;if(label==='Verified open shelter entrances'){globalThis.__shelterMapSelect=onSelect;globalThis.__shelterMapOrigin=origin};return <div role="region" aria-label={label} />}}))
 const point={name:'Test origin',latitude:13.6,longitude:74.8}
 const row={id:'isolated-test',name:'DEMONSTRATION ONLY fixture',address:'Never a real shelter',district_id:'nic:udupi.nic.in',district_name:'Udupi',latitude:13.5,longitude:74.7,capacity:10,occupancy:2,available_capacity:8,water:'yes',toilets:'unknown',accessibility:'Fixture information',status:'open',verified_at:new Date().toISOString(),updated_at:new Date().toISOString(),verification_expires_at:new Date(Date.now()+86400000).toISOString(),demonstration:true,straight_line_km:12.4,restrictions:'DO NOT TRAVEL',contact:null}
 const list=(rows=[row],mode='demonstration')=>({status:'available',mode,shelters:rows,total:rows.length,verification_valid_hours:24})
@@ -97,9 +97,9 @@ it('"Use my location" passes a timestamped GPS point to the app and never guesse
  const getCurrentPosition=vi.fn(ok=>ok(position));vi.stubGlobal('navigator',{...navigator,geolocation:{getCurrentPosition}});vi.stubGlobal('isSecureContext',true)
  render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
  fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
- expect(onLocate).toHaveBeenCalledWith({name:'Your GPS location',latitude:13.34,longitude:74.74,accuracy_m:25,gps_timestamp:position.timestamp,kind:'gps'})
+ await waitFor(()=>expect(onLocate).toHaveBeenCalledWith({name:'Your GPS location',latitude:13.34,longitude:74.74,accuracy_m:25,gps_timestamp:position.timestamp,kind:'gps'}))
  getCurrentPosition.mockImplementation((ok,fail)=>fail({code:1}));onLocate.mockClear()
- fireEvent.click(screen.getByRole('button',{name:'Use my location'}));expect(onLocate).not.toHaveBeenCalled();expect(screen.getByText(/permission denied/)).toBeTruthy()
+ fireEvent.click(screen.getByRole('button',{name:'Use my location'}));expect(await screen.findByText(/permission denied/)).toBeTruthy();expect(onLocate).not.toHaveBeenCalled()
 })
 it('a map click fills district, empty name and address from the place lookup, never overwriting typed text',async()=>{
  const place={status:'available',district:{name:'Udupi',aliases:['Udupi'],source:'IMD district boundary (map service)'},name:{value:'TEST FIXTURE hall',source:'OpenStreetMap'},address:{value:'TEST Road, Manipal, Udupi, Karnataka 576101',source:'OpenStreetMap'},messages:[],attribution:'Place and address suggestion: © OpenStreetMap contributors, ODbL 1.0 (via Nominatim).'}
@@ -119,7 +119,7 @@ it('"Get directions" without a location asks for it, then rechecks and opens dir
  const onLocate=vi.fn();stubGps({coords:{latitude:13.34,longitude:74.74,accuracy:20},timestamp:Date.now()})
  const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(row.name)
  fireEvent.click(screen.getByRole('button',{name:'Get directions'}))
- expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:20}));expect(screen.getByText(/Finding your location for directions/)).toBeTruthy()
+ expect(screen.getByText(/Finding your location for directions/)).toBeTruthy();await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:20})))
  rerender(<PublicShelters point={gpsPoint()} active onLocate={onLocate}/>)
  expect(await screen.findByRole('heading',{name:'Directions to '+row.name})).toBeTruthy()
  expect(fetch.mock.calls.filter(([u])=>String(u).startsWith('/api/shelters?latitude=13.34')).length).toBeGreaterThanOrEqual(2)  // directory rechecked from the new start point
@@ -147,4 +147,39 @@ it('when GPS is refused, the start can be clicked on the shelter map and directi
  expect(onLocate).toHaveBeenCalledWith({name:'Start point chosen on the map',latitude:13.36,longitude:74.76,kind:'map',uncertainty_m:50})
  rerender(<PublicShelters point={{name:'Start point chosen on the map',latitude:13.36,longitude:74.76,kind:'map',uncertainty_m:50}} active onLocate={onLocate}/>)
  expect(await screen.findByRole('heading',{name:'Directions to '+row.name})).toBeTruthy()
+})
+
+// Browsers report a coarse fix first and refine it; the page keeps watching briefly for the best one.
+function stubWatch(){const calls={};const clearWatch=vi.fn();const watchPosition=vi.fn((ok,fail)=>{calls.ok=ok;calls.fail=fail;return 7})
+ vi.stubGlobal('navigator',{...navigator,geolocation:{watchPosition,clearWatch,getCurrentPosition:vi.fn()}});vi.stubGlobal('isSecureContext',true);return {calls,watchPosition,clearWatch}}
+const fix=accuracy=>({coords:{latitude:13.34,longitude:74.74,accuracy},timestamp:Date.now()})
+it('keeps the most accurate fix instead of the first coarse one, and stops once it is precise',async()=>{
+ const onLocate=vi.fn(),{calls,clearWatch}=stubWatch()
+ render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
+ fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
+ act(()=>calls.ok(fix(850)));expect(await screen.findByRole('button',{name:'±850 m, improving…'})).toBeTruthy();expect(onLocate).not.toHaveBeenCalled()
+ act(()=>calls.ok(fix(2000)));expect(screen.getByRole('button',{name:'±850 m, improving…'})).toBeTruthy()  // a worse later fix is ignored
+ act(()=>calls.ok(fix(12)))
+ await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:12})));expect(onLocate).toHaveBeenCalledOnce();expect(clearWatch).toHaveBeenCalledWith(7)
+})
+it('a fix still too coarse for directions is shown as an area and the exact start can be tapped on the map',async()=>{
+ const onLocate=vi.fn(),{calls}=stubWatch()
+ const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
+ fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
+ act(()=>{calls.ok(fix(900));calls.fail({code:3})})  // no better fix arrives
+ await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:900})))
+ rerender(<PublicShelters point={gpsPoint(900)} active onLocate={onLocate}/>)
+ expect(screen.getByText(/located you only to ±900 m; directions need ±100 m/)).toBeTruthy()
+ expect(screen.getAllByText('Click your starting point on the map.').length).toBeGreaterThan(0)
+ expect(globalThis.__shelterMapOrigin).toEqual(expect.objectContaining({accuracy_m:900,showAccuracy:true}))
+ act(()=>{globalThis.__shelterMapSelect({latitude:13.341,longitude:74.742})})
+ expect(onLocate).toHaveBeenLastCalledWith({name:'Start point chosen on the map',latitude:13.341,longitude:74.742,kind:'map',uncertainty_m:50})
+ expect(screen.queryByText('Click your starting point on the map.')).toBeNull();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
+})
+it('a precise but expired GPS start is refreshed once when Shelters opens',async()=>{
+ const {watchPosition}=stubWatch()
+ const old={...gpsPoint(30),gps_timestamp:Date.now()-6*60000}
+ const {rerender}=render(<PublicShelters point={old} active onLocate={vi.fn()}/>)
+ await waitFor(()=>expect(watchPosition).toHaveBeenCalledOnce())
+ rerender(<PublicShelters point={old} active onLocate={vi.fn()}/>);expect(watchPosition).toHaveBeenCalledOnce()
 })
