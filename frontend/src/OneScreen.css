@@ -17,7 +17,7 @@ main.app-content>*{min-height:0}
 
 /* Shared tabs / steps (ScreenTabs.jsx). */
 .screen-tabs{display:flex;gap:4px;flex-shrink:0;margin:0 0 8px;padding:3px;background:#e8eef4;border-radius:10px;overflow:hidden}
-.screen-tabs button{flex:1 1 0;min-width:0;min-height:40px;margin:0;padding:6px 8px;border:0;border-radius:8px;background:transparent;color:#29445f;font-size:13px;font-weight:600;box-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.screen-tabs button{flex:1 1 auto;min-width:0;min-height:40px;margin:0;padding:6px 8px;border:0;border-radius:8px;background:transparent;color:#29445f;font-size:13px;font-weight:600;box-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .screen-tabs button[aria-selected=true]{background:#fff;color:#0f4f63;box-shadow:0 1px 3px rgba(20,50,80,.2)}
 .screen-panel{min-height:0;flex:1 1 auto;display:flex;flex-direction:column}
 .screen-panel[hidden]{display:none!important}
@@ -456,3 +456,15 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
 @media (max-width:1099px){
  :is(.page-home,.page-weather) .imd-nowcast{margin:4px 0 0;padding:3px 6px;font-size:.74rem;line-height:1.3}
 }
+/* Flood Map "Rivers" tab: one compact row per checked river point. */
+.river-forecast h3{display:flex;align-items:center;gap:8px;font-size:.95rem;margin:0 0 6px}
+.river-list{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:4px}
+.river-list li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:.82rem;padding:4px 6px;border:1px solid #e3eae8;border-radius:8px;background:#fbfdfc}
+.river-list li small{flex-basis:100%;color:#4b5f5a;font-size:.74rem}
+.river-list li .risk-chip{font-size:.72rem;padding:0 6px}
+.river-forecast>.muted{font-size:.74rem;margin:4px 0}
+@media (min-width:1100px){ .river-list li small{flex-basis:auto} }
+
+/* Tabs never clip their labels: on narrow screens they tighten, and wrap to a second row if still too wide. */
+.screen-tabs{flex-wrap:wrap}
+@media (max-width:1099px){ .screen-tabs button{padding:4px 6px;font-size:12.5px;min-height:36px} }

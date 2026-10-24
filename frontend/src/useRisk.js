@@ -35,6 +35,14 @@ function validated(result, check) {
   return { ...result, data: null, error: 'Risk response could not be validated' }
 }
 
+// GloFAS river flood forecast for the checked Karnataka river points (modelled flow, not observed levels).
+export const validRiverForecast = d => !!d && d.status === 'available' && Array.isArray(d.points) && d.points.length > 0 &&
+  d.points.every(p => LEVELS.has(p.level) && typeof p.river === 'string' && typeof p.place === 'string' && Number.isFinite(p.grid?.latitude) &&
+    Number.isFinite(p.grid?.longitude) && Number.isFinite(p.peak?.share_above?.['2_year']) && Number.isFinite(p.peak?.share_above?.['5_year']))
+export function useRiverForecast(active) {
+  return validated(useJson(active ? '/api/river-forecast' : null, 60 * 60 * 1000), validRiverForecast)
+}
+
 export function useRiskPoint(point) {
   const ok = point && Number.isFinite(point.latitude) && Number.isFinite(point.longitude)
   const url = ok ? '/api/risk?' + new URLSearchParams({ latitude: point.latitude.toFixed(5), longitude: point.longitude.toFixed(5) }) : null

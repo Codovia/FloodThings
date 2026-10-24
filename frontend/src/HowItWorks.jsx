@@ -7,7 +7,7 @@ import ScreenTabs from './ScreenTabs.jsx'
 // Explains the risk index and why it is rule-based rather than a trained flood model.
 const PIPELINE = [
   ['Live data', 'Forecast rain, river flow, ground height (Open-Meteo); official warnings (IMD, NDMA SACHET); approved citizen reports'],
-  ['Prediction', 'Flood and drainage risk index for the next 24 hours'],
+  ['Prediction', 'Flood and drainage risk index for the next 24 hours; 7-day river flood forecast (Copernicus GloFAS) for six checked rivers'],
   ['Map and app', 'Risk for any point in Karnataka, nearby risky spots, statewide map, verified shelters and routes to them (not certified flood-safe)'],
   ['Early warning', 'Suggested alert drafts → an administrator checks and approves → Telegram'],
 ]
@@ -41,6 +41,7 @@ export default function HowItWorks({ navigate }) {
         <tbody>{FACTORS.map(([f, why, risk]) => <tr key={f}><td><strong>{f}</strong></td><td>{why}</td><td>{risk}</td></tr>)}</tbody>
       </table></div>
       <p className="muted">Flood risk is about rivers and low land. Drainage risk is about water that cannot drain away in towns.</p>
+      <p className="muted">Separately, the Flood Map's <strong>Rivers</strong> tab compares the 50-run GloFAS river forecast with each river's own 2-, 5- and 10-year flood levels at six points (Krishna, Ghataprabha, Kabini, Netravati, Tungabhadra, Kali). Each point was kept only because its model cell lies on that river in OpenStreetMap and its largest past flows match documented floods.</p>
     </section>
       </> },
       { id: 'ml', label: 'Why not ML', content: <>

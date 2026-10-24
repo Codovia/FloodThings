@@ -5,7 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import useMapResize from './useMapResize.js'
 import useShelterDirectory, { validShelterDirectory } from './useShelterDirectory.js'
 import { PageLink } from './AppNavigation.jsx'
-import { useRiskGrid, useOfficialDistricts, LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
+import { useRiskGrid, useOfficialDistricts, useRiverForecast, LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
 import { OFFICIAL_COLOURS } from './OfficialWarnings.jsx'
 import './RiskPanel.css'
 import ScreenTabs, { useWide } from './ScreenTabs.jsx'
@@ -51,7 +51,7 @@ function useEvidence(url, retry=0){
  return !url?{data:null,error:null,loading:false}:state.url===url?state:{data:null,error:null,loading:true}
 }
 
-function IntelligenceGeography({district,history,shelters,risk,official,point,popup,onPoint,onFeature,children}){
+function IntelligenceGeography({district,history,shelters,risk,official,rivers,point,popup,onPoint,onFeature,children}){
  const element=useRef(null),map=useRef(null),select=useRef(onPoint),detail=useRef(onFeature),zoneRenderer=useRef(null)
  const [tileError,setTileError]=useState(false)
  const districtRef=useRef(district)
@@ -98,12 +98,18 @@ function IntelligenceGeography({district,history,shelters,risk,official,point,po
     const text=document.createElement('span');text.textContent=`${monthYear(feature.properties.start_date)} flood · seen by satellite`
     layer.bindTooltip(text);layer.on('click',()=>detail.current(feature.id))
    }}))
+  // Checked river points: GloFAS 7-day forecast against each cell's own flood levels.
+  if(rivers)for(const r of rivers){
+   const marker=L.circleMarker([r.grid.latitude,r.grid.longitude],{radius:9,color:'#0d3b66',weight:3,fillColor:LEVEL_COLORS[r.level],fillOpacity:.95,bubblingMouseEvents:false})
+   const text=document.createElement('span');text.textContent=`${r.river} at ${r.place} · river flood forecast, 7 days: ${LEVEL_NAMES[r.level]} — ${Math.round(r.peak.share_above['2_year']*100)}% of forecast runs above the 2-year flood level (${r.peak.date}). Modelled, not observed.`
+   marker.bindTooltip(text);add(marker)
+  }
   if(shelters&&validShelterDirectory(shelters))for(const shelter of shelters.shelters){
    const marker=L.circleMarker([shelter.latitude,shelter.longitude],{radius:9,color:'#00695c',fillColor:'#18a999',fillOpacity:.9})
    const text=document.createElement('span');text.textContent=`${shelters.mode==='demonstration'?'DEMONSTRATION ONLY — ':''}${shelter.name} · ${shelter.available_capacity} reported spaces · verified ${shelter.verified_at}`;marker.bindPopup(text);add(marker)
   }
   return()=>{if(map.current)for(const layer of layers)map.current.removeLayer(layer)}
- },[history,shelters,risk,official])
+ },[history,shelters,risk,official,rivers])
  useEffect(()=>{
   if(!map.current||!point)return
   const marker=L.circleMarker([point.latitude,point.longitude],{radius:7,color:'#fff',weight:2,fillColor:'#344b68',fillOpacity:1}).addTo(map.current)
@@ -139,8 +145,8 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  function chooseFeature(id){setFeatureId(id);onFeatureChange?.(id)}
  const wide=useWide(),[tab,setTab]=useState(()=>wide?'place':'map')
  function check(next){setChecked(next);onPoint?.(next);setTab('place')}
- const [layers,setLayers]=useState({official:true,risk:true,history:true,shelters:false})
- const riskGrid=useRiskGrid(layers.risk),officialDistricts=useOfficialDistricts(true)
+ const [layers,setLayers]=useState({official:true,risk:true,rivers:true,history:true,shelters:false})
+ const riskGrid=useRiskGrid(layers.risk),officialDistricts=useOfficialDistricts(true),riverForecast=useRiverForecast(layers.rivers)
  const directory=useEvidence('/api/flood-map/districts',retry)
  const query=new URLSearchParams(districtId?{district_id:districtId}:{})
  const historicalQuery=new URLSearchParams(query);if(eventId)historicalQuery.set('event_id',eventId)
@@ -160,25 +166,27 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  const today=place?.imd&&place.imd.status!=='stale'?place.imd.days[0]:null
  const popup=place?[place.imd?`${place.imd.district} district`:'Outside Karnataka districts',`Official IMD warning today: ${today?levelName(today.level):'unavailable'}`,place.cell?`Rain risk next 24 h: ${LEVEL_NAMES[place.cell.level]||'Unavailable'} (experimental)`:null].filter(Boolean):null
  const mapStage=<div className="intelligence-map-stage">
-  <IntelligenceGeography district={district} history={safeHistory} shelters={shownShelters} risk={layers.risk&&riskGrid.data?.cells?riskGrid.data:null} official={layers.official?officialDistricts.data:null} point={checked} popup={popup} onPoint={check} onFeature={chooseFeature}>
+  <IntelligenceGeography district={district} history={safeHistory} shelters={shownShelters} risk={layers.risk&&riskGrid.data?.cells?riskGrid.data:null} official={layers.official?officialDistricts.data:null} rivers={layers.rivers&&riverForecast.data?riverForecast.data.points:null} point={checked} popup={popup} onPoint={check} onFeature={chooseFeature}>
    {wide?<>
    <fieldset className="intelligence-layers"><legend>Show on map</legend>
-    <p className="layer-group">Today</p>{[['official','Official IMD warnings'],['risk','Rain risk, next 24 h']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
+    <p className="layer-group">Today</p>{[['official','Official IMD warnings'],['risk','Rain risk, next 24 h'],['rivers','River flood forecast, 7 days']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
     <p className="layer-group">Background</p>{[['history','Past floods (satellite)'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
    </fieldset>
    <div className="intelligence-legend" aria-label="Map legend">
     {layers.official&&<div className="risk-legend" aria-label="Official IMD warning legend"><strong>IMD today</strong>{['red','orange','yellow','green'].map(l=><span key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}>{levelName(l)}</span>)}</div>}
     {layers.risk&&<div className="risk-legend zones" aria-label="Rain risk legend"><strong>Rain risk 24 h</strong>{['moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="muted">clear = Low</span></div>}
+    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div>}
     <div className="risk-legend other">{layers.history&&<span className="legend-water">Past flood</span>}{layers.shelters&&<span className="legend-shelter">Verified shelter</span>}<span className="legend-point">Your checked place</span></div>
    </div>
    </>:<div className="intelligence-layers-toggle"><Popup label="Layers & legend" buttonClassName="secondary" title="Map layers and legend">
    <fieldset className="intelligence-layers"><legend>Show on map</legend>
-    <p className="layer-group">Today</p>{[['official','Official IMD warnings'],['risk','Rain risk, next 24 h']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
+    <p className="layer-group">Today</p>{[['official','Official IMD warnings'],['risk','Rain risk, next 24 h'],['rivers','River flood forecast, 7 days']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
     <p className="layer-group">Background</p>{[['history','Past floods (satellite)'],['shelters','Verified shelters']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
    </fieldset>
    <div className="intelligence-legend" aria-label="Map legend">
     {layers.official&&<div className="risk-legend" aria-label="Official IMD warning legend"><strong>IMD today</strong>{['red','orange','yellow','green'].map(l=><span key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}>{levelName(l)}</span>)}</div>}
     {layers.risk&&<div className="risk-legend zones" aria-label="Rain risk legend"><strong>Rain risk 24 h</strong>{['moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="muted">clear = Low</span></div>}
+    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div>}
     <div className="risk-legend other">{layers.history&&<span className="legend-water">Past flood</span>}{layers.shelters&&<span className="legend-shelter">Verified shelter</span>}<span className="legend-point">Your checked place</span></div>
    </div>
    </Popup></div>}
@@ -204,7 +212,23 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
     {riskCounts.length>0&&<p className="risk-count-chips">{riskCounts.map(([l,n])=><span key={l} className="risk-chip" style={{'--swatch':LEVEL_COLORS[l]}}>{n} {LEVEL_NAMES[l]}</span>)}</p>}
     <p className="muted">Experimental rule-based index from forecast rain only (~28 km areas) — not a flood probability or an official warning.</p></div>}
   </>},
-  {id:'floods',label:'Past floods',content:<>
+  {id:'rivers',label:'Rivers',content:<section className="intelligence-card river-forecast" aria-labelledby="river-forecast-title">
+   <h3 id="river-forecast-title">River flood forecast · next 7 days <span className="source-tag experimental">Experimental</span></h3>
+   {!layers.rivers?<p className="muted">River forecast hidden. Turn on "River flood forecast" in the map layers.</p>
+    :riverForecast.loading&&!riverForecast.data?<p role="status">Loading the river forecast…</p>
+    :riverForecast.error||!riverForecast.data?<p role="status">River forecast unavailable{riverForecast.error?` (${riverForecast.error})`:''}. This does not mean rivers are normal; check CWC and KSNDMC.</p>
+    :<ul className="river-list" aria-label="River flood forecast, next 7 days">{riverForecast.data.points.map(r=><li key={r.id} data-level={r.level}>
+      <span className="risk-chip" style={{'--swatch':LEVEL_COLORS[r.level]}}>{LEVEL_NAMES[r.level]}</span>
+      <strong>{r.river}</strong> at {r.place} <span className="muted">({r.district})</span>
+      <small>{Math.round(r.peak.share_above['2_year']*100)}% of runs above the 2-year flood level · {Math.round(r.peak.share_above['5_year']*100)}% above 5-year</small></li>)}</ul>}
+   <p className="muted">Modelled river flow from Copernicus GloFAS (50 forecast runs) at {riverForecast.data?.points.length||6} river points checked against OpenStreetMap and past floods. Not observed water levels or an official warning; dam releases are only approximated.</p>
+   <p className="muted"><Popup label="How the river forecast was checked" title="How the river forecast works">
+    <p>Each point is the GloFAS model cell on a named river near a town. A point was kept only if OpenStreetMap shows that river within 3 km and the model's largest past flows (1997–2021) fall within 3 days of a documented flood, such as the Krishna and Ghataprabha floods of August 2019 and the Kabini flood of August 2018.</p>
+    <p>Flood levels (2-, 5- and 10-year) come from each cell's own 25 yearly maxima, as GloFAS does. "High" means most of the 50 forecast runs exceed the 2-year level; "Severe", the 5-year level; "Moderate", at least 1 in 5 runs above the 2-year level. These cut-offs are the project's choice.</p>
+    <p>Not shown: Bhima at Afzalpur and Kaveri at Srirangapatna did not pass the past-flood check, so they are not forecast here. Source: Copernicus GloFAS v4 via Open-Meteo (CC BY 4.0); river lines © OpenStreetMap contributors.</p>
+   </Popup></p>
+  </section>},
+  {id:'floods',label:<><span className="label-long">Past floods</span><span className="label-short">Floods</span></>,ariaLabel:'Past floods',content:<>
    {layers.history&&<section className="intelligence-card past-floods" aria-labelledby="past-floods-title"><h3 id="past-floods-title">Past floods</h3>
     <p className="historical-notice">{safeHistory?(safeHistory.total===0?'No past floods are mapped for this district. This does not mean it never floods.':`${safeHistory.total} mapped flood cells from ${safeHistory.coverage.historical_events} recorded floods in ${[...new Set(safeHistory.geojson.features.map(f=>f.properties.district).filter(Boolean))].join(', ')||'mapped districts'}.`):history.error?'Past floods could not be loaded.':'Loading past floods…'}</p>
     <p className="muted">Maximum water seen by satellite during each flood — not current flooding, flooded roads or evacuation advice.</p>

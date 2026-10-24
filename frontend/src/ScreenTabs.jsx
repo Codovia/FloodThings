@@ -29,7 +29,7 @@ export default function ScreenTabs({ tabs, label, mode = 'phone', active, onActi
   }
   return <div className={`screen-tabs-wrap ${tabbed ? 'tabbed' : 'untabbed'} ${className}`}>
     {tabbed && <div role="tablist" aria-label={label} className="screen-tabs">{shown.map((t, i) =>
-      <button key={t.id} type="button" role="tab" id={`${id}-${t.id}`} aria-selected={t.id === current} aria-controls={`${id}-${t.id}-panel`} tabIndex={t.id === current ? 0 : -1} onClick={() => choose(t.id)} onKeyDown={e => key(e, i)}>{t.label}</button>)}</div>}
+      <button key={t.id} type="button" role="tab" id={`${id}-${t.id}`} aria-label={t.ariaLabel} aria-selected={t.id === current} aria-controls={`${id}-${t.id}-panel`} tabIndex={t.id === current ? 0 : -1} onClick={() => choose(t.id)} onKeyDown={e => key(e, i)}>{t.label}</button>)}</div>}
     {shown.map(t => <div key={t.id} id={`${id}-${t.id}-panel`} role={tabbed ? 'tabpanel' : undefined} aria-labelledby={tabbed ? `${id}-${t.id}` : undefined} hidden={tabbed && t.id !== current} className={`screen-panel panel-${t.id}`}>{t.content}</div>)}
   </div>
 }
