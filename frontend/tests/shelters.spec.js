@@ -35,7 +35,9 @@ test('explicit demonstration fixtures render exact entrance, mobile map and no u
  await page.getByRole('button',{name:'Get directions'}).click();await expect(link).toBeVisible()
  const url=new URL(await link.getAttribute('href'));expect(url.searchParams.get('destination')).toBe('13.5,74.7');expect(url.searchParams.get('api')).toBe('1')
  // Directions open on the Map tab; the capacity warning is on the Shelters tab.
- await expect(page.getByText(/Routes are not checked for flooding/)).toBeVisible();expect(await expectOneScreen(page)).toEqual({page:0,width:0,scrolls:0,outside:0})
+ await expect(page.getByText(/Routes are not checked for flooding/)).toBeVisible()
+ // Like the other one-screen checks, measure after the panel settles (the safety net re-measures after changes).
+ await page.waitForTimeout(1600);expect(await expectOneScreen(page)).toEqual({page:0,width:0,scrolls:0,outside:0})
  await openTab(page,'Shelters');await expect(page.getByText('Capacity is not a reservation. Directions are not verified flood-safe; confirm access before travel.',{exact:true})).toBeVisible();expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
  await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled shelter database outage'})}))
  await page.getByRole('button',{name:'Refresh shelters'}).click();await expect(page.getByText(/Controlled shelter database outage/)).toBeVisible();await expect(link).toHaveCount(0)

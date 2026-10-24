@@ -203,3 +203,13 @@ it('a precise but expired GPS start is refreshed once when Shelters opens',async
  await waitFor(()=>expect(watchPosition).toHaveBeenCalledOnce())
  rerender(<PublicShelters point={old} active onLocate={vi.fn()}/>);expect(watchPosition).toHaveBeenCalledOnce()
 })
+it('while the browser permission prompt is open it says so, and "Block" ends the attempt at once',async()=>{
+ const status={state:'prompt',onchange:null},{watchPosition,clearWatch}=stubWatch()
+ vi.stubGlobal('navigator',{...navigator,geolocation:{watchPosition,clearWatch,getCurrentPosition:vi.fn()},permissions:{query:vi.fn(async()=>status)}})
+ render(<PublicShelters point={null} active onLocate={vi.fn()}/>)
+ expect(await screen.findByText(/Allow location access in your browser's prompt/)).toBeTruthy()
+ expect(screen.getByRole('button',{name:'Allow location…'})).toBeTruthy()
+ act(()=>{status.state='denied';status.onchange()})
+ expect(await screen.findByText(/Location permission denied/)).toBeTruthy();expect(clearWatch).toHaveBeenCalled()
+ expect(screen.getByRole('button',{name:'Use my location'})).toBeTruthy()
+})

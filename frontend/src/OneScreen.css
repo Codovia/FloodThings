@@ -471,3 +471,5 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
 .river-list li .ai-line{flex-basis:100%;font-size:.74rem;color:#33475b}
 .river-list li .ai-line[data-state="likely"]{color:#8a1c1c}
 .ai-eval{margin:4px 0;padding-left:1.2em;font-size:.82rem}
+/* Shelters: a location message is a short line, not a large banner. */
+.page-shelters .shelters-panel>.notice{font-size:.8rem;padding:6px 10px;margin:4px 0}

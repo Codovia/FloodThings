@@ -33,7 +33,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const [retryTarget,setRetryTarget]=useState(null),[pickingStart,setPickingStart]=useState(null)
   const [navTarget,setNavTarget]=useState(null),[travelMode,setTravelMode]=useState('walking')
   const [selected,setSelected]=useState(null),[locating,setLocating]=useState(false),[locateError,setLocateError]=useState(null)
-  const [locatingAccuracy,setLocatingAccuracy]=useState(null),locateJob=useRef(null),staleRefreshed=useRef(null),pendingRef=useRef(null)
+  const [awaitingPermission,setAwaitingPermission]=useState(false),[locatingAccuracy,setLocatingAccuracy]=useState(null),locateJob=useRef(null),staleRefreshed=useRef(null),pendingRef=useRef(null)
   pendingRef.current=pending
   useEffect(()=>()=>locateJob.current?.abort(),[])
   // One-screen rule: shelters are paged instead of scrolled; on phones the map and help are tabs.
@@ -75,16 +75,22 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
     if(!onLocate)return
     if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');onFail?.();return}
     locateJob.current?.abort();const job=new AbortController();locateJob.current=job
-    setLocating(true);setLocateError(null);setLocatingAccuracy(null)
+    setLocating(true);setLocateError(null);setLocatingAccuracy(null);setAwaitingPermission(false)
+    // While the browser's permission prompt is open, say so; a "Block" answer ends the attempt at once.
+    Promise.resolve(navigator.permissions?.query?.({name:'geolocation'})).then(status=>{
+      if(!status||locateJob.current!==job)return
+      if(status.state==='prompt')setAwaitingPermission(true)
+      status.onchange=()=>{if(locateJob.current!==job)return;setAwaitingPermission(false);if(status.state==='denied')job.abort('denied')}
+    },()=>{})
     const asPoint=r=>({name:'Your GPS location',latitude:r.coords.latitude,longitude:r.coords.longitude,accuracy_m:r.coords.accuracy,gps_timestamp:r.timestamp,kind:'gps'})
     // The first usable fix is used at once (shelters list immediately); a better one replaces it when it arrives.
     let used=null
-    preciseLocation({signal:job.signal,onProgress:p=>{setLocatingAccuracy(Math.round(p.coords.accuracy));if(!used&&p.coords.accuracy<=MAX_START_ACCURACY_M){used=p.coords.accuracy;onLocate(asPoint(p))}}}).then(r=>{
+    preciseLocation({signal:job.signal,onProgress:p=>{setAwaitingPermission(false);setLocatingAccuracy(Math.round(p.coords.accuracy));if(!used&&p.coords.accuracy<=MAX_START_ACCURACY_M){used=p.coords.accuracy;onLocate(asPoint(p))}}}).then(r=>{
       if(used===null||r.coords.accuracy<used)onLocate(asPoint(r))
       // Too coarse for directions: show the area on the map and let the person tap the exact start.
       if(r.coords.accuracy>MAX_START_ACCURACY_M&&!pendingRef.current)startPicking('locate')
-    },e=>{if(e?.name==='AbortError')return;setLocateError(e?.code===1?'Location permission denied. Allow location for this site, or use "Change location" to choose your place.':'Location unavailable. Use "Change location", or tap your start on the map.');onFail?.()})
-    .finally(()=>{if(locateJob.current===job){locateJob.current=null;setLocating(false);setLocatingAccuracy(null)}})
+    },e=>{if(e?.name==='AbortError'&&job.signal.reason!=='denied')return;setLocateError(e?.code===1||job.signal.reason==='denied'?'Location permission denied. Allow location for this site, or use "Change location" to choose your place.':'Location unavailable. Use "Change location", or tap your start on the map.');onFail?.()})
+    .finally(()=>{if(locateJob.current===job){locateJob.current=null;setLocating(false);setLocatingAccuracy(null);setAwaitingPermission(false)}})
   }
   // Like Home: when Shelters opens without a usable start, look up the location once (unless access was refused),
   // so nobody has to place their start by hand. A fix older than five minutes is refreshed the same way.
@@ -191,8 +197,8 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const roughness=selectedPoint?.kind==='network'?'Your location is only an approximate city estimate.':selectedPoint?.kind==='gps'&&!(selectedPoint.accuracy_m<=MAX_START_ACCURACY_M)?`Your device located you only to ±${Math.round(selectedPoint.accuracy_m)} m; directions need ±${MAX_START_ACCURACY_M} m or better. Laptops often cannot do better.`:'Your GPS fix is older than five minutes; update your location for directions.'
   return <section className={(overview?"panel shelters-overview":"panel shelters-panel")+(!wide&&tab==='map'?' map-focus':'')} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">VERIFIED BY ADMINISTRATORS</p><h2 id="public-shelters-title">Open shelters near you</h2></div><button className="secondary" onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
-    <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m${approx?', approximate':''})`:''}.`}</p>:<p>Set your location to list the nearest shelters first.</p>}
-      {onLocate&&<button type="button" onClick={()=>locate()} disabled={locating}>{locating?(locatingAccuracy!==null?`±${locatingAccuracy} m, improving…`:'Finding you…'):point?'Update my location':'Use my location'}</button>}</div>
+    <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m${approx?', approximate':''})`:''}.`}</p>:<p>{awaitingPermission?'Allow location access in your browser\'s prompt (next to the address bar) to list the nearest shelters.':'Set your location to list the nearest shelters first.'}</p>}
+      {onLocate&&<button type="button" onClick={()=>locate()} disabled={locating}>{locating?(awaitingPermission?'Allow location…':locatingAccuracy!==null?`±${locatingAccuracy} m, improving…`:'Finding you…'):point?'Update my location':'Use my location'}</button>}</div>
     {locateError&&!point&&<p role="status" className="notice">{locateError}</p>}
     {selectedPoint && !point && !locating && <p role="status" className="notice">{roughness}{!pickingStart&&onLocate&&<> <button type="button" className="link-button" onClick={()=>startPicking('locate')}>Tap my start on the map</button></>}</p>}
     <div aria-live="polite" aria-busy={current.loading} className="shelter-status">
