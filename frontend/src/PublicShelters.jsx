@@ -14,8 +14,11 @@ import RouteSteps from './RouteSteps.jsx'
 const PER_PAGE=1  // one shelter card per screen (one-screen rule)
 const ago=value=>{const m=Math.max(0,Math.round((Date.now()-Date.parse(value))/60000));return m<1?'just now':m<60?`${m} min ago`:`${Math.round(m/60)} h ago`}
 const clock=value=>new Intl.DateTimeFormat('en-IN',{dateStyle:'medium',timeStyle:'short',timeZone:'Asia/Kolkata'}).format(new Date(value))+' IST'
-// Directions need a start within this radius; coarser fixes are shown on the map for the person to refine.
-export const MAX_START_ACCURACY_M = 100
+// A device fix within PRECISE is a precise start; up to MAX (the route service's own limit) it is used as an
+// approximate start and labelled so. Coarser fixes, network estimates and fixes older than 5 minutes are not used.
+export const PRECISE_START_ACCURACY_M = 100
+export const MAX_START_ACCURACY_M = 1000
+export const approximateStart = point => point?.kind === 'gps' && point.accuracy_m > PRECISE_START_ACCURACY_M
 export function usableNavigationOrigin(point, now=Date.now()) {
   if (!point || point.kind === 'network' || !Number.isFinite(point.latitude) || Math.abs(point.latitude)>90 || !Number.isFinite(point.longitude) || Math.abs(point.longitude)>180) return null
   if (point.kind === 'gps' && (!Number.isFinite(point.accuracy_m) || point.accuracy_m>MAX_START_ACCURACY_M || point.accuracy_m<0 || !Number.isFinite(point.gps_timestamp) || point.gps_timestamp>now || now-point.gps_timestamp>300000)) return null
@@ -37,6 +40,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const wide=useWide(),[tab,setTab]=useState('list')
   const selectedPoint=point
   point=usableNavigationOrigin(point)
+  const approx=approximateStart(point)
   // An imprecise GPS fix is still shown as an area (blue circle) so the person can tap the exact start inside it.
   const mapOrigin=point||(selectedPoint?.kind==='gps'&&Number.isFinite(selectedPoint.accuracy_m)?{...selectedPoint,showAccuracy:true}:null)
   const key=point?`${point.latitude}:${point.longitude}`:'no-origin'
@@ -55,7 +59,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const pins=ordered.map((s,i)=>({...s,label:String(i+1),name:`${i+1}. ${s.name} · ${s.available_capacity} places free`,tone:s.available_capacity<Math.max(10,s.capacity*0.15)?'limited':'ok'}))
   const navListed=!!navTarget&&!!data?.shelters.some(s=>s.id===navTarget.id&&s.latitude===navTarget.latitude&&s.longitude===navTarget.longitude)
   const navLink=navTarget&&navigation?.id===navTarget.id&&navigation.key===key&&Date.now()-navigation.at<5000?navigation.url:null
-  const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
+  const navigator_=navTarget&&point?<ShelterNavigation shelter={navTarget} origin={approx?{...point,approximate:true}:point} listed={navListed} demonstration={data?.mode==='demonstration'} mode={travelMode} onMode={setTravelMode} link={navLink} rechecking={current.loading} onRecheck={()=>checkDestination({preventDefault(){}},navTarget)} onClose={()=>setNavTarget(null)}/>:null
   useEffect(()=>{if(navTarget)setTab('map')},[navTarget?.id])
   function startPicking(target=retryTarget||'nearest'){setPickingStart(target);setNavigationNotice(null);setTab('map')}  // the map banner says what to do
   function pickStart(p){
@@ -72,20 +76,29 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
     if(!navigator.geolocation||!window.isSecureContext){setLocateError('Location needs a supported browser and a secure connection. Use "Change location" instead.');onFail?.();return}
     locateJob.current?.abort();const job=new AbortController();locateJob.current=job
     setLocating(true);setLocateError(null);setLocatingAccuracy(null)
-    preciseLocation({signal:job.signal,onProgress:p=>setLocatingAccuracy(Math.round(p.coords.accuracy))}).then(r=>{
-      onLocate({name:'Your GPS location',latitude:r.coords.latitude,longitude:r.coords.longitude,accuracy_m:r.coords.accuracy,gps_timestamp:r.timestamp,kind:'gps'})
+    const asPoint=r=>({name:'Your GPS location',latitude:r.coords.latitude,longitude:r.coords.longitude,accuracy_m:r.coords.accuracy,gps_timestamp:r.timestamp,kind:'gps'})
+    // The first usable fix is used at once (shelters list immediately); a better one replaces it when it arrives.
+    let used=null
+    preciseLocation({signal:job.signal,onProgress:p=>{setLocatingAccuracy(Math.round(p.coords.accuracy));if(!used&&p.coords.accuracy<=MAX_START_ACCURACY_M){used=p.coords.accuracy;onLocate(asPoint(p))}}}).then(r=>{
+      if(used===null||r.coords.accuracy<used)onLocate(asPoint(r))
       // Too coarse for directions: show the area on the map and let the person tap the exact start.
       if(r.coords.accuracy>MAX_START_ACCURACY_M&&!pendingRef.current)startPicking('locate')
     },e=>{if(e?.name==='AbortError')return;setLocateError(e?.code===1?'Location permission denied. Allow location for this site, or use "Change location" to choose your place.':'Location unavailable. Use "Change location", or tap your start on the map.');onFail?.()})
     .finally(()=>{if(locateJob.current===job){locateJob.current=null;setLocating(false);setLocatingAccuracy(null)}})
   }
-  // A precise GPS start expires after five minutes; refresh it once when Shelters is opened.
+  // Like Home: when Shelters opens without a usable start, look up the location once (unless access was refused),
+  // so nobody has to place their start by hand. A fix older than five minutes is refreshed the same way.
+  const autoLocated=useRef(false)
   useEffect(()=>{
-    const p=selectedPoint
-    if(!enabled||!onLocate||locating||point||p?.kind!=='gps'||!(p.accuracy_m<=MAX_START_ACCURACY_M)||staleRefreshed.current===p.gps_timestamp)return
-    staleRefreshed.current=p.gps_timestamp;locate()
-  },[enabled,selectedPoint])
-  const directions=s=>'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:`${s.latitude},${s.longitude}`,...(point?{origin:`${point.latitude},${point.longitude}`}:{})})
+    if(!enabled){autoLocated.current=false;return}
+    if(autoLocated.current||point||!onLocate||locating)return
+    autoLocated.current=true
+    let live=true
+    Promise.resolve(navigator.permissions?.query?.({name:'geolocation'})).then(state=>{if(live&&state?.state!=='denied')locate()},()=>{if(live)locate()})
+    return()=>{live=false}
+  },[enabled,point])
+  // With an approximate start the origin is left out, so Google Maps starts from the phone's own location.
+  const directions=s=>'https://www.google.com/maps/dir/?'+new URLSearchParams({api:'1',destination:`${s.latitude},${s.longitude}`,...(point&&!approx?{origin:`${point.latitude},${point.longitude}`}:{})})
   async function inAppRoute(shelter,profile='foot-walking'){
     if(!usableNavigationOrigin(selectedPoint)){setNavigationNotice('Select an adequate starting location before requesting a route.');return}
     setRouteBusy(true);setRoute(null);setNavigationNotice('Planning a route that avoids approved flood reports…')
@@ -175,12 +188,12 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const mapView=navigator_||<>{pickBanner}{route&&<div className="route-summary" role="status"><p><strong>{(route.distance_m/1000).toFixed(1)} km · about {Math.round(route.duration_s/60)} min walking to {ordered.find(x=>x.id===route.shelterId)?.name||'the shelter'}</strong> · <Popup label="Turn-by-turn directions" title={`Turn-by-turn directions · ${route.steps.length} steps`}><RouteSteps steps={route.steps}/></Popup></p><p className="notice">{route.label}</p><p className="muted">{route.attribution}</p></div>}<ShelterMap onSelect={pickingStart?pickStart:null} points={pins} route={route?.geometry} origin={mapOrigin} focus={focus} onInspect={p=>select(p.id,true)} navigationBounds={navigationBounds} label="Verified open shelter entrances"/></>
   // Phones: while the Map tab is open, the list header steps aside so the map and directions fit.
   // Why the current location cannot start directions, and how to fix it.
-  const roughness=selectedPoint?.kind==='network'?'Your location is only an approximate city estimate.':selectedPoint?.kind==='gps'&&!(selectedPoint.accuracy_m<=MAX_START_ACCURACY_M)?`Your device located you only to ±${Math.round(selectedPoint.accuracy_m)} m; directions need ±${MAX_START_ACCURACY_M} m. Laptops and indoor phones often cannot do better.`:'Your GPS fix is older than five minutes; update your location for directions.'
+  const roughness=selectedPoint?.kind==='network'?'Your location is only an approximate city estimate.':selectedPoint?.kind==='gps'&&!(selectedPoint.accuracy_m<=MAX_START_ACCURACY_M)?`Your device located you only to ±${Math.round(selectedPoint.accuracy_m)} m; directions need ±${MAX_START_ACCURACY_M} m or better. Laptops often cannot do better.`:'Your GPS fix is older than five minutes; update your location for directions.'
   return <section className={(overview?"panel shelters-overview":"panel shelters-panel")+(!wide&&tab==='map'?' map-focus':'')} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">VERIFIED BY ADMINISTRATORS</p><h2 id="public-shelters-title">Open shelters near you</h2></div><button className="secondary" onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
-    <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m)`:''}.`}</p>:<p>Set your location to list the nearest shelters first.</p>}
+    <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m${approx?', approximate':''})`:''}.`}</p>:<p>Set your location to list the nearest shelters first.</p>}
       {onLocate&&<button type="button" onClick={()=>locate()} disabled={locating}>{locating?(locatingAccuracy!==null?`±${locatingAccuracy} m, improving…`:'Finding you…'):point?'Update my location':'Use my location'}</button>}</div>
-    {locateError&&<p role="status" className="notice">{locateError}</p>}
+    {locateError&&!point&&<p role="status" className="notice">{locateError}</p>}
     {selectedPoint && !point && !locating && <p role="status" className="notice">{roughness}{!pickingStart&&onLocate&&<> <button type="button" className="link-button" onClick={()=>startPicking('locate')}>Tap my start on the map</button></>}</p>}
     <div aria-live="polite" aria-busy={current.loading} className="shelter-status">
       {current.loading&&<p role="status">Checking shelter directory…</p>}

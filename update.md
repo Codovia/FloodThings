@@ -2478,3 +2478,15 @@ Live rain source: the app reads Open-Meteo forecast-model rain (past 30 days + 7
 App: `backend/app/river_flood_model.py` adds `ai_model` to each `/api/river-forecast` point (status available / not_used / unavailable — never "not likely" on failure); Flood Map → Rivers shows a GloFAS line and an AI line per river, three rivers per page, and a "How the AI model was tested" popup with these numbers; How it works "AI models" tab states what failed (district flood-day models) and what works. Not an official warning; dam operations are not modelled.
 
 Verification: backend 562/562 (8 new: input windows/no gap filling, scoring, loading rules, flagging, rain-scale conversion, outage handling, shipped-model integrity); unit 293/293; build passes; Playwright 81 passed, 8 skipped (database-gated), 1 known admin-layout failure. Live: Rivers tab one screen on both pages at 1508×761, 1366×768, 1920×1080 and 390×700; AI models tab one screen at 1508, 1366 and 390.
+
+## 2026-10-25 — Shelters finds the user's location by itself; an approximate start no longer requires a map tap
+
+Request: use location on Shelters like Home, instead of making the user place a start point on the map.
+
+Before: Shelters never looked up the location on opening; "Get directions" demanded a start within ±100 m, so a laptop or indoor phone (typically ±150 m–1 km) was sent to tap the map, and the coarse fix was not even used to sort shelters.
+
+Reconciled control (explicit): the start-accuracy rule is now two-tier. ±100 m or better = precise start; ±100 m to ±1 km = approximate start, matching the route service's existing limit (`routing.py` `MAX_ORIGIN_ACCURACY_M = 1000`, unchanged), labelled "approximate" in the distance line and the directions panel. With an approximate start the Google Maps link carries no origin, so Google Maps starts from the phone's own GPS. Unchanged: fixes older than 5 minutes, worse than ±1 km, or network (IP) city estimates are not used; tapping the map remains available and is required only when no usable fix exists.
+
+Changes (`PublicShelters.jsx`, `ShelterNavigation.jsx`): opening Shelters without a usable start looks the location up once (skipped if the browser reports permission "denied"; replaces the narrower stale-fix refresh); the first fix within ±1 km is used immediately and replaced if a better one arrives; a failed automatic lookup's message is hidden once a start exists.
+
+Verification: unit 295/295 (new: approximate start gives directions with no origin in the Google link and no map tap; automatic lookup on open and none when permission is denied; worse than ±1 km still never gives directions); build passes. Browser (Playwright Chromium, emulated ±650 m fix, user opens /shelters directly): located and listed in 0.9 s (1508×761) and 0.6 s (390×844), "GPS ±650 m, approximate", no map-tap banner, directions opened, Google link `origin` absent. Playwright 81 passed, 8 skipped (database-gated), 1 known admin-layout failure. Test adjustment: `navigation.spec.js` withdraws location access after its GPS step because its frozen page clock makes the real-time-stamped fix look stale (Shelters would correctly refresh it).

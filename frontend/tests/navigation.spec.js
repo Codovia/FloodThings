@@ -22,6 +22,9 @@ const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 test('five routes, direct URLs, back/forward, persistent location and one freshness lifecycle',async({page})=>{
  const requests=await setup(page);await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
  await selectPoint(page,13.34,74.74);await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
+ // The page clock is frozen while the browser stamps GPS fixes with real time, so the fix looks stale and Shelters
+ // would refresh it automatically. Location access is withdrawn so this test checks only that the point persists.
+ await page.context().clearPermissions()
  await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click();await openTab(page,'Past floods');await expect(page.getByText(/56 mapped flood cells/)).toBeVisible();await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.goBack();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)

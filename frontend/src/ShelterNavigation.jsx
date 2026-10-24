@@ -67,7 +67,7 @@ export default function ShelterNavigation({ shelter, origin, listed, demonstrati
     {!listed && <p role="alert" className="notice error">This shelter is no longer listed as verified open with free places. Navigation stopped — go back and choose another shelter.</p>}
     {listed && <>
       <div className="shelter-navigation-bar">
-        <p>From <strong>{origin.name}</strong>{shelter.straight_line_km !== null && ` · ${Number(shelter.straight_line_km).toFixed(1)} km straight line`}</p>
+        <p>From <strong>{origin.name}</strong>{origin.approximate && ` (approximate, ±${Math.round(origin.accuracy_m)} m — "Start navigation in Google Maps" uses your phone's own location)`}{shelter.straight_line_km !== null && ` · ${Number(shelter.straight_line_km).toFixed(1)} km straight line`}</p>
         <div className="risk-area-toggle" role="group" aria-label="Travel mode">{MODES.map(([value, label]) => <button key={value} type="button" aria-pressed={mode === value} onClick={() => onMode(value)}>{label}</button>)}</div>
         {!safeOff && <div className="risk-area-toggle shelter-route-source" role="group" aria-label="Route source">
         <button type="button" aria-label="Avoids reported flooding" aria-pressed={view === 'safe'} onClick={() => setSource('safe')}><span className="label-long">Avoids reported flooding</span><span className="label-short">Avoids flooding</span></button>

@@ -130,11 +130,30 @@ it('the Home "nearest open shelter" request opens directions to the nearest shel
  render(<PublicShelters point={gpsPoint()} active onLocate={vi.fn()} nearestRequest={1}/>)
  expect(await screen.findByRole('heading',{name:'Directions to '+near.name})).toBeTruthy()
 })
-it('an imprecise location never produces directions and says how to fix it',async()=>{
- const onLocate=vi.fn();stubGps({coords:{latitude:13.34,longitude:74.74,accuracy:900},timestamp:Date.now()})
+it('a location worse than ±1 km never produces directions and says how to fix it',async()=>{
+ const onLocate=vi.fn();stubGps({coords:{latitude:13.34,longitude:74.74,accuracy:1500},timestamp:Date.now()})
  const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate} nearestRequest={1}/>);await waitFor(()=>expect(onLocate).toHaveBeenCalled())
- rerender(<PublicShelters point={gpsPoint(900)} active onLocate={onLocate} nearestRequest={1}/>)
- expect(await screen.findByText(/too uncertain \(±900 m\) for directions/)).toBeTruthy();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
+ rerender(<PublicShelters point={gpsPoint(1500)} active onLocate={onLocate} nearestRequest={1}/>)
+ expect(await screen.findByText(/too uncertain \(±1500 m\) for directions/)).toBeTruthy();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
+})
+it('an approximate location (±100 m to ±1 km) gives directions without a map tap; Google Maps starts from the phone',async()=>{
+ const far={...row,id:'far',straight_line_km:30},near={...row,id:'near',name:'DEMONSTRATION ONLY near fixture',straight_line_km:2.1}
+ fetch.mockImplementation(()=>reply(list([far,near])))
+ render(<PublicShelters point={gpsPoint(650)} active onLocate={vi.fn()} nearestRequest={1}/>)
+ expect(await screen.findByRole('heading',{name:'Directions to '+near.name})).toBeTruthy()
+ expect(screen.getByText(/approximate, ±650 m — "Start navigation in Google Maps" uses your phone's own location/)).toBeTruthy()
+ expect(screen.getByText(/GPS ±650 m, approximate/)).toBeTruthy()
+ const link=await screen.findByRole('link',{name:/Inspect demonstration directions/})
+ expect(new URL(link.href).searchParams.get('origin')).toBeNull()  // no approximate origin sent: the phone's own GPS is used
+ expect(screen.queryByText('Click your starting point on the map.')).toBeNull()
+})
+it('opening Shelters without a start looks up the location automatically, unless access was refused',async()=>{
+ const {watchPosition}=stubWatch()
+ const {unmount}=render(<PublicShelters point={null} active onLocate={vi.fn()}/>)
+ await waitFor(()=>expect(watchPosition).toHaveBeenCalledOnce());unmount()
+ const refused=stubWatch();vi.stubGlobal('navigator',{...navigator,geolocation:{watchPosition:refused.watchPosition,clearWatch:vi.fn()},permissions:{query:vi.fn(async()=>({state:'denied'}))}})
+ render(<PublicShelters point={null} active onLocate={vi.fn()}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
+ await new Promise(r=>setTimeout(r,20));expect(refused.watchPosition).not.toHaveBeenCalled()
 })
 it('when GPS is refused, the start can be clicked on the shelter map and directions continue',async()=>{
  const onLocate=vi.fn();stubGps(null)
@@ -155,23 +174,24 @@ function stubWatch(){const calls={};const clearWatch=vi.fn();const watchPosition
 const fix=accuracy=>({coords:{latitude:13.34,longitude:74.74,accuracy},timestamp:Date.now()})
 it('keeps the most accurate fix instead of the first coarse one, and stops once it is precise',async()=>{
  const onLocate=vi.fn(),{calls,clearWatch}=stubWatch()
- render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
- fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
- act(()=>calls.ok(fix(850)));expect(await screen.findByRole('button',{name:'±850 m, improving…'})).toBeTruthy();expect(onLocate).not.toHaveBeenCalled()
+ render(<PublicShelters point={null} active onLocate={onLocate}/>)  // opening Shelters starts the lookup
+ await waitFor(()=>expect(calls.ok).toBeTruthy())
+ act(()=>calls.ok(fix(850)));expect(await screen.findByRole('button',{name:'±850 m, improving…'})).toBeTruthy()
+ expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({accuracy_m:850}))  // used at once as an approximate start
  act(()=>calls.ok(fix(2000)));expect(screen.getByRole('button',{name:'±850 m, improving…'})).toBeTruthy()  // a worse later fix is ignored
  act(()=>calls.ok(fix(12)))
- await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:12})));expect(onLocate).toHaveBeenCalledOnce();expect(clearWatch).toHaveBeenCalledWith(7)
+ await waitFor(()=>expect(onLocate).toHaveBeenLastCalledWith(expect.objectContaining({kind:'gps',accuracy_m:12})));expect(onLocate).toHaveBeenCalledTimes(2);expect(clearWatch).toHaveBeenCalledWith(7)
 })
 it('a fix still too coarse for directions is shown as an area and the exact start can be tapped on the map',async()=>{
  const onLocate=vi.fn(),{calls}=stubWatch()
- const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>);await screen.findByText(/Set your location to list the nearest shelters first/)
- fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
- act(()=>{calls.ok(fix(900));calls.fail({code:3})})  // no better fix arrives
- await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:900})))
- rerender(<PublicShelters point={gpsPoint(900)} active onLocate={onLocate}/>)
- expect(screen.getByText(/located you only to ±900 m; directions need ±100 m/)).toBeTruthy()
+ const {rerender}=render(<PublicShelters point={null} active onLocate={onLocate}/>)  // opening Shelters starts the lookup
+ await waitFor(()=>expect(calls.ok).toBeTruthy())
+ act(()=>{calls.ok(fix(1500));calls.fail({code:3})})  // no better fix arrives
+ await waitFor(()=>expect(onLocate).toHaveBeenCalledWith(expect.objectContaining({kind:'gps',accuracy_m:1500})))
+ rerender(<PublicShelters point={gpsPoint(1500)} active onLocate={onLocate}/>)
+ expect(screen.getByText(/located you only to ±1500 m; directions need ±1000 m or better/)).toBeTruthy()
  expect(screen.getAllByText('Click your starting point on the map.').length).toBeGreaterThan(0)
- expect(globalThis.__shelterMapOrigin).toEqual(expect.objectContaining({accuracy_m:900,showAccuracy:true}))
+ expect(globalThis.__shelterMapOrigin).toEqual(expect.objectContaining({accuracy_m:1500,showAccuracy:true}))
  act(()=>{globalThis.__shelterMapSelect({latitude:13.341,longitude:74.742})})
  expect(onLocate).toHaveBeenLastCalledWith({name:'Start point chosen on the map',latitude:13.341,longitude:74.742,kind:'map',uncertainty_m:50})
  expect(screen.queryByText('Click your starting point on the map.')).toBeNull();expect(screen.queryByRole('heading',{name:/^Directions to/})).toBeNull()
