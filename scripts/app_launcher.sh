@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Loopback demonstration launcher. Private configuration is parsed, never sourced.
+# Loopback demonstration launcher (run it through ./floodpulse.sh). Private configuration is parsed, never sourced.
 set +x
 set -Eeuo pipefail
 umask 077
-ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+ROOT=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd -P)  # this file lives in scripts/
 cd "$ROOT"
 case "${1:-}" in
   --help|-h)
-    printf 'Usage: ./start.sh [--check|--help]\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nUses private DATABASE_URL/SHELTER_DATABASE_URL environment or data/tmp/launcher/config.json references; optional root .env loads Telegram keys only (0600). Explicit environment takes precedence. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
+    printf 'Usage: scripts/app_launcher.sh [--check|--help] (normally run through ./floodpulse.sh)\nStarts the existing local database, FastAPI and Vite. Ctrl+C stops only owned web processes.\nUses private DATABASE_URL/SHELTER_DATABASE_URL environment or data/tmp/launcher/config.json references; optional root .env loads Telegram keys only (0600). Explicit environment takes precedence. No installs or migrations.\nDefaults: backend 18050, frontend 14180; override FLOODPULSE_BACKEND_PORT/FLOODPULSE_FRONTEND_PORT.\n--check checks readiness without starting any service.\n'
     exit 0 ;;
   ''|--check) [[ $# -le 1 ]] || { printf 'Unexpected arguments. Use --help.\n' >&2; exit 1; } ;;
   *) printf 'Unknown option. Use --help.\n' >&2; exit 1 ;;
@@ -99,7 +99,7 @@ printf '[2/5] Checking PostgreSQL/PostGIS container...\n'
 timeout 5 docker info >/dev/null 2>&1 || fail 'Docker unavailable. Start Docker or obtain access to its daemon; no service was recreated.'
 state=$(timeout 5 docker inspect --format '{{.State.Status}}' "$DB" 2>/dev/null) || fail 'Existing floodpulse-sprint6-db container missing. Provision the documented database separately; no container or volume was created.'
 if [[ "$state" != running ]]; then
-  [[ "${1:-}" != --check ]] || fail 'Database is stopped; normal ./start.sh can start the existing container.'
+  [[ "${1:-}" != --check ]] || fail 'Database is stopped; ./floodpulse.sh can start the existing container.'
   [[ "$state" == exited || "$state" == created ]] || fail 'Database is paused/restarting or otherwise unavailable; inspect Docker separately.'
   timeout 10 docker start "$DB" >/dev/null 2>&1 || fail 'Could not start the existing database container.'
 fi

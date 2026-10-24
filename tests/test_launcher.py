@@ -82,11 +82,11 @@ time.sleep(120)
 
 @pytest.fixture
 def project(tmp_path):
-    script = tmp_path / 'start.sh'
-    script.write_bytes((ROOT / 'start.sh').read_bytes()); script.chmod(0o700)
+    scripts = tmp_path / 'scripts'; scripts.mkdir()
+    script = scripts / 'app_launcher.sh'
+    script.write_bytes((ROOT / 'scripts/app_launcher.sh').read_bytes()); script.chmod(0o700)
     envdir = tmp_path / 'backend/.venv/bin'; envdir.mkdir(parents=True)
     (tmp_path / 'frontend').mkdir()
-    scripts = tmp_path / 'scripts'; scripts.mkdir()
     (scripts / 'launcher_config.py').write_bytes((ROOT / 'scripts/launcher_config.py').read_bytes())
     (scripts / 'launcher_processes.py').write_text((ROOT / 'scripts/launcher_processes.py').read_text().replace('STARTUP_TIMEOUT = 30','STARTUP_TIMEOUT = 2'))
     (envdir / 'activate').write_text(f'export VIRTUAL_ENV={tmp_path}/backend/.venv\n')
@@ -107,7 +107,7 @@ def project(tmp_path):
 
 def run(project, *args, **settings):
     root, env = project
-    result = subprocess.run([str(root / 'start.sh'), *args], env={**env, **settings}, cwd='/', capture_output=True, text=True, timeout=20)
+    result = subprocess.run([str(root / 'scripts/app_launcher.sh'), *args], env={**env, **settings}, cwd='/', capture_output=True, text=True, timeout=20)
     assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in result.stdout + result.stderr
     return result
 
@@ -170,7 +170,7 @@ def test_root_dotenv_reaches_only_backend_even_with_explicit_database_connection
 
 @pytest.mark.parametrize('missing', ['DATABASE_URL', 'SHELTER_DATABASE_URL'])
 def test_real_preflight_names_missing_variable_without_printing_other_values(missing):
-    code = (ROOT / 'start.sh').read_text().split('"$VENV/bin/python" - preflight <<\'PY\'\n')[1].split('\nPY\n')[0]
+    code = (ROOT / 'scripts/app_launcher.sh').read_text().split('"$VENV/bin/python" - preflight <<\'PY\'\n')[1].split('\nPY\n')[0]
     env = {**os.environ, 'DATABASE_URL': 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY',
            'SHELTER_DATABASE_URL': 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY'}
     del env[missing]
@@ -202,7 +202,7 @@ def test_start_wait_duplicate_lock_sigint_shutdown_and_existing_database_preserv
     root, env = project
     (root / 'state').write_text('exited')
     terminal = (root / 'terminal.log').open('w')
-    proc = subprocess.Popen([str(root / 'start.sh')], cwd='/', env={**env, 'NOT_READY_PROBES': '2'}, stdout=terminal, stderr=subprocess.STDOUT, text=True)
+    proc = subprocess.Popen([str(root / 'scripts/app_launcher.sh')], cwd='/', env={**env, 'NOT_READY_PROBES': '2'}, stdout=terminal, stderr=subprocess.STDOUT, text=True)
     try:
         for _ in range(200):
             if 'Press Ctrl+C' in (root / 'terminal.log').read_text():break
@@ -242,7 +242,7 @@ def launch_until_ready(project):
     for name in ('backend.ready','frontend.ready','backend.worker','frontend.worker'):
         (root/name).unlink(missing_ok=True)
     terminal = (root/'terminal.log').open('w')
-    proc = subprocess.Popen([str(root/'start.sh')], cwd='/', env=env,
+    proc = subprocess.Popen([str(root/'scripts/app_launcher.sh')], cwd='/', env=env,
                             stdout=terminal, stderr=subprocess.STDOUT)
     terminal.close()
     try:

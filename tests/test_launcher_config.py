@@ -95,7 +95,7 @@ def test_helper_executes_launcher_from_another_directory_without_url_exports(pro
     dotenv.write_text('TELEGRAM_BOT_USERNAME=FloodPulsebot\n'
                       'TELEGRAM_BOT_TOKEN=' + secrets.token_urlsafe(32) + '\n')
     dotenv.chmod(0o600)
-    launcher = root / 'start.sh'
+    launcher = root / 'scripts/app_launcher.sh'; launcher.parent.mkdir(exist_ok=True)
     launcher.write_text('#!' + sys.executable + '\nimport os,sys\n'
                         'assert os.environ["FLOODPULSE_CONFIG_LOADED"]=="1"\n'
                         'assert os.environ["DATABASE_URL"] and os.environ["SHELTER_DATABASE_URL"]\n'
@@ -223,7 +223,7 @@ def test_dotenv_failure_never_echoes_input_even_with_explicit_database_urls(dote
 
 def test_helper_loads_dotenv_even_when_database_connections_are_already_exported(dotenv):
     root, _, _ = dotenv
-    launcher = root / 'start.sh'
+    launcher = root / 'scripts/app_launcher.sh'; launcher.parent.mkdir(exist_ok=True)
     launcher.write_text('#!' + sys.executable + '\nimport os\n'
                         'assert os.environ["TELEGRAM_BOT_USERNAME"]=="FloodPulsebot"\n'
                         'assert all(os.environ.get(k) for k in '

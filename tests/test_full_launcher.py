@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 APP = r'''
 import os,sys,subprocess,time,signal
 from pathlib import Path
-root=Path(__file__).resolve().parent
+root=Path(__file__).resolve().parents[1]  # the app launcher lives in scripts/
 if '--check' in sys.argv:
  (root/'checked').touch();sys.exit(0)
 sys.path.insert(0,str(root/'scripts'))
@@ -149,7 +149,7 @@ def project(tmp_path):
     (package / '__init__.py').touch()
     (package / 'telegram_delivery.py').write_bytes((ROOT / 'backend/app/telegram_delivery.py').read_bytes())
     replacements = {'BACKEND_PORT': str(ports[0]), 'FRONTEND_PORT': str(ports[1]), 'PROXY_PORT': str(ports[2])}
-    for name, body in [('start.sh', APP), ('cloudflared', TUNNEL), ('driver.py', DRIVER)]:
+    for name, body in [('scripts/app_launcher.sh', APP), ('cloudflared', TUNNEL), ('driver.py', DRIVER)]:
         for original, replacement in replacements.items():
             body = body.replace(original, replacement)
         path = tmp_path / name; path.write_text('#!' + sys.executable + '\n' + body); path.chmod(0o700)
@@ -292,11 +292,11 @@ def test_without_telegram_uses_only_existing_application(project):
 
 
 def test_help_is_available_without_configuration_or_environment(tmp_path):
-    script = tmp_path / 'start-full.sh'
-    script.write_bytes((ROOT / 'start-full.sh').read_bytes()); script.chmod(0o700)
+    script = tmp_path / 'floodpulse.sh'
+    script.write_bytes((ROOT / 'floodpulse.sh').read_bytes()); script.chmod(0o700)
     result = subprocess.run([str(script), '--help'], env={'PATH': '/usr/bin:/bin'}, capture_output=True, text=True, timeout=3)
-    assert result.returncode == 0 and 'Usage:' in result.stdout
-    assert sorted(p.name for p in tmp_path.iterdir()) == ['start-full.sh']
+    assert result.returncode == 0 and './floodpulse.sh --telegram' in result.stdout
+    assert sorted(p.name for p in tmp_path.iterdir()) == ['floodpulse.sh']  # --help creates and changes nothing
 
 
 def test_ctrl_c_during_tunnel_startup_cleans_every_owned_process(project):
@@ -316,7 +316,7 @@ def test_ctrl_c_during_tunnel_startup_cleans_every_owned_process(project):
 def test_missing_cloudflared_fails_check_without_starting_or_registration(project):
     root, ports, launch = project
     (root / 'cloudflared').unlink()
-    # Remove the system executable from lookup without affecting Python/start.sh.
+    # Remove the system executable from lookup without affecting Python/the app launcher.
     driver = root / 'driver.py'
     driver.write_text(driver.read_text().replace("if '--check' in sys.argv:", "f.shutil.which=lambda name: None\nif '--check' in sys.argv:"))
     child = launch('--check', '--telegram'); output = child.communicate(timeout=5)[0]

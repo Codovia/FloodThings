@@ -71,7 +71,7 @@ def test_preflight_distinguishes_non_port_failures_without_echoing_exception(fai
         if failure == 'model': raise OSError(private)
     monkeypatch.setattr(importlib, 'import_module', dependency)
     monkeypatch.setitem(sys.modules, 'app.rainfall_outlook', SimpleNamespace(RainfallModel=model))
-    code = (ROOT / 'start.sh').read_text().split('"$VENV/bin/python" - preflight <<\'PY\'\n')[1].split('\nPY\n')[0]
+    code = (ROOT / 'scripts/app_launcher.sh').read_text().split('"$VENV/bin/python" - preflight <<\'PY\'\n')[1].split('\nPY\n')[0]
     with pytest.raises(SystemExit) as error:
         exec(code, {})
     message = str(error.value)

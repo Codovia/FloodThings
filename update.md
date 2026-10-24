@@ -2522,3 +2522,11 @@ Removed:
 - Local, untracked: `__pycache__`, `.pytest_cache`, `frontend/dist`, and the 15 MB training-download cache `data/tmp/river_flood_model_v1` (re-downloaded by the training script if needed): 17 MB freed. `data/tmp/launcher` and `data/tmp/risk_cache` kept.
 
 Verification: backend 530/530, root (launcher) 172/172, unit 291/291, build passes, Playwright 81 passed, 8 skipped (database-gated), the known admin-layout failure; no test modified `docs/` afterwards.
+
+## 2026-10-25 — One start file: `floodpulse.sh` (start.sh moved, start-full.sh removed)
+
+Request: check the start shell files. Three start files sat at the top level. `start-full.sh` only ran `scripts/full_launcher.py` (removed; `floodpulse.sh` runs it directly). `start.sh`, the core app launcher used by the supervisor and the tests, moved to `scripts/app_launcher.sh` (its root is now the parent folder); its path is defined once as `APP_LAUNCHER` in `launcher_config.py` and used by `launcher_config.py` and `full_launcher.py`. User-facing messages, README and current docs (Azure/AWS hosting, manual setup, full launcher, Telegram, architecture) now say `./floodpulse.sh`; dated decision records and earlier `update.md` entries are unchanged. The `deploy/` server scripts and `scripts/setup-admin.sh` / `chrome-for-mcp.sh` have separate jobs and stay.
+
+Bug found by a real restart test and fixed: `--stop` (and the stop-before-start) stopped the app launcher, but the supervisor was still shutting down and holding its lock, so the immediately following start refused ("A full-system launcher is already running"). `floodpulse.sh` now waits (`flock -w 60`) until both launcher locks are free.
+
+Verification (real, the user's app was not running; launcher logs showed its previous run had shut down cleanly): `--check` passed; start ready in ~10 s with `/api/health` and `/api/river-forecast` 200 (current backend); two restarts while running each replaced the backend (new PIDs, river forecast 200); `--stop` left no FloodPulse process and freed ports 18050/14180; a second `--stop` reported nothing running. Launcher tests 172/172 (paths updated; the help test now covers `floodpulse.sh` and checks it creates nothing), backend 530/530. The app was left stopped.

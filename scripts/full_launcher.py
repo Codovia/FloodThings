@@ -1,4 +1,4 @@
-"""Separate full-system supervisor; start.sh retains its existing lifecycle/DB guards."""
+"""Full-system supervisor (app + Telegram tunnel); the app launcher keeps its lifecycle/DB guards. Run via ./floodpulse.sh."""
 import argparse
 import ctypes
 import fcntl
@@ -16,7 +16,7 @@ import sys
 import threading
 import time
 
-from launcher_config import private_file
+from launcher_config import APP_LAUNCHER, private_file
 from launcher_processes import identity, same_process, signal_process, ensure_ports_available, LaunchError, reap
 from telegram_webhook_setup import (SetupError, atomic_private_json, load_configuration, register,
                                     tunnel_url, resolve_public, public_status, public_environment, TelegramAPI)
@@ -79,7 +79,7 @@ def owned(state):
 
 
 def stop_owned(state, receipt):
-    # Give start.sh its normal shutdown grace before touching any surviving workers.
+    # Give the app launcher its normal shutdown grace before touching any surviving workers.
     rows = {row['pid']: row for row in owned(state)}
     for child in state.get('leaders', []):
         if child['pid'] in rows and rows[child['pid']]['start'] == child['start']:
@@ -298,12 +298,12 @@ def locked_run(root, folder, environment, telegram, cloudflared):
             if health == front == 200 and live and all(listener_owned(port, state) for port in PORTS.values()):
                 return
             time.sleep(.2)
-        raise SetupError('Existing start.sh application readiness timed out. Run ./start.sh --check separately; no database recreated or migrated.')
+        raise SetupError('Application readiness timed out. Run ./floodpulse.sh --check separately; no database recreated or migrated.')
     try:
         atomic_private_json(receipt, state)
         print('Starting existing FloodPulse launcher on 18050/14180…', flush=True)
         app_env = application_environment(telegram.environment if telegram else environment)
-        start([str(root / 'start.sh')], app_env)
+        start([str(root / APP_LAUNCHER)], app_env)
         wait_local()
         if telegram:
             status, body = local_status(18050, '/api/alerts/subscription')
@@ -354,7 +354,7 @@ def locked_run(root, folder, environment, telegram, cloudflared):
             register(telegram, TelegramAPI(telegram), output.origin, folder / 'webhook.json', root)
             pulse()
         print('\nApplication: http://127.0.0.1:14180\nAdmin:       http://127.0.0.1:14180/admin\n'
-              'Backend/frontend: verified; database managed only by start.sh.', flush=True)
+              'Backend/frontend: verified; database managed only by the app launcher.', flush=True)
         if telegram:
             print('Public webhook hostname: ' + output.origin.split('/')[2] + '\nBot: @' + telegram.username
                   + '\nProxy/DNS/HTTPS ingress: verified. Telegram webhook registration: verified. No alert sent.', flush=True)
@@ -391,7 +391,7 @@ def locked_run(root, folder, environment, telegram, cloudflared):
 
 class Parser(argparse.ArgumentParser):
     def error(self, message):
-        raise SetupError('Invalid arguments. Use ./start-full.sh --help; argument values are not displayed.')
+        raise SetupError('Invalid arguments. Use ./floodpulse.sh --help; argument values are not displayed.')
 
 
 def main():
@@ -422,10 +422,10 @@ def main():
                     os.close(fd)
             ensure_ports_available({**PORTS, **({'webhook proxy': 18060} if args.telegram else {})})
             environment = application_environment(config.environment if config else os.environ)
-            check = subprocess.run([str(ROOT / 'start.sh'), '--check'], cwd=ROOT, env=environment,
+            check = subprocess.run([str(ROOT / APP_LAUNCHER), '--check'], cwd=ROOT, env=environment,
                                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=150)
             if check.returncode:
-                raise SetupError('Existing ./start.sh --check did not pass. Run that read-only command for safe dependency/database diagnostics; no service was started.')
+                raise SetupError('./floodpulse.sh --check did not pass. Run that read-only command for safe dependency/database diagnostics; no service was started.')
             print('Checks passed. No service started, account created, webhook changed or Telegram request made. Bot/network ownership is checked only on an explicit --telegram start.')
             return 0
         return supervise(ROOT, os.environ, config, binary)

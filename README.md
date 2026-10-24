@@ -41,7 +41,7 @@ and then runs the existing launchers below with all their checks.
 | Admin | http://127.0.0.1:14180/admin |
 | API | http://127.0.0.1:18050 (interactive docs at `/docs`) |
 
-**With Telegram:** put `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET` in a private `0600` root `.env`, then run `./floodpulse.sh --telegram` (app + webhook proxy + Cloudflare Quick Tunnel). The underlying launchers, `./start.sh` and `./start-full.sh [--telegram] [--check]`, still work on their own.
+**With Telegram:** put `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET` in a private `0600` root `.env`, then run `./floodpulse.sh --telegram` (app + webhook proxy + Cloudflare Quick Tunnel). Internally it runs `scripts/full_launcher.py`, which supervises `scripts/app_launcher.sh` (database, port and dependency checks, then backend and frontend).
 
 See [docs/FULL_SYSTEM_LAUNCHER.md](docs/FULL_SYSTEM_LAUNCHER.md) and [docs/TELEGRAM_OPT_IN_MVP.md](docs/TELEGRAM_OPT_IN_MVP.md).
 

@@ -153,7 +153,7 @@ scripts/            launchers, Telegram webhook, admin setup, model + data prove
 data/processed/     published derived data (Udupi history, drainage study)
 data/reference/     location directory
 docs/               ARCHITECTURE (this), operations guides, decisions/, research/
-start.sh, start-full.sh
+floodpulse.sh, scripts/app_launcher.sh
 ```
 
 ## 9. What was removed and why

@@ -17,7 +17,7 @@ outside the commit. No authentication/send request was made to Telegram.
 
 | Item | Verified evidence | Status |
 | --- | --- | --- |
-| Launcher | Executable `start.sh`; selects `backend/.venv`, independent of the caller's venv/current directory; loopback FastAPI 18050 and Vite development 14180. Source matches the audited commit. | READY |
+| Launcher | Executable `scripts/app_launcher.sh`; selects `backend/.venv`, independent of the caller's venv/current directory; loopback FastAPI 18050 and Vite development 14180. Source matches the audited commit. | READY |
 | Backend | Python 3.12.14; FastAPI 0.135.1, Uvicorn 0.41.0, httpx 0.28.1, SQLAlchemy 2.0.54, Alembic 1.20.0, psycopg 3.3.6, GeoAlchemy2 0.20.0, NumPy 2.5.3, scikit-learn 1.8.0 installed. | READY |
 | Frontend | Node 22.22.1/npm 9.2.0; React/react-dom 19.2.0, Leaflet 1.9.4, Vite 7.3.6 installed; `frontend/dist/index.html` exists. Build was not regenerated in this audit. | READY |
 | Private launcher profile | Ignored `data/tmp/launcher/config.json`, current-user ownership/mode 0600, credential-free service URLs; both referenced files exist, are nonempty and owner-only. Actual reader/service authentication passed without printing values. | READY |
@@ -95,7 +95,7 @@ identifier beginning with a lowercase letter, using lowercase letters, digits,
 periods, underscores or hyphens. `--reset-password` is only for a deliberately
 authorized later rotation, and revokes existing sessions.
 
-**Isolated-database caveat:** `start.sh` validates the database name
+**Isolated-database caveat:** `scripts/app_launcher.sh` validates the database name
 `floodpulse_directory`; it will reject a differently named demo database. Use
 the release guide's two-server alternative (archived in tag `archive/research-2026-10-16`)
 with both private database URLs pointing to the disposable demo database. The
@@ -110,8 +110,8 @@ new credentials or model training. Use the already configured normal terminal:
 
 ```bash
 cd /home/pioneer/Projects/FloodPrediction
-./start.sh --check
-./start.sh
+./floodpulse.sh --check
+./floodpulse.sh
 ```
 
 No prior venv activation is necessary. `--check` does not start a stopped
@@ -185,7 +185,7 @@ hardware, permissions and source-access approval. It was not inspected.**
 3. Provision an independent persistent PostgreSQL/PostGIS database and least-
    privilege roles using [README database setup](../README.md#postgresqlpostgis-location-directory)
    and [shelter grants](../README.md#administrator-controlled-emergency-shelters),
-   including notification-table grants. For **start.sh compatibility**, its
+   including notification-table grants. For **scripts/app_launcher.sh compatibility**, its
    contract is container `floodpulse-sprint6-db`, `127.0.0.1:55436`, database
    `floodpulse_directory`. The README's generic new-instance example uses another
    name/port: an authorized operator must adapt those explicitly on the new
@@ -218,7 +218,7 @@ hardware, permissions and source-access approval. It was not inspected.**
    (**8,387 bytes** together); no raw training sources or retraining are required
    for inference. Offline full training-data reproduction additionally requires
    retained local sources and is a separate optional task.
-8. Confirm the above permissions/licences, `./start.sh --check`, then rehearse P2.
+8. Confirm the above permissions/licences, `./floodpulse.sh --check`, then rehearse P2.
    Backup/restore, if chosen instead of a clean directory import, must use the
    release guide's trusted-backup/isolated-restore procedure and least-privilege
    reprovisioning. No safe wholesale archive-copy shortcut is assumed.
@@ -232,7 +232,7 @@ provide a ready public-deployment procedure.
 
 - Select a reviewed host/domain/TLS and a production static server for
   `frontend/dist`, with a same-origin `/api` reverse proxy and managed FastAPI
-  process. `start.sh` is loopback development; neither Vite dev nor preview is
+  process. `scripts/app_launcher.sh` is loopback development; neither Vite dev nor preview is
   the public production server. [Official Vite deployment guidance](https://vite.dev/guide/static-deploy.html)
   confirms preview is for local inspection (reviewed 10 October 2026).
 - Configure exact HTTPS `SHELTER_PUBLIC_ORIGIN`, `SHELTER_COOKIE_SECURE=true`,

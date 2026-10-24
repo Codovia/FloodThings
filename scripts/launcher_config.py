@@ -10,6 +10,8 @@ from urllib.parse import quote, urlsplit, urlunsplit
 
 
 CONNECTIONS = {'DATABASE_URL', 'SHELTER_DATABASE_URL'}
+# The core application launcher (database/port/dependency checks, then backend and frontend).
+APP_LAUNCHER = 'scripts/app_launcher.sh'
 TELEGRAM_KEYS = {'TELEGRAM_BOT_USERNAME', 'TELEGRAM_BOT_TOKEN',
                  'TELEGRAM_DESTINATIONS', 'TELEGRAM_WEBHOOK_SECRET'}
 ROUTING_KEYS = {'OPENROUTESERVICE_API_KEY', 'GOOGLE_MAPS_EMBED_API_KEY', 'MAPTILER_PUBLIC_KEY'}  # Backend only; launcher_processes strips them from Vite.
@@ -122,7 +124,7 @@ def main():
     except (OSError, ValueError, TypeError, KeyError, AttributeError):
         sys.exit('FloodPulse: private launcher profile unavailable/invalid. Check data/tmp/launcher/config.json and referenced file ownership/0600 permissions; no configuration values are printed.')
     environment['FLOODPULSE_CONFIG_LOADED'] = '1'
-    os.execve(str(root / 'start.sh'), [str(root / 'start.sh'), *sys.argv[2:]], environment)
+    os.execve(str(root / APP_LAUNCHER), [str(root / APP_LAUNCHER), *sys.argv[2:]], environment)
 
 
 if __name__ == '__main__':

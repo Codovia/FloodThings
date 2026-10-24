@@ -102,7 +102,7 @@ Create your administrator account (you type the password privately, 16–128 cha
 
 1. **Google Maps key:** Google Cloud → Credentials → your key → Website restrictions → add
    `https://YOUR-DOMAIN/*`. Otherwise the in-app Google route map shows an error.
-2. **Telegram:** stop any laptop tunnel (`start-full.sh --telegram`) first, then point the bot at
+2. **Telegram:** stop any laptop tunnel (`floodpulse.sh --telegram`) first, then point the bot at
    the server:
    ```bash
    docker compose run --rm --no-deps app python -B /app/deploy-tools/telegram_webhook.py

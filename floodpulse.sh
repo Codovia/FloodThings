@@ -7,8 +7,8 @@
 #   ./floodpulse.sh --check      check that everything is ready; starts nothing
 #   ./floodpulse.sh --help
 #
-# It wraps the existing launchers (start.sh, start-full.sh), which keep all their checks: database,
-# ports, dependencies, private configuration. Press Ctrl+C in this terminal to stop the app.
+# It runs the existing launchers (scripts/full_launcher.py, which supervises scripts/app_launcher.sh),
+# keeping all their checks: database, ports, dependencies, private configuration. Ctrl+C stops the app.
 set +x
 set -Eeuo pipefail
 umask 077
@@ -47,6 +47,12 @@ done
 #    launcher is signalled (as Ctrl+C would); it then stops its own backend and web server.
 if [[ "$mode" != check ]]; then
   "$PY" -B scripts/launcher_processes.py stop "$ROOT" || fail 'Could not stop the running app safely; stop it with Ctrl+C in its terminal.'
+  # The supervisor shuts down after the app launcher; wait until both have released their locks.
+  for lock in data/tmp/full_launcher/lock data/tmp/launcher/lock; do
+    if [[ -e "$lock" ]]; then
+      flock -w 60 "$lock" true || fail 'The previous run is still shutting down after 60 seconds; try again shortly.'
+    fi
+  done
 fi
 [[ "$mode" != stop ]] || exit 0
 
@@ -58,8 +64,8 @@ if (( ${#telegram[@]} )) && [[ "$mode" == start && -z "$yes" ]]; then
   [[ "$answer" == [yY]* ]] || fail 'Cancelled; nothing was started.'
 fi
 
-# 5. Start (or only check). start-full.sh runs start.sh's checks and services, plus the tunnel with --telegram.
+# 5. Start (or only check): the supervisor runs the app launcher's checks and services, plus the tunnel with --telegram.
 args=("${telegram[@]}")
 [[ "$mode" != check ]] || args+=(--check)
 say "$([[ "$mode" == check ]] && echo 'Checking readiness (nothing will be started)…' || echo 'Starting. Open http://127.0.0.1:14180 when it says it is ready; Ctrl+C stops it.')"
-exec "$ROOT/start-full.sh" "${args[@]}"
+exec "$PY" -B "$ROOT/scripts/full_launcher.py" "${args[@]}"

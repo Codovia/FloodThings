@@ -110,7 +110,7 @@ def verify_browser(username, password, identity):
                                               'identity': identity, 'origin': ORIGIN}),
                             text=True, capture_output=True, env=environment, timeout=60)
     if result.returncode:
-        raise SetupError('Browser verification did not pass. Account credentials were not changed. Check your chosen credentials and start current code with ./start.sh, then run ./scripts/setup-admin.sh --verify-only. No browser logs or credentials were displayed.')
+        raise SetupError('Browser verification did not pass. Account credentials were not changed. Check your chosen credentials and start current code with ./floodpulse.sh, then run ./scripts/setup-admin.sh --verify-only. No browser logs or credentials were displayed.')
     checks = json.loads(result.stdout)
     if not all(checks.get(key) is True for key in ('login','shelter_management','citizen_moderation','alert_administration','logout','session_revoked')):
         raise SetupError('Browser login/logout checks did not pass; no success is claimed.')

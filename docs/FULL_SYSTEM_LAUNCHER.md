@@ -1,6 +1,6 @@
 # Full-system local launcher — 15 October 2026
 
-This optional Linux supervisor invokes the existing `start.sh` unchanged. It
+This optional Linux supervisor invokes the existing `scripts/app_launcher.sh` unchanged. It
 starts the configured **live** application, a webhook-only proxy and a temporary
 Cloudflare Quick Tunnel. An explicit `--telegram` start authorizes only the
 ownership-constrained webhook setup below. It never sends an alert or creates an
@@ -12,20 +12,20 @@ never import these Telegram secrets into that runtime.
 From the project root:
 
 ```bash
-./start-full.sh --help
-./start-full.sh --check --telegram
-./start-full.sh --telegram
+./floodpulse.sh --help
+./floodpulse.sh --check --telegram
+./floodpulse.sh --telegram
 ```
 
 The check validates private configuration, installed `cloudflared` and free
-ports, then invokes the unchanged `start.sh --check` for dependencies, saved
+ports, then invokes the unchanged `scripts/app_launcher.sh --check` for dependencies, saved
 artifact and existing PostgreSQL/schema/roles. It starts/recovers no process,
 makes no Telegram request and changes no service or database data. The existing
 launcher may open its normal lock file. A passing check does **not** prove public
 connectivity, bot identity or webhook ownership.
 
-Without `--telegram`, `./start-full.sh` starts only the existing application.
-`./start.sh` remains available unchanged. Do not run these concurrently for the
+Without `--telegram`, `./floodpulse.sh` starts only the existing application.
+`scripts/app_launcher.sh` can also run on its own. Do not run these concurrently for the
 same checkout. Fixed loopback ports: backend **18050**, frontend **14180**,
 Telegram proxy **18060**; no automatic port substitution.
 
@@ -39,7 +39,7 @@ user-owned regular **0600** file; explicit environment values (even empty ones)
 win. Existing backend validation checks the authorized destination contract.
 
 Press **Ctrl+C** and wait for the terminal prompt before restarting. SIGTERM to
-the full supervisor also works. It gives `start.sh` its normal shutdown grace,
+the full supervisor also works. It gives `scripts/app_launcher.sh` its normal shutdown grace,
 then terminates remaining verified owned descendants using PID/start checks and
 pidfds, including detached workers. The exclusive lock remains held until owned
 processes terminate and listening ports release. PostgreSQL/data stay preserved.
@@ -54,7 +54,7 @@ and still face backend freshness/consent checks. Shutdown sends no notification.
 
 1. Acquire the separate full-launcher lock and recover only proven children of
    its previous crashed session. Check all requested ports with safe PID/UID/
-   executable diagnostics. Invoke `start.sh`; its database/ownership guards and
+   executable diagnostics. Invoke `scripts/app_launcher.sh`; its database/ownership guards and
    separate lock stay authoritative. No setup, migration, import or reset occurs.
 2. Verify health, frontend response, live mode and that application listeners
    belong to this launch. Verify backend bot configuration and unsigned webhook
@@ -116,7 +116,7 @@ outside this launcher. No takeover override or automatic unregister is provided.
 | --- | --- |
 | Named port occupied | Use safe PID information to identify its owner. Stop its known terminal normally; never kill by port. A legacy manual proxy/tunnel is not owned here. |
 | Launcher already running | Stop its owning terminal and wait; do not delete a held lock/receipt. |
-| Existing launcher check failed | Run `./start.sh --check` separately for precise dependency/model/config/database diagnostics. |
+| Existing launcher check failed | Run `./floodpulse.sh --check` separately for precise dependency/model/config/database diagnostics. |
 | Private config invalid | Correct four keys, destination contract, user ownership and exact 0600 privately. Never paste values into support requests. |
 | Missing cloudflared | Install the official executable separately and put it on PATH. |
 | No/invalid tunnel URL, DNS/TLS failure | Check college networking/Cloudflare/DNS, then retry after shutdown. No connected status is claimed. |
@@ -145,7 +145,7 @@ Tests use relocated loopback ports, temporary source/config trees, random inert
 private fixtures and fake providers. They never register a real webhook, send a
 message, change live consent or connect to operational PostgreSQL. Prior 14 October
 delivery evidence remains separate. Live connectivity/registration is **NOT
-TESTED** until the operator deliberately runs `./start-full.sh --telegram` and
+TESTED** until the operator deliberately runs `./floodpulse.sh --telegram` and
 confirms its connection. Live administrator authentication stays blocked pending
 private password rotation. No fictional reports/shelters, database provisioning,
 model training or scientific/security boundary changes are part of this command.
