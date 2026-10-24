@@ -25,9 +25,15 @@ React 19 + Vite + Leaflet · FastAPI (Python 3.12) · PostgreSQL 16 + PostGIS 3.
 Prerequisites: Python 3.12+, Node 22.12+ (or 20.19+), Docker (existing `floodpulse-sprint6-db` PostGIS container), and the private launcher profile `data/tmp/launcher/config.json`. That profile holds the restricted database connections; see [Manual setup](docs/MANUAL_SETUP_CHECKLIST.md).
 
 ```bash
-./start.sh --check          # read-only readiness check
-./start.sh                  # starts backend + frontend (Ctrl+C to stop)
+./floodpulse.sh             # start the app; restarts it if already running, so new code loads (Ctrl+C to stop)
+./floodpulse.sh --check     # read-only readiness check; starts nothing
+./floodpulse.sh --stop      # stop the running app
+./floodpulse.sh --telegram  # also point the Telegram bot at this laptop (asks first: it takes the bot from the server)
 ```
+
+`floodpulse.sh` is the single entry point. It reads Telegram settings only from `.env` (ignoring outdated copies
+VS Code puts in terminals), keeps `data/` private, stops this folder's verified running launcher before starting,
+and then runs the existing launchers below with all their checks.
 
 | | URL |
 |---|---|
@@ -35,12 +41,7 @@ Prerequisites: Python 3.12+, Node 22.12+ (or 20.19+), Docker (existing `floodpul
 | Admin | http://127.0.0.1:14180/admin |
 | API | http://127.0.0.1:18050 (interactive docs at `/docs`) |
 
-**With Telegram:** put `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET` in a private `0600` root `.env`, then run:
-
-```bash
-./start-full.sh --check --telegram
-./start-full.sh --telegram    # app + webhook proxy + Cloudflare Quick Tunnel
-```
+**With Telegram:** put `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET` in a private `0600` root `.env`, then run `./floodpulse.sh --telegram` (app + webhook proxy + Cloudflare Quick Tunnel). The underlying launchers, `./start.sh` and `./start-full.sh [--telegram] [--check]`, still work on their own.
 
 See [docs/FULL_SYSTEM_LAUNCHER.md](docs/FULL_SYSTEM_LAUNCHER.md) and [docs/TELEGRAM_OPT_IN_MVP.md](docs/TELEGRAM_OPT_IN_MVP.md).
 

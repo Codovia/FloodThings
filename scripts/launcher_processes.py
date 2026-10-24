@@ -195,11 +195,12 @@ def stop_owned(root, state):
     receipt_path(root).unlink(missing_ok=True)
 
 
-def recover(root):
+def load_receipt(root):
+    """The private ownership receipt of this checkout's launcher, validated; None if absent."""
     try:
         state = json.loads(private_file(receipt_path(root), 16384, required_mode=0o600))
     except FileNotFoundError:
-        return
+        return None
     try:
         valid = (state['root'] == str(root) and state['uid'] == os.getuid()
                  and isinstance(state['run_id'], str) and re.fullmatch(r'[a-f0-9]{64}', state['run_id'])
@@ -209,7 +210,36 @@ def recover(root):
                  and type(state['launcher']['start']) is int and state['launcher']['start'] > 0)
         if not valid:
             raise LaunchError('Invalid private launcher ownership receipt; no process was stopped.')
-        if state['boot_id'] != Path('/proc/sys/kernel/random/boot_id').read_text().strip():
+        state['current_boot'] = state['boot_id'] == Path('/proc/sys/kernel/random/boot_id').read_text().strip()
+        return state
+    except (KeyError, TypeError):
+        raise LaunchError('Invalid private launcher ownership receipt; no process was stopped.') from None
+
+
+def stop_running(root, wait=45):
+    """Stop this checkout's running launcher the way Ctrl+C in its terminal would.
+
+    Only the launcher recorded in the private receipt is signalled, and only if its process id, start time
+    and user still match; the launcher then shuts down its own backend and frontend. Returns True if one was stopped.
+    """
+    state = load_receipt(root)
+    if not state or not state['current_boot'] or not same_process(state['launcher']):
+        return False
+    os.kill(state['launcher']['pid'], signal.SIGINT)
+    deadline = time.monotonic() + wait
+    while time.monotonic() < deadline:
+        if not same_process(state['launcher']):
+            return True
+        time.sleep(0.5)
+    raise LaunchError('The running FloodPulse did not stop within 45 seconds; stop it with Ctrl+C in its own terminal.')
+
+
+def recover(root):
+    state = load_receipt(root)
+    if state is None:
+        return
+    try:
+        if not state['current_boot']:
             receipt_path(root).unlink()
             return  # A previous boot cannot establish current process ownership.
         if same_process(state['launcher']):
@@ -306,6 +336,9 @@ def main():
         root = Path(sys.argv[2]).resolve()
         if sys.argv[1] == 'recover':
             recover(root)
+            return 0
+        if sys.argv[1] == 'stop':
+            print('FloodPulse: stopped the running app.' if stop_running(root) else 'FloodPulse: no running app found for this folder.', flush=True)
             return 0
         return run(root)
     except LaunchError as error:

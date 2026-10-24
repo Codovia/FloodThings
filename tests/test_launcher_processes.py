@@ -127,3 +127,47 @@ def test_bad_ownership_receipt_fails_closed(tmp_path, foreign_process, kind):
     with pytest.raises((OSError, ValueError, processes.LaunchError)):
         processes.recover(tmp_path)
     assert child.poll() is None
+
+
+@pytest.fixture
+def stoppable(tmp_path):
+    """A throwaway process standing in for a running launcher; it exits on Ctrl+C (SIGINT)."""
+    child = subprocess.Popen([sys.executable, '-c', 'import time\ntry:\n time.sleep(120)\nexcept KeyboardInterrupt:\n pass'])
+    import time
+    for _ in range(100):
+        if processes.identity(child.pid): break
+        time.sleep(.01)
+    try:
+        yield child
+    finally:
+        if child.poll() is None:
+            child.kill()
+        child.wait(timeout=5)
+
+
+def receipt_for(tmp_path, launcher, boot=None):
+    state = {'root': str(tmp_path), 'uid': os.getuid(), 'run_id': secrets.token_hex(32),
+             'boot_id': boot or Path('/proc/sys/kernel/random/boot_id').read_text().strip(),
+             'launcher': launcher, 'ports': {'backend': 18050, 'frontend': 14180}}
+    processes.receipt_path(tmp_path).parent.mkdir(parents=True, exist_ok=True)
+    processes.save_receipt(tmp_path, state)
+
+
+def test_stop_signals_only_the_verified_running_launcher(tmp_path, stoppable):
+    import time
+    time.sleep(.3)  # let the child install its interpreter before it is interrupted
+    receipt_for(tmp_path, processes.identity(stoppable.pid))
+    assert processes.stop_running(tmp_path, wait=10) is True
+    assert stoppable.wait(timeout=5) == 0  # exited through its Ctrl+C handler
+
+
+def test_stop_never_signals_a_recycled_pid_or_a_previous_boot(tmp_path, stoppable):
+    row = processes.identity(stoppable.pid)
+    receipt_for(tmp_path, {**row, 'start': row['start'] + 1})
+    assert processes.stop_running(tmp_path, wait=1) is False and stoppable.poll() is None
+    receipt_for(tmp_path, row, boot='0' * 36)
+    assert processes.stop_running(tmp_path, wait=1) is False and stoppable.poll() is None
+
+
+def test_stop_without_a_receipt_does_nothing(tmp_path):
+    assert processes.stop_running(tmp_path) is False
