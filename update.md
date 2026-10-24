@@ -2510,3 +2510,15 @@ Request: one shell file to start the app.
 Stopping: new `launcher_processes.py stop` signals only this folder's launcher recorded in the private ownership receipt, and only if its process id, start time, user and boot still match — the same SIGINT as Ctrl+C, after which the launcher stops its own backend and frontend (the full launcher exits with it). Receipt loading/validation is shared with the existing recovery path (`load_receipt`).
 
 Verification: `bash -n`; `--help`, unknown option (exit 1), `--check` ("Checks passed", nothing started) run for real; root tests 172/172 (new: a verified launcher is stopped and exits through its Ctrl+C handler; a recycled PID or previous-boot receipt is never signalled; no receipt does nothing). Not run here: a real start/stop, because the user's app is running in their own terminal and restarting it from this session would move it out of their control.
+
+## 2026-10-25 — Codebase cleanup (user-approved groups)
+
+Request: remove unnecessary files. Inventory first (15.7 MB tracked; docs 10.7 MB), then the user chose three groups; kept by rule: datasets, migrations, model artifacts, research/provenance documents, all scripts (each is used by a test, launcher or provenance record), `.env`, launcher settings. Design wireframes kept (user's choice).
+
+Removed:
+- Dead code: `backend/app/river_outlook.py` + `/api/river-outlook` wiring (no reach was ever approved; superseded by `/api/river-forecast`) and its tests in `test_home_sources.py` plus the unused `tests/fixtures/glofas_forecast_v4.json`; `frontend/src/HistoricalFloodMap.jsx` + its test file (replaced by the Flood Map; its one App-level test is covered by `App.test.jsx` and `navigation.spec.js`) and two stale mocks of it. `docs/ARCHITECTURE.md` updated.
+- Not removed although listed as candidate: `drainage.py` — its store is also the integrity validator for the kept Udupi drainage dataset and its tests rebuild and validate that dataset through it.
+- `docs/verification/` (30 screenshots of the 13–15 Oct interface, ~5 MB). `ui-ux.spec.js` now writes its screenshots to a temporary folder (`FLOODPULSE_UI_EVIDENCE_DIR` or the system temp dir) instead of overwriting tracked files on every run.
+- Local, untracked: `__pycache__`, `.pytest_cache`, `frontend/dist`, and the 15 MB training-download cache `data/tmp/river_flood_model_v1` (re-downloaded by the training script if needed): 17 MB freed. `data/tmp/launcher` and `data/tmp/risk_cache` kept.
+
+Verification: backend 530/530, root (launcher) 172/172, unit 291/291, build passes, Playwright 81 passed, 8 skipped (database-gated), the known admin-layout failure; no test modified `docs/` afterwards.

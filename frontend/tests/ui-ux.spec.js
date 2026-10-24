@@ -1,10 +1,13 @@
 import {test,expect} from '@playwright/test'
 import {mkdir} from 'node:fs/promises'
+import {tmpdir} from 'node:os'
+import {join} from 'node:path'
 
 // Presentation/layout fixtures only: all API requests intercepted, no persistence,
 // external provider calls, credentials or notification sends.
 const phase=process.env.FLOODPULSE_UI_EVIDENCE_PHASE||'after'
-const output=new URL('../../docs/verification/ui_ux_2026_10_15/',import.meta.url).pathname
+// Screenshots go to a temporary folder, never into docs/ (they used to overwrite tracked files on every run).
+const output=(process.env.FLOODPULSE_UI_EVIDENCE_DIR||join(tmpdir(),'floodpulse-ui-evidence'))+'/'
 test.beforeEach(async({page})=>{
  await page.addInitScript(()=>Object.defineProperty(navigator,'geolocation',{value:{getCurrentPosition:(_yes,no)=>no({code:1})}}))
  await page.route('**/*',async route=>{

@@ -20,7 +20,6 @@ from .notifications import router as notifications_router
 from .reports import router as reports_router
 from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
-from .river_outlook import router as river_outlook_router, RiverOutlook
 from .river_forecast import router as river_forecast_router, RiverForecast
 from .risk import router as risk_router, RiskService
 from .official import router as official_router, OfficialService, official_tls_context
@@ -34,7 +33,6 @@ async def lifespan(app: FastAPI):
     async with httpx.AsyncClient(timeout=httpx.Timeout(10.0), follow_redirects=False) as client:
         app.state.weather = OpenMeteoAdapter(client)
         app.state.reverse_geocoder = ReverseGeocoder(client)
-        app.state.river_outlook = RiverOutlook(client)
         app.state.river_forecast = RiverForecast(client)
         app.state.risk = RiskService(client)
         # IMD and NDMA SACHET get their own client with the extra pinned root (see official.py).
@@ -63,7 +61,6 @@ app.include_router(notifications_router)
 app.include_router(reports_router)
 app.include_router(subscriptions_router)
 app.include_router(geocoding_router)
-app.include_router(river_outlook_router)
 app.include_router(river_forecast_router)
 app.include_router(risk_router)
 app.include_router(official_router)

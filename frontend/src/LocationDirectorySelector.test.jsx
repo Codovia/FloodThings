@@ -11,7 +11,6 @@ const forecastList = () => { openTab('7 days'); return screen.getByRole('list', 
 
 const mapState = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: mapState }))
-vi.mock('./HistoricalFloodMap.jsx', () => ({ default: () => <div>Historical evidence</div> }))
 const districts = [{ id: 'nic:udupi.nic.in', name: 'Udupi', navigation_bounds: [[13,74],[14,75]] }, { id: 'nic:other.nic.in', name: 'Other district', navigation_bounds: null }]
 const places = [1,2].map((id, i) => ({ id: `osm:node:${id}`, name: 'Duplicate fixture', district_id: districts[0].id, selectable: true, coordinate_status: 'verified_osm_place_point',
   coordinates: { latitude: [13.2,13.4][i], longitude: [74.5,74.7][i] }, coordinate_source: { license: 'ODbL 1.0', url: `https://www.openstreetmap.org/node/${id}` }, association_source_url: 'https://udupi.nic.in/en/municipal-administration/' }))

@@ -6,7 +6,6 @@ import WeatherLocationSelector from './WeatherLocationSelector.jsx'
 
 const state = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn(), events: {}, tileEvents: {} }))
 vi.mock('leaflet', () => ({ default: state }))
-vi.mock('./HistoricalFloodMap.jsx', () => ({ default: () => <div>Historical evidence unchanged</div> }))
 const weather = (point = null, temperature = 27) => ({ status: 'partial', message: 'Some values are unavailable.',
   location: point, current: { temperature_c: temperature, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: '2026-10-08T00:00:00Z', stale: false },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(8 + i).padStart(2, '0')}`, weather_code: 61, precipitation_mm: i === 1 ? null : i + 1, temperature_min_c: 20, temperature_max_c: 30 })),
