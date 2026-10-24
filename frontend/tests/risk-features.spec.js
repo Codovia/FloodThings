@@ -48,7 +48,8 @@ test('live point risk on Home and the statewide risk grid on Flood Map', async (
   expect(grid.status()).toBe(200); expect(gridBody.cells).toHaveLength(256)
   await expect(page.getByRole('checkbox', { name: 'Rain risk, next 24 h' })).toBeChecked()
   await page.getByRole('tab', { name: 'Today', exact: true }).click()
-  await expect(page.getByText(/(of 256 areas High or Severe|all 256 areas Low or unavailable)/)).toBeVisible()
+  // Home's Kundapur choice sets the Udupi district filter, so Today counts only the grid areas inside Udupi.
+  await expect(page.getByText(/(of \d+ areas in Udupi High or Severe|all \d+ areas in Udupi Low or unavailable)/)).toBeVisible()
   await expect(page.getByLabel('Rain risk legend')).toBeVisible()
   expect(await page.locator('.intelligence-map path.leaflet-interactive').count()).toBeGreaterThanOrEqual(256)
   await page.screenshot({ path: evidence + '/02-flood-map-risk-grid.png' })

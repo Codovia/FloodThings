@@ -27,7 +27,7 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
   const extras = current ? [condition(current.weather_code), [Number.isFinite(current.humidity_percent) && `Humidity: ${current.humidity_percent}%.`, Number.isFinite(current.wind_speed) && current.wind_speed_unit && `Wind: ${current.wind_speed} ${current.wind_speed_unit}.`].filter(Boolean).join(' ')].filter(Boolean).join(' · ') : ''
   return <div className="home-emergency-dashboard home-viewport-fit">
     <section className="home-location-bar" aria-label="Home location selection">
-      <div className="home-place"><p className="eyebrow">YOUR LOCATION</p><h2>{point?.name || (location.status === 'coarse' ? 'Approximate location — select your town' : 'Karnataka statewide view')}</h2><p role="status">{location.message}</p>{gpsNotice && !location.message.includes(gpsNotice) && <p role="status">{gpsNotice}</p>}</div>
+      <div className="home-place"><p className="eyebrow">YOUR LOCATION</p><h2>{point?.name || (location.status === 'coarse' ? 'Approximate location — select your town' : 'Karnataka statewide view')}</h2><p role="status">{point && location.status === 'idle' ? 'Place you selected. Location access is optional.' : location.message}</p>{gpsNotice && !location.message.includes(gpsNotice) && <p role="status">{gpsNotice}</p>}</div>
       {point && <div className="home-weather-line" aria-label="Current weather and rain">
         <h2 className="home-temp">{weatherStatus}</h2>
         <p>{extras}{current && <small> · valid {clock(current.valid_at)}</small>}</p>

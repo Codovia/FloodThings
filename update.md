@@ -2530,3 +2530,20 @@ Request: check the start shell files. Three start files sat at the top level. `s
 Bug found by a real restart test and fixed: `--stop` (and the stop-before-start) stopped the app launcher, but the supervisor was still shutting down and holding its lock, so the immediately following start refused ("A full-system launcher is already running"). `floodpulse.sh` now waits (`flock -w 60`) until both launcher locks are free.
 
 Verification (real, the user's app was not running; launcher logs showed its previous run had shut down cleanly): `--check` passed; start ready in ~10 s with `/api/health` and `/api/river-forecast` 200 (current backend); two restarts while running each replaced the backend (new PIDs, river forecast 200); `--stop` left no FloodPulse process and freed ports 18050/14180; a second `--stop` reported nothing running. Launcher tests 172/172 (paths updated; the help test now covers `floodpulse.sh` and checks it creates nothing), backend 530/530. The app was left stopped.
+
+## 2026-10-25 — Flood Map: every control clicked in Chrome; broken and redundant ones fixed
+
+Request: work on the Flood Map and check every click, using Chrome DevTools (MCP browser, live app, 1508×761 and 390×700).
+
+Clicked and working as intended: map tap → Place panel (IMD level, rain risk, past floods within 5 km) with "Clear", "Full check on Home", "Shelters near here"; all five layer checkboxes (IMD 31 shapes, rain risk 256, rivers 6, past floods 56, shelters 1); tabs Place/Today/Rivers/Past floods/Sources; recorded-flood selector (56 → 23 → 56); "Zoom to past floods"; past-flood cell → "Flood evidence details" (source and CC BY-NC licence attribution needed); Rivers pager and both "How …" popups; "Show all Karnataka"; zoom ±.
+
+Found and fixed:
+- "Go to district" did not move the map for 29 of 31 districts (only Dakshina Kannada and Udupi have directory bounds). It now frames the district with its IMD warning outline (already drawn as the official layer); the directory and IMD lists are matched by every known spelling (`/api/official/districts` now returns `aliases`, e.g. Bagalkot/Bagalkote). The existing rule that no bounds are invented holds: a district with neither keeps the view and the notice.
+- Today showed statewide numbers under a district heading: with a district selected it now shows that district's IMD warning and only the rain-risk areas inside its outline ("0 of 5 areas in Kodagu").
+- The same result appeared three times (panel, map popup, hover label); on laptops the map popup is no longer shown (the Place panel is visible); phones keep it on the Map tab. Choosing a district closes any stale popup.
+- Kabini showed a green "Low" marker while the AI model said "flood likely" (92 mm upstream in 3 days, GloFAS 2%): a red dashed ring now marks AI-flagged rivers (legend entry added) and the row says "GloFAS disagrees; check CWC/KSNDMC".
+- A tap in the Arabian Sea offered Home and Shelters actions: it now says "Outside Karnataka … FloodPulse covers Karnataka only" with no actions.
+- Sources tab lacked the IMD, rain-risk and river sources: now listed.
+- Home after "Full check on Home" said "Choose a place or allow location access." beside the chosen place: it now says "Place you selected. Location access is optional."
+
+Verification: Chrome re-check of each fix (Kodagu framed, Today scoped, no laptop popup, outside-state card, sources, disagreement note, Home message; phone: tap opens Place, all six tabs one screen with no clipped labels, popup on the Map tab). Unit 294/294 (new: IMD-outline framing and district Today, outside Karnataka, model disagreement); backend 530/530 (district aliases); build passes; Playwright 81 passed, 8 skipped (database-gated), the known admin-layout failure. Spec updates for intended changes: the severe fixture river now has the red ring; Today counts are district-scoped when Home set a district; Kolar is framed by its IMD outline instead of showing the "bounds unavailable" notice.

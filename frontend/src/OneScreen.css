@@ -473,3 +473,7 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
 .ai-eval{margin:4px 0;padding-left:1.2em;font-size:.82rem}
 /* Shelters: a location message is a short line, not a large banner. */
 .page-shelters .shelters-panel>.notice{font-size:.8rem;padding:6px 10px;margin:4px 0}
+/* Flood Map: layer sources list and the AI red-ring legend entry. */
+.intelligence-sources{margin:4px 0 6px;padding-left:1.1em;font-size:.8rem;line-height:1.4}
+.intelligence-sources li{margin:2px 0}
+.risk-legend .legend-ai-ring::before{background:transparent;border:2px dashed #b71c1c;border-radius:50%;box-sizing:border-box}

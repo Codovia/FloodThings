@@ -176,6 +176,7 @@ def test_statewide_districts_keep_only_karnataka_and_suggest_only_orange_red():
              'properties': {**IMD_FEATURE['properties'], 'District': 'GADAG', 'Day_1': '1', 'Day1_Color': 4, 'Day_2': '1', 'Day2_Color': 4}}
     districts = karnataka_districts([IMD_FEATURE, neighbour, green], TODAY)
     assert [d['district'] for d in districts] == ['Gadag', 'Udupi']
+    assert districts[0]['aliases'] == ['Gadag'] and 'Udupi' in districts[1]['aliases']  # known spellings for matching
     assert [day['level'] for day in districts[1]['days']] == ['orange', 'yellow'] and districts[1]['geometry']['type'] == 'MultiPolygon'
     drafts = official_suggestions(districts, NOW.isoformat())
     assert [s['id'] for s in drafts['suggestions']] == ['imd-UDUPI-2026-10-16']

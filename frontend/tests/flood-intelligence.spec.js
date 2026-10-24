@@ -15,7 +15,8 @@ test('31 districts, original GeoJSON, independent layers, details and statewide 
  await page.locator('.intelligence-map path[fill="#dc6047"]').first().click({force:true});await expect(page.getByRole('heading',{name:'Flood evidence details'})).toBeVisible();await expect(page.getByText(/Maximum water seen by satellite during this flood/)).toBeVisible();await expect(page.getByText(/SHA-256|Stable feature ID/)).toHaveCount(0)
  await page.getByRole('button',{name:'Close',exact:true}).click();await expect(page.getByRole('heading',{name:'Flood evidence details'})).toHaveCount(0)
  await expect(page.getByLabel(/Flood-Prone/i)).toHaveCount(0);await openTab(page,'Sources');await expect(page.getByText(/No verified potential flood-prone zone dataset/)).toBeVisible();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
- await select.selectOption('nic:kolar.nic.in');await openTab(page,'Past floods');await expect(page.getByText(/No past floods are mapped for this district/)).toBeVisible();await expect(page.getByText(/Map bounds are unavailable for Kolar/)).toBeVisible();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(0)
+ await select.selectOption('nic:kolar.nic.in');await openTab(page,'Past floods');await expect(page.getByText(/No past floods are mapped for this district/)).toBeVisible();await expect(page.getByText(/Map bounds are unavailable for Kolar/)).toHaveCount(0);  // framed by its IMD warning outline
+ await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(0)
  await page.getByRole('button',{name:'Show all Karnataka'}).click();await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56);await expect(page.getByLabel('Past floods (satellite)')).toBeChecked()
  await page.getByLabel('Verified shelters',{exact:true}).check();await openTab(page,'Past floods');await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible();expect(errors).toEqual([])
 })
@@ -49,7 +50,7 @@ test('Rivers tab shows the checked river forecast as issued, one screen, and an 
   await page.waitForTimeout(1600);expect(await expectOneScreen(page),`${size.width}`).toEqual({page:0,width:0,scrolls:0,outside:0})
  }
  await page.setViewportSize({width:1366,height:768});await page.goto('/flood-map')
- await expect(page.locator('.intelligence-map path[fill="#b71c1c"][stroke="#0d3b66"]')).toHaveCount(1)  // the severe river marker
+ await expect(page.locator('.intelligence-map path[fill="#b71c1c"][stroke="#b71c1c"]')).toHaveCount(1)  // the severe river marker, with the red ring because its AI flag is set
  await openTab(page,'Rivers');await page.getByRole('button',{name:'How the river forecast was checked'}).click()
  await expect(page.getByRole('dialog')).toContainText(/Bhima at Afzalpur and Kaveri at Srirangapatna did not pass/);await page.getByRole('button',{name:'Close',exact:true}).click()
  available=false;await page.reload();await openTab(page,'Rivers')

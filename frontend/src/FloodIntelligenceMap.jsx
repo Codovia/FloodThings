@@ -33,6 +33,12 @@ export function placeCheck(point,{official,risk,history}){
  return {imd,cell,near}
 }
 const dates=p=>`${p.start_date} – ${p.end_date_inclusive} (UTC source dates)`
+// The IMD record (and outline) of a directory district, matched by any known spelling (e.g. Bagalkot/Bagalkote).
+export function imdDistrict(district,official){
+ if(!district||!official?.districts)return null
+ const names=new Set([district.name,...(district.aliases||[])].map(n=>n.toLowerCase()))
+ return official.districts.find(d=>[d.district,...(d.aliases||[])].some(n=>names.has(n.toLowerCase())))||null
+}
 
 function useEvidence(url, retry=0){
  const [state,setState]=useState({url:null,data:null,error:null,loading:false})
@@ -52,15 +58,15 @@ function useEvidence(url, retry=0){
 }
 
 // FloodPulse's own trained model, next to GloFAS: a 3-day flood flag from upstream rain.
-function AiModelLine({ai}){
+function AiModelLine({ai,level}){
  if(!ai||ai.status==='not_trained')return null
  if(ai.status==='not_used')return <small className="ai-line" data-state="not_used">AI: not used here (a simple rain rule tested better)</small>
  if(ai.status!=='available')return <small className="ai-line" data-state={ai.status}>AI: unavailable{ai.message?` — ${ai.message}`:''}</small>
  const day=ai.first_flagged_date&&new Intl.DateTimeFormat('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(ai.first_flagged_date+'T00:00:00Z'))
- return <small className="ai-line" data-state={ai.flood_likely?'likely':'calm'}>AI: {ai.flood_likely?<strong>flood likely within 3 days of {day}</strong>:'not likely this week'} · {Math.round(ai.peak_upstream_rain_3d_mm)} mm upstream in 3 days</small>
+ return <small className="ai-line" data-state={ai.flood_likely?'likely':'calm'}>AI: {ai.flood_likely?<strong>flood likely within 3 days of {day}</strong>:'not likely this week'} · {Math.round(ai.peak_upstream_rain_3d_mm)} mm upstream in 3 days{ai.flood_likely&&level==='low'?' — GloFAS disagrees; check CWC/KSNDMC':''}</small>
 }
 
-function IntelligenceGeography({district,history,shelters,risk,official,rivers,point,popup,onPoint,onFeature,children}){
+function IntelligenceGeography({district,outline,history,shelters,risk,official,rivers,point,popup,onPoint,onFeature,children}){
  const element=useRef(null),map=useRef(null),select=useRef(onPoint),detail=useRef(onFeature),zoneRenderer=useRef(null)
  const [tileError,setTileError]=useState(false)
  const districtRef=useRef(district)
@@ -80,9 +86,12 @@ function IntelligenceGeography({district,history,shelters,risk,official,rivers,p
  useMapResize(map)
  useEffect(()=>{
   if(!map.current)return
+  map.current.closePopup?.()  // a popup from an earlier check would be out of context
   if(!district)map.current.fitBounds(KARNATAKA_BOUNDS,{padding:[8,8],animate:false})
   else if(district.navigation_bounds)map.current.fitBounds(district.navigation_bounds,{padding:[20,20],animate:false})
- },[district])
+  // Otherwise frame the district with its IMD warning outline (the official layer drawn on this map).
+  else if(outline)map.current.fitBounds(L.geoJSON(outline).getBounds(),{padding:[20,20],animate:false})
+ },[district,!!outline])
  useEffect(()=>{
   if(!map.current)return
   const layers=[]
@@ -109,8 +118,10 @@ function IntelligenceGeography({district,history,shelters,risk,official,rivers,p
    }}))
   // Checked river points: GloFAS 7-day forecast against each cell's own flood levels.
   if(rivers)for(const r of rivers){
-   const marker=L.circleMarker([r.grid.latitude,r.grid.longitude],{radius:9,color:'#0d3b66',weight:3,fillColor:LEVEL_COLORS[r.level],fillOpacity:.95,bubblingMouseEvents:false})
-   const text=document.createElement('span');text.textContent=`${r.river} at ${r.place} · river flood forecast, 7 days: ${LEVEL_NAMES[r.level]} — ${Math.round(r.peak.share_above['2_year']*100)}% of forecast runs above the 2-year flood level (${r.peak.date}). Modelled, not observed.`
+   const aiFlag=r.ai_model?.status==='available'&&r.ai_model.flood_likely
+   // The AI model flagging a flood is shown as a red ring, so a green GloFAS marker never hides it.
+   const marker=L.circleMarker([r.grid.latitude,r.grid.longitude],{radius:9,color:aiFlag?'#b71c1c':'#0d3b66',weight:aiFlag?4:3,dashArray:aiFlag?'4 3':null,fillColor:LEVEL_COLORS[r.level],fillOpacity:.95,bubblingMouseEvents:false})
+   const text=document.createElement('span');text.textContent=`${r.river} at ${r.place} · river flood forecast, 7 days: ${LEVEL_NAMES[r.level]} — ${Math.round(r.peak.share_above['2_year']*100)}% of forecast runs above the 2-year flood level (${r.peak.date}).${aiFlag?' AI model: flood likely within 3 days — the two models disagree.':''} Modelled, not observed.`
    marker.bindTooltip(text);add(marker)
   }
   if(shelters&&validShelterDirectory(shelters))for(const shelter of shelters.shelters){
@@ -164,6 +175,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  const shelters=useShelterDirectory(null,layers.shelters)
  const details=useEvidence(featureId?'/api/flood-map/features/'+encodeURIComponent(featureId):null,retry)
  const district=directory.data?.items.find(d=>d.id===districtId)||null
+ const districtImd=imdDistrict(district,officialDistricts.data)
  const shownShelters=shelters.data&&validShelterDirectory(shelters.data)?{...shelters.data,shelters:shelters.data.shelters.filter(s=>!districtId||s.district_id===districtId)}:null
  function toggle(key){setLayers(current=>({...current,[key]:!current[key]}));if(key==='history')chooseFeature(null)}
  function chooseDistrict(id){setDistrictId(id);onDistrictChange?.(id,directory.data?.items.find(d=>d.id===id)||null);chooseFeature(null)}
@@ -171,12 +183,14 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  const loading=[directory,history,shelters,details].some(s=>s.loading)
  const safeHistory=history.data?.status==='available'&&history.data.geojson?.type==='FeatureCollection'?history.data:null
  const warned=officialDistricts.data?['red','orange','yellow'].map(l=>[l,officialDistricts.data.districts.filter(d=>d.status!=='stale'&&d.days[0]?.level===l).map(d=>d.district).sort()]).filter(([,names])=>names.length):[]
- const riskCounts=riskGrid.data?['severe','high','moderate'].map(l=>[l,riskGrid.data.cells.filter(c=>c.level===l).length]).filter(([,n])=>n):[]
+ // With a district selected, the rain-risk summary counts only the grid areas inside its IMD outline.
+ const scopeCells=riskGrid.data?(district&&districtImd?riskGrid.data.cells.filter(c=>inGeometry(c.longitude,c.latitude,districtImd.geometry)):riskGrid.data.cells):[]
+ const riskCounts=['severe','high','moderate'].map(l=>[l,scopeCells.filter(c=>c.level===l).length]).filter(([,n])=>n)
  const place=placeCheck(checked,{official:officialDistricts.data,risk:layers.risk?riskGrid.data:null,history:safeHistory})
  const today=place?.imd&&place.imd.status!=='stale'?place.imd.days[0]:null
  const popup=place?[place.imd?`${place.imd.district} district`:'Outside Karnataka districts',`Official IMD warning today: ${today?levelName(today.level):'unavailable'}`,place.cell?`Rain risk next 24 h: ${LEVEL_NAMES[place.cell.level]||'Unavailable'} (experimental)`:null].filter(Boolean):null
  const mapStage=<div className="intelligence-map-stage">
-  <IntelligenceGeography district={district} history={safeHistory} shelters={shownShelters} risk={layers.risk&&riskGrid.data?.cells?riskGrid.data:null} official={layers.official?officialDistricts.data:null} rivers={layers.rivers&&riverForecast.data?riverForecast.data.points:null} point={checked} popup={popup} onPoint={check} onFeature={chooseFeature}>
+  <IntelligenceGeography district={district} outline={districtImd?.geometry||null} history={safeHistory} shelters={shownShelters} risk={layers.risk&&riskGrid.data?.cells?riskGrid.data:null} official={layers.official?officialDistricts.data:null} rivers={layers.rivers&&riverForecast.data?riverForecast.data.points:null} point={checked} popup={wide?null:popup} onPoint={check} onFeature={chooseFeature}>
    {wide?<>
    <fieldset className="intelligence-layers"><legend>Show on map</legend>
     <p className="layer-group">Today</p>{[['official','Official IMD warnings'],['risk','Rain risk, next 24 h'],['rivers','River flood forecast, 7 days']].map(([key,label])=><label key={key}><input type="checkbox" checked={layers[key]} onChange={()=>toggle(key)}/>{label}</label>)}
@@ -185,7 +199,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
    <div className="intelligence-legend" aria-label="Map legend">
     {layers.official&&<div className="risk-legend" aria-label="Official IMD warning legend"><strong>IMD today</strong>{['red','orange','yellow','green'].map(l=><span key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}>{levelName(l)}</span>)}</div>}
     {layers.risk&&<div className="risk-legend zones" aria-label="Rain risk legend"><strong>Rain risk 24 h</strong>{['moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="muted">clear = Low</span></div>}
-    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div>}
+    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="legend-ai-ring">red ring = AI flags a flood</span></div>}
     <div className="risk-legend other">{layers.history&&<span className="legend-water">Past flood</span>}{layers.shelters&&<span className="legend-shelter">Verified shelter</span>}<span className="legend-point">Your checked place</span></div>
    </div>
    </>:<div className="intelligence-layers-toggle"><Popup label="Layers & legend" buttonClassName="secondary" title="Map layers and legend">
@@ -196,14 +210,17 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
    <div className="intelligence-legend" aria-label="Map legend">
     {layers.official&&<div className="risk-legend" aria-label="Official IMD warning legend"><strong>IMD today</strong>{['red','orange','yellow','green'].map(l=><span key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}>{levelName(l)}</span>)}</div>}
     {layers.risk&&<div className="risk-legend zones" aria-label="Rain risk legend"><strong>Rain risk 24 h</strong>{['moderate','high','severe','unavailable'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="muted">clear = Low</span></div>}
-    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}</div>}
+    {layers.rivers&&<div className="risk-legend rivers" aria-label="River flood forecast legend"><strong>Rivers 7 days</strong>{['low','moderate','high','severe'].map(l=><span key={l} style={{'--swatch':LEVEL_COLORS[l]}}>{LEVEL_NAMES[l]}</span>)}<span className="legend-ai-ring">red ring = AI flags a flood</span></div>}
     <div className="risk-legend other">{layers.history&&<span className="legend-water">Past flood</span>}{layers.shelters&&<span className="legend-shelter">Verified shelter</span>}<span className="legend-point">Your checked place</span></div>
    </div>
    </Popup></div>}
   </IntelligenceGeography>
  </div>
  const tabs=[!wide&&{id:'map',label:'Map',content:mapStage},
-  {id:'place',label:'Place',content:place?<section className="intelligence-card place-check" aria-labelledby="place-check-title">
+  {id:'place',label:'Place',content:place&&!place.imd&&officialDistricts.data?<section className="intelligence-card place-check" aria-labelledby="place-check-title">
+     <div className="place-check-head"><h3 id="place-check-title">Outside Karnataka</h3><button className="link-button" onClick={()=>setChecked(null)}>Clear</button></div>
+     <p>{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E is outside Karnataka's districts. FloodPulse covers Karnataka only — tap a place inside the state.</p>
+    </section>:place?<section className="intelligence-card place-check" aria-labelledby="place-check-title">
      <div className="place-check-head"><h3 id="place-check-title">{place.imd?`Checked place · ${place.imd.district}`:'Checked place'}</h3><button className="link-button" onClick={()=>setChecked(null)}>Clear</button></div>
      <p className="muted">{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E{!place.imd&&officialDistricts.data?' · outside Karnataka district boundaries':''}</p>
      <dl className="place-rows">
@@ -215,10 +232,11 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
     </section>:<div className="intelligence-card place-prompt"><h3>Check a place</h3><p>Tap or click anywhere on the map. You will see the official IMD warning for that district, the experimental rain risk for the next 24 hours, and whether floods were mapped nearby before.</p></div>},
   {id:'today',label:'Today',content:<>
    <h3 className="intelligence-glance-title">{district?.name||'Today across Karnataka'}</h3>
+   {district?<div className="intelligence-card official-district-status"><p><strong>Official IMD warning today:</strong> {officialDistricts.loading&&!officialDistricts.data?'loading':officialDistricts.error?`unavailable (${officialDistricts.error}). This does not mean there is no warning`:!districtImd?`not available for ${district.name}`:districtImd.status==='stale'?`the latest IMD bulletin (${districtImd.issued_date}) is out of date`:<><span className="official-chip" data-level={districtImd.days[0]?.level} style={{background:OFFICIAL_COLOURS[districtImd.days[0]?.level]}}>{levelName(districtImd.days[0]?.level)}</span> {districtImd.days[0]?.warnings?.length?districtImd.days[0].warnings.join(', '):'No warning'}</>}.</p></div>:<>
    <div className="intelligence-card official-district-status"><p><strong>Official IMD warnings today:</strong> {officialDistricts.loading&&!officialDistricts.data?'loading':officialDistricts.error?`unavailable (${officialDistricts.error}). This does not mean there is no warning`:officialDistricts.data?['red','orange','yellow','green'].map(l=>[l,officialDistricts.data.districts.filter(d=>d.days[0]?.level===l).length]).filter(([,n])=>n).map(([l,n])=>`${n} ${levelName(l)}`).join(' · ')||'no current district bulletins':'unavailable'}.</p>
     {warned.length>0&&<ul className="warned-districts" aria-label="Districts under an IMD warning today">{warned.map(([l,names])=><li key={l} style={{'--swatch':OFFICIAL_COLOURS[l]}}><span className="warned-level">{levelName(l)}</span> {names.join(', ')}</li>)}</ul>}
-    <p className="muted">As issued by the India Meteorological Department (<a href="https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php">source</a>). Red = take action, Orange = be prepared, Yellow = be updated.</p></div>
-   {layers.risk&&<div className="intelligence-card risk-grid-status"><p><strong>Rain risk, next 24 h:</strong> {riskGrid.loading&&!riskGrid.data?'loading statewide grid':riskGrid.error?riskGrid.error:riskGrid.data?(riskCounts.length?`${riskGrid.data.cells.filter(c=>['high','severe'].includes(c.level)).length} of ${riskGrid.data.cells.length} areas High or Severe`:`all ${riskGrid.data.cells.length} areas Low or unavailable`)+` · checked ${new Date(riskGrid.data.retrieved_at).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',minute:'2-digit'})} IST`:'unavailable'}.</p>
+    <p className="muted">As issued by the India Meteorological Department (<a href="https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php">source</a>). Red = take action, Orange = be prepared, Yellow = be updated.</p></div></>}
+   {layers.risk&&<div className="intelligence-card risk-grid-status"><p><strong>Rain risk, next 24 h:</strong> {riskGrid.loading&&!riskGrid.data?'loading statewide grid':riskGrid.error?riskGrid.error:riskGrid.data?(riskCounts.length?`${scopeCells.filter(c=>['high','severe'].includes(c.level)).length} of ${scopeCells.length} areas${district&&districtImd?` in ${district.name}`:''} High or Severe`:`all ${scopeCells.length} areas${district&&districtImd?` in ${district.name}`:''} Low or unavailable`)+` · checked ${new Date(riskGrid.data.retrieved_at).toLocaleTimeString('en-IN',{timeZone:'Asia/Kolkata',hour:'numeric',minute:'2-digit'})} IST`:'unavailable'}.</p>
     {riskCounts.length>0&&<p className="risk-count-chips">{riskCounts.map(([l,n])=><span key={l} className="risk-chip" style={{'--swatch':LEVEL_COLORS[l]}}>{n} {LEVEL_NAMES[l]}</span>)}</p>}
     <p className="muted">Experimental rule-based index from forecast rain only (~28 km areas) — not a flood probability or an official warning.</p></div>}
   </>},
@@ -231,7 +249,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
       <span className="risk-chip" style={{'--swatch':LEVEL_COLORS[r.level]}}>{LEVEL_NAMES[r.level]}</span>
       <strong>{r.river}</strong> at {r.place} <span className="muted">({r.district})</span>
       <small>GloFAS: {Math.round(r.peak.share_above['2_year']*100)}% of runs above 2-year flood level · {Math.round(r.peak.share_above['5_year']*100)}% above 5-year</small>
-      <AiModelLine ai={r.ai_model} /></li>)}</ul><Pager paged={riverPage} label="More rivers"/></>}
+      <AiModelLine ai={r.ai_model} level={r.level} /></li>)}</ul><Pager paged={riverPage} label="More rivers"/></>}
    <p className="muted">Modelled river flow (Copernicus GloFAS, 50 runs) and the FloodPulse AI model at {riverForecast.data?.points.length||6} checked river points. Not observed water levels or an official warning.</p>
    <p className="muted"><Popup label="How the AI model was tested" title="FloodPulse AI river flood model">
     <p>A model trained by FloodPulse predicts whether each river will rise above its 2-year flood level within 3 days, from rain over the river's upstream catchment (traced along OpenStreetMap rivers, e.g. up to Mahabaleshwar for the Krishna). It uses no river readings.</p>
@@ -251,12 +269,17 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
     <label>Recorded flood<select aria-label="Recorded flood" value={eventId} onChange={e=>{setEventId(e.target.value);chooseFeature(null)}}><option value="">All recorded floods</option>{(safeHistory?.events||[]).map(e=><option key={e.event_id} value={e.event_id}>{eventName(e)}</option>)}</select></label>
    </section>}
    {!layers.history&&<p className="muted">Past floods hidden.</p>}
-   {district&&!district.navigation_bounds&&<p className="notice">Map bounds are unavailable for {district.name}, so the map keeps its current view; the information here is still filtered to {district.name}.</p>}
+   {district&&!district.navigation_bounds&&!districtImd&&<p className="notice">Map bounds are unavailable for {district.name}, so the map keeps its current view; the information here is still filtered to {district.name}.</p>}
    {layers.shelters&&shownShelters&&<p>{shownShelters.mode==='demonstration'?'DEMONSTRATION ONLY — not actual destinations. ':''}{shownShelters.shelters.length?'Only currently verified Open entrances with spare capacity are shown.':'No currently verified open shelters are available in this directory.'} Directions are not verified flood-safe.</p>}
    {layers.shelters&&<p className="muted">Shelter availability: {shelters.freshness}, rechecked every minute.</p>}
    {layers.shelters&&shelters.data&&!shownShelters&&<p role="alert">Shelter availability could not be verified. No substitute destinations are shown.</p>}
   </>},
   {id:'sources',label:'Sources',content:<div className="intelligence-events">{layers.history&&(safeHistory?.events||[]).map(e=><p key={e.event_id}>GFD {e.event_id} ({eventName(e)}): {e.qualified_pixel_count} satellite cells.</p>)}{layers.history&&<p>Satellite flood maps exist for two Udupi floods (2005 and 2009). Each red cell is part of one of those floods, not a separate flood. Tap a cell on the map for its details.</p>}
+   <ul className="intelligence-sources" aria-label="Map layer sources">
+    <li><strong>IMD warnings:</strong> India Meteorological Department district-wise warnings, as issued (<a href="https://mausam.imd.gov.in/responsive/districtWiseWarningGIS.php">source</a>).</li>
+    <li><strong>Rain risk:</strong> Open-Meteo forecast rain (CC BY 4.0) in FloodPulse's experimental rule-based index.</li>
+    <li><strong>Rivers:</strong> Copernicus GloFAS v4 via Open-Meteo (CC BY 4.0) and the FloodPulse AI river model; river lines © OpenStreetMap contributors (ODbL).</li>
+   </ul>
    <p>{hazardNotice} Past floods and terrain are not relabelled as flood-prone zones.</p>
    <p>{directory.data?.total??'Unavailable'} districts. A checked place is matched to a district using IMD's district boundaries.</p>
 <p className="muted intelligence-attribution">Satellite evidence: <a href="https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1">Global Flood Database V1</a> · Tellman et al. (2021) · <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>, attribution and non-commercial use required. Modern Udupi outline: geoBoundaries v6 · CC BY 4.0, not a verified historical boundary.</p>

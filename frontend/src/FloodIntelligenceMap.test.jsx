@@ -85,3 +85,33 @@ it('a river forecast outage is stated, never shown as normal rivers',async()=>{
  expect(await screen.findByText(/River forecast unavailable \(River forecast provider unavailable \(timeout\)\.\)\. This does not mean rivers are normal/)).toBeTruthy()
  expect(screen.queryByRole('list',{name:'River flood forecast, next 7 days'})).toBeNull()
 })
+// TEST FIXTURE ONLY: an IMD record with an outline for a district the directory has no bounds for.
+const kodagu={district:'Kodagu',aliases:['Kodagu','Coorg'],imd_name:'KODAGU',status:'available',issued_date:'2026-10-16',days:[{date:'2026-10-16',level:'yellow',warnings:['Thunderstorm & lightning, squall etc'],status:'available'}],
+ geometry:{type:'Polygon',coordinates:[[[75.5,12.2],[76.1,12.2],[76.1,12.6],[75.5,12.6],[75.5,12.2]]]}}
+const withKodagu=url=>{const u=new URL(url,'http://localhost');if(u.pathname!=='/api/official/districts')return responses(url);return responses(url).then(async r=>{const body=await r.json();return reply({...body,districts:[...body.districts,kodagu]})})}
+it('a district without directory bounds is framed by its IMD outline, and Today then shows only that district',async()=>{
+ fetch.mockImplementation(withKodagu)
+ await start();const map=mock.map.mock.results[0].value;map.fitBounds.mockClear()
+ const id=directory.districts.find(d=>d.name==='Kodagu').id
+ fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:id}})
+ await waitFor(()=>expect(map.fitBounds).toHaveBeenCalled())  // framed by the IMD outline
+ expect(screen.queryByText(/Map bounds are unavailable for Kodagu/)).toBeNull()
+ fireEvent.click(screen.getByRole('tab',{name:'Today'}))
+ const card=document.querySelector('.official-district-status').textContent
+ expect(card).toMatch(/Official IMD warning today:.*Yellow.*Thunderstorm & lightning, squall etc/);expect(card).not.toMatch(/\d+ Orange/)
+ expect(document.querySelector('.risk-grid-status').textContent).toMatch(/areas in Kodagu/)
+})
+it('a tap outside Karnataka says so and offers no Home or Shelters action',async()=>{
+ await start();const map=mock.map.mock.results[0].value
+ const click=map.on.mock.calls.find(([name])=>name==='click')[1]
+ act(()=>click({latlng:{lat:15.8,lng:70.7}}))  // Arabian Sea
+ expect(await screen.findByRole('heading',{name:'Outside Karnataka'})).toBeTruthy()
+ expect(screen.queryByRole('link',{name:'Full check on Home'})).toBeNull();expect(screen.queryByRole('link',{name:'Shelters near here'})).toBeNull()
+})
+it('when the AI model flags a flood but GloFAS is low, the row says the models disagree and the marker gets a red ring',async()=>{
+ fetch.mockImplementation(url=>new URL(url,'http://localhost').pathname==='/api/river-forecast'?reply({...rivers,points:[{...rivers.points[0],level:'low'}]}):responses(url))
+ await start();fireEvent.click(screen.getByRole('tab',{name:'Rivers'}))
+ expect(await screen.findByText(/GloFAS disagrees; check CWC\/KSNDMC/)).toBeTruthy()
+ const ring=mock.circleMarker.mock.calls.find(([latlng])=>latlng[0]===13.125)[1]
+ expect(ring).toEqual(expect.objectContaining({color:'#b71c1c',dashArray:'4 3'}))
+})

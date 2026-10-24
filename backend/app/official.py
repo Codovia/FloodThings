@@ -221,7 +221,8 @@ def karnataka_districts(features, today):
         record = imd_district([feature], centre[1], centre[0], today) if centre else {'status': 'unavailable'}
         if record.get('status') not in ('available', 'stale'):
             continue
-        out.append({'district': DISTRICT_NAMES[name][0], 'imd_name': name, 'status': record['status'],
+        # aliases: every known spelling (e.g. Bagalkot/Bagalkote), so other directories can match the district.
+        out.append({'district': DISTRICT_NAMES[name][0], 'aliases': DISTRICT_NAMES[name], 'imd_name': name, 'status': record['status'],
                     'issued_date': record['issued_date'], 'days': record['days'][:2] if record['status'] == 'available' else [],
                     'geometry': {'type': geometry['type'], 'coordinates': rounded(geometry['coordinates'])}})
     return sorted(out, key=lambda d: d['district'])
