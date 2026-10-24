@@ -1,0 +1,117 @@
+import React from 'react'
+import {afterEach,beforeEach,expect,it,vi} from 'vitest'
+import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {readFileSync} from 'node:fs'
+import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
+const directory=JSON.parse(readFileSync('../data/reference/karnataka_location_directory_v2/directory.json','utf8'))
+const mock=vi.hoisted(()=>({map:vi.fn(),tileLayer:vi.fn(),geoJSON:vi.fn(),circleMarker:vi.fn(),rectangle:vi.fn(),circle:vi.fn(),svg:vi.fn(()=>({})),clicks:[]}))
+vi.mock('leaflet',()=>({default:mock}))
+const props={event_id:2728,grid_row:1,grid_col:2,district:'Udupi',clear_views:2,start_date:'2005-09-14',end_date_inclusive:'2005-09-30',place_name:null,mechanism:{method:'No reviewed source establishes a flood mechanism'},geometry_meaning:'Source-exported observation-qualified raster cell',processing_grid_m:250,observation_quality:'qualified_source_mask_and_clear_views',source:{name:'Global Flood Database V1',url:'https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1',license:'CC BY-NC 4.0',license_url:'https://creativecommons.org/licenses/by-nc/4.0/',conditions:'Attribution and non-commercial use required'},dataset_version:'udupi_flood_spatial_v1',image_id:'GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2728',retrieved_at:'2026-10-03T00:00:00Z',limitations:'Historical maximum, not daily occurrence',source_geometry_sha256:'a'.repeat(64)}
+const feature={type:'Feature',id:'gfd:2728:r1:c2',properties:props,geometry:{type:'Polygon',coordinates:[[[74,13],[75,13],[75,14],[74,13]]]}}
+const history={status:'available',geojson:{type:'FeatureCollection',features:[feature]},events:[{event_id:2728,qualified_pixel_count:1,image_id:props.image_id,start_date:props.start_date,end_date_inclusive:props.end_date_inclusive}],total:1,coverage:{historical_events:1},boundary:null}
+const reply=(data,ok=true)=>Promise.resolve({ok,json:async()=>data})
+// TEST FIXTURE ONLY: shape of /api/river-forecast; invented values.
+const rivers={status:'available',label:'TEST',points:[{id:'test_river',river:'Testriver',place:'Fixtureville',district:'Udupi',grid:{latitude:13.125,longitude:74.875},level:'high',
+ meaning:'TEST',peak:{date:'2026-10-25',median_m3s:150,share_above:{'2_year':.62,'5_year':.08,'10_year':0}},days:[],flood_levels_m3s:{'2_year':100,'5_year':200,'10_year':300},
+ ai_model:{status:'available',flood_likely:true,first_flagged_date:'2026-10-26',peak_upstream_rain_3d_mm:212.4,evaluation:{model_f1:.71,rain_rule_f1:.62,documented_floods_flagged:['2019-08-08']}}}]}
+// The river forecast points are the only circle markers; no flood or shelter record is turned into a point.
+const onlyRiverMarkers=()=>mock.circleMarker.mock.calls.every(([latlng])=>latlng[0]===13.125&&latlng[1]===74.875)
+function responses(url){
+ const u=new URL(url,'http://localhost')
+ if(u.pathname==='/api/flood-map/districts')return reply({status:'available',items:directory.districts,total:31})
+ if(u.pathname==='/api/flood-map/historical')return reply(u.searchParams.has('district_id')&&u.searchParams.get('district_id')!=='nic:udupi.nic.in'?{...history,events:[],geojson:{type:'FeatureCollection',features:[]},total:0,coverage:{historical_events:0}}:history)
+ if(u.pathname==='/api/flood-map/hazards')return reply({status:'unavailable',message:'No verified potential flood-prone zone dataset is available for this district.',geojson:{type:'FeatureCollection',features:[]}})
+ if(u.pathname==='/api/flood-map/drainage')return reply({status:'unavailable',message:'No reviewed drainage context is available for this district.'})
+ if(u.pathname.startsWith('/api/flood-map/features/'))return reply({feature})
+ if(u.pathname==='/api/shelters')return reply({status:'available',mode:'live',shelters:[]})
+ if(u.pathname==='/api/official/districts')return reply({status:'available',official:true,label:'TEST',retrieved_at:'2026-10-16T00:00:00Z',districts:[{district:'Udupi',imd_name:'UDUPI',status:'available',issued_date:'2026-10-16',days:[{date:'2026-10-16',level:'orange',warnings:['Very heavy rain'],status:'available'}],geometry:{type:'Polygon',coordinates:[[[74.6,13.5],[74.9,13.5],[74.9,13.8],[74.6,13.5]]]}}]})
+ if(u.pathname==='/api/risk/grid')return reply({status:'available',experimental:true,cell_size_degrees:0.25,retrieved_at:'2026-10-16T00:00:00Z',note:'Rain-only test grid',cells:[{id:'g1',latitude:13.625,longitude:74.625,level:'moderate',score:2,rain_24h_mm:70,rain_5d_mm:10,peak_mmh:8}]})
+ if(u.pathname==='/api/river-forecast')return reply(rivers)
+ throw Error('Unexpected test request '+url)
+}
+beforeEach(()=>{
+ vi.clearAllMocks();mock.clicks.length=0
+ mock.map.mockReturnValue({setView:vi.fn().mockReturnThis(),on:vi.fn(),fitBounds:vi.fn(),removeLayer:vi.fn(),remove:vi.fn()})
+ mock.tileLayer.mockReturnValue({addTo:vi.fn().mockReturnThis(),on:vi.fn()})
+ mock.circleMarker.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindPopup:vi.fn(),bindTooltip:vi.fn()})
+ mock.rectangle.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindTooltip:vi.fn(),on:vi.fn()})
+ mock.circle.mockReturnValue({addTo:vi.fn().mockReturnThis(),bindTooltip:vi.fn(),on:vi.fn()})
+ mock.geoJSON.mockImplementation((data,options)=>{for(const f of data.features||[])options?.onEachFeature?.(f,{bindTooltip:vi.fn(),on:(name,fn)=>mock.clicks.push(fn)});return {addTo:vi.fn().mockReturnThis(),getBounds:()=>({})}})
+ vi.stubGlobal('fetch',vi.fn(responses))
+})
+afterEach(()=>{cleanup();vi.useRealTimers();vi.unstubAllGlobals();vi.restoreAllMocks()})
+const start=async()=>{render(<FloodIntelligenceMap/>);await screen.findByText(/1 mapped flood cells/);await waitFor(()=>expect(mock.geoJSON.mock.calls.some(([d])=>JSON.stringify(d)===JSON.stringify(history.geojson))).toBe(true))}
+it('all 31 genuine district names have stable NIC identifiers',async()=>{await start();const select=screen.getByLabelText('Go to district');expect(select.options.length).toBe(32);for(const d of directory.districts)expect([...select.options].some(o=>o.value===d.id&&o.text===d.name)).toBe(true)})
+it('district filtering and statewide reset preserve layer choices',async()=>{await start();fireEvent.click(screen.getByLabelText('Verified shelters'));fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:'nic:kolar.nic.in'}});await screen.findByText(/No past floods are mapped for this district/);expect(screen.getByText(/Map bounds are unavailable/)).toBeTruthy();expect(screen.getByLabelText('Verified shelters').checked).toBe(true);fireEvent.click(screen.getByRole('button',{name:'Show all Karnataka'}));await screen.findByText(/1 mapped flood cells/);expect(screen.getByLabelText('Verified shelters').checked).toBe(true);expect(fetch.mock.calls.some(([u])=>u.includes('district_id=nic%3Akolar.nic.in'))).toBe(true)})
+it('uses permitted navigation bounds and invents no unavailable bounds',async()=>{await start();const map=mock.map.mock.results[0].value;fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:'nic:udupi.nic.in'}});await waitFor(()=>expect(map.fitBounds).toHaveBeenCalledWith(directory.districts.find(d=>d.id==='nic:udupi.nic.in').navigation_bounds,expect.any(Object)));map.fitBounds.mockClear();fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:'nic:kolar.nic.in'}});await screen.findByText(/No past floods are mapped/);expect(map.fitBounds).not.toHaveBeenCalled()})
+it('passes original polygons to Leaflet instead of fabricated event points',async()=>{await start();expect(mock.geoJSON.mock.calls.some(([d])=>JSON.stringify(d)===JSON.stringify(history.geojson))).toBe(true);expect(onlyRiverMarkers()).toBe(true)})
+it('no empty flood-prone layer is offered; its absence is stated, and past floods toggle independently',async()=>{await start();expect(screen.queryByLabelText(/Flood-Prone/i)).toBeNull();expect(screen.getByText(/No verified potential flood-prone zone dataset is available, so no flood-prone zones are shown/)).toBeTruthy();expect(fetch.mock.calls.some(([u])=>u.includes('/api/flood-map/hazards'))).toBe(false);expect(screen.getByLabelText('Past floods (satellite)').checked).toBe(true);fireEvent.click(screen.getByLabelText('Past floods (satellite)'));await screen.findByText('Past floods hidden.');expect(screen.queryByLabelText('Mapped flood cell')).toBeNull();expect(screen.getByLabelText('Official IMD warnings').checked).toBe(true)})
+it('cell details are plain language and close',async()=>{await start();await waitFor(()=>expect(mock.clicks[0]).toBeTypeOf('function'));act(()=>mock.clicks[0]());await screen.findByRole('heading',{name:'Flood evidence details'});expect(screen.getByText('No verified place name for this cell')).toBeTruthy();expect(screen.getByText(/Maximum water seen by satellite during this flood/)).toBeTruthy();expect(screen.queryByText(props.source_geometry_sha256)).toBeNull();expect(screen.queryByLabelText('Mapped flood cell')).toBeNull();fireEvent.click(screen.getByRole('button',{name:'Close'}));expect(screen.queryByRole('heading',{name:'Flood evidence details'})).toBeNull()})
+it('polygon click opens details without changing weather point',async()=>{const onPoint=vi.fn();render(<FloodIntelligenceMap onPoint={onPoint}/>);await screen.findByText(/1 mapped flood cells/);await waitFor(()=>expect(mock.clicks[0]).toBeTypeOf("function"));act(()=>mock.clicks[0]());await screen.findByRole('heading',{name:'Flood evidence details'});expect(onPoint).not.toHaveBeenCalled()})
+it('offers no drains research layer and never requests it',async()=>{await start();expect(screen.queryByLabelText('Drains (Udupi study)')).toBeNull();expect(fetch.mock.calls.some(([u])=>u.includes('/api/flood-map/drainage')||u.includes('/api/drainage-research'))).toBe(false)})
+it('shelter toggle shows genuine empty state with no fabricated points',async()=>{await start();fireEvent.click(screen.getByLabelText('Verified shelters'));await screen.findByText(/No currently verified open shelters/);expect(onlyRiverMarkers()).toBe(true)})
+it('rejects unverified closed shelter responses',async()=>{fetch.mockImplementation(u=>u==='/api/shelters'?reply({mode:'live',shelters:[{status:'closed',latitude:13,longitude:74}]}):responses(u));await start();fireEvent.click(screen.getByLabelText('Verified shelters'));await screen.findByText(/Shelter availability could not be verified/);expect(onlyRiverMarkers()).toBe(true)})
+it('provider errors show retry without replacement polygons',async()=>{fetch.mockImplementation(u=>u.startsWith('/api/flood-map/historical')?reply({detail:'Historical checksum failed'},false):responses(u));render(<FloodIntelligenceMap/>);await screen.findByRole('alert');expect(screen.getByText(/No substitute geometry/)).toBeTruthy();expect(mock.geoJSON.mock.calls.every(([d])=>d.type==='Feature'&&d.geometry?.type==='Polygon')).toBe(true);expect(screen.getByRole('button',{name:'Retry map evidence'})).toBeTruthy()})
+it('late previous-district response cannot replace current filtering',async()=>{let release;fetch.mockImplementation(u=>u.includes('district_id=nic%3Audupi.nic.in')?new Promise(r=>{release=()=>r({ok:true,json:async()=>history})}):responses(u));await start();fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:'nic:udupi.nic.in'}});fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:'nic:kolar.nic.in'}});await screen.findByText(/No past floods are mapped/);await act(async()=>release());expect(screen.queryByText(/1 mapped flood cells/)).toBeNull()})
+it('request controllers are cleaned up on unmount',()=>{const signals=[];fetch.mockImplementation((u,options)=>{signals.push(options.signal);return new Promise(()=>{})});const {unmount}=render(<FloodIntelligenceMap/>);unmount();expect(signals.length).toBe(5);expect(signals.every(s=>s.aborted)).toBe(true)})
+it('request timeout is explicit',async()=>{vi.useFakeTimers();fetch.mockImplementation((u,{signal})=>new Promise((resolve,reject)=>signal.addEventListener('abort',()=>reject(new DOMException('Aborted','AbortError')))));render(<FloodIntelligenceMap/>);await act(async()=>{await vi.advanceTimersByTimeAsync(15000)});expect(screen.getByRole('alert').textContent).toContain('timed out')})
+it('official IMD district layer is on by default, summarised and independently switchable',async()=>{
+ await start();await screen.findByText(/Official IMD warnings today:/)
+ expect(screen.getByText(/Official IMD warnings today:/).closest('p').textContent).toContain('1 Orange')
+ expect(screen.getByLabelText('Official IMD warnings').checked).toBe(true)
+ expect(screen.getByLabelText('Official IMD warning legend')).toBeTruthy()
+ // Switching the layer off removes the district colours and legend; the text summary stays for the place check.
+ fireEvent.click(screen.getByLabelText('Official IMD warnings'));expect(screen.queryByLabelText('Official IMD warning legend')).toBeNull();expect(screen.getByText(/Official IMD warnings today:/)).toBeTruthy()
+})
+
+it('Rivers tab lists the checked river points with the share of forecast runs above the flood levels, and draws them',async()=>{
+ await start()
+ fireEvent.click(screen.getByRole('tab',{name:'Rivers'}))
+ const list=await screen.findByRole('list',{name:'River flood forecast, next 7 days'})
+ expect(list.textContent).toMatch(/High.*Testriver.*Fixtureville.*GloFAS: 62% of runs above 2-year flood level · 8% above 5-year/)
+ expect(list.textContent).toMatch(/AI: flood likely within 3 days of Mon, 26 Oct · 212 mm upstream in 3 days/)
+ fireEvent.click(screen.getByRole('button',{name:'How the AI model was tested'}))
+ expect(screen.getByRole('dialog').textContent).toMatch(/Testriver: model F1 0\.71 vs a simple rain rule 0\.62 · flagged the documented flood of 2019-08-08 1–4 days ahead/)
+ fireEvent.click(screen.getByRole('button',{name:'Close'}))
+ expect(screen.getByText(/Not observed water levels or an official warning/)).toBeTruthy()
+ expect(mock.circleMarker.mock.calls.some(([latlng])=>latlng[0]===13.125&&latlng[1]===74.875)).toBe(true)
+ fireEvent.click(screen.getByLabelText('River flood forecast, 7 days'))
+ expect(screen.getByText(/River forecast hidden/)).toBeTruthy()
+})
+it('a river forecast outage is stated, never shown as normal rivers',async()=>{
+ fetch.mockImplementation(url=>new URL(url,'http://localhost').pathname==='/api/river-forecast'?reply({status:'unavailable',points:[],message:'River forecast provider unavailable (timeout).'},false):responses(url))
+ await start()
+ fireEvent.click(screen.getByRole('tab',{name:'Rivers'}))
+ expect(await screen.findByText(/River forecast unavailable \(River forecast provider unavailable \(timeout\)\.\)\. This does not mean rivers are normal/)).toBeTruthy()
+ expect(screen.queryByRole('list',{name:'River flood forecast, next 7 days'})).toBeNull()
+})
+// TEST FIXTURE ONLY: an IMD record with an outline for a district the directory has no bounds for.
+const kodagu={district:'Kodagu',aliases:['Kodagu','Coorg'],imd_name:'KODAGU',status:'available',issued_date:'2026-10-16',days:[{date:'2026-10-16',level:'yellow',warnings:['Thunderstorm & lightning, squall etc'],status:'available'}],
+ geometry:{type:'Polygon',coordinates:[[[75.5,12.2],[76.1,12.2],[76.1,12.6],[75.5,12.6],[75.5,12.2]]]}}
+const withKodagu=url=>{const u=new URL(url,'http://localhost');if(u.pathname!=='/api/official/districts')return responses(url);return responses(url).then(async r=>{const body=await r.json();return reply({...body,districts:[...body.districts,kodagu]})})}
+it('a district without directory bounds is framed by its IMD outline, and Today then shows only that district',async()=>{
+ fetch.mockImplementation(withKodagu)
+ await start();const map=mock.map.mock.results[0].value;map.fitBounds.mockClear()
+ const id=directory.districts.find(d=>d.name==='Kodagu').id
+ fireEvent.change(screen.getByLabelText('Go to district'),{target:{value:id}})
+ await waitFor(()=>expect(map.fitBounds).toHaveBeenCalled())  // framed by the IMD outline
+ expect(screen.queryByText(/Map bounds are unavailable for Kodagu/)).toBeNull()
+ fireEvent.click(screen.getByRole('tab',{name:'Today'}))
+ const card=document.querySelector('.official-district-status').textContent
+ expect(card).toMatch(/Official IMD warning today:.*Yellow.*Thunderstorm & lightning, squall etc/);expect(card).not.toMatch(/\d+ Orange/)
+ expect(document.querySelector('.risk-grid-status').textContent).toMatch(/areas in Kodagu/)
+})
+it('a tap outside Karnataka says so and offers no Home or Shelters action',async()=>{
+ await start();const map=mock.map.mock.results[0].value
+ const click=map.on.mock.calls.find(([name])=>name==='click')[1]
+ act(()=>click({latlng:{lat:15.8,lng:70.7}}))  // Arabian Sea
+ expect(await screen.findByRole('heading',{name:'Outside Karnataka'})).toBeTruthy()
+ expect(screen.queryByRole('link',{name:'Full check on Home'})).toBeNull();expect(screen.queryByRole('link',{name:'Shelters near here'})).toBeNull()
+})
+it('when the AI model flags a flood but GloFAS is low, the row says the models disagree and the marker gets a red ring',async()=>{
+ fetch.mockImplementation(url=>new URL(url,'http://localhost').pathname==='/api/river-forecast'?reply({...rivers,points:[{...rivers.points[0],level:'low'}]}):responses(url))
+ await start();fireEvent.click(screen.getByRole('tab',{name:'Rivers'}))
+ expect(await screen.findByText(/GloFAS disagrees; check CWC\/KSNDMC/)).toBeTruthy()
+ const ring=mock.circleMarker.mock.calls.find(([latlng])=>latlng[0]===13.125)[1]
+ expect(ring).toEqual(expect.objectContaining({color:'#b71c1c',dashArray:'4 3'}))
+})

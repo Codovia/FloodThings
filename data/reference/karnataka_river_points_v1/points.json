@@ -1,0 +1,855 @@
+{
+ "version": "karnataka_river_points_v1",
+ "built_at": "2026-10-24T14:49:31+00:00",
+ "source": {
+  "name": "Copernicus GloFAS v4 via Open-Meteo Flood API",
+  "url": "https://open-meteo.com/en/docs/flood-api",
+  "license": "CC BY 4.0"
+ },
+ "geography_source": {
+  "name": "OpenStreetMap (Overpass API)",
+  "url": "https://www.openstreetmap.org/copyright",
+  "license": "ODbL 1.0"
+ },
+ "method": "Build the verified Karnataka river forecast points (GloFAS v4 via Open-Meteo).\n\nA candidate becomes a forecast point only if BOTH checks pass:\n1. Geography: OpenStreetMap has a river with the expected name within 3 km of the model cell\n   (the model's 5 km grid can otherwise pick a neighbouring stream).\n2. Flood history: a documented flood (dated, sourced) falls within 3 days of one of the cell's\n   three largest annual peaks in the GloFAS v4 reanalysis (1997-2021, the years `consolidated_v4` covers).\nFlood levels (2-, 5- and 10-year) are a Gumbel fit to the cell's own 25 annual maxima, as\nGloFAS does for its own thresholds, so model bias is not compared against observed levels.\n\nRun: python3 scripts/build_karnataka_river_points.py  (network; writes data/reference/...)",
+ "points": [
+  {
+   "id": "krishna_kudachi",
+   "river": "Krishna",
+   "place": "Kudachi",
+   "district": "Belagavi",
+   "query_point": {
+    "latitude": 16.625,
+    "longitude": 74.875
+   },
+   "grid": {
+    "latitude": 16.625,
+    "longitude": 74.875
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Krishna"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2019-08-06",
+      "m3s": 11427.8
+     },
+     {
+      "date": "2020-10-16",
+      "m3s": 7344.1
+     },
+     {
+      "date": "2008-09-12",
+      "m3s": 7327.2
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "Krishna and tributaries crossed highest flood levels in Karnataka, 8 Aug 2019",
+      "event_date": "2019-08-08",
+      "source": "https://sandrp.in/2019/08/12/krishna-basin-floods-in-karnataka-the-role-of-dams/",
+      "model_peak_date": "2019-08-06",
+      "model_peak_m3s": 11427.8
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 7,
+    "episodes_above_2_year": 17,
+    "documented_events": [
+     {
+      "event_date": "2019-08-08",
+      "inside_5_year_episode": true
+     },
+     {
+      "event_date": "2009-10-02",
+      "inside_5_year_episode": false
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2008-09-12",
+      "end": "2008-09-13",
+      "peak_m3s": 7327.2
+     },
+     {
+      "start": "2010-07-27",
+      "end": "2010-07-27",
+      "peak_m3s": 6605.9
+     },
+     {
+      "start": "2013-07-25",
+      "end": "2013-07-25",
+      "peak_m3s": 6470.4
+     },
+     {
+      "start": "2019-08-05",
+      "end": "2019-08-11",
+      "peak_m3s": 11427.8
+     },
+     {
+      "start": "2020-08-06",
+      "end": "2020-08-07",
+      "peak_m3s": 6917.3
+     },
+     {
+      "start": "2020-10-15",
+      "end": "2020-10-16",
+      "peak_m3s": 7344.1
+     },
+     {
+      "start": "2021-07-24",
+      "end": "2021-07-24",
+      "peak_m3s": 6279.6
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 4313.7,
+    "5_year": 6257.4,
+    "10_year": 7544.3
+   },
+   "mean_annual_maximum_m3s": 4675.0,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "106576644f75e2bdc265ed51f636bb3ebe188abf8f8d28389a3d27756612bd81"
+   }
+  },
+  {
+   "id": "ghataprabha_gokak",
+   "river": "Ghataprabha",
+   "place": "Gokak",
+   "district": "Belagavi",
+   "query_point": {
+    "latitude": 16.175,
+    "longitude": 74.825
+   },
+   "grid": {
+    "latitude": 16.175,
+    "longitude": 74.825
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Ghataprabha",
+     "Markandeya"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2019-08-07",
+      "m3s": 1976.0
+     },
+     {
+      "date": "2020-08-06",
+      "m3s": 1697.2
+     },
+     {
+      "date": "2008-08-12",
+      "m3s": 1677.8
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "Ghataprabha at Gokak Falls new record level, crossed 5 Aug, peak 9 Aug 2019 (CWC data)",
+      "event_date": "2019-08-09",
+      "source": "https://sandrp.in/2019/10/03/breaching-historic-flood-levels-many-times-over-aftermath-of-ghataprabha-floods-2019/",
+      "model_peak_date": "2019-08-07",
+      "model_peak_m3s": 1976.0
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 7,
+    "episodes_above_2_year": 18,
+    "documented_events": [
+     {
+      "event_date": "2019-08-09",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2008-08-11",
+      "end": "2008-08-13",
+      "peak_m3s": 1677.8
+     },
+     {
+      "start": "2011-08-30",
+      "end": "2011-08-30",
+      "peak_m3s": 1320.3
+     },
+     {
+      "start": "2013-07-23",
+      "end": "2013-07-25",
+      "peak_m3s": 1654.8
+     },
+     {
+      "start": "2014-07-31",
+      "end": "2014-08-01",
+      "peak_m3s": 1632.0
+     },
+     {
+      "start": "2019-08-05",
+      "end": "2019-08-10",
+      "peak_m3s": 1976.0
+     },
+     {
+      "start": "2020-08-05",
+      "end": "2020-08-07",
+      "peak_m3s": 1697.2
+     },
+     {
+      "start": "2020-09-23",
+      "end": "2020-09-23",
+      "peak_m3s": 1573.0
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 891.6,
+    "5_year": 1310.9,
+    "10_year": 1588.5
+   },
+   "mean_annual_maximum_m3s": 969.6,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "cd658781bfbbc566bfa2d027c40229e2c6002c3fd01821e7497d315325b71d9e"
+   }
+  },
+  {
+   "id": "kabini_nanjangud",
+   "river": "Kabini",
+   "place": "Nanjangud",
+   "district": "Mysuru",
+   "query_point": {
+    "latitude": 12.175,
+    "longitude": 76.725
+   },
+   "grid": {
+    "latitude": 12.175,
+    "longitude": 76.725
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Kabini"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2018-08-16",
+      "m3s": 1418.1
+     },
+     {
+      "date": "2021-10-24",
+      "m3s": 1198.5
+     },
+     {
+      "date": "2011-09-02",
+      "m3s": 1126.2
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "Kabini dam releases inundated Nanjangud, 18 Aug 2018",
+      "event_date": "2018-08-18",
+      "source": "https://sandrp.in/2018/11/08/hfl-crossing-flood-events-during-india-sw-monsoon-2018/",
+      "model_peak_date": "2018-08-16",
+      "model_peak_m3s": 1418.1
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 7,
+    "episodes_above_2_year": 17,
+    "documented_events": [
+     {
+      "event_date": "2018-08-18",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2006-05-31",
+      "end": "2006-05-31",
+      "peak_m3s": 1010.6
+     },
+     {
+      "start": "2007-06-23",
+      "end": "2007-06-23",
+      "peak_m3s": 1073.0
+     },
+     {
+      "start": "2009-07-18",
+      "end": "2009-07-19",
+      "peak_m3s": 1073.0
+     },
+     {
+      "start": "2011-09-01",
+      "end": "2011-09-03",
+      "peak_m3s": 1126.2
+     },
+     {
+      "start": "2018-08-15",
+      "end": "2018-08-17",
+      "peak_m3s": 1418.1
+     },
+     {
+      "start": "2020-08-08",
+      "end": "2020-08-09",
+      "peak_m3s": 1046.1
+     },
+     {
+      "start": "2021-10-24",
+      "end": "2021-10-24",
+      "peak_m3s": 1198.5
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 707.2,
+    "5_year": 974.6,
+    "10_year": 1151.6
+   },
+   "mean_annual_maximum_m3s": 756.9,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "1dbf4c64bbe7b78b44cb5b77809d4262eea5dd30be1135f938f9e36abe5981f8"
+   }
+  },
+  {
+   "id": "netravati_bantwal",
+   "river": "Netravati",
+   "place": "Bantwal",
+   "district": "Dakshina Kannada",
+   "query_point": {
+    "latitude": 12.875,
+    "longitude": 74.925
+   },
+   "grid": {
+    "latitude": 12.875,
+    "longitude": 74.925
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Netravati"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2009-07-17",
+      "m3s": 1540.7
+     },
+     {
+      "date": "2019-08-09",
+      "m3s": 1519.5
+     },
+     {
+      "date": "2020-08-10",
+      "m3s": 1512.6
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "Netravati at Bantwal 11.6 m against an 8.5 m danger level, 10 Aug 2019",
+      "event_date": "2019-08-10",
+      "source": "https://www.deccanherald.com/india/karnataka/rain-recedes-but-situation-still-grim-in-dk-752845.html",
+      "model_peak_date": "2019-08-09",
+      "model_peak_m3s": 1519.5
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 8,
+    "episodes_above_2_year": 21,
+    "documented_events": [
+     {
+      "event_date": "2019-08-10",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "1998-06-29",
+      "end": "1998-07-05",
+      "peak_m3s": 1454.5
+     },
+     {
+      "start": "1998-07-20",
+      "end": "1998-07-20",
+      "peak_m3s": 1366.7
+     },
+     {
+      "start": "2007-06-23",
+      "end": "2007-06-23",
+      "peak_m3s": 1444.4
+     },
+     {
+      "start": "2009-07-16",
+      "end": "2009-07-19",
+      "peak_m3s": 1540.7
+     },
+     {
+      "start": "2011-09-01",
+      "end": "2011-09-03",
+      "peak_m3s": 1512.6
+     },
+     {
+      "start": "2018-08-16",
+      "end": "2018-08-16",
+      "peak_m3s": 1376.2
+     },
+     {
+      "start": "2019-08-08",
+      "end": "2019-08-10",
+      "peak_m3s": 1519.5
+     },
+     {
+      "start": "2020-08-05",
+      "end": "2020-08-11",
+      "peak_m3s": 1512.6
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 1124.8,
+    "5_year": 1338.5,
+    "10_year": 1480.1
+   },
+   "mean_annual_maximum_m3s": 1164.5,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "f9eaaf4cc4e1d91dce0ac17d7cba50a44bec8c1d43d634921871babfbe6cc1b1"
+   }
+  },
+  {
+   "id": "tungabhadra_hampi",
+   "river": "Tungabhadra",
+   "place": "Hampi",
+   "district": "Vijayanagara",
+   "query_point": {
+    "latitude": 15.325,
+    "longitude": 76.375
+   },
+   "grid": {
+    "latitude": 15.325,
+    "longitude": 76.375
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Tungabhadra"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2021-07-19",
+      "m3s": 9203.5
+     },
+     {
+      "date": "2009-10-03",
+      "m3s": 8708.6
+     },
+     {
+      "date": "2020-08-08",
+      "m3s": 4665.6
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "North Karnataka floods, Krishna and Tungabhadra overflowing, 28 Sep - 4 Oct 2009",
+      "event_date": "2009-10-02",
+      "source": "https://earthobservatory.nasa.gov/images/40601/flooding-along-the-krishna-river",
+      "model_peak_date": "2009-10-03",
+      "model_peak_m3s": 8708.6
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 3,
+    "episodes_above_2_year": 12,
+    "documented_events": [
+     {
+      "event_date": "2009-10-02",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2009-10-01",
+      "end": "2009-10-06",
+      "peak_m3s": 8708.6
+     },
+     {
+      "start": "2020-08-08",
+      "end": "2020-08-08",
+      "peak_m3s": 4665.6
+     },
+     {
+      "start": "2021-07-18",
+      "end": "2021-07-25",
+      "peak_m3s": 9203.5
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 2355.2,
+    "5_year": 4288.8,
+    "10_year": 5569.1
+   },
+   "mean_annual_maximum_m3s": 2714.6,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "b6fdc671d22fd3922f8908e3b073a8bf0fb3b779c74799802174f7ffd885d3cd"
+   }
+  },
+  {
+   "id": "kali_dandeli",
+   "river": "Kali",
+   "place": "Dandeli",
+   "district": "Uttara Kannada",
+   "query_point": {
+    "latitude": 15.175,
+    "longitude": 74.675
+   },
+   "grid": {
+    "latitude": 15.175,
+    "longitude": 74.675
+   },
+   "accepted": true,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Kali"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2019-08-08",
+      "m3s": 938.7
+     },
+     {
+      "date": "2008-08-12",
+      "m3s": 900.6
+     },
+     {
+      "date": "2013-07-25",
+      "m3s": 880.0
+     }
+    ],
+    "documented_flood_matches": [
+     {
+      "event": "Kadra dam releases flooded Kali river villages; Navy rescued over 300 people near Kadra, 6 Aug 2019",
+      "event_date": "2019-08-06",
+      "source": "https://sandrp.in/2019/08/31/unprecedented-dam-flood-situation-in-uttara-kannada-in-aug-2019/",
+      "model_peak_date": "2019-08-08",
+      "model_peak_m3s": 938.7
+     }
+    ],
+    "history_ok": true
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 6,
+    "episodes_above_2_year": 16,
+    "documented_events": [
+     {
+      "event_date": "2019-08-06",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2008-08-11",
+      "end": "2008-08-13",
+      "peak_m3s": 900.6
+     },
+     {
+      "start": "2009-07-16",
+      "end": "2009-07-18",
+      "peak_m3s": 759.3
+     },
+     {
+      "start": "2013-07-24",
+      "end": "2013-07-27",
+      "peak_m3s": 880.0
+     },
+     {
+      "start": "2019-08-06",
+      "end": "2019-08-11",
+      "peak_m3s": 938.7
+     },
+     {
+      "start": "2020-08-06",
+      "end": "2020-08-08",
+      "peak_m3s": 811.8
+     },
+     {
+      "start": "2021-07-23",
+      "end": "2021-07-23",
+      "peak_m3s": 715.1
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 542.5,
+    "5_year": 711.5,
+    "10_year": 823.4
+   },
+   "mean_annual_maximum_m3s": 573.9,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "7ed47e6b683caec9f660cab1518215e1c28ddb55843a2583a04a1d6d9d62476a"
+   }
+  },
+  {
+   "id": "bhima_afzalpur",
+   "river": "Bhima",
+   "place": "Afzalpur",
+   "district": "Kalaburagi",
+   "query_point": {
+    "latitude": 17.125,
+    "longitude": 76.425
+   },
+   "grid": {
+    "latitude": 17.125,
+    "longitude": 76.425
+   },
+   "accepted": false,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Bhima"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2019-08-07",
+      "m3s": 10161.5
+     },
+     {
+      "date": "2020-08-09",
+      "m3s": 8850.2
+     },
+     {
+      "date": "2006-08-10",
+      "m3s": 8202.5
+     }
+    ],
+    "documented_flood_matches": [],
+    "history_ok": false
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 6,
+    "episodes_above_2_year": 20,
+    "documented_events": [
+     {
+      "event_date": "2020-10-17",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2006-08-09",
+      "end": "2006-08-12",
+      "peak_m3s": 8202.5
+     },
+     {
+      "start": "2009-10-04",
+      "end": "2009-10-05",
+      "peak_m3s": 6279.6
+     },
+     {
+      "start": "2016-09-21",
+      "end": "2016-09-21",
+      "peak_m3s": 6094.4
+     },
+     {
+      "start": "2019-08-06",
+      "end": "2019-08-09",
+      "peak_m3s": 10161.5
+     },
+     {
+      "start": "2020-08-08",
+      "end": "2020-08-10",
+      "peak_m3s": 8850.2
+     },
+     {
+      "start": "2020-10-15",
+      "end": "2020-10-16",
+      "peak_m3s": 7869.5
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 3060.5,
+    "5_year": 5424.1,
+    "10_year": 6989.0
+   },
+   "mean_annual_maximum_m3s": 3499.9,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "6d279d3f851901575be905757edd5fad73ffc027a737b7126c4b63c97014b6f2"
+   }
+  },
+  {
+   "id": "cauvery_srirangapatna",
+   "river": "Kaveri",
+   "place": "Srirangapatna",
+   "district": "Mandya",
+   "query_point": {
+    "latitude": 12.425,
+    "longitude": 76.675
+   },
+   "grid": {
+    "latitude": 12.425,
+    "longitude": 76.675
+   },
+   "accepted": false,
+   "checks": {
+    "osm_named_rivers_within_3km": [
+     "Kaveri",
+     "Kāveri"
+    ],
+    "geography_ok": true,
+    "top3_annual_peaks": [
+     {
+      "date": "2011-09-03",
+      "m3s": 1814.5
+     },
+     {
+      "date": "2020-08-10",
+      "m3s": 1662.4
+     },
+     {
+      "date": "2009-07-21",
+      "m3s": 1628.3
+     }
+    ],
+    "documented_flood_matches": [],
+    "history_ok": false
+   },
+   "hindcast": {
+    "years": [
+     1997,
+     2021
+    ],
+    "episodes_above_5_year": 4,
+    "episodes_above_2_year": 30,
+    "documented_events": [
+     {
+      "event_date": "2018-08-16",
+      "inside_5_year_episode": true
+     }
+    ],
+    "above_5_year": [
+     {
+      "start": "2009-07-20",
+      "end": "2009-07-23",
+      "peak_m3s": 1628.3
+     },
+     {
+      "start": "2011-09-02",
+      "end": "2011-09-06",
+      "peak_m3s": 1814.5
+     },
+     {
+      "start": "2018-08-17",
+      "end": "2018-08-19",
+      "peak_m3s": 1385.8
+     },
+     {
+      "start": "2020-08-09",
+      "end": "2020-08-13",
+      "peak_m3s": 1662.4
+     }
+    ]
+   },
+   "flood_levels_m3s": {
+    "2_year": 663.1,
+    "5_year": 1069.2,
+    "10_year": 1338.0
+   },
+   "mean_annual_maximum_m3s": 738.6,
+   "history": {
+    "model": "consolidated_v4",
+    "years": [
+     1997,
+     2021
+    ],
+    "annual_maxima": 25,
+    "response_sha256": "18cc4a0863809100805f1fd1033c8123d1e5c45cd1f9fe20c0502be79d0a6802"
+   }
+  }
+ ]
+}

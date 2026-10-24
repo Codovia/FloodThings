@@ -1,3 +1,4 @@
+import { openTab } from './oneScreen.js'
 import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -18,20 +19,26 @@ test.beforeEach(async ({ page }) => {
 test('both event geometries match exported coordinates and Leaflet draws every retained cell', async ({ page }) => {
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
-  await page.goto('/')
+  await page.goto('/flood-map')
+  await page.goto('/weather')
   await expect(page.getByText(/Weather unavailable/)).toBeVisible()
-  await expect(page.getByRole('heading', { name: 'Udupi flood event maps' })).toBeVisible()
-  await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
+  await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
+  await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
+  await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
+  await openTab(page, 'Sources')
+  await expect(page.getByText(/GFD 2728/)).toBeVisible()
   await expect(page.getByRole('link', { name: 'CC BY-NC 4.0', exact: true })).toBeVisible()
   for (const id of [2728, 3551]) {
-    if (id === 3551) await page.getByLabel('Recorded event').selectOption(String(id))
-    await expect(page.getByText(new RegExp(`Source image:.*DFO_${id}`))).toBeVisible()
+    if (id === 3551) { await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood').selectOption(String(id)); await openTab(page, 'Sources') }
+    await expect(page.getByText(new RegExp(`GFD ${id}`))).toBeVisible()
     const actual = saved(id)
     const response = await page.request.get(`/api/historical-floods/${id}`)
     expect(response.ok()).toBe(true)
     expect((await response.json()).floodwater).toEqual(actual)
     // SVG paths must be the exported polygon rings (one path per raster cell), not markers/circles.
     await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(actual.features.length)
+    // All historical event evidence remains original polygon paths, not event markers.
     expect(await page.locator('.historical-map circle, .historical-map .leaflet-marker-icon').count()).toBe(0)
     const map = page.getByRole('region', { name: /Historical satellite floodwater/ })
     await map.scrollIntoViewIfNeeded()
@@ -42,10 +49,11 @@ test('both event geometries match exported coordinates and Leaflet draws every r
 
 test('district view, mobile layout and historical warning remain usable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 })
-  await page.goto('/')
-  await expect(page.getByText(/Source image:.*DFO_2728/)).toBeVisible()
-  await page.getByRole('button', { name: 'Show district', exact: true }).click()
-  await page.getByRole('button', { name: 'Zoom to mapped water', exact: true }).click()
-  await expect(page.getByText(/This is not current flooding/)).toBeVisible()
+  await page.goto('/flood-map')
+  await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')
+  await openTab(page, 'Past floods'); await page.getByLabel('Recorded flood', { exact: true }).selectOption('2728')
+  await openTab(page, 'Sources'); await expect(page.getByText(/GFD 2728/)).toBeVisible()
+  await openTab(page, 'Map'); await page.getByRole('button', { name: 'Zoom to past floods', exact: true }).click()
+  await openTab(page, 'Past floods'); await expect(page.getByText(/not current flooding/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })

@@ -1,0 +1,517 @@
+{
+  "version": "karnataka_identity_policy_20261005_v1",
+  "created_at": "2026-10-05T14:46:07.620620+00:00",
+  "soi_manifest_path": "data/reference/karnataka_soi_verification_v1/manifest.json",
+  "stage_1_current_lgd_complete": false,
+  "later_flood_evidence_research_blocked_by_lgd_outage": false,
+  "lgd": {
+    "status": "unavailable_http_403",
+    "catalogue_url": "https://data.gov.in/resource/local-government-directory-lgd-districts",
+    "catalogue_resource_uuid": "37231365-78ba-44d5-ac22-3deec40b9197",
+    "catalogue_updated_date": "2026-10-04",
+    "catalogue_post_changed_utc": "2026-10-04T10:12:00+00:00",
+    "catalogue_publication_date": "2022-07-22",
+    "verified_dataset_update_date": null,
+    "update_date_semantics": "resource catalogue metadata; dataset rows unavailable; unrelated catalogue update 2026-10-05 and cached search 2026-09-18 are not district-file verification",
+    "catalogue_response": "HTTP 200 HTML; rendered page omits resource body, includes sandbox notice; embedded public CSV link legitimately inspected",
+    "download_url": "https://www.data.gov.in/files/ogdpv2dms/s3fs-public/datafile/lgd_districts.csv",
+    "download_result": "HTTP 403, zero response bytes, no content type; retained filename does not contain CSV observations",
+    "requests": 2,
+    "network_probing_stopped": true,
+    "api_credentials_used": false,
+    "captcha_access_attempted": false,
+    "current_karnataka_district_count": null,
+    "original_lgd_columns": null,
+    "active_inactive_status": null
+  },
+  "coverage": {
+    "soi_2025_polygons": 31,
+    "independently_current_lgd_verified_identities": 0,
+    "reconciled_polygons": 0,
+    "unresolved_polygons": 31,
+    "nic_name_candidates": 12,
+    "unresolved_soi_name_variants": 19
+  },
+  "unresolved_identities": [
+    {
+      "source_district_code": "555",
+      "soi_name_original": "Belag<vi"
+    },
+    {
+      "source_district_code": "556",
+      "soi_name_original": "B<galkot"
+    },
+    {
+      "source_district_code": "557",
+      "soi_name_original": "Vijayapura"
+    },
+    {
+      "source_district_code": "558",
+      "soi_name_original": "B\\dar"
+    },
+    {
+      "source_district_code": "559",
+      "soi_name_original": "Raich#r"
+    },
+    {
+      "source_district_code": "560",
+      "soi_name_original": "Koppal"
+    },
+    {
+      "source_district_code": "561",
+      "soi_name_original": "Gadag"
+    },
+    {
+      "source_district_code": "562",
+      "soi_name_original": "Dh<rw<d"
+    },
+    {
+      "source_district_code": "563",
+      "soi_name_original": "Uttara Kannada"
+    },
+    {
+      "source_district_code": "564",
+      "soi_name_original": "H<veri"
+    },
+    {
+      "source_district_code": "565",
+      "soi_name_original": "Ball<ri"
+    },
+    {
+      "source_district_code": "566",
+      "soi_name_original": "Chitradurga"
+    },
+    {
+      "source_district_code": "567",
+      "soi_name_original": "D<vanagere"
+    },
+    {
+      "source_district_code": "568",
+      "soi_name_original": "Shivamogga"
+    },
+    {
+      "source_district_code": "569",
+      "soi_name_original": "Udupi"
+    },
+    {
+      "source_district_code": "570",
+      "soi_name_original": "Chikkamagal#ru"
+    },
+    {
+      "source_district_code": "571",
+      "soi_name_original": "Tumak#ru"
+    },
+    {
+      "source_district_code": "572",
+      "soi_name_original": "Bengal#ru (Urban)"
+    },
+    {
+      "source_district_code": "573",
+      "soi_name_original": "Mandya"
+    },
+    {
+      "source_district_code": "574",
+      "soi_name_original": "H<ssan"
+    },
+    {
+      "source_district_code": "575",
+      "soi_name_original": "Dakshina Kannada"
+    },
+    {
+      "source_district_code": "576",
+      "soi_name_original": "Kodagu"
+    },
+    {
+      "source_district_code": "577",
+      "soi_name_original": "Mys#ru"
+    },
+    {
+      "source_district_code": "578",
+      "soi_name_original": "Ch<mar<janagara"
+    },
+    {
+      "source_district_code": "579",
+      "soi_name_original": "Kalaburagi"
+    },
+    {
+      "source_district_code": "580",
+      "soi_name_original": "Y<dgir"
+    },
+    {
+      "source_district_code": "581",
+      "soi_name_original": "Kol<ra"
+    },
+    {
+      "source_district_code": "582",
+      "soi_name_original": "Chikkaball<pura"
+    },
+    {
+      "source_district_code": "583",
+      "soi_name_original": "Bengal#ru (Rural)"
+    },
+    {
+      "source_district_code": "584",
+      "soi_name_original": "R<managara"
+    },
+    {
+      "source_district_code": "761",
+      "soi_name_original": "Vijayanagara"
+    }
+  ],
+  "unresolved_nic_name_cases": [
+    "Bagalkote",
+    "Ballari",
+    "Belagavi",
+    "Bengaluru Rural",
+    "Bengaluru South",
+    "Bengaluru Urban",
+    "Bidar",
+    "Chamarajanagar",
+    "Chikkaballapura",
+    "Chikkamagaluru",
+    "Davanagere",
+    "Dharwad",
+    "Hassan",
+    "Haveri",
+    "Kolar",
+    "Mysuru",
+    "Raichur",
+    "Tumakuru",
+    "Yadgir"
+  ],
+  "rename_review": {
+    "official_url": "https://bengalurusouth.nic.in/en/about-district/",
+    "official_rename_date": "2025-05-23",
+    "documented_old_name": "Ramanagara",
+    "official_page_new_wording": "Bangalore South",
+    "official_page_heading": "BENGALURU SOUTH",
+    "source_soi_name": "R<managara",
+    "soi_source_code": "584",
+    "current_code_584_continuity": "not_verified",
+    "alias_applied": false,
+    "reason": "District history documents a rename but supplies no LGD code or evidence decoding the literal SOI source spelling."
+  },
+  "vijayanagara_review": {
+    "official_url": "https://vijayanagara.nic.in/en/about-district/",
+    "genuine_distinct_soi_polygon": true,
+    "soi_source_code": "761",
+    "nic_exact_name_candidate": "Vijayanagara",
+    "current_lgd_code_761": "not_independently_verified"
+  },
+  "retrievals": [
+    {
+      "name": "ogd-primary.html",
+      "source_url": "https://data.gov.in/resource/local-government-directory-lgd-districts",
+      "retrieved_at": "2026-10-05T14:35:07.402934+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://www.data.gov.in/resource/local-government-directory-lgd-districts",
+      "content_type": "text/html; charset=utf-8",
+      "last_modified_header": null,
+      "bytes": 1014711,
+      "sha256": "195667f87b8a108d83aa6729afde3ddf939fcdd331124b26bf02d4b250601a48",
+      "original_filename": "ogd-primary.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:08.579189+00:00"
+    },
+    {
+      "name": "soi-copyright.html",
+      "source_url": "https://surveyofindia.gov.in/pages/copyright-policy",
+      "retrieved_at": "2026-10-05T14:35:08.579714+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/pages/copyright-policy",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 113750,
+      "sha256": "9023b59e4cf190fbbd9ca96427e041b676de5d0313daed790257c1668ab362af",
+      "original_filename": "soi-copyright.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:11.207452+00:00"
+    },
+    {
+      "name": "soi-abdb.html",
+      "source_url": "https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-",
+      "retrieved_at": "2026-10-05T14:35:11.207902+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/pages/administrative-boundary-data-base-abdb-",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 113783,
+      "sha256": "4bf9544b16b264a7290923b09dabaf51a1857b166c83adef5b45b977b51ee672",
+      "original_filename": "soi-abdb.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:11.460864+00:00"
+    },
+    {
+      "name": "soi-pricing.html",
+      "source_url": "https://surveyofindia.gov.in/pages/pricing-of-digital-data",
+      "retrieved_at": "2026-10-05T14:35:11.461313+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/pages/pricing-of-digital-data",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 127823,
+      "sha256": "e91ee4f872b4ac6aef6a5dcd0a7e7cfcbfde0dc9cefc8d08b633e3cb4da83819",
+      "original_filename": "soi-pricing.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:11.711046+00:00"
+    },
+    {
+      "name": "soi-publishing-licence.pdf",
+      "source_url": "https://surveyofindia.gov.in/documents/publishing-licence.pdf",
+      "retrieved_at": "2026-10-05T14:35:11.711781+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/documents/publishing-licence.pdf",
+      "content_type": "application/pdf",
+      "last_modified_header": "Mon, 23 Jun 2025 09:20:06 GMT",
+      "bytes": 40073,
+      "sha256": "8045f33ea4eae4685c244b11d88b5ad72321639a6f094519cc3eafee822e9b5e",
+      "original_filename": "soi-publishing-licence.pdf",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:11.919789+00:00"
+    },
+    {
+      "name": "soi-terms.html",
+      "source_url": "https://surveyofindia.gov.in/pages/terms-and-conditions",
+      "retrieved_at": "2026-10-05T14:35:11.920259+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/pages/terms-and-conditions",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 113781,
+      "sha256": "4d3930ec4ff189662e2d34e8eb34d6c7bf93e6d268f04760b02499aff78494fd",
+      "original_filename": "soi-terms.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:12.107953+00:00"
+    },
+    {
+      "name": "bengaluru-south.html",
+      "source_url": "https://bengalurusouth.nic.in/en/about-district/",
+      "retrieved_at": "2026-10-05T14:35:12.109017+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://bengalurusouth.nic.in/en/about-district/",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 132943,
+      "sha256": "f2dcab2595a2353ef938e57803f234c47eac532ce66f8dd03f6903ff765cf5cc",
+      "original_filename": "bengaluru-south.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:14.549985+00:00"
+    },
+    {
+      "name": "vijayanagara.html",
+      "source_url": "https://vijayanagara.nic.in/en/about-district/",
+      "retrieved_at": "2026-10-05T14:35:14.550638+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://vijayanagara.nic.in/en/about-district/",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 112947,
+      "sha256": "734c62fc0e012b0dc8ef03b4dd81a2ed68a2472d3d383620a674745980ee4793",
+      "original_filename": "vijayanagara.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:35:28.207063+00:00"
+    },
+    {
+      "name": "lgd_districts.csv",
+      "source_url": "https://www.data.gov.in/files/ogdpv2dms/s3fs-public/datafile/lgd_districts.csv",
+      "retrieved_at": "2026-10-05T14:37:04.420425+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 403,
+      "response_url": "https://www.data.gov.in/files/ogdpv2dms/s3fs-public/datafile/lgd_districts.csv",
+      "content_type": null,
+      "last_modified_header": null,
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "original_filename": "lgd_districts.csv",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:37:05.288357+00:00"
+    },
+    {
+      "name": "soi-vector-catalogue-2025.pdf",
+      "source_url": "https://surveyofindia.gov.in/UserFiles/files/Vector%20Data%20Catalog%202025%281%29.pdf",
+      "retrieved_at": "2026-10-05T14:39:07.898006+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/UserFiles/files/Vector%20Data%20Catalog%202025%281%29.pdf",
+      "content_type": "application/pdf",
+      "last_modified_header": "Mon, 13 Oct 2025 06:06:29 GMT",
+      "status": "request_failed",
+      "error": {
+        "type": "ValueError",
+        "message": "Response exceeds 2 MiB ceiling"
+      },
+      "completed_at": "2026-10-05T14:39:12.912194+00:00"
+    },
+    {
+      "name": "soi-superseded-policies.html",
+      "source_url": "https://surveyofindia.gov.in/pages/soi-superseded-policies",
+      "retrieved_at": "2026-10-05T14:39:12.913026+00:00",
+      "method": "GET",
+      "parameters": {},
+      "connect_seconds": 5,
+      "read_seconds": 12,
+      "wall_seconds": 20,
+      "max_bytes": 2097152,
+      "retries": 0,
+      "http_status": 200,
+      "response_url": "https://surveyofindia.gov.in/pages/soi-superseded-policies",
+      "content_type": "text/html; charset=UTF-8",
+      "last_modified_header": null,
+      "bytes": 112375,
+      "sha256": "eb3da96b53f6b75ce0161237e291223c658816d0d7c11596a39df27f8757ce71",
+      "original_filename": "soi-superseded-policies.html",
+      "status": "http_response_retained",
+      "completed_at": "2026-10-05T14:39:13.431752+00:00"
+    }
+  ],
+  "inputs": {
+    "data/reference/karnataka_soi_verification_v1/manifest.json": {
+      "sha256": "0e913708a25db36616a1c43ced7619a87835d678a7416f07430ee08f922684ba",
+      "bytes": 25074
+    },
+    "data/reference/karnataka_nic_provisional_v1/district_names.json": {
+      "sha256": "419fad46ef9eb4369809c4d9710f417089138792e9669fb1781e41c451fafcbc",
+      "bytes": 31265
+    },
+    "scripts/reconcile_karnataka_lgd.py": {
+      "sha256": "3f497640dab5af5055250b95ed27c394342454ac02b6ac32071159959da7cde4",
+      "bytes": 10813
+    },
+    "data/raw/reference/stage2g_20261005_v1/ogd-primary.html": {
+      "sha256": "195667f87b8a108d83aa6729afde3ddf939fcdd331124b26bf02d4b250601a48",
+      "bytes": 1014711
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-copyright.html": {
+      "sha256": "9023b59e4cf190fbbd9ca96427e041b676de5d0313daed790257c1668ab362af",
+      "bytes": 113750
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-abdb.html": {
+      "sha256": "4bf9544b16b264a7290923b09dabaf51a1857b166c83adef5b45b977b51ee672",
+      "bytes": 113783
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-pricing.html": {
+      "sha256": "e91ee4f872b4ac6aef6a5dcd0a7e7cfcbfde0dc9cefc8d08b633e3cb4da83819",
+      "bytes": 127823
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-publishing-licence.pdf": {
+      "sha256": "8045f33ea4eae4685c244b11d88b5ad72321639a6f094519cc3eafee822e9b5e",
+      "bytes": 40073
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-terms.html": {
+      "sha256": "4d3930ec4ff189662e2d34e8eb34d6c7bf93e6d268f04760b02499aff78494fd",
+      "bytes": 113781
+    },
+    "data/raw/reference/stage2g_20261005_v1/bengaluru-south.html": {
+      "sha256": "f2dcab2595a2353ef938e57803f234c47eac532ce66f8dd03f6903ff765cf5cc",
+      "bytes": 132943
+    },
+    "data/raw/reference/stage2g_20261005_v1/vijayanagara.html": {
+      "sha256": "734c62fc0e012b0dc8ef03b4dd81a2ed68a2472d3d383620a674745980ee4793",
+      "bytes": 112947
+    },
+    "data/raw/reference/stage2g_20261005_v1/lgd_districts.csv": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "data/raw/reference/stage2g_20261005_v1/soi-superseded-policies.html": {
+      "sha256": "eb3da96b53f6b75ce0161237e291223c658816d0d7c11596a39df27f8757ce71",
+      "bytes": 112375
+    },
+    "data/raw/reference/stage2g_20261005_v1/retrievals.json": {
+      "sha256": "b3b325912613d8edd860cbe563bd79b402d551c577c25a940a7f0333b5ea2441",
+      "bytes": 8574
+    },
+    "data/raw/reference/soi/Metadata_ABDB.zip": {
+      "sha256": "1a14716b73f00fc8391f2708a7975c2f2c1ad4a4e91aafb6dce6546a039e9514",
+      "bytes": 38879
+    },
+    "data/raw/reference/soi/metadata-extracted-v1/DISTRICT BOUNDARY.xlsx": {
+      "sha256": "6b05a2497fa8e6dd196c8534f75f8d8dcd76307b0132807e939adb886b72b21d",
+      "bytes": 11250
+    },
+    "data/raw/reference/soi/extracted/State_District_Subdistrict_PAN INDIA/District_Subdistrict_PAN INDIA/District Boundary.qmd": {
+      "sha256": "36082af476048a547b4a55a3f91ca50cee5994a96c23d33207ded66b6cef5d2b",
+      "bytes": 666
+    }
+  },
+  "files": {
+    "mapping.json": {
+      "sha256": "3815740d5a114fa3f430dd86c290f23f892e59826662a15579b6bcd22a0047dd",
+      "bytes": 15477
+    },
+    "publication_policy.json": {
+      "sha256": "05838ce0787e921d4f99c9dba745a8a999596c06b0d79d0fda9be42fb8266c36",
+      "bytes": 4965
+    }
+  },
+  "publication_scope": "code, tests, original factual non-spatial metadata/checksums and source register/log; raw pages, policy PDF, geometry and rainfall withheld",
+  "next_task": "Karnataka historical flood-event evidence catalogue; retain source identifiers with unresolved current-LGD status and enforce each flood source licence"
+}

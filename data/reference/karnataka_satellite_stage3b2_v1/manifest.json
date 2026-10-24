@@ -1,0 +1,2685 @@
+{
+  "annual": {
+    "daily_table_sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819",
+    "dates": 365,
+    "records": 11315,
+    "source_district_identifiers": 31
+  },
+  "attribution": "Cloud to Street / Dartmouth Flood Observatory; Tellman et al. (2021), doi:10.1038/s41586-021-03695-w; IFI Manabendra Saharia / IIT Delhi / HydroSense Lab, doi:10.5281/zenodo.16994648",
+  "boundary_license": "CC BY 4.0; geoBoundaries v6.0.0 / William & Mary geoLab",
+  "boundary_source": "WM/geoLab/geoBoundaries/600/ADM2",
+  "branch": "feature/karnataka-data-foundation",
+  "catalogue_discrepancy": "Description 250 m classification; band table 30 m; actual live projections retained, analysis fixed to verified 250 m grid.",
+  "changes": "Project-derived exact-name candidate ranking, public footprint/state geometry checks, centre-owned observation-qualified event counts and cumulative aggregate summaries. Source identities and windows preserved.",
+  "code_checksums": {
+    "backend/tests/test_satellite_expansion.py": {
+      "bytes": 12314,
+      "sha256": "72d5fdfc83a86c31dee29fe0d367627c2bbe4baced4eebe48e1442c2ac43d9a6"
+    },
+    "scripts/expand_karnataka_satellite.py": {
+      "bytes": 29971,
+      "sha256": "63b9ef137dbc654246edb920dc1ec177c9cc3c0410db18d892daa810d2b42375"
+    }
+  },
+  "created_at": "2026-10-06T06:32:58.123439+00:00",
+  "cumulative": {
+    "daily_labels_created": 0,
+    "ifi_confirmations": 0,
+    "positive_regions": [
+      "Chitradurga",
+      "Kolar",
+      "Udupi"
+    ],
+    "positive_years": [
+      "2005",
+      "2009",
+      "2010"
+    ],
+    "qualifying_counts_are_lower_bounds": false,
+    "qualifying_pixels": 387,
+    "reviewed_events": 13,
+    "reviewed_regions": [
+      "Bijapur",
+      "Chikkaballapura",
+      "Chitradurga",
+      "Dharwad",
+      "Gadag",
+      "Kodagu",
+      "Kolar",
+      "Mandya",
+      "Raichur",
+      "Udupi"
+    ],
+    "reviewed_years": [
+      "2004",
+      "2005",
+      "2006",
+      "2007",
+      "2009",
+      "2010",
+      "2016",
+      "2017"
+    ],
+    "status_counts": {
+      "candidate_mismatch": 0,
+      "incomplete_computation": 0,
+      "insufficient_observation": 7,
+      "observed_no_qualifying_floodwater": 2,
+      "satellite_positive": 4
+    }
+  },
+  "cumulative_pixel_semantics": "Sum of qualifying event-pixel counts, not a unique geographic union across dates.",
+  "current_lgd": "0/31 independently current-LGD verified; 12 NIC exact-name candidates and 19 unresolved name cases unchanged.",
+  "eligible_ranking_pool": [
+    {
+      "footprint_intersection_km2": 98.39346021455067,
+      "gfd_id": 2507,
+      "ifi_project_event_id": "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+      "ifi_source_event_id": "UEI-IMD-FL-2004-0029",
+      "planned_partition_count": 20,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B75110579117636",
+        "shapeName": "Dharwad",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4239.907209323658,
+      "state_fraction": 1,
+      "temporal_overlap": {
+        "days": 7,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.06363636363636363
+      }
+    },
+    {
+      "footprint_intersection_km2": 1367.9786046674774,
+      "gfd_id": 2507,
+      "ifi_project_event_id": "fp-ifi-f0dac214a90ec234d1f0b02b3b8302c92751ed91294e91d54a71d835082f4d9d",
+      "ifi_source_event_id": "UEI-IMD-FL-2004-0028",
+      "planned_partition_count": 20,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B33966968116377",
+        "shapeName": "Gadag",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4655.488639012475,
+      "state_fraction": 1,
+      "temporal_overlap": {
+        "days": 7,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.06363636363636363
+      }
+    },
+    {
+      "footprint_intersection_km2": 10439.645203759255,
+      "gfd_id": 2698,
+      "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0059",
+      "planned_partition_count": 42,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B40495457052818",
+        "shapeName": "Bijapur",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 10439.645203759255,
+      "state_fraction": 0.9976978530896904,
+      "temporal_overlap": {
+        "days": 1,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.04
+      }
+    },
+    {
+      "footprint_intersection_km2": 4220.474122741555,
+      "gfd_id": 2698,
+      "ifi_project_event_id": "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0058",
+      "planned_partition_count": 20,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B80772392204057",
+        "shapeName": "Chikkaballapura",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4220.474122741555,
+      "state_fraction": 0.9964002053891597,
+      "temporal_overlap": {
+        "days": 1,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.04
+      }
+    },
+    {
+      "footprint_intersection_km2": 4119.82296998651,
+      "gfd_id": 2758,
+      "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0065",
+      "planned_partition_count": 20,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B29292403538801",
+        "shapeName": "Kolar",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4119.82296998651,
+      "state_fraction": 0.9944436768305904,
+      "temporal_overlap": {
+        "days": 6,
+        "ifi_fraction": 0.8571428571428571,
+        "jaccard": 0.12244897959183673
+      }
+    },
+    {
+      "footprint_intersection_km2": 4922.803309560803,
+      "gfd_id": 2758,
+      "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0065",
+      "planned_partition_count": 30,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B43335986553000",
+        "shapeName": "Mandya",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4922.803309560803,
+      "state_fraction": 1,
+      "temporal_overlap": {
+        "days": 6,
+        "ifi_fraction": 0.8571428571428571,
+        "jaccard": 0.12244897959183673
+      }
+    },
+    {
+      "footprint_intersection_km2": 4922.803309560803,
+      "gfd_id": 2935,
+      "ifi_project_event_id": "fp-ifi-573242e6d97f5bcb9a977d9bf0cf5d089cb78824a96b37dc04c22e8fea665d40",
+      "ifi_source_event_id": "UEI-IMD-FL-2006-0043",
+      "planned_partition_count": 30,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B43335986553000",
+        "shapeName": "Mandya",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4922.803309560803,
+      "state_fraction": 1,
+      "temporal_overlap": {
+        "days": 1,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.02127659574468085
+      }
+    },
+    {
+      "footprint_intersection_km2": 8476.97148945455,
+      "gfd_id": 3107,
+      "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+      "ifi_source_event_id": "UEI-IMD-FL-2007-0062",
+      "planned_partition_count": 42,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B284680734793",
+        "shapeName": "Raichur",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 8476.97148945455,
+      "state_fraction": 0.9976162600409777,
+      "temporal_overlap": {
+        "days": 1,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.07692307692307693
+      }
+    },
+    {
+      "footprint_intersection_km2": 4146.28809263273,
+      "gfd_id": 4378,
+      "ifi_project_event_id": "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+      "ifi_source_event_id": "UEI-IMD-FL-2016-0066",
+      "planned_partition_count": 25,
+      "region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B57609583882472",
+        "shapeName": "Kodagu",
+        "shapeType": "ADM2"
+      },
+      "region_area_km2": 4146.28809263273,
+      "state_fraction": 0.9980878358093219,
+      "temporal_overlap": {
+        "days": 2,
+        "ifi_fraction": 1.0,
+        "jaccard": 0.07142857142857142
+      }
+    }
+  ],
+  "events": [
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            67.99348385500659,
+            0,
+            -0.002245788210298804,
+            31.476967555548033
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": null,
+      "clear_views_mean_valid": null,
+      "computation_complete": true,
+      "duration_mean_qualifying": null,
+      "empty_geometry_skips": 11,
+      "evidence_status": "insufficient_observation",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2006-09-12",
+      "gfd_id": 2935,
+      "gfd_start": "2006-07-28",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2006-07-28",
+      "ifi_project_event_id": "fp-ifi-573242e6d97f5bcb9a977d9bf0cf5d089cb78824a96b37dc04c22e8fea665d40",
+      "ifi_source_event_id": "UEI-IMD-FL-2006-0043",
+      "ifi_start": "2006-07-28",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2935_From_20060728_to_20060912",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 30,
+      "region_area_km2": 4922.803309560707,
+      "retrieved_at": "2026-10-06T06:28:01.535538+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B43335986553000",
+        "shapeName": "Mandya",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                67.99348385500659,
+                0,
+                -0.002245788210298804,
+                31.476967555548033
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                67.99348385500659,
+                0,
+                -0.002245788210298804,
+                31.476967555548033
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                67.99348385500659,
+                0,
+                -0.002245788210298804,
+                31.476967555548033
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                67.99348385500659,
+                0,
+                -0.002245788210298804,
+                31.476967555548033
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                67.99348385500659,
+                0,
+                -0.002245788210298804,
+                31.476967555548033
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              67.99348385500659,
+              0,
+              -0.002245788210298804,
+              31.476967555548033
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 2935
+      },
+      "statistics": {
+        "clear_perc_count": 0.0,
+        "clear_perc_sum": 0.0,
+        "clear_views_sum": 0.0,
+        "duration_count": 0.0,
+        "duration_sum": 0.0,
+        "mapped_water_pixels": 0,
+        "permanent_water_pixels": 0,
+        "qualifying_pixels": 0,
+        "region_pixels": 78484,
+        "valid_pixels": 0
+      },
+      "unusable_region_cells": 78484,
+      "valid_fraction": 0.0
+    },
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            73.38337555972372,
+            0,
+            -0.002245788210298804,
+            32.792999446783135
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": null,
+      "clear_views_mean_valid": null,
+      "computation_complete": true,
+      "duration_mean_qualifying": null,
+      "empty_geometry_skips": 3,
+      "evidence_status": "insufficient_observation",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2004-10-07",
+      "gfd_id": 2507,
+      "gfd_start": "2004-06-20",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2004-08-08",
+      "ifi_project_event_id": "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+      "ifi_source_event_id": "UEI-IMD-FL-2004-0029",
+      "ifi_start": "2004-08-02",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2507_From_20040620_to_20041007",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 20,
+      "region_area_km2": 4239.907209323658,
+      "retrieved_at": "2026-10-06T06:28:20.158782+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B75110579117636",
+        "shapeName": "Dharwad",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                73.38337555972372,
+                0,
+                -0.002245788210298804,
+                32.792999446783135
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                73.38337555972372,
+                0,
+                -0.002245788210298804,
+                32.792999446783135
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                73.38337555972372,
+                0,
+                -0.002245788210298804,
+                32.792999446783135
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                73.38337555972372,
+                0,
+                -0.002245788210298804,
+                32.792999446783135
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                73.38337555972372,
+                0,
+                -0.002245788210298804,
+                32.792999446783135
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              73.38337555972372,
+              0,
+              -0.002245788210298804,
+              32.792999446783135
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 2507
+      },
+      "statistics": {
+        "clear_perc_count": 0.0,
+        "clear_perc_sum": 0.0,
+        "clear_views_sum": 0.0,
+        "duration_count": 0.0,
+        "duration_sum": 0.0,
+        "mapped_water_pixels": 0,
+        "permanent_water_pixels": 0,
+        "qualifying_pixels": 0,
+        "region_pixels": 67538,
+        "valid_pixels": 0
+      },
+      "unusable_region_cells": 67538,
+      "valid_fraction": 0.0
+    },
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            72.49628921665568,
+            0,
+            -0.002245788210298804,
+            31.472475979127438
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": 0.9919512848143269,
+      "clear_views_mean_valid": 54.11828605914303,
+      "computation_complete": true,
+      "duration_mean_qualifying": null,
+      "empty_geometry_skips": 5,
+      "evidence_status": "insufficient_observation",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2016-08-03",
+      "gfd_id": 4378,
+      "gfd_start": "2016-07-07",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2016-07-12",
+      "ifi_project_event_id": "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+      "ifi_source_event_id": "UEI-IMD-FL-2016-0066",
+      "ifi_start": "2016-07-11",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_4378_From_20160707_to_20160803",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 25,
+      "region_area_km2": 4146.288092632779,
+      "retrieved_at": "2026-10-06T06:28:41.269656+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B57609583882472",
+        "shapeName": "Kodagu",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                31.472475979127438
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                31.472475979127438
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                31.472475979127438
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                31.472475979127438
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                31.472475979127438
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              31.472475979127438
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 4378
+      },
+      "statistics": {
+        "clear_perc_count": 3314.0,
+        "clear_perc_sum": 3287.3265578746796,
+        "clear_views_sum": 179348.0,
+        "duration_count": 0.0,
+        "duration_sum": 0.0,
+        "mapped_water_pixels": 0,
+        "permanent_water_pixels": 0,
+        "qualifying_pixels": 0,
+        "region_pixels": 66031,
+        "valid_pixels": 3314
+      },
+      "unusable_region_cells": 62717,
+      "valid_fraction": 0.050188547803304506
+    },
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            72.49628921665568,
+            0,
+            -0.002245788210298804,
+            24.604855632033697
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": 0.9894841251031686,
+      "clear_views_mean_valid": 52.2362406168923,
+      "computation_complete": true,
+      "duration_mean_qualifying": null,
+      "empty_geometry_skips": 6,
+      "evidence_status": "observed_no_qualifying_floodwater",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2005-08-16",
+      "gfd_id": 2698,
+      "gfd_start": "2005-07-23",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2005-08-01",
+      "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0059",
+      "ifi_start": "2005-08-01",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2698_From_20050723_to_20050816",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 42,
+      "region_area_km2": 10439.645203759273,
+      "retrieved_at": "2026-10-06T06:29:17.988617+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B40495457052818",
+        "shapeName": "Bijapur",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 2698
+      },
+      "statistics": {
+        "clear_perc_count": 166123.0,
+        "clear_perc_sum": 164376.07131451368,
+        "clear_views_sum": 8677641.0,
+        "duration_count": 0.0,
+        "duration_sum": 0.0,
+        "mapped_water_pixels": 0,
+        "permanent_water_pixels": 765,
+        "qualifying_pixels": 0,
+        "region_pixels": 166424,
+        "valid_pixels": 166123
+      },
+      "unusable_region_cells": 301,
+      "valid_fraction": 0.998191366629813
+    },
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            75.48767911277369,
+            0,
+            -0.002245788210298804,
+            16.452644428649037
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": 0.9919899789800253,
+      "clear_views_mean_valid": 91.85043126599476,
+      "computation_complete": true,
+      "duration_mean_qualifying": 5.2522796352583585,
+      "empty_geometry_skips": 3,
+      "evidence_status": "satellite_positive",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2005-12-09",
+      "gfd_id": 2758,
+      "gfd_start": "2005-10-23",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2005-10-28",
+      "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0065",
+      "ifi_start": "2005-10-22",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_2758_From_20051023_to_20051209",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 20,
+      "region_area_km2": 4119.82296998651,
+      "retrieved_at": "2026-10-06T06:29:35.379283+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B29292403538801",
+        "shapeName": "Kolar",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                75.48767911277369,
+                0,
+                -0.002245788210298804,
+                16.452644428649037
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                75.48767911277369,
+                0,
+                -0.002245788210298804,
+                16.452644428649037
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                75.48767911277369,
+                0,
+                -0.002245788210298804,
+                16.452644428649037
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                75.48767911277369,
+                0,
+                -0.002245788210298804,
+                16.452644428649037
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                75.48767911277369,
+                0,
+                -0.002245788210298804,
+                16.452644428649037
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              75.48767911277369,
+              0,
+              -0.002245788210298804,
+              16.452644428649037
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 2758
+      },
+      "statistics": {
+        "clear_perc_count": 63302.0,
+        "clear_perc_sum": 62794.94964939356,
+        "clear_views_sum": 5814316.0,
+        "duration_count": 329.0,
+        "duration_sum": 1728.0,
+        "mapped_water_pixels": 329,
+        "permanent_water_pixels": 4,
+        "qualifying_pixels": 329,
+        "region_pixels": 65827,
+        "valid_pixels": 63302
+      },
+      "unusable_region_cells": 2525,
+      "valid_fraction": 0.9616418794719492
+    },
+    {
+      "analysis_grid": {
+        "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+        "crs": "EPSG:32643",
+        "derivation": "flooded.projection().atScale(250) sets scale; flooded aligned to verified UTM grid then .projection().atScale(250) sets analysis projection",
+        "mixed_source_projections": false,
+        "nominal_scale_m": 250,
+        "source_band_projections": {
+          "clear_perc": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "clear_views": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "duration": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "flooded": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          },
+          "jrc_perm_water": {
+            "crs": "EPSG:4326",
+            "nominal_scale_m": 250,
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ]
+          }
+        },
+        "source_flooded_at_scale_250": {
+          "crs": "EPSG:4326",
+          "nominal_scale_m": 250,
+          "transform": [
+            0.002245788210298804,
+            0,
+            72.49628921665568,
+            0,
+            -0.002245788210298804,
+            24.604855632033697
+          ]
+        },
+        "transform": [
+          250,
+          0,
+          0,
+          0,
+          -250,
+          0
+        ]
+      },
+      "association_status": "provisional_temporal_only",
+      "clear_perc_mean_valid": 0.9886144805690739,
+      "clear_views_mean_valid": 30.260000754062514,
+      "computation_complete": true,
+      "duration_mean_qualifying": null,
+      "empty_geometry_skips": 10,
+      "evidence_status": "observed_no_qualifying_floodwater",
+      "excess_area_m2": 0,
+      "gap_area_m2": 0,
+      "gfd_end_inclusive": "2007-07-04",
+      "gfd_id": 3107,
+      "gfd_start": "2007-06-22",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2007-06-27",
+      "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+      "ifi_source_event_id": "UEI-IMD-FL-2007-0062",
+      "ifi_start": "2007-06-27",
+      "image_id": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1/DFO_3107_From_20070622_to_20070704",
+      "maximum_actual_partition_cells": 7056,
+      "maximum_band_pixel_budget": 70560,
+      "maximum_expected_spatial_cells": 7056,
+      "maximum_safe_workload": 88200,
+      "maximum_touching_pair_overlap_m2": 0,
+      "partition_count": 42,
+      "region_area_km2": 8476.971489454709,
+      "retrieved_at": "2026-10-06T06:30:16.598864+00:00",
+      "review_region": {
+        "shapeGroup": "IND",
+        "shapeID": "76128533B284680734793",
+        "shapeName": "Raichur",
+        "shapeType": "ADM2"
+      },
+      "source_projection_metadata": {
+        "aligned_mask_projection": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "analysis": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:32643",
+            "transform": [
+              250,
+              0,
+              0,
+              0,
+              -250,
+              0
+            ],
+            "type": "Projection"
+          }
+        },
+        "bands": {
+          "clear_perc": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "clear_views": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "duration": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "flooded": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          },
+          "jrc_perm_water": {
+            "nominal_scale_m": 250,
+            "projection": {
+              "crs": "EPSG:4326",
+              "transform": [
+                0.002245788210298804,
+                0,
+                72.49628921665568,
+                0,
+                -0.002245788210298804,
+                24.604855632033697
+              ],
+              "type": "Projection"
+            }
+          }
+        },
+        "flooded_at_scale_250": {
+          "nominal_scale_m": 250,
+          "projection": {
+            "crs": "EPSG:4326",
+            "transform": [
+              0.002245788210298804,
+              0,
+              72.49628921665568,
+              0,
+              -0.002245788210298804,
+              24.604855632033697
+            ],
+            "type": "Projection"
+          }
+        },
+        "id": 3107
+      },
+      "statistics": {
+        "clear_perc_count": 132615.0,
+        "clear_perc_sum": 131105.10934066772,
+        "clear_views_sum": 4012930.0,
+        "duration_count": 0.0,
+        "duration_sum": 0.0,
+        "mapped_water_pixels": 0,
+        "permanent_water_pixels": 854,
+        "qualifying_pixels": 0,
+        "region_pixels": 135207,
+        "valid_pixels": 132615
+      },
+      "unusable_region_cells": 2592,
+      "valid_fraction": 0.9808293949277774
+    }
+  ],
+  "exclusion_counts": {
+    "Public Karnataka containment or event footprint unavailable": 5,
+    "ambiguous": 35,
+    "invalid_ifi_window": 2,
+    "no_candidate": 172,
+    "no_unique_exact_public_district_token": 10,
+    "not_strong_temporal": 7,
+    "outside_gfd_coverage": 257,
+    "previously_reviewed_gfd": 21,
+    "primary_dfo_india_not_verified": 7
+  },
+  "initial_metadata_failure": {
+    "actual_source_id": "1811400B56841107211215",
+    "actual_source_name": "Karn?taka",
+    "checkpoint": "data/working/karnataka_satellite_event_evidence_v3",
+    "code_preservation": "Exact original code retained in content-addressed local recovery snapshot; immutable manifest expected checksum unchanged.",
+    "diagnostic_state_count": 36,
+    "error": {
+      "message": "Public Karnataka state identity unavailable",
+      "type": "ValueError"
+    },
+    "original_code_sha256": "c1c987288198711800d35fafb12da17bf8f56efc049582b36e567f61fd61c756",
+    "resolution": "Bounded metadata-only inventory verified literal source name and ID; subsequent query uses exact source ID, preserves source spelling and requires exact retained identity. No flood reductions ran in the failed checkpoint."
+  },
+  "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+  "local_bytes_by_directory": {
+    "data/raw/flood_satellite/stage3b2_state_diagnostic_v1": 8202,
+    "data/raw/flood_satellite/stage3b2_v1": 19809,
+    "data/raw/flood_satellite/stage3b2_v2": 1796412,
+    "data/working/karnataka_satellite_event_evidence_v3": 426053,
+    "data/working/karnataka_satellite_event_evidence_v4": 1460885
+  },
+  "local_file_checksums": {
+    "data/raw/flood_satellite/stage3b2_state_diagnostic_v1/requests.jsonl": {
+      "bytes": 550,
+      "sha256": "eef5a67a4959f292165810e51b734e2649f9cb8b76fa2fdd251173c698a13a54"
+    },
+    "data/raw/flood_satellite/stage3b2_state_diagnostic_v1/state_names.json": {
+      "bytes": 5728,
+      "sha256": "bf9ccd73ecf0d02ec7a130ab92d83bb0c7f2a7c4122e73755ba97e975f2401fa"
+    },
+    "data/raw/flood_satellite/stage3b2_state_diagnostic_v1/timing.jsonl": {
+      "bytes": 1924,
+      "sha256": "107592587757e8f24cee4503defd679a395004a20181f46901967d329824166d"
+    },
+    "data/raw/flood_satellite/stage3b2_v1/access.json": {
+      "bytes": 205,
+      "sha256": "2f05c22185956d059e576e14b7ea0729455a22565977270d6f0720e1e3aeb6c0"
+    },
+    "data/raw/flood_satellite/stage3b2_v1/geography.json": {
+      "bytes": 17113,
+      "sha256": "f69de3428c15236eb9431d10ef0929f3e3a103b49b75a1b31c22df749598cca5"
+    },
+    "data/raw/flood_satellite/stage3b2_v1/requests.jsonl": {
+      "bytes": 557,
+      "sha256": "6a54d417f78cb84fa22e61ef3eda0692886a14b67f8e37aaf44b24f7915aaf63"
+    },
+    "data/raw/flood_satellite/stage3b2_v1/timing.jsonl": {
+      "bytes": 1934,
+      "sha256": "01cb83ec0df05aa2ab89daaace3c38339940ff63f20cee235de67e2fc59961c9"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/access.json": {
+      "bytes": 491,
+      "sha256": "e1e0ce38362b5d7d0b9ce1cab6a55b6584d152dd46fe8fdeb0ed90475a165197"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2507_checkpoint.json": {
+      "bytes": 102233,
+      "sha256": "af1aa19f6161dde19a0235b2512ad1ca61011c5b89698bf9820cd5b6ba4813cc"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2507_preflight.json": {
+      "bytes": 76925,
+      "sha256": "2f4f1c818510e340b19bac001e0c322afa1e39cf5c5d33e85760e489f961d186"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2698_checkpoint.json": {
+      "bytes": 171434,
+      "sha256": "1ac01185d2d9d028d2747d3180004102cc9baf436d1aa84737e2c2c584a30a91"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2698_preflight.json": {
+      "bytes": 128177,
+      "sha256": "640e9b6dec8818cb9b1b0cf09f5b90804b2dd4d56e6cba61fb4a0a51f274f698"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2758_checkpoint.json": {
+      "bytes": 112594,
+      "sha256": "cd91a3bae82c0466fbb3da0851c84a2d24c00924f8df83fc1a1ba49f18ece03d"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2758_preflight.json": {
+      "bytes": 86018,
+      "sha256": "2d88be4cf3a75b9a5728f07622b98a2783118f684c96c731e0869d3aa6f20759"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2935_checkpoint.json": {
+      "bytes": 137312,
+      "sha256": "d79ab45e0e5b2b9eccf7aface98e942d07f3cfba96d7dc5d53a9aed5e28fa42e"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_2935_preflight.json": {
+      "bytes": 104392,
+      "sha256": "8452ac9a88744824ea75b18135cd9d71062eb83604e501478c6c4a0c5ed95b94"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_3107_checkpoint.json": {
+      "bytes": 148935,
+      "sha256": "d0ae69d7c704a253de8fca0b74c77ead3bae8376c09cab421161594d84629bdb"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_3107_preflight.json": {
+      "bytes": 107808,
+      "sha256": "ec4c96f8f02a2fb7fe49570622d67ec22b12c93ff776d492774be7d50cd6b5f9"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_4378_checkpoint.json": {
+      "bytes": 121415,
+      "sha256": "cc0b1bd6c067412ec4ceac0326de7a6ba55aaf1f789131328fde203dbbbd596d"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/event_4378_preflight.json": {
+      "bytes": 91835,
+      "sha256": "24d95664d8632d7fc63a10b3ce21c9670cb8c6c1044909350cea1bc86a184d60"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/geography.json": {
+      "bytes": 17380,
+      "sha256": "2fb71a612fb9a5af01b244d815c13593a1260fd57c608f1ad4cb8c60f54caa72"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/progress.jsonl": {
+      "bytes": 85170,
+      "sha256": "f3823ddd8324b77cb9badfff4df96f6da74e67d87608a7467e3e5726f8f6e4e8"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/requests.jsonl": {
+      "bytes": 29807,
+      "sha256": "e0bab2d193c8877cc868144d711877fb3d9be7bda251c732e26cd4655aa88b80"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/selection.json": {
+      "bytes": 170339,
+      "sha256": "a8568c3070ec38ce5898d6fe2fcef9000cf19a13cf91e953b7846db89a431703"
+    },
+    "data/raw/flood_satellite/stage3b2_v2/timing.jsonl": {
+      "bytes": 104147,
+      "sha256": "d496a2eabfa64e05b375b28123c49dbd5fc9a37a127a45fcb0477dc3b3712a3a"
+    },
+    "data/working/karnataka_satellite_event_evidence_v3/candidates.json": {
+      "bytes": 420298,
+      "sha256": "a907c74f532633ad5d791a45d04ca742b06edb895dd6f9bc814055d421e44578"
+    },
+    "data/working/karnataka_satellite_event_evidence_v3/event_evidence.json": {
+      "bytes": 3,
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    "data/working/karnataka_satellite_event_evidence_v3/manifest.json": {
+      "bytes": 5747,
+      "sha256": "3f8205862af9b80046ea378fa35ced08389cbb1f51d2063d5c5255f9ed9cc4f3"
+    },
+    "data/working/karnataka_satellite_event_evidence_v3/selection.json": {
+      "bytes": 5,
+      "sha256": "38e0b9de817f645c4bec37c0d4a3e58baecccb040f5718dc069a72c7385a0bed"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/candidates.json": {
+      "bytes": 420298,
+      "sha256": "a907c74f532633ad5d791a45d04ca742b06edb895dd6f9bc814055d421e44578"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/event_evidence.json": {
+      "bytes": 860202,
+      "sha256": "1beac86b5c36181f41d6a71450b52903b05537a1428605a8f8c3677eccb579b5"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/manifest.json": {
+      "bytes": 10046,
+      "sha256": "938e52f6648cc815c675f65374ddbcd93754bc7deb2fb34da2e7bf925d4dc2e9"
+    },
+    "data/working/karnataka_satellite_event_evidence_v4/selection.json": {
+      "bytes": 170339,
+      "sha256": "a8568c3070ec38ce5898d6fe2fcef9000cf19a13cf91e953b7846db89a431703"
+    }
+  },
+  "new_batch_status_counts": {
+    "candidate_mismatch": 0,
+    "incomplete_computation": 0,
+    "insufficient_observation": 3,
+    "observed_no_qualifying_floodwater": 2,
+    "satellite_positive": 1
+  },
+  "new_qualifying_event_pixels": 329,
+  "observation_cautions": [
+    "All three band masks and clear_views>0 required; permanent water excluded.",
+    "Zero-water status requires complete computation and valid fraction >=95%, not an independently verified non-flood label.",
+    "DFO metadata and image footprints can span multiple regions/countries; a footprint is not actual floodwater.",
+    "All IFI associations remain provisional; no causal event identity or exact flood day is established.",
+    "Modern public district geometries are not verified historical/current-LGD identities.",
+    "Raw clear_views and clear_perc values are not rescaled or represented as verified day/percentage normalization."
+  ],
+  "parameters": {
+    "alignment": "nearest-neighbour data AND masks on the unchanged Udupi-compatible EPSG:32643 250 m grid; no bilinear/bicubic",
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "bestEffort": false,
+    "crs": "EPSG:32643",
+    "deadline_seconds": 60,
+    "maxPixels": 300000,
+    "max_attempts": 3,
+    "metric_bands": [
+      "region_pixels",
+      "valid_pixels",
+      "qualifying_pixels",
+      "mapped_water_pixels",
+      "permanent_water_pixels",
+      "clear_views_sum",
+      "clear_perc_sum",
+      "clear_perc_count",
+      "duration_sum",
+      "duration_count"
+    ],
+    "safety_factor": 1.25,
+    "scale_m": 250,
+    "target_band_pixels": 90000,
+    "tileScale": 2,
+    "total_seconds": 900,
+    "transform": [
+      250,
+      0,
+      0,
+      0,
+      -250,
+      0
+    ],
+    "valid_fraction_zero_gate": 0.95
+  },
+  "preserved_candidate_inventory": {
+    "ambiguous_ifi_cases": 19,
+    "candidate_relationships": 89,
+    "ifi_with_candidates": 63,
+    "within_gfd_period_ifi": 235,
+    "within_period_ifi_without_candidate": 172
+  },
+  "previous_verified_commit": "d611f0a6c66fe0aa0f018c71e89971417673e6d5",
+  "publication_scope": "Only reviewed code/tests, source identifiers, aggregate summaries/rankings and provenance/checksums published. SOI geometry and rainfall tables, detailed candidate/event records, raw journals and exact public geometry retained locally. No satellite raster exports.",
+  "quality_semantics": "Raw source clear_views/clear_perc/duration sums and means; no guessed days/percentage normalization; event-window extent not daily occurrence.",
+  "readiness": {
+    "next_task": "Stage 3C: separately authorized, targeted exploratory historical rainfall windows for positive satellite evidence, preserving event-window uncertainty and prediction-time availability; no training or daily/negative labels.",
+    "reasons": [
+      "Only four positive maps across three public regions and three years; one positive is only two cells.",
+      "Seven insufficient-observation results and regional/temporal/selection bias remain.",
+      "Two observed-zero maps are not independent negative training observations.",
+      "Maximum event extent has no exact daily timing; all IFI spatial associations remain provisional."
+    ],
+    "stage3c": "Limited exploratory rainfall-window construction for the four verified positive event/region scopes is supported; first explicitly anchor dates and retain separate IFI/GFD windows.",
+    "statewide_model_ready": false
+  },
+  "regression_gates_after": {
+    "event_3652_qualifying_pixels": 2,
+    "files_modified": 0,
+    "udupi": {
+      "files_modified": 0,
+      "nearest_alignment": {
+        "2728": "three protected bands reproduced exactly in memory",
+        "3551": "three protected bands reproduced exactly in memory"
+      },
+      "qualified_pixels": {
+        "2728": 33,
+        "3551": 23
+      }
+    }
+  },
+  "regression_gates_before": {
+    "event_3652_qualifying_pixels": 2,
+    "files_modified": 0,
+    "udupi": {
+      "files_modified": 0,
+      "nearest_alignment": {
+        "2728": "three protected bands reproduced exactly in memory",
+        "3551": "three protected bands reproduced exactly in memory"
+      },
+      "qualified_pixels": {
+        "2728": 33,
+        "3551": 23
+      }
+    }
+  },
+  "reviewed_ids": [
+    2935,
+    2507,
+    4378,
+    2698,
+    2758,
+    3107
+  ],
+  "selected_ids": [
+    2935,
+    2507,
+    4378,
+    2698,
+    2758,
+    3107
+  ],
+  "selection_limit": 10,
+  "selection_ranking_rounds": [
+    [
+      {
+        "gfd_id": 2935,
+        "ifi_project_event_id": "fp-ifi-573242e6d97f5bcb9a977d9bf0cf5d089cb78824a96b37dc04c22e8fea665d40",
+        "rank": [
+          false,
+          false,
+          -1.0,
+          -0.02127659574468085,
+          4922.803309560803,
+          2,
+          2935,
+          "fp-ifi-573242e6d97f5bcb9a977d9bf0cf5d089cb78824a96b37dc04c22e8fea665d40",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      },
+      {
+        "gfd_id": 2507,
+        "ifi_project_event_id": "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+        "rank": [
+          false,
+          true,
+          -1.0,
+          -0.06363636363636363,
+          4239.907209323658,
+          9,
+          2507,
+          "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+          "76128533B75110579117636"
+        ],
+        "shapeID": "76128533B75110579117636"
+      },
+      {
+        "gfd_id": 2507,
+        "ifi_project_event_id": "fp-ifi-f0dac214a90ec234d1f0b02b3b8302c92751ed91294e91d54a71d835082f4d9d",
+        "rank": [
+          false,
+          true,
+          -1.0,
+          -0.06363636363636363,
+          4655.488639012475,
+          3,
+          2507,
+          "fp-ifi-f0dac214a90ec234d1f0b02b3b8302c92751ed91294e91d54a71d835082f4d9d",
+          "76128533B33966968116377"
+        ],
+        "shapeID": "76128533B33966968116377"
+      },
+      {
+        "gfd_id": 4378,
+        "ifi_project_event_id": "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.07142857142857142,
+          4146.28809263273,
+          4,
+          4378,
+          "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+          "76128533B57609583882472"
+        ],
+        "shapeID": "76128533B57609583882472"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.04,
+          10439.645203759255,
+          2,
+          2698,
+          "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+          "76128533B40495457052818"
+        ],
+        "shapeID": "76128533B40495457052818"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4119.82296998651,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B29292403538801"
+        ],
+        "shapeID": "76128533B29292403538801"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4922.803309560803,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      },
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.04,
+          4220.474122741555,
+          1,
+          2698,
+          "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+          "76128533B80772392204057"
+        ],
+        "shapeID": "76128533B80772392204057"
+      }
+    ],
+    [
+      {
+        "gfd_id": 2507,
+        "ifi_project_event_id": "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+        "rank": [
+          false,
+          true,
+          -1.0,
+          -0.06363636363636363,
+          4239.907209323658,
+          9,
+          2507,
+          "fp-ifi-7def42a35d395f4822cc324fbffb0017096b50f725084b148177bdc08f7732c1",
+          "76128533B75110579117636"
+        ],
+        "shapeID": "76128533B75110579117636"
+      },
+      {
+        "gfd_id": 2507,
+        "ifi_project_event_id": "fp-ifi-f0dac214a90ec234d1f0b02b3b8302c92751ed91294e91d54a71d835082f4d9d",
+        "rank": [
+          false,
+          true,
+          -1.0,
+          -0.06363636363636363,
+          4655.488639012475,
+          3,
+          2507,
+          "fp-ifi-f0dac214a90ec234d1f0b02b3b8302c92751ed91294e91d54a71d835082f4d9d",
+          "76128533B33966968116377"
+        ],
+        "shapeID": "76128533B33966968116377"
+      },
+      {
+        "gfd_id": 4378,
+        "ifi_project_event_id": "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.07142857142857142,
+          4146.28809263273,
+          4,
+          4378,
+          "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+          "76128533B57609583882472"
+        ],
+        "shapeID": "76128533B57609583882472"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.04,
+          10439.645203759255,
+          2,
+          2698,
+          "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+          "76128533B40495457052818"
+        ],
+        "shapeID": "76128533B40495457052818"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4119.82296998651,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B29292403538801"
+        ],
+        "shapeID": "76128533B29292403538801"
+      },
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.04,
+          4220.474122741555,
+          1,
+          2698,
+          "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+          "76128533B80772392204057"
+        ],
+        "shapeID": "76128533B80772392204057"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          true,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4922.803309560803,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      }
+    ],
+    [
+      {
+        "gfd_id": 4378,
+        "ifi_project_event_id": "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.07142857142857142,
+          4146.28809263273,
+          4,
+          4378,
+          "fp-ifi-af84ea1994aaf16155071fb3c1a5d0405415d3d57180f0d2d6cf93e1d2964897",
+          "76128533B57609583882472"
+        ],
+        "shapeID": "76128533B57609583882472"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.04,
+          10439.645203759255,
+          2,
+          2698,
+          "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+          "76128533B40495457052818"
+        ],
+        "shapeID": "76128533B40495457052818"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4119.82296998651,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B29292403538801"
+        ],
+        "shapeID": "76128533B29292403538801"
+      },
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.04,
+          4220.474122741555,
+          1,
+          2698,
+          "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+          "76128533B80772392204057"
+        ],
+        "shapeID": "76128533B80772392204057"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          true,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4922.803309560803,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      }
+    ],
+    [
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+        "rank": [
+          true,
+          false,
+          -1.0,
+          -0.04,
+          10439.645203759255,
+          2,
+          2698,
+          "fp-ifi-756a7450ebb66040aeafc63fda8e8e95d63af7e5e7e6ddc3976d2c127ce9ba02",
+          "76128533B40495457052818"
+        ],
+        "shapeID": "76128533B40495457052818"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4119.82296998651,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B29292403538801"
+        ],
+        "shapeID": "76128533B29292403538801"
+      },
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      },
+      {
+        "gfd_id": 2698,
+        "ifi_project_event_id": "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.04,
+          4220.474122741555,
+          1,
+          2698,
+          "fp-ifi-7a9915e814ce8032dddaf1b19c067fb68ec76c1cb3999e7431b2eba8285a2858",
+          "76128533B80772392204057"
+        ],
+        "shapeID": "76128533B80772392204057"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          true,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4922.803309560803,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      }
+    ],
+    [
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          false,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4119.82296998651,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B29292403538801"
+        ],
+        "shapeID": "76128533B29292403538801"
+      },
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      },
+      {
+        "gfd_id": 2758,
+        "ifi_project_event_id": "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+        "rank": [
+          true,
+          true,
+          -0.8571428571428571,
+          -0.12244897959183673,
+          4922.803309560803,
+          6,
+          2758,
+          "fp-ifi-6d0f3fc9194f367d26956c117b16a308d3b254bface8e95caa6a9d6a8a66efc8",
+          "76128533B43335986553000"
+        ],
+        "shapeID": "76128533B43335986553000"
+      }
+    ],
+    [
+      {
+        "gfd_id": 3107,
+        "ifi_project_event_id": "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+        "rank": [
+          true,
+          true,
+          -1.0,
+          -0.07692307692307693,
+          8476.97148945455,
+          1,
+          3107,
+          "fp-ifi-b8354ec2b45b851495f8ca6e6c64dce3e83b356c960c9a4bd643ed634ceba4ff",
+          "76128533B284680734793"
+        ],
+        "shapeID": "76128533B284680734793"
+      }
+    ]
+  ],
+  "selection_rule": "Exclude prior IDs, ambiguous IFI links, weak/invalid/out-of-period windows, non-Karnataka-only IFI, and non-India-primary DFO metadata. Require a unique exact original district token, public Karnataka state containment >=99%, positive event-footprint intersection and safe existing planner. All remaining candidates are strong temporal and non-ambiguous; greedily prefer new years, new regions, higher IFI overlap fraction/Jaccard, smaller region, fewer source tokens, then stable IDs. Seed diversity from prior seven reviews; one region per GFD ID, up to ten. No raster outcomes used. Footprint intersections permit research review only, not verified IFI event identity or floodwater.",
+  "source": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1",
+  "source_license": "CC BY-NC 4.0",
+  "source_url": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+  "state_source": "WM/geoLab/geoBoundaries/600/ADM1",
+  "timing": {
+    "accepted": 162,
+    "accepted_budget": "60-second per attempt; 900-second suspend-inclusive total; three attempts maximum and 2/4-second backoff",
+    "attempts": 162,
+    "batch_elapsed_seconds": 164.8453755849987,
+    "failed_or_late": 0,
+    "host_suspension_detected": false,
+    "maximum_request_seconds": 11.600925732998803,
+    "recorded_fields": [
+      "monotonic/suspend-aware starts and ends",
+      "accepted UTC time",
+      "deadline status",
+      "elapsed time",
+      "suspension detection"
+    ],
+    "reduction_attempts": 141
+  },
+  "unreviewed_selected_ids": [],
+  "validation": {
+    "authorized_existing_edits": [
+      "docs/DATA_SOURCE_REGISTER.md",
+      "update.md"
+    ],
+    "browser_regressions": 4,
+    "dataset_validators": "All existing Udupi/NIC/SOI/12 months/smoke/caches/annual/Stage2G/Stage3A/Stage3B v1,v2 and new v3,v4 passed read-only.",
+    "frontend_rerun_needed_this_task": false,
+    "frontend_tests": 14,
+    "full_backend_tests": 407,
+    "new_completed_files_readonly_validation": 33,
+    "new_stage3b2_tests": 29,
+    "previous_intermittent_history": "Preserved unchanged in update.md.",
+    "production_build": "passed",
+    "stage3b_and_3b2_tests": 91,
+    "starting_files_before_authorized_docs_edits": 640,
+    "unchanged_starting_files_required": 638
+  },
+  "version": "karnataka_satellite_stage3b2_v1"
+}

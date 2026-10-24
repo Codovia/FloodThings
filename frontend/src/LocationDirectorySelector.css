@@ -1,0 +1,7 @@
+.location-directory { margin: 1rem 0; }
+.location-directory label { display: block; font-weight: 650; margin: .8rem 0 .3rem; }
+.location-directory input, .location-directory select { width: 100%; max-width: 38rem; padding: .7rem; font: inherit; color: #173b36; background: white; border: 1px solid #5c746d; border-radius: .35rem; }
+.location-directory ul { list-style: none; padding: 0; display: grid; gap: .5rem; }
+.location-directory li button { text-align: left; white-space: normal; overflow-wrap: anywhere; max-width: 100%; }
+.location-directory :is(button, input, select):focus-visible { outline: 3px solid #164d98; outline-offset: 3px; }
+.location-directory button:disabled { opacity: 1; color: #52625d; background: #e6ebe8; }

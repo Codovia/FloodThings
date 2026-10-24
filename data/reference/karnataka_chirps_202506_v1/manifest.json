@@ -1,0 +1,2476 @@
+{
+  "version": "karnataka_chirps_soi2025_202506_v1",
+  "mode": "month",
+  "month": 6,
+  "raw_directory": "data/raw/chirps/karnataka_window_202506_verified_v1",
+  "created_at": "2026-10-04T17:20:29.530382+00:00",
+  "project": "floodpulse",
+  "access": {
+    "initialization": "succeeded",
+    "constant_probe": 1,
+    "retrieved_at": "2026-10-04T17:18:46.049356+00:00"
+  },
+  "stage_1_complete": false,
+  "source": {
+    "collection": "UCSB-CHG/CHIRPS/DAILY",
+    "version": "CHIRPS v2.0 Final",
+    "band": "precipitation",
+    "units": "mm/day",
+    "url": "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+    "license": "Public domain",
+    "license_checked_on": "2026-10-04",
+    "citation": "Funk et al. (2015), doi:10.1038/sdata.2015.66",
+    "native_resolution_degrees": 0.05
+  },
+  "dates": [
+    "2025-06-01",
+    "2025-06-02",
+    "2025-06-03",
+    "2025-06-04",
+    "2025-06-05",
+    "2025-06-06",
+    "2025-06-07",
+    "2025-06-08",
+    "2025-06-09",
+    "2025-06-10",
+    "2025-06-11",
+    "2025-06-12",
+    "2025-06-13",
+    "2025-06-14",
+    "2025-06-15",
+    "2025-06-16",
+    "2025-06-17",
+    "2025-06-18",
+    "2025-06-19",
+    "2025-06-20",
+    "2025-06-21",
+    "2025-06-22",
+    "2025-06-23",
+    "2025-06-24",
+    "2025-06-25",
+    "2025-06-26",
+    "2025-06-27",
+    "2025-06-28",
+    "2025-06-29",
+    "2025-06-30"
+  ],
+  "geographic_window": [
+    73.5,
+    11.0,
+    79.0,
+    19.0
+  ],
+  "window_kind": "fixed geographic download window, not an administrative boundary",
+  "download_parameters": {
+    "crs": "EPSG:4326",
+    "crs_transform": [
+      0.05,
+      0.0,
+      73.5,
+      0.0,
+      -0.05,
+      19.0
+    ],
+    "dimensions": [
+      110,
+      160
+    ],
+    "format": "GEO_TIFF",
+    "bands": [
+      "precipitation",
+      "valid_mask"
+    ],
+    "filePerBand": false
+  },
+  "images": [
+    {
+      "date": "2025-06-01",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250601",
+      "source_time_start_ms": 1748736000000,
+      "source_time_end_ms": 1748822400000,
+      "image_asset_version": 1752900603109009,
+      "source_asset_version_original": 1752900603109009,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:18:51.463618+00:00",
+        "bytes": 2581,
+        "sha256": "ec3645ff9d27a565d4582ca9c6de090061f686ccd9e474538ee0bebaeebbdf04",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250601.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-02",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250602",
+      "source_time_start_ms": 1748822400000,
+      "source_time_end_ms": 1748908800000,
+      "image_asset_version": 1752901069917504,
+      "source_asset_version_original": 1752901069917504,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:18:55.245616+00:00",
+        "bytes": 3057,
+        "sha256": "863103d2f15f5a7d746e8dbc31bd43642475899fb87bdde340d6060c19151e20",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250602.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-03",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250603",
+      "source_time_start_ms": 1748908800000,
+      "source_time_end_ms": 1748995200000,
+      "image_asset_version": 1752901656565554,
+      "source_asset_version_original": 1752901656565554,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:18:57.300376+00:00",
+        "bytes": 2715,
+        "sha256": "93da0293cf9990cf5c9cdbe4417fc90f44bad901a3ac6a4657dbfa7cebfe0e37",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250603.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-04",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250604",
+      "source_time_start_ms": 1748995200000,
+      "source_time_end_ms": 1749081600000,
+      "image_asset_version": 1752901354148601,
+      "source_asset_version_original": 1752901354148601,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:18:59.655035+00:00",
+        "bytes": 1990,
+        "sha256": "e627d33423eb6922ed69b89446024293f30b2c9bfedd74d124c1525214f385cb",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250604.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-05",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250605",
+      "source_time_start_ms": 1749081600000,
+      "source_time_end_ms": 1749168000000,
+      "image_asset_version": 1752900997516452,
+      "source_asset_version_original": 1752900997516452,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:03.546640+00:00",
+        "bytes": 1771,
+        "sha256": "fb64e38856669585d0a73a20315b2efe40678788bc929f4f6df0a0ae338c667f",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250605.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-06",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250606",
+      "source_time_start_ms": 1749168000000,
+      "source_time_end_ms": 1749254400000,
+      "image_asset_version": 1752901305881414,
+      "source_asset_version_original": 1752901305881414,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:07.848506+00:00",
+        "bytes": 6820,
+        "sha256": "8438d49a06d100e053c8086fb38bcff06bc746a70b1db90a29ffb3d1728b05e9",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250606.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-07",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250607",
+      "source_time_start_ms": 1749254400000,
+      "source_time_end_ms": 1749340800000,
+      "image_asset_version": 1752901602902676,
+      "source_asset_version_original": 1752901602902676,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:11.638004+00:00",
+        "bytes": 23525,
+        "sha256": "33fac786de18085ec7e5e20074d3b8fc2612dc0dde3ec46f79d54f648e20104f",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250607.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-08",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250608",
+      "source_time_start_ms": 1749340800000,
+      "source_time_end_ms": 1749427200000,
+      "image_asset_version": 1752900946494148,
+      "source_asset_version_original": 1752900946494148,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:14.294587+00:00",
+        "bytes": 52154,
+        "sha256": "7284085aff25177f25cbc1d5033a7c2e313f4b70077e83e46a8566c723ce2afd",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250608.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-09",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250609",
+      "source_time_start_ms": 1749427200000,
+      "source_time_end_ms": 1749513600000,
+      "image_asset_version": 1752901635472584,
+      "source_asset_version_original": 1752901635472584,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:18.307756+00:00",
+        "bytes": 29932,
+        "sha256": "2ecb8b55651e44bee28307c1c10b984353d16e3769b67936c2ce792482b9c149",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250609.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-10",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250610",
+      "source_time_start_ms": 1749513600000,
+      "source_time_end_ms": 1749600000000,
+      "image_asset_version": 1752901533239569,
+      "source_asset_version_original": 1752901533239569,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:21.572722+00:00",
+        "bytes": 32615,
+        "sha256": "ba625c7acd7a7b8f8d91c489415539a669ecb2281b6aa7ab1be4b79dd25931c6",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250610.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-11",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250611",
+      "source_time_start_ms": 1749600000000,
+      "source_time_end_ms": 1749686400000,
+      "image_asset_version": 1752900838960096,
+      "source_asset_version_original": 1752900838960096,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:24.520059+00:00",
+        "bytes": 67103,
+        "sha256": "3d75e4dc9744bf040190a3b5599c9602df53de4768ea890df15a0103ea50fb2a",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250611.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-12",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250612",
+      "source_time_start_ms": 1749686400000,
+      "source_time_end_ms": 1749772800000,
+      "image_asset_version": 1752901512415571,
+      "source_asset_version_original": 1752901512415571,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:28.636927+00:00",
+        "bytes": 67821,
+        "sha256": "ab137a174bcab14198c00db9f02894a0b183ef79b4d8245225fa19664ef4a174",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250612.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-13",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250613",
+      "source_time_start_ms": 1749772800000,
+      "source_time_end_ms": 1749859200000,
+      "image_asset_version": 1752900873210285,
+      "source_asset_version_original": 1752900873210285,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:31.816839+00:00",
+        "bytes": 63026,
+        "sha256": "327e69371ac59fd48d8ab4d77344ceb1630b38d92e58362b208d0bc199a99ce2",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250613.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-14",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250614",
+      "source_time_start_ms": 1749859200000,
+      "source_time_end_ms": 1749945600000,
+      "image_asset_version": 1752900870533814,
+      "source_asset_version_original": 1752900870533814,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:36.954169+00:00",
+        "bytes": 66546,
+        "sha256": "2030dba1e6dae98447895362f7a923f060b3d98ea0170008ff6b9272b1b7cabd",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250614.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-15",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250615",
+      "source_time_start_ms": 1749945600000,
+      "source_time_end_ms": 1750032000000,
+      "image_asset_version": 1752900953713879,
+      "source_asset_version_original": 1752900953713879,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:41.182948+00:00",
+        "bytes": 65920,
+        "sha256": "abad7651fdf0bf3c104611c4b1db7e8d7351a5f17fe5f7823d0244780ee6f273",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250615.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-16",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250616",
+      "source_time_start_ms": 1750032000000,
+      "source_time_end_ms": 1750118400000,
+      "image_asset_version": 1752901375345300,
+      "source_asset_version_original": 1752901375345300.0,
+      "source_asset_version_json_type": "float",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:45.327353+00:00",
+        "bytes": 11656,
+        "sha256": "b7f2001dc025b6770be08a60ff8e1ccede3088d5cf035002480f86e1bc687840",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250616.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-17",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250617",
+      "source_time_start_ms": 1750118400000,
+      "source_time_end_ms": 1750204800000,
+      "image_asset_version": 1752901036794032,
+      "source_asset_version_original": 1752901036794032,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:49.218551+00:00",
+        "bytes": 6338,
+        "sha256": "b45595b11350d92105737f1200465df9174a0f068b044dc97bfb854d8368e8df",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250617.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-18",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250618",
+      "source_time_start_ms": 1750204800000,
+      "source_time_end_ms": 1750291200000,
+      "image_asset_version": 1752900896032396,
+      "source_asset_version_original": 1752900896032396,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:51.189097+00:00",
+        "bytes": 5637,
+        "sha256": "c038805dcef312d5e58d4ff5510de1d8bd7dfa48968e6795f9c64621e607df7e",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250618.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-19",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250619",
+      "source_time_start_ms": 1750291200000,
+      "source_time_end_ms": 1750377600000,
+      "image_asset_version": 1752901574753868,
+      "source_asset_version_original": 1752901574753868,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:53.724456+00:00",
+        "bytes": 13604,
+        "sha256": "5c299721fe896d3cece97e83b4400e78a7484bb98ede189117acef8d16a008ef",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250619.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-20",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250620",
+      "source_time_start_ms": 1750377600000,
+      "source_time_end_ms": 1750464000000,
+      "image_asset_version": 1752900932979507,
+      "source_asset_version_original": 1752900932979507,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:19:56.393878+00:00",
+        "bytes": 13424,
+        "sha256": "d14a4647dc9d7c277b52c14e666b7ce24b766abd8795b3d2f4026cf0d0c66395",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250620.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-21",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250621",
+      "source_time_start_ms": 1750464000000,
+      "source_time_end_ms": 1750550400000,
+      "image_asset_version": 1752900579191269,
+      "source_asset_version_original": 1752900579191269,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:00.174446+00:00",
+        "bytes": 5470,
+        "sha256": "1a4e895d7234edb179eb5b3041cff9bcf65c2c7f642677aad36d5c59a83a4cba",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250621.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-22",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250622",
+      "source_time_start_ms": 1750550400000,
+      "source_time_end_ms": 1750636800000,
+      "image_asset_version": 1752901065012129,
+      "source_asset_version_original": 1752901065012129,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:02.942438+00:00",
+        "bytes": 21535,
+        "sha256": "177bd8f3dc83fdb63bc305cb400f4c2f417a1d880e1df5af716b793bb56d5576",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250622.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-23",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250623",
+      "source_time_start_ms": 1750636800000,
+      "source_time_end_ms": 1750723200000,
+      "image_asset_version": 1752901417015537,
+      "source_asset_version_original": 1752901417015537,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:04.988313+00:00",
+        "bytes": 11846,
+        "sha256": "f8ef3dc375fd1c87be16db28f723915ba8e4ced132e67d1e52ba3354cde3f654",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250623.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-24",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250624",
+      "source_time_start_ms": 1750723200000,
+      "source_time_end_ms": 1750809600000,
+      "image_asset_version": 1752901182910902,
+      "source_asset_version_original": 1752901182910902,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:07.640565+00:00",
+        "bytes": 14665,
+        "sha256": "27c373b6271ee46f9b246035287a0e7ad75df23166b13d380a95d5062decb104",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250624.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-25",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250625",
+      "source_time_start_ms": 1750809600000,
+      "source_time_end_ms": 1750896000000,
+      "image_asset_version": 1752901272967690,
+      "source_asset_version_original": 1752901272967690.0,
+      "source_asset_version_json_type": "float",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:11.340664+00:00",
+        "bytes": 35702,
+        "sha256": "492df0b10320e6df526d303a4b0388b9a15c923309418a7e0cc99d778b318cf0",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250625.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-26",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250626",
+      "source_time_start_ms": 1750896000000,
+      "source_time_end_ms": 1750982400000,
+      "image_asset_version": 1752901083757916,
+      "source_asset_version_original": 1752901083757916,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:14.206625+00:00",
+        "bytes": 28553,
+        "sha256": "b1a63f13a2fe6f107d8db0b3b8108ab47550aece7e0e2222692a05f7e01460a9",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250626.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-27",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250627",
+      "source_time_start_ms": 1750982400000,
+      "source_time_end_ms": 1751068800000,
+      "image_asset_version": 1752901134128797,
+      "source_asset_version_original": 1752901134128797,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:18.094812+00:00",
+        "bytes": 3785,
+        "sha256": "e36e5e6816aee107bd2c4905d7cf1364d58b1232ce637844c90cb07bd1e57b0e",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250627.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-28",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250628",
+      "source_time_start_ms": 1751068800000,
+      "source_time_end_ms": 1751155200000,
+      "image_asset_version": 1752901609018534,
+      "source_asset_version_original": 1752901609018534,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:22.191281+00:00",
+        "bytes": 4540,
+        "sha256": "2a1fcd4f3230cafac27c676d95223a0d08a192ff112e8eb173c3ae38b126031a",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250628.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-29",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250629",
+      "source_time_start_ms": 1751155200000,
+      "source_time_end_ms": 1751241600000,
+      "image_asset_version": 1752901147390264,
+      "source_asset_version_original": 1752901147390264,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:25.949250+00:00",
+        "bytes": 11455,
+        "sha256": "017b334a95f82d74995c37c0cebe53629cff0c284fd5d3fbf6412b0ff32a43e7",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250629.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    },
+    {
+      "date": "2025-06-30",
+      "source_image_id": "UCSB-CHG/CHIRPS/DAILY/20250630",
+      "source_time_start_ms": 1751241600000,
+      "source_time_end_ms": 1751328000000,
+      "image_asset_version": 1752900857089144,
+      "source_asset_version_original": 1752900857089144,
+      "source_asset_version_json_type": "int",
+      "native_grid": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0,
+          -180,
+          0,
+          -0.05,
+          50
+        ]
+      },
+      "native_dimensions": [
+        7200,
+        2000
+      ],
+      "units": "mm/day",
+      "download": {
+        "retrieved_at": "2026-10-04T17:20:28.552981+00:00",
+        "bytes": 26339,
+        "sha256": "b4845de4072f3a3c4a81e3250d08e288770b0ce834cf8fc370809333d4f2c281",
+        "request": {
+          "host": "earthengine.googleapis.com",
+          "timeouts_seconds": [
+            5,
+            15
+          ],
+          "elapsed_ceiling_seconds": 30,
+          "byte_ceiling": 1048576,
+          "retries": 0
+        }
+      },
+      "file": "20250630.tif",
+      "raster_metadata": {
+        "crs": "EPSG:4326",
+        "transform": [
+          0.05,
+          0.0,
+          73.5,
+          0.0,
+          -0.05,
+          19.0
+        ],
+        "dimensions": [
+          110,
+          160
+        ],
+        "bands": 2,
+        "dtype": "float32",
+        "geotiff_nodata": "-Infinity",
+        "nodata_encoding": -9999,
+        "mask_rule": "second band is original source mask; 0=missing, 1=valid; zeros in valid rain remain measured values",
+        "valid_window_pixels": 15325,
+        "window_pixels": 17600
+      }
+    }
+  ],
+  "geometry_provenance": {
+    "edition": "2025",
+    "source_id": "SOI/ABDB/VECTOR/50000/2025/DISTRICT/INDIA",
+    "soi_archive_sha256": "b8325e5d9dd0f04a6663d775363fe38cd2f23bd9dbae3fb7118b4e6e0ce0bcb7",
+    "original_district_shp_sha256": "05efac0a02c113f25cd55df3f01a4aee7201bfc9b299f73bb3e273b9aa7e3740",
+    "working_district_shp_sha256": "89eb1ff0363d5bca6ccc6cbcd8ebad5b883ab64ed3d4f1bd3f485d75451d6344",
+    "working_manifest_sha256": "0e913708a25db36616a1c43ced7619a87835d678a7416f07430ee08f922684ba",
+    "identities": [
+      {
+        "source_record_index": 268,
+        "source_objectid": 344,
+        "district_name_original": "B<galkot",
+        "district_lgd_code_as_supplied_by_soi": "556",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6563.00620878778,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 269,
+        "source_objectid": 345,
+        "district_name_original": "Bengal#ru (Rural)",
+        "district_lgd_code_as_supplied_by_soi": "583",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 2298.053375183859,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 270,
+        "source_objectid": 346,
+        "district_name_original": "Belag<vi",
+        "district_lgd_code_as_supplied_by_soi": "555",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 13405.07300939293,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 271,
+        "source_objectid": 347,
+        "district_name_original": "Chikkamagal#ru",
+        "district_lgd_code_as_supplied_by_soi": "570",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 7213.636981852976,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 272,
+        "source_objectid": 348,
+        "district_name_original": "Ball<ri",
+        "district_lgd_code_as_supplied_by_soi": "565",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4245.864916655512,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 273,
+        "source_objectid": 349,
+        "district_name_original": "Ch<mar<janagara",
+        "district_lgd_code_as_supplied_by_soi": "578",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5640.669646332363,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 274,
+        "source_objectid": 350,
+        "district_name_original": "Chitradurga",
+        "district_lgd_code_as_supplied_by_soi": "566",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8436.691346107767,
+        "nic_exact_name": "Chitradurga",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 275,
+        "source_objectid": 351,
+        "district_name_original": "Koppal",
+        "district_lgd_code_as_supplied_by_soi": "560",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5578.633319511963,
+        "nic_exact_name": "Koppal",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 276,
+        "source_objectid": 352,
+        "district_name_original": "Vijayanagara",
+        "district_lgd_code_as_supplied_by_soi": "761",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5647.66535617508,
+        "nic_exact_name": "Vijayanagara",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 277,
+        "source_objectid": 353,
+        "district_name_original": "Raich#r",
+        "district_lgd_code_as_supplied_by_soi": "559",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8438.80668616617,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 278,
+        "source_objectid": 354,
+        "district_name_original": "Chikkaball<pura",
+        "district_lgd_code_as_supplied_by_soi": "582",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4244.231581448191,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 279,
+        "source_objectid": 355,
+        "district_name_original": "D<vanagere",
+        "district_lgd_code_as_supplied_by_soi": "567",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4482.6437230494885,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 280,
+        "source_objectid": 356,
+        "district_name_original": "Dh<rw<d",
+        "district_lgd_code_as_supplied_by_soi": "562",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4258.386166734271,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 281,
+        "source_objectid": 357,
+        "district_name_original": "Gadag",
+        "district_lgd_code_as_supplied_by_soi": "561",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4658.243351091693,
+        "nic_exact_name": "Gadag",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 282,
+        "source_objectid": 358,
+        "district_name_original": "H<veri",
+        "district_lgd_code_as_supplied_by_soi": "564",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4821.387879791073,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 283,
+        "source_objectid": 359,
+        "district_name_original": "H<ssan",
+        "district_lgd_code_as_supplied_by_soi": "574",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6821.106717539691,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 284,
+        "source_objectid": 360,
+        "district_name_original": "Kalaburagi",
+        "district_lgd_code_as_supplied_by_soi": "579",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10954.536297515162,
+        "nic_exact_name": "Kalaburagi",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 285,
+        "source_objectid": 361,
+        "district_name_original": "Bengal#ru (Urban)",
+        "district_lgd_code_as_supplied_by_soi": "572",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 2194.050134823002,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 286,
+        "source_objectid": 362,
+        "district_name_original": "Kol<ra",
+        "district_lgd_code_as_supplied_by_soi": "581",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3979.8178081860015,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 287,
+        "source_objectid": 363,
+        "district_name_original": "Mandya",
+        "district_lgd_code_as_supplied_by_soi": "573",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4955.132933207565,
+        "nic_exact_name": "Mandya",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 288,
+        "source_objectid": 364,
+        "district_name_original": "Mys#ru",
+        "district_lgd_code_as_supplied_by_soi": "577",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6310.0378331659,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 289,
+        "source_objectid": 365,
+        "district_name_original": "Shivamogga",
+        "district_lgd_code_as_supplied_by_soi": "568",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8478.926129967973,
+        "nic_exact_name": "Shivamogga",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 290,
+        "source_objectid": 366,
+        "district_name_original": "Dakshina Kannada",
+        "district_lgd_code_as_supplied_by_soi": "575",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4847.364442371039,
+        "nic_exact_name": "Dakshina Kannada",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 291,
+        "source_objectid": 367,
+        "district_name_original": "Uttara Kannada",
+        "district_lgd_code_as_supplied_by_soi": "563",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10299.013875686225,
+        "nic_exact_name": "Uttara Kannada",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 292,
+        "source_objectid": 368,
+        "district_name_original": "Vijayapura",
+        "district_lgd_code_as_supplied_by_soi": "557",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10491.605732885402,
+        "nic_exact_name": "Vijayapura",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 293,
+        "source_objectid": 369,
+        "district_name_original": "Y<dgir",
+        "district_lgd_code_as_supplied_by_soi": "580",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5275.218101058992,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 294,
+        "source_objectid": 370,
+        "district_name_original": "R<managara",
+        "district_lgd_code_as_supplied_by_soi": "584",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3519.890805572589,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 295,
+        "source_objectid": 371,
+        "district_name_original": "Udupi",
+        "district_lgd_code_as_supplied_by_soi": "569",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3579.071215901866,
+        "nic_exact_name": "Udupi",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 296,
+        "source_objectid": 372,
+        "district_name_original": "Tumak#ru",
+        "district_lgd_code_as_supplied_by_soi": "571",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10599.894566251203,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 297,
+        "source_objectid": 373,
+        "district_name_original": "Kodagu",
+        "district_lgd_code_as_supplied_by_soi": "576",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4100.897651217361,
+        "nic_exact_name": "Kodagu",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 298,
+        "source_objectid": 374,
+        "district_name_original": "B\\dar",
+        "district_lgd_code_as_supplied_by_soi": "558",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5444.231274444466,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      }
+    ],
+    "current_lgd_reconciled": false,
+    "nic_exact_matches": 12,
+    "unresolved_matches": 19,
+    "external_geometry_transmission": false
+  },
+  "method": "unweighted arithmetic mean/min/max of valid native CHIRPS cell centres strictly inside original local SOI polygons; boundary-centre pixels excluded; no area weighting, interpolation or centroid substitution",
+  "temporal_semantics": "daily accumulated precipitation in mm/day, UTC observation windows; historical estimates, not gauges or prediction-time availability",
+  "geometry_temporal_limit": "2025-edition geometry used; not claimed to represent each historical observation year's boundaries",
+  "identity_limit": "SOI supplied DIST_LGD identifiers pending independent current-LGD verification; NIC exact-name matches are candidates only",
+  "request_limits": {
+    "per_request_deadline_ms": 60000,
+    "retries": 0,
+    "client_automatic_retries": 0,
+    "max_attempts_per_operation": 3,
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "wall_seconds": 900,
+    "max_days": 30,
+    "max_download_bytes": 1048576
+  },
+  "processing_code": {
+    "original_name": "extract_karnataka_rainfall.py",
+    "bytes": 39202,
+    "sha256": "9c310b37f38d57a3091ab97a15fb12425155ab688ca07bd62fa16a4f2cb3bfa8"
+  },
+  "csv_fields": [
+    "source_state_lgd_code",
+    "source_district_lgd_code",
+    "district_name_original",
+    "nic_exact_name",
+    "identity_status",
+    "geometry_edition",
+    "geometry_source_id",
+    "geometry_version",
+    "date",
+    "source_collection",
+    "source_image_id",
+    "source_time_start_ms",
+    "source_time_end_ms",
+    "image_asset_version",
+    "units",
+    "mean_mm_per_day",
+    "min_mm_per_day",
+    "max_mm_per_day",
+    "expected_pixel_count",
+    "valid_pixel_count",
+    "valid_fraction",
+    "status",
+    "retrieved_at"
+  ],
+  "raw_retrieval_log": {
+    "original_name": "retrieval.jsonl",
+    "bytes": 57834,
+    "sha256": "fccd2f3d5fe7ca55a6e0e4f38e7ead007f778c739e4cc53897b4ae0712a12abe"
+  },
+  "request_attempt_log": {
+    "original_name": "request_attempts.jsonl",
+    "bytes": 17806,
+    "sha256": "0196c4e41a34cb1930b874969f744302552bd54137bc6d359867d15cbbda28f9"
+  },
+  "validation": {
+    "requested_records": 930,
+    "records": 930,
+    "valid_records": 930,
+    "complete_pixel_coverage_records": 930,
+    "partial_pixel_coverage_records": 0,
+    "missing_observations": []
+  },
+  "independent_checks": [
+    {
+      "date": "2025-06-01",
+      "source_district_lgd_code": "565",
+      "expected_pixel_count": 143,
+      "valid_pixel_count": 143,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-01",
+      "source_district_lgd_code": "761",
+      "expected_pixel_count": 195,
+      "valid_pixel_count": 195,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-01",
+      "source_district_lgd_code": "569",
+      "expected_pixel_count": 116,
+      "valid_pixel_count": 116,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-15",
+      "source_district_lgd_code": "565",
+      "expected_pixel_count": 143,
+      "valid_pixel_count": 143,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-15",
+      "source_district_lgd_code": "761",
+      "expected_pixel_count": 195,
+      "valid_pixel_count": 195,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-15",
+      "source_district_lgd_code": "569",
+      "expected_pixel_count": 116,
+      "valid_pixel_count": 116,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-30",
+      "source_district_lgd_code": "565",
+      "expected_pixel_count": 143,
+      "valid_pixel_count": 143,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-30",
+      "source_district_lgd_code": "761",
+      "expected_pixel_count": 195,
+      "valid_pixel_count": 195,
+      "matches_vector_calculation": true
+    },
+    {
+      "date": "2025-06-30",
+      "source_district_lgd_code": "569",
+      "expected_pixel_count": 116,
+      "valid_pixel_count": 116,
+      "matches_vector_calculation": true
+    }
+  ],
+  "reuse": {
+    "chirps": "Public domain",
+    "soi_policy_url": "https://surveyofindia.gov.in/pages/copyright-policy",
+    "district_aggregate_publication": "permission not established; local only",
+    "geometry_publication": false
+  },
+  "files": {
+    "daily_rainfall.csv": {
+      "original_name": "daily_rainfall.csv",
+      "bytes": 342329,
+      "sha256": "fed8bc7e9681f8fdbf4add8066a0f378cf30ef7d88d293b7ac0ffb023c55aad4"
+    }
+  },
+  "published_content": "source metadata, methods, coverage and checksums only; local district rainfall table not published"
+}

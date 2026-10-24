@@ -1,0 +1,355 @@
+{
+  "created_at": "2026-10-07T15:19:30.371245+00:00",
+  "files": {
+    "cell_candidates.csv": {
+      "bytes": 11283,
+      "sha256": "c155b7091428c0aea106f8f2319e055a8618cb35e713de9f282b0b778a4e628f"
+    },
+    "comparison_evidence.csv": {
+      "bytes": 5022,
+      "sha256": "9624cd1071f4be02beebddfba0c98cb1bad67f00ce34e0566fa37dc1ad3f088d"
+    },
+    "coordinate_candidates.csv": {
+      "bytes": 2707,
+      "sha256": "948aacd97f569c884f2cdbeddfb66553516131614c12190a3676ba45e9efeec8"
+    },
+    "cwc_catchment_provenance.json": {
+      "bytes": 941,
+      "sha256": "cb6d1ed7f27795b647a4542cb911b5aeebf29cc0a34fb1001e1a5baa0e8e9675"
+    },
+    "daily_modelled_discharge.csv": {
+      "bytes": 280041,
+      "sha256": "f09b934c41a7ab856abdc4ccf1cefce1fd3a5b8d30d61969da42a2a6f6905bf3"
+    },
+    "hydrograph_context.json": {
+      "bytes": 5194,
+      "sha256": "627ab016da3d76b733ccfca35e8aaf3570656fdee372051f4bb3b0ca8db8dbbf"
+    },
+    "limitations.json": {
+      "bytes": 1307,
+      "sha256": "83afa93aba52a614847f39750545a5674b789f7304418c7b5f806943acb83758"
+    },
+    "source_provenance.json": {
+      "bytes": 5361,
+      "sha256": "3f380bcd078b86cb210c20f7e17e7d4dda73eed08f2b8ad4d516c0b54e2a6dde"
+    },
+    "station_mapping.json": {
+      "bytes": 1760,
+      "sha256": "2e088083278e934190a42eade3353c5fe8f9d183f499bd2e3cc6140cd34fb0bf"
+    },
+    "technical_metadata.json": {
+      "bytes": 6750,
+      "sha256": "27ff090157533da5bbc7bc8320d421c2db05098c65e0327ccbc92cdf5f1246ee"
+    }
+  },
+  "inputs": [
+    {
+      "bytes": 111747,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/catalogue.html",
+      "sha256": "7ed9bca1dedd93fb254cc29efc47c7659d7001134b12a0ff9a019f88dff5dcb3"
+    },
+    {
+      "bytes": 606,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/catalogue.html.json",
+      "sha256": "179505f5d511afea1f0411f0333026b1071e096551e503d9de2bbb495b588b17"
+    },
+    {
+      "bytes": 13838,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/changelog.txt",
+      "sha256": "971c5730415903329551c59e2ae8e17ed072f20a79edaaa42e3a07ab93922f12"
+    },
+    {
+      "bytes": 688,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/changelog.txt.json",
+      "sha256": "a4563085555e2ab245b34d41851c59b2b44b296fbc2f2621f4ca8ca245711ea4"
+    },
+    {
+      "bytes": 540,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/copyright.txt",
+      "sha256": "f20723519a580fb35b3499870f0b1baea54f483195105416e547f0014f1610d2"
+    },
+    {
+      "bytes": 686,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/copyright.txt.json",
+      "sha256": "98abcfc2fa3ab16d26a32cde4b86a4ba5932cde01671564944aa1a08835ac295"
+    },
+    {
+      "bytes": 97619,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/download_form.html",
+      "sha256": "84f85f0355638fc4be74f940ae172608162d60fc84826eb4716ddf983f0ccca8"
+    },
+    {
+      "bytes": 605,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/download_form.html.json",
+      "sha256": "6ba0e4e4debdd28573445c772ff8ca32c0f023b70be4ae92e9b757acdb5e2ad1"
+    },
+    {
+      "bytes": 26878,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/ldd_semantics.html",
+      "sha256": "d13543e50af13c6170e1ce3bdb54f9eef00dd63528e78dad1b5592010131bde8"
+    },
+    {
+      "bytes": 575,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/ldd_semantics.html.json",
+      "sha256": "453ba0bc03549094a082137d46d65bfff392c0a753a5812e5323e15047a86504"
+    },
+    {
+      "bytes": 5361,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/manual_source_provenance.json",
+      "sha256": "cc4bd5ab8ae967376fa6e1d895e6d40470171a455b4b14e9a62d32f1b699dbe7"
+    },
+    {
+      "bytes": 166256,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/model_output.html",
+      "sha256": "91e3b580f2fe9afcb8c3a3bd26322a8cb3b9aeb99be7c71c665837bc4955f0c7"
+    },
+    {
+      "bytes": 585,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/model_output.html.json",
+      "sha256": "e607dc48d8ca3fd99923f516f57266f6193d6745bde58a588f5ac7d4db4b0d01"
+    },
+    {
+      "bytes": 5000,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/network.html",
+      "sha256": "d45e7e16249739033ca76e0dc9f2038e419da8dcc60a2744c5bb2c6c2e0f38ef"
+    },
+    {
+      "bytes": 787,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/network.html.json",
+      "sha256": "766cefa5232f04ad712958812e57eab5071a9f1971bd29f0c211336deb073717"
+    },
+    {
+      "bytes": 236,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/readme.txt",
+      "sha256": "9448f8a1159c9b14e3e1b9d8eab1a6ddf88d26e1f888a34cef430c756e4e6e1e"
+    },
+    {
+      "bytes": 736,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/readme.txt.json",
+      "sha256": "e1f0cc3c716804de61f7a90b58e0d886b45776fb29eef1afedd4b33059070631"
+    },
+    {
+      "bytes": 19145,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/release_readme.txt",
+      "sha256": "115f29a457d1e240d1f9ba693fb1896569c844f2fa6bca0fd209c93d66e24e3f"
+    },
+    {
+      "bytes": 776,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/release_readme.txt.json",
+      "sha256": "3c5a5fb6bb4bb7557956a10d3d338d415fda0f9b0ed491165fad8273fd6d045c"
+    },
+    {
+      "bytes": 1016,
+      "path": "data/raw/reference/glofas_v5_pilot_metadata_v1/search_protocol.json",
+      "sha256": "d6f5fc89d6e05b7d4b334e61fbe0ce3bf8fa56c792b49e550ffd192e197221ba"
+    },
+    {
+      "bytes": 21703274,
+      "path": "data/raw/reference/glofas_v5_static/chan_Global_03min.nc",
+      "sha256": "f4f1e6ff093ed6211efc6722a518acb242dacc9df1c5a998dca7b21c316499dc"
+    },
+    {
+      "bytes": 830,
+      "path": "data/raw/reference/glofas_v5_static/chan_Global_03min.nc.json",
+      "sha256": "4bcfe17cf7c2df32670481c84978491d4a994862f5f5b39a3a3e35ba45c0477b"
+    },
+    {
+      "bytes": 21701786,
+      "path": "data/raw/reference/glofas_v5_static/ldd_repaired.nc",
+      "sha256": "9199e3cc8f2fbc197c55c3ed541226156305d992dd36c3322463bb1916846be4"
+    },
+    {
+      "bytes": 926,
+      "path": "data/raw/reference/glofas_v5_static/ldd_repaired.nc.json",
+      "sha256": "a9d6d194aa743918cbb10109426674cf9670ec7e0007e49c262303262a1821dd"
+    },
+    {
+      "bytes": 20905986,
+      "path": "data/raw/reference/glofas_v5_static/ldd_repaired.nc.partial",
+      "sha256": "4f815e756a9221612ac5ca747b1189decfb2c9a8f24e18815837e72c4d813d3f"
+    },
+    {
+      "bytes": 442,
+      "path": "data/raw/reference/glofas_v5_static/ldd_repaired.nc.resume.json",
+      "sha256": "df0e8d9d33e007ee27c21917f18850b0364a58a446172ce003b26364e1f7e1a1"
+    },
+    {
+      "bytes": 795800,
+      "path": "data/raw/reference/glofas_v5_static/ldd_repaired.nc.tail",
+      "sha256": "fbbf6426d3850a0d5b645e1c4af87f230a54259b83bce0d2ebfc99e6433ef29f"
+    },
+    {
+      "bytes": 313,
+      "path": "data/raw/reference/glofas_v5_static/ldd_resume_headers.txt",
+      "sha256": "ff2fe6db07283d1c2734d2176101ab57912354e25a8140d872961d750a1b7fad"
+    },
+    {
+      "bytes": 86501639,
+      "path": "data/raw/reference/glofas_v5_static/upArea_repaired_correctedmetadata_3000.nc",
+      "sha256": "798b89dd5881ff17e6fc6ffb1981ab82784a3ae46289cb016bd07d4aed43706f"
+    },
+    {
+      "bytes": 18510624,
+      "path": "data/raw/reference/stage3e3_v1/cwc_station_metadata.pdf",
+      "sha256": "b44e4cf9a419d87730d9e79098f60cd70cc32fa042ad684d1333ffe583bc1c13"
+    },
+    {
+      "bytes": 153801,
+      "path": "data/working/glofas_access_smoke_v1/glofas_v5_karnataka_pilot_2019_jul_aug.nc",
+      "sha256": "563ef9718aaa99b84c4d843d1384970635fb1b83b7a63675980d6b3b1dd3e90d"
+    },
+    {
+      "bytes": 42669,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/discharge_reconciliation.csv",
+      "sha256": "1ba0dd8fbd4b842bbbefb55a13477da9eeb1dc61b20134bc5b305a841d2ffab5"
+    },
+    {
+      "bytes": 2054142,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/observation_quality.csv",
+      "sha256": "9a0429d13fc24a5c7532482812bd4a8d06bf3e9228237ba5da73a2f9ba2c456d"
+    },
+    {
+      "bytes": 17471,
+      "path": "data/working/karnataka_hydrology_semantics_v1/coordinate_provenance.json",
+      "sha256": "4c7b76020866c096bebbec9bfac609faa11c2fef938805019f6a3c3929cf1991"
+    }
+  ],
+  "local_manifest_sha256": "8ab83036518a89dbb14d8aae8147dd499f3e34636c92ccbdc2636db285700afd",
+  "processing_code": {
+    "bytes": 24044,
+    "path": "scripts/build_glofas_pilot.py",
+    "sha256": "ec2cc14768189e214209d1873830ca873949bdeff78c3319f582febc6241a854"
+  },
+  "publication": "Code/tests/methodology and non-spatial aggregate provenance/checksums only; detailed outputs and source binaries local",
+  "source_provenance": {
+    "auxiliary_downloads": {
+      "channel": {
+        "attempts": 1,
+        "byte_ceiling": 67108864,
+        "bytes": 21703274,
+        "content_type": "application/x-netcdf",
+        "deadline_seconds": 120,
+        "error": null,
+        "final_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/chan_Global_03min.nc",
+        "http_status": "200",
+        "retrieved_at": "2026-10-07T15:04:08.578762+00:00",
+        "returncode": 0,
+        "sha256": "f4f1e6ff093ed6211efc6722a518acb242dacc9df1c5a998dca7b21c316499dc",
+        "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/chan_Global_03min.nc",
+        "started_at": "2026-10-07T15:03:29.331417+00:00",
+        "status": "retrieved"
+      },
+      "direction_attempt1": {
+        "attempts": 1,
+        "byte_ceiling": 67108864,
+        "bytes": 20905986,
+        "content_type": "application/x-netcdf",
+        "deadline_seconds": 120,
+        "error": "curl: (28) Operation timed out after 120002 milliseconds with 20905986 out of 21701786 bytes received\n",
+        "final_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/ldd_repaired.nc",
+        "http_status": "200",
+        "retrieved_at": "2026-10-07T15:06:08.683309+00:00",
+        "returncode": 28,
+        "sha256": "4f815e756a9221612ac5ca747b1189decfb2c9a8f24e18815837e72c4d813d3f",
+        "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/ldd_repaired.nc",
+        "started_at": "2026-10-07T15:04:08.665487+00:00",
+        "status": "access_failed"
+      },
+      "direction_resume": {
+        "attempt": 2,
+        "deadline_seconds": 60,
+        "error": "",
+        "http_status": "206",
+        "range_start": 20905986,
+        "retrieved_at": "2026-10-07T15:11:07.986725+00:00",
+        "returncode": 0,
+        "source_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/ldd_repaired.nc",
+        "started_at": "2026-10-07T15:11:05.079440+00:00"
+      }
+    },
+    "historical": {
+      "api_request_template_or_job_id_retained": false,
+      "bytes": 153801,
+      "dataset_id": "cems-glofas-historical",
+      "exact_retrieval_time": "not_supplied; filesystem modification time not treated as retrieval time",
+      "file_version_attribute": "GRIB_configuration=v5.0",
+      "licence": "CEMS-FLOODS rev.1",
+      "new_authentication_attempted": false,
+      "official_url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-historical?tab=download",
+      "path": "data/working/glofas_access_smoke_v1/glofas_v5_karnataka_pilot_2019_jul_aug.nc",
+      "reported_request_area": [
+        17,
+        74,
+        16,
+        77.5
+      ],
+      "reported_request_period": [
+        "2019-07-01",
+        "2019-08-31"
+      ],
+      "reported_selection_labels": [
+        "version5.0",
+        "LISFLOOD",
+        "consolidated",
+        "time_mean",
+        "average_river_discharge_in_the_last_24_hours",
+        "NetCDF",
+        "unarchived"
+      ],
+      "retrieval_method": "user_manual_official_EWDS_download",
+      "retrieved_at": null,
+      "sha256": "563ef9718aaa99b84c4d843d1384970635fb1b83b7a63675980d6b3b1dd3e90d"
+    },
+    "publication_handling": "Original binaries and detailed source-coordinate/CWC-derived products remain local; source metadata/checksums/aggregate counts permitted",
+    "release_evidence": {
+      "changelog_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/CHANGELOG.txt",
+      "changelog_v2_1_0": "Explicitly same hydrological model setup as GloFASv5.x",
+      "changelog_v2_1_1": "Reservoir latitude cleanup only; do not infer archive mtime as release date",
+      "copyright_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/copyright.txt",
+      "readme_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/README_v2.1.0_OS-LISFLOOD-v5x.txt",
+      "readme_version": "2.1.0; retained within2.1.1 release"
+    },
+    "upstream_area": {
+      "bytes": 86501639,
+      "filesystem_mtime_not_retrieval_date": true,
+      "licence": "CC BY4.0",
+      "official_url": "https://jeodpp.jrc.ec.europa.eu/ftp/jrc-opendata/CEMS-GLOFAS/LISFLOOD_static_and_parameter_maps_for_GloFAS/v2.1.1_OS-LISFLOOD-v5.x/Catchments_morphology_and_river_network/upArea_repaired_correctedmetadata_3000.nc",
+      "original_http_metadata": "not_supplied",
+      "path": "data/raw/reference/glofas_v5_static/upArea_repaired_correctedmetadata_3000.nc",
+      "release": "v2.1.1_OS-LISFLOOD-v5.x",
+      "retrieval_method": "user_manual_download_from_official_JRC_release",
+      "retrieved_at": null,
+      "sha256": "798b89dd5881ff17e6fc6ffb1981ab82784a3ae46289cb016bd07d4aed43706f",
+      "units": "m2 defined in release README; units attribute absent",
+      "variable": "Band1"
+    },
+    "verified_at": "2026-10-07T15:19:28.601895+00:00"
+  },
+  "summary": {
+    "access": "glofas_v5_access_verified_from_supplied_official_file_not_new_authentication",
+    "approved_measured_rows_reviewed": 14,
+    "comparison_status": "temporal_semantics_unresolved",
+    "coordinate_repairs": 0,
+    "coordinate_variants": 12,
+    "extracted_cell_series": 13,
+    "features": 0,
+    "gokak_comparison": "measured_comparison_unavailable",
+    "labels": 0,
+    "mapping_status_counts": {
+      "glofas_cell_match_ambiguous": 1,
+      "glofas_cell_match_supported": 2
+    },
+    "model_time_steps": 62,
+    "modelled_rows": 806,
+    "preserved_comparisons": 81,
+    "preserved_eligible_rows": 14,
+    "preserved_measured_observations": 1697,
+    "preserved_unresolved_disagreements": 33,
+    "readiness": "modelled_hydrology_ready_limited",
+    "reviewed_candidates": 48,
+    "stations": 3,
+    "time_compatible_quantitative_comparisons": 0,
+    "valid_modelled_rows": 806
+  },
+  "version": "karnataka_glofas_2019_pilot_v1"
+}

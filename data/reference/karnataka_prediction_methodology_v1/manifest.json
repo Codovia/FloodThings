@@ -1,0 +1,1949 @@
+{
+  "candidates": [
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "chirps_faq",
+        "chirps_producer",
+        "chirps_catalogue"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "chirps_final_daily",
+      "feature_name": "Native regional daily rainfall",
+      "geographic_coverage": "31SOI2025polygons in2025; reviewed event scopes1981onwards catalogue",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Third week of following month; preliminary2days after pentad, not Final",
+      "leakage_status": "availability_unverified",
+      "licence": "CHIRPS public domain; SOI-dependent detailed2025tables withheld",
+      "operational_source": "CHIRPS Final delayed monitoring only; live rainfall proxy not selected",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "Final daily value is not available the same day; preliminary/version3 or NWP differs, requires separate validation",
+      "reason": "Final daily value is not available the same day; preliminary/version3 or NWP differs, requires separate validation",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "chirps_catalogue",
+      "source_type": "satellite_station_blend",
+      "spatial_resolution": "0.05deg EPSG4326",
+      "temporal_resolution": "daily",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm/day"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "chirps_faq",
+        "chirps_catalogue",
+        "stage3c",
+        "stage3d"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "antecedent_rainfall",
+      "feature_name": "Stage3C/3D1/3/7/14/30day sums and7/14day maxima",
+      "geographic_coverage": "4positive/2observed-zero scopes",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Inherits delayed CHIRPS Final publication",
+      "leakage_status": "availability_unverified",
+      "licence": "CHIRPS public domain;geoBoundariesCC BY;event-linkedGFDCC BY-NC;detailedtables local",
+      "operational_source": "No validated live equivalent; forecast/recent model estimates require validation",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "Calendar cut-off satisfied but Final release was after anchor; not operational backtest",
+      "reason": "Calendar cut-off satisfied but Final release was after anchor; not operational backtest",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "chirps_catalogue",
+      "source_type": "retrospective_antecedent_summary",
+      "spatial_resolution": "native regional cell-centre means",
+      "temporal_resolution": "completed daily windows before GFDstart",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3c",
+        "stage3d"
+      ],
+      "feature_class": "DESCRIPTIVE_ONLY",
+      "feature_id": "event_rainfall",
+      "feature_name": "Event-window rainfall totals/mean/max",
+      "geographic_coverage": "4positive scopes",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "DESCRIPTIVE_ONLY_NOT_PREDICTION_FEATURE; includes event-start/future rain",
+      "reason": "DESCRIPTIVE_ONLY_NOT_PREDICTION_FEATURE; includes event-start/future rain",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage3c",
+      "source_type": "post_anchor_summary",
+      "spatial_resolution": "CHIRPS0.05deg regional means",
+      "temporal_resolution": "GFDstart through end inclusive",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_history",
+        "om_terms"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "om_reanalysis_precip",
+      "feature_name": "Historical ERA5 precipitation through Open-Meteo",
+      "geographic_coverage": "Global catalogue; no retained extraction in checkout",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Provider lists5day delay;record-specific final/revision time unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0 data; hosted service terms apply",
+      "operational_source": "Open-Meteo forecast;requires distinct model/run validation",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "ERA5 is retrospectively reconstructed; not equivalent to live NWP estimates",
+      "reason": "ERA5 is retrospectively reconstructed; not equivalent to live NWP estimates",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "om_history",
+      "source_type": "reanalysis",
+      "spatial_resolution": "ERA50.25deg;ERA5-Land0.1deg atmospheric precipitation caveat",
+      "temporal_resolution": "hourly/daily",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_history",
+        "om_terms"
+      ],
+      "feature_class": "MODELLED_PAST",
+      "feature_id": "om_ifs_history",
+      "feature_name": "Open-Meteo historical IFS analysis",
+      "geographic_coverage": "Global from2017catalogue;not acquired",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Provider says6hourly/no delay;actual issue/delivery logs absent",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0;freehost noncommercial",
+      "operational_source": "Pinned Open-Meteo IFS live model",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Model changes and archive construction require as-of proof; no availability inferred from current archive",
+      "reason": "Model changes and archive construction require as-of proof; no availability inferred from current archive",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_history",
+      "source_type": "modelled_analysis",
+      "spatial_resolution": "9km",
+      "temporal_resolution": "hourly",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_forecast",
+        "om_terms",
+        "weather_adapter"
+      ],
+      "feature_class": "MODELLED_PAST",
+      "feature_id": "om_current_precip",
+      "feature_name": "Current preceding-interval precipitation",
+      "geographic_coverage": "Working app Bengaluru point only",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Underlying model cadence,not3minute cacheTTL;actual returned interval preserved",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CC BY4.0;freehost noncommercial",
+      "operational_source": "https://api.open-meteo.com/v1/forecast current.precipitation",
+      "prediction_time_availability": "near_real_time_available",
+      "quality_caveat": "Operationally retrieved, but current value is model output; app omits issue/model-run IDs and no historical snapshots; no measured-past claim",
+      "reason": "Operationally retrieved, but current value is model output; app omits issue/model-run IDs and no historical snapshots; no measured-past claim",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_forecast",
+      "source_type": "weather_model_estimate",
+      "spatial_resolution": "model-dependent global grid;coordinate is not rain gauge",
+      "temporal_resolution": "returned current interval",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm/returned interval"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_forecast",
+        "om_terms",
+        "weather_adapter"
+      ],
+      "feature_class": "FORECAST",
+      "feature_id": "om_forecast_precip",
+      "feature_name": "Issued weather-model precipitation forecast",
+      "geographic_coverage": "Catalogueglobal;app3dailyBengaluru forecasts",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Model dependent;global commonly6h;need delivery/issuance snapshot",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CC BY4.0;noncommercial freehost;no SLA",
+      "operational_source": "https://api.open-meteo.com/v1/forecast hourly.precipitation/daily.precipitation_sum",
+      "prediction_time_availability": "forecast_available",
+      "quality_caveat": "Forecast available by retrieval but issue time/model selection unknown;current day total mixes elapsed/future model periods,not observed antecedent rainfall",
+      "reason": "Forecast available by retrieval but issue time/model selection unknown;current day total mixes elapsed/future model periods,not observed antecedent rainfall",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_forecast",
+      "source_type": "weather_forecast",
+      "spatial_resolution": "model-dependent global grid",
+      "temporal_resolution": "hourly;daily sums",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm/hour or local-calendar-day total"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_forecast",
+        "weather_adapter",
+        "om_terms"
+      ],
+      "feature_class": "MODELLED_PAST",
+      "feature_id": "om_current_temperature_humidity",
+      "feature_name": "Existing current temperature and humidity context",
+      "geographic_coverage": "Working Bengaluru dashboard",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CC BY4.0;freehost noncommercial",
+      "operational_source": "Existing forecast API current temperature/humidity fields",
+      "prediction_time_availability": "near_real_time_available",
+      "quality_caveat": "Actual adapter variables; no demonstrated flood-predictive usefulness, no observed-gauge claim",
+      "reason": "Actual adapter variables; no demonstrated flood-predictive usefulness, no observed-gauge claim",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_forecast",
+      "source_type": "weather_model_estimate",
+      "spatial_resolution": "model dependent",
+      "temporal_resolution": "returned current valid time",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "degC;percent"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_forecast",
+        "weather_adapter",
+        "om_terms"
+      ],
+      "feature_class": "FORECAST",
+      "feature_id": "om_forecast_temperature",
+      "feature_name": "Daily temperature min/max forecast",
+      "geographic_coverage": "Working Bengaluru dashboard",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CC BY4.0;free hosted service non-commercial",
+      "operational_source": "Existing forecast API daily.temperature_2m_min/max",
+      "prediction_time_availability": "forecast_available",
+      "quality_caveat": "Forecast daily extremes must not be mistaken for elapsed observations; scientific relevance not established",
+      "reason": "Forecast daily extremes must not be mistaken for elapsed observations; scientific relevance not established",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_forecast",
+      "source_type": "weather_forecast",
+      "spatial_resolution": "model dependent global grid",
+      "temporal_resolution": "daily calendar min/max",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "degC"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_historical_forecast"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "om_seamless_archive",
+      "feature_name": "Stitched historical forecast precipitation",
+      "geographic_coverage": "Broadly2021onward;catalogue only",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0/service terms",
+      "operational_source": "Live seamless forecast API;run-pinning review required",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "Stitched early-run values are not full forecasts known at one historical issuance; JSON shape is not as-of parity",
+      "reason": "Stitched early-run values are not full forecasts known at one historical issuance; JSON shape is not as-of parity",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "om_historical_forecast",
+      "source_type": "archived_model_forecasts",
+      "spatial_resolution": "model specific",
+      "temporal_resolution": "continuous hourly",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_previous",
+        "om_terms"
+      ],
+      "feature_class": "FORECAST",
+      "feature_id": "om_previous_runs",
+      "feature_name": "Fixed-lead past model runs",
+      "geographic_coverage": "Most previous runs2024;singleIFS2024-03-14/others2026-04-02;no proved2005\u20132010positive coverage",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Initialization is not publication; archive existence is not historic availability",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0/service terms",
+      "operational_source": "Same pinned live forecast model/run snapshots",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Potential as-of reconstruction only after pinned version/model/run, first-availability timing and location/horizon coverage validation;not acquired",
+      "reason": "Potential as-of reconstruction only after pinned version/model/run, first-availability timing and location/horizon coverage validation;not acquired",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_previous",
+      "source_type": "archived_forecasts",
+      "spatial_resolution": "model specific",
+      "temporal_resolution": "hourly validtime plus lead/run",
+      "training_serving_parity": "COMPATIBLE_WITH_CAVEATS",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "om_single",
+        "om_terms"
+      ],
+      "feature_class": "FORECAST",
+      "feature_id": "om_single_runs",
+      "feature_name": "Initialization-pinned full forecast runs",
+      "geographic_coverage": "Most previous runs2024;singleIFS2024-03-14/others2026-04-02;no proved2005\u20132010positive coverage",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Initialization is not publication; archive existence is not historic availability",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0/service terms",
+      "operational_source": "Same pinned live forecast model/run snapshots",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Potential as-of reconstruction only after pinned version/model/run, first-availability timing and location/horizon coverage validation;not acquired",
+      "reason": "Potential as-of reconstruction only after pinned version/model/run, first-availability timing and location/horizon coverage validation;not acquired",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "om_single",
+      "source_type": "archived_forecasts",
+      "spatial_resolution": "model specific",
+      "temporal_resolution": "hourly validtime plus lead/run",
+      "training_serving_parity": "COMPATIBLE_WITH_CAVEATS",
+      "units": "mm"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "glofas_history",
+        "glofas_forecast",
+        "stage4f"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "sadalga_glofas_history",
+      "feature_name": "Sadalga supported model cell",
+      "geographic_coverage": "Existing62intervalsJuly\u2013August2019",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Consolidated monthly;exact sample publication/revision unknown",
+      "leakage_status": "availability_unverified",
+      "licence": "CEMS-FLOODS licence;source-specific/model-data policy review",
+      "operational_source": "GloFAS operational ensemble forecast/initialization, version parity unresolved",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "2026v5consolidated2019simulation did not exist at2019issuance;historical context only;coordinate/calibration caveats",
+      "reason": "2026v5consolidated2019simulation did not exist at2019issuance;historical context only;coordinate/calibration caveats",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "glofas_history",
+      "source_type": "modelled_glofas_historical",
+      "spatial_resolution": "v5native0.05deg EPSG4326",
+      "temporal_resolution": "preceding24h mean ending00UTC",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "glofas_history",
+        "glofas_forecast",
+        "stage4f"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "huvinhedgi_glofas_history",
+      "feature_name": "Huvinhedgi supported model cell",
+      "geographic_coverage": "Existing62intervalsJuly\u2013August2019",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Consolidated monthly;exact sample publication/revision unknown",
+      "leakage_status": "availability_unverified",
+      "licence": "CEMS-FLOODS licence;source-specific/model-data policy review",
+      "operational_source": "GloFAS operational ensemble forecast/initialization, version parity unresolved",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "2026v5consolidated2019simulation did not exist at2019issuance;historical context only;coordinate/calibration caveats",
+      "reason": "2026v5consolidated2019simulation did not exist at2019issuance;historical context only;coordinate/calibration caveats",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "glofas_history",
+      "source_type": "modelled_glofas_historical",
+      "spatial_resolution": "v5native0.05deg EPSG4326",
+      "temporal_resolution": "preceding24h mean ending00UTC",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4f"
+      ],
+      "feature_class": "EXCLUDED",
+      "feature_id": "gokak_discharge",
+      "feature_name": "Canonical Gokak model discharge",
+      "geographic_coverage": "2019candidate series retained",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Gauge/reach remains ambiguous; do not select/average candidates or resolve from magnitude",
+      "reason": "Gauge/reach remains ambiguous; do not select/average candidates or resolve from magnitude",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage4f",
+      "source_type": "modelled_glofas",
+      "spatial_resolution": "Two distinct0.05deg candidates",
+      "temporal_resolution": "daily",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "glofas_history"
+      ],
+      "feature_class": "MODELLED_PAST",
+      "feature_id": "glofas_intermediate",
+      "feature_name": "ERA5T intermediate modelled discharge",
+      "geographic_coverage": "Global catalogue;not acquired",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Daily update; exact product delivery/forcing lag unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "CEMS-FLOODS terms",
+      "operational_source": "cems-glofas-historical intermediate (not a forecast)",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Updated daily is not zero-latency; exact elapsed interval/publication/version/init states need validation",
+      "reason": "Updated daily is not zero-latency; exact elapsed interval/publication/version/init states need validation",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "glofas_history",
+      "source_type": "modelled_past",
+      "spatial_resolution": "0.05deg version-dependent",
+      "temporal_resolution": "24h",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "glofas_forecast",
+        "glofas_forcing",
+        "glofas_v5_status"
+      ],
+      "feature_class": "FORECAST",
+      "feature_id": "glofas_ensemble_forecast",
+      "feature_name": "Forecast river discharge, separate from measured values",
+      "geographic_coverage": "Global inclKarnataka;service catalogue only",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Daily00UTC cycle not delivery guarantee;time-criticalEWDS warning",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CEMS-FLOODS terms;access acceptance handled separately",
+      "operational_source": "cems-glofas-forecast;documented operational route/service feasibility requires review",
+      "prediction_time_availability": "forecast_available",
+      "quality_caveat": "Must pin actual operational version,member,run,step and delivery. v5history cannot silently substitute;station relevance limited to supported reaches",
+      "reason": "Must pin actual operational version,member,run,step and delivery. v5history cannot silently substitute;station relevance limited to supported reaches",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "glofas_forecast",
+      "source_type": "modelled_glofas_forecast",
+      "spatial_resolution": "listedv4native0.05deg EPSG4326",
+      "temporal_resolution": "daily means;00UTC forecast cycles",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "glofas_reforecast",
+        "glofas_forecast"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "glofas_reforecast",
+      "feature_name": "Retrospective forecast-like hindcasts",
+      "geographic_coverage": "2003\u20132022hindcast years catalogue;not acquired",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "CEMS-FLOODS terms",
+      "operational_source": "Version-matched GloFAS forecast after separate validation",
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "Produced later,not actual historic issued forecasts;future forcing/initial-state and model-vintage leakage must be audited;cannot establishas-of availability",
+      "reason": "Produced later,not actual historic issued forecasts;future forcing/initial-state and model-vintage leakage must be audited;cannot establishas-of availability",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "glofas_reforecast",
+      "source_type": "modelled_reforecasts",
+      "spatial_resolution": "listedv4native0.05deg",
+      "temporal_resolution": "24h;twiceweekly initialization",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m3/s"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4f"
+      ],
+      "feature_class": "UNRESOLVED",
+      "feature_id": "cwc_daily_discharge",
+      "feature_name": "14quality-caveated measured discharge rows",
+      "geographic_coverage": "Sadalga2/Huvinhedgi12;Gokak0flood-period",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "NWDP Other(Open) not standardlicence;producerreuse unresolved",
+      "operational_source": null,
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Observed/reported source class separate from model;historicalpublication latency and exact temporal equivalence unresolved",
+      "reason": "Observed/reported source class separate from model;historicalpublication latency and exact temporal equivalence unresolved",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "stage4f",
+      "source_type": "measured_cwc_nwdp",
+      "spatial_resolution": "CWC stations;coordinates caveated",
+      "temporal_resolution": "Nominaldaily;exact statistic/timezone/bounds unresolved",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "m3/sec"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4f"
+      ],
+      "feature_class": "UNRESOLVED",
+      "feature_id": "cwc_hourly_level",
+      "feature_name": "Measured hourly river level context",
+      "geographic_coverage": "Stage4B retained2019window",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "NWDP/CWCreuse unresolved",
+      "operational_source": null,
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Datum/reference stability,publicationtime/quality/coordinatehistory need review;no threshold or change features yet",
+      "reason": "Datum/reference stability,publicationtime/quality/coordinatehistory need review;no threshold or change features yet",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "stage4f",
+      "source_type": "measured_cwc_nwdp",
+      "spatial_resolution": "CWC stations",
+      "temporal_resolution": "nominalhourly",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "m;datum unresolved"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4f"
+      ],
+      "feature_class": "EXCLUDED",
+      "feature_id": "water_level_threshold",
+      "feature_name": "Water-level threshold exceedance",
+      "geographic_coverage": "No usable derivation",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Stage4F datum/time/source eligibility prohibitions remain unchanged",
+      "reason": "Stage4F datum/time/source eligibility prohibitions remain unchanged",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage4f",
+      "source_type": "unsupported_derivation",
+      "spatial_resolution": "station",
+      "temporal_resolution": "not constructed",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "not constructed"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4f"
+      ],
+      "feature_class": "EXCLUDED",
+      "feature_id": "cwc_model_skill",
+      "feature_name": "Quantitative CWC/GloFAS skill comparison",
+      "geographic_coverage": "No usable derivation",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Stage4F datum/time/source eligibility prohibitions remain unchanged",
+      "reason": "Stage4F datum/time/source eligibility prohibitions remain unchanged",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage4f",
+      "source_type": "unsupported_derivation",
+      "spatial_resolution": "station",
+      "temporal_resolution": "not constructed",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "not constructed"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4d"
+      ],
+      "feature_class": "DESCRIPTIVE_ONLY",
+      "feature_id": "future_discharge_peak",
+      "feature_name": "Full July\u2013August2019 modelled maximum/date/rank",
+      "geographic_coverage": "Stage4Ddescriptivehydrograph",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Full-window outcome/statistic requires future modelled elapsed values at earlier issuance;not a forecast peak",
+      "reason": "Full-window outcome/statistic requires future modelled elapsed values at earlier issuance;not a forecast peak",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage4d",
+      "source_type": "full_window_descriptive",
+      "spatial_resolution": "retained model cells",
+      "temporal_resolution": "Full62interval window",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "m3/s;date;rank"
+    },
+    {
+      "allowed_for_deployment": true,
+      "allowed_for_training": false,
+      "deployment_scope": "dated_research_context_only",
+      "evidence_ids": [
+        "dem_catalogue",
+        "udupi_gis"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "surface_elevation",
+      "feature_name": "Surface elevation",
+      "geographic_coverage": "Existing3kmx3kmUdupi studywindow only",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Staticcached layer retrieved2026-10-03;originalearlierrelease day not inferred",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "Copernicus WorldDEM30free licence with required attribution/adaptation/liability notices",
+      "operational_source": "Existing checksum-validated local drainage layer dataset",
+      "prediction_time_availability": "historically_available",
+      "quality_caveat": "Available now as dated exploratoryresearchcontext;not bare-earthflow/drainageinfrastructure or statewidecoverage. Post-eventvintage excludesstrict2005\u20132010backtests",
+      "reason": "Available now as dated exploratoryresearchcontext;not bare-earthflow/drainageinfrastructure or statewidecoverage. Post-eventvintage excludesstrict2005\u20132010backtests",
+      "safe_set": "SAFE_NOW",
+      "scientific_candidate_only": true,
+      "source": "dem_catalogue",
+      "source_type": "dated_static_surface",
+      "spatial_resolution": "30m EPSG32643;sourceEPSG4326",
+      "temporal_resolution": "2024_1release;2010\u20132020acquisitions",
+      "training_serving_parity": "EXACT",
+      "units": "m aboveEGM2008"
+    },
+    {
+      "allowed_for_deployment": true,
+      "allowed_for_training": false,
+      "deployment_scope": "dated_research_context_only",
+      "evidence_ids": [
+        "dem_catalogue",
+        "udupi_gis"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "surface_slope",
+      "feature_name": "Horn-derived surface slope",
+      "geographic_coverage": "Existing3kmx3kmUdupi studywindow only",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "Staticcached layer retrieved2026-10-03;originalearlierrelease day not inferred",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "Copernicus WorldDEM30free licence with required attribution/adaptation/liability notices",
+      "operational_source": "Existing checksum-validated local drainage layer dataset",
+      "prediction_time_availability": "historically_available",
+      "quality_caveat": "Available now as dated exploratoryresearchcontext;not bare-earthflow/drainageinfrastructure or statewidecoverage. Post-eventvintage excludesstrict2005\u20132010backtests",
+      "reason": "Available now as dated exploratoryresearchcontext;not bare-earthflow/drainageinfrastructure or statewidecoverage. Post-eventvintage excludesstrict2005\u20132010backtests",
+      "safe_set": "SAFE_NOW",
+      "scientific_candidate_only": true,
+      "source": "dem_catalogue",
+      "source_type": "dated_static_surface",
+      "spatial_resolution": "30m EPSG32643;sourceEPSG4326",
+      "temporal_resolution": "2024_1release;2010\u20132020acquisitions",
+      "training_serving_parity": "EXACT",
+      "units": "degrees"
+    },
+    {
+      "allowed_for_deployment": true,
+      "allowed_for_training": false,
+      "deployment_scope": "dated_research_context_only",
+      "evidence_ids": [
+        "worldcover_catalogue",
+        "udupi_gis"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "landcover_2021",
+      "feature_name": "Dated2021 land-cover class",
+      "geographic_coverage": "Existing3kmUdupionly",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "requires_asof_and_vintage_checks",
+      "licence": "CC BY4.0 ESAWorldCover attribution",
+      "operational_source": "Existing local land_cover raster with2021label",
+      "prediction_time_availability": "historically_available",
+      "quality_caveat": "Known now as2021baseline;notcurrentlandcover or2005\u20132010conditions;nodata/localclassificationlimits retained",
+      "reason": "Known now as2021baseline;notcurrentlandcover or2005\u20132010conditions;nodata/localclassificationlimits retained",
+      "safe_set": "SAFE_NOW",
+      "scientific_candidate_only": true,
+      "source": "worldcover_catalogue",
+      "source_type": "dated_static_landcover",
+      "spatial_resolution": "10m EPSG32643 local/sourceEPSG4326",
+      "temporal_resolution": "2021v200;2022citation",
+      "training_serving_parity": "EXACT",
+      "units": "classcode"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage4d",
+        "stage4f",
+        "glofas_forecast"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "v5_upstream_network",
+      "feature_name": "Model upstream area/channel/LDD context",
+      "geographic_coverage": "Retainedglobalstatic;bounded30/48cellresearch",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "JRCstatic CC BY4.0 plus model-policy review",
+      "operational_source": "Same version-compatible GloFAS static release, pendingforecast-version match",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "2026modelsetup unavailableas-such2019;futureversion-matchedmodelcontext at supportedcells only;not verifiedphysicaldrainage. Gokak topology cannot selectgauge",
+      "reason": "2026modelsetup unavailableas-such2019;futureversion-matchedmodelcontext at supportedcells only;not verifiedphysicaldrainage. Gokak topology cannot selectgauge",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "stage4d",
+      "source_type": "model_static_network",
+      "spatial_resolution": "0.05deg EPSG4326",
+      "temporal_resolution": "v2.1.1OSLISFLOODv5release",
+      "training_serving_parity": "PROXY_REQUIRES_VALIDATION",
+      "units": "m2;channelflag;PCRasterdirection"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "soi_policy"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "soi_district_geometry",
+      "feature_name": "SOI2025edition district association",
+      "geographic_coverage": "31Karnatakapolygonslocal",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "SOIpublication/internalreuse unresolved;conservative localpolicy",
+      "operational_source": null,
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "CurrentLGDindependentreconciliation andABDBreuse unresolved;derivedrainfalltableslocal;no upload/deployment ofrestrictedgeometry",
+      "reason": "CurrentLGDindependentreconciliation andABDBreuse unresolved;derivedrainfalltableslocal;no upload/deployment ofrestrictedgeometry",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "soi_2025",
+      "source_type": "administrative_geometry",
+      "spatial_resolution": "1:50000source;CRSvalidatedlocally",
+      "temporal_resolution": "2025edition,not historicalvintage",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "sourcecodes/polygons"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3c"
+      ],
+      "feature_class": "STATIC",
+      "feature_id": "public_review_boundary",
+      "feature_name": "geoBoundariesreview scope identity",
+      "geographic_coverage": "ReviewedUdupi/Chitradurga/Kolarscopes",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "CC BY4.0 with attribution",
+      "operational_source": "Existing public reviewed geoBoundaries geometries",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "Permittedpublicboundaryalternativecontext exists but not currentLGD or historicalboundary;no statewide foundation substitution",
+      "reason": "Permittedpublicboundaryalternativecontext exists but not currentLGD or historicalboundary;no statewide foundation substitution",
+      "safe_set": "SAFE_AFTER_VALIDATION",
+      "scientific_candidate_only": true,
+      "source": "stage3c",
+      "source_type": "administrative_geometry",
+      "spatial_resolution": "v6compositeEPSG4326;not a localitymeasurement",
+      "temporal_resolution": "2023composite",
+      "training_serving_parity": "COMPATIBLE_WITH_CAVEATS",
+      "units": "scopeidentifier"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "osm_terms",
+        "udupi_gis"
+      ],
+      "feature_class": "UNRESOLVED",
+      "feature_id": "osm_drain_context",
+      "feature_name": "Mapped drain/ditch network coverage",
+      "geographic_coverage": "3kmUdupi;zero mappedwaysreturned",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "ODbL1.0 attribution/database obligations",
+      "operational_source": "OSMversionedquery/extract aftercoveragevalidation",
+      "prediction_time_availability": "unresolved",
+      "quality_caveat": "No actual featuregeometry in boundedstudy;missingcoverage isunknown,not zero drainage or capacity",
+      "reason": "No actual featuregeometry in boundedstudy;missingcoverage isunknown,not zero drainage or capacity",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "osm_terms",
+      "source_type": "mapped_static_infrastructure",
+      "spatial_resolution": "OSMline coordinates;CRS84/metricclip",
+      "temporal_resolution": "Source2026querysnapshot",
+      "training_serving_parity": "UNRESOLVED",
+      "units": "geometry;not capacity"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "udupi_gis"
+      ],
+      "feature_class": "EXCLUDED",
+      "feature_id": "invented_drain_capacity",
+      "feature_name": "Drainage capacity/score",
+      "geographic_coverage": "No measurements",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Noverifiedpipe/capacity/blockage/discharge data;cannot manufacture or useQandAproxyassumptions",
+      "reason": "Noverifiedpipe/capacity/blockage/discharge data;cannot manufacture or useQandAproxyassumptions",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "udupi_gis",
+      "source_type": "unsupported",
+      "spatial_resolution": "unavailable",
+      "temporal_resolution": "unavailable",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "unavailable"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "jrc_catalogue",
+        "stage3_aux"
+      ],
+      "feature_class": "RETROSPECTIVE_ONLY",
+      "feature_id": "jrc_history",
+      "feature_name": "JRCfullhistorical water context",
+      "geographic_coverage": "ExistingStage3auxdiagnostics",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "availability_unverified",
+      "licence": "JRCcatalogue terms/attribution",
+      "operational_source": null,
+      "prediction_time_availability": "retrospectively_available",
+      "quality_caveat": "Whole-history water occurrence andevent-year/month classes containpost-issuanceobservations;no static exemption. Needasofcutoff/version/releaseproofbeforefutureinput",
+      "reason": "Whole-history water occurrence andevent-year/month classes containpost-issuanceobservations;no static exemption. Needasofcutoff/version/releaseproofbeforefutureinput",
+      "safe_set": "RESEARCH_ONLY",
+      "scientific_candidate_only": true,
+      "source": "jrc_catalogue",
+      "source_type": "retrospective_surface_water",
+      "spatial_resolution": "30m",
+      "temporal_resolution": "1984\u20132021fullhistory",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "occurrencepercent/classes"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "gfd_catalogue"
+      ],
+      "feature_class": "TARGET_OR_LABEL",
+      "feature_id": "gfd_extent",
+      "feature_name": "GFD event-window floodwater evidence",
+      "geographic_coverage": "Existingreviewedproducts",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "GFD/IFICC BY-NC4.0;SAR/NRSCterms source-specific",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "reason": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "gfd_catalogue",
+      "source_type": "satellite_outcome",
+      "spatial_resolution": "source-specific;GFD250m",
+      "temporal_resolution": "eventwindow;notdailyoccurrence",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "outcomeevidence"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3a"
+      ],
+      "feature_class": "TARGET_OR_LABEL",
+      "feature_id": "reported_ifi_event",
+      "feature_name": "IFIreported event identity/dates/description",
+      "geographic_coverage": "Existingreviewedproducts",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "GFD/IFICC BY-NC4.0;SAR/NRSCterms source-specific",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "reason": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage3a",
+      "source_type": "reported_outcome",
+      "spatial_resolution": "source-specific;GFD250m",
+      "temporal_resolution": "eventwindow;notdailyoccurrence",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "outcomeevidence"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3_aux"
+      ],
+      "feature_class": "TARGET_OR_LABEL",
+      "feature_id": "post_event_sar",
+      "feature_name": "Sentinel1change/NRSCpost-event corroboration",
+      "geographic_coverage": "Existingreviewedproducts",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "GFD/IFICC BY-NC4.0;SAR/NRSCterms source-specific",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "reason": "Outcome/diagnostic evidence mustremainseparatefrompredictors;no dailylabelpromotion. ExistingSARdiagnosticsnotverifiedpositives",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage3_aux",
+      "source_type": "post_event_diagnostic",
+      "spatial_resolution": "source-specific;GFD250m",
+      "temporal_resolution": "eventwindow;notdailyoccurrence",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "outcomeevidence"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3d"
+      ],
+      "feature_class": "TARGET_OR_LABEL",
+      "feature_id": "observed_zero",
+      "feature_name": "Two usable reviewedmaps withzeroqualifyingcells",
+      "geographic_coverage": "2698Bijapur/3107Raichur;unknownotherwindows",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Neitherzero-mapfindingnornorecordcertifiesnonflood;nullbinarytargets preserved",
+      "reason": "Neitherzero-mapfindingnornorecordcertifiesnonflood;nullbinarytargets preserved",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage3d",
+      "source_type": "nonnegative_unlabeled_evidence",
+      "spatial_resolution": "reviewedscopes",
+      "temporal_resolution": "specificmapwindow",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "evidenceclass"
+    },
+    {
+      "allowed_for_deployment": false,
+      "allowed_for_training": false,
+      "deployment_scope": "not_approved",
+      "evidence_ids": [
+        "stage3d"
+      ],
+      "feature_class": "TARGET_OR_LABEL",
+      "feature_id": "missing_as_negative",
+      "feature_name": "Missing/unknown flood observation",
+      "geographic_coverage": "2698Bijapur/3107Raichur;unknownotherwindows",
+      "historical_availability": "Retained research evidence; exact as-of availability unverified",
+      "latency": "record-level publication latency unverified",
+      "leakage_status": "leakage_prohibited",
+      "licence": "source-specific terms; repository review required",
+      "operational_source": null,
+      "prediction_time_availability": "prediction_time_unavailable",
+      "quality_caveat": "Neitherzero-mapfindingnornorecordcertifiesnonflood;nullbinarytargets preserved",
+      "reason": "Neitherzero-mapfindingnornorecordcertifiesnonflood;nullbinarytargets preserved",
+      "safe_set": "PROHIBITED",
+      "scientific_candidate_only": true,
+      "source": "stage3d",
+      "source_type": "nonnegative_unlabeled_evidence",
+      "spatial_resolution": "reviewedscopes",
+      "temporal_resolution": "specificmapwindow",
+      "training_serving_parity": "NO_OPERATIONAL_EQUIVALENT",
+      "units": "evidenceclass"
+    }
+  ],
+  "created_at": "2026-10-07T19:00:39.358946+00:00",
+  "files": {
+    "feature_availability_matrix.json": {
+      "bytes": 52506,
+      "sha256": "1a4f59da3c6e1ef54ea5b73c431449cb05c62406ea8ed8367fa383fe8052b466"
+    },
+    "feature_source_register.json": {
+      "bytes": 19146,
+      "sha256": "831e7e6292c49be79c9a3c6e96a7e6623e911b8bdb91d2ee32f22fea77f54ac0"
+    },
+    "forecast_horizon_assessment.json": {
+      "bytes": 1286,
+      "sha256": "78a6e9492b39b563480c6328fdfa2069245187a9bb668cf196478279b069b996"
+    },
+    "hydrology_availability_review.json": {
+      "bytes": 17578,
+      "sha256": "c63e06f4bdbcf80158330bde0ae1e631e7bc98f9af4307fa0f17c4c4df7eec42"
+    },
+    "label_readiness_review.json": {
+      "bytes": 1242,
+      "sha256": "717b4a84e5103774857b9bdf3c990bdad2b4c70692d22878a994128194dd2a29"
+    },
+    "leakage_register.json": {
+      "bytes": 18986,
+      "sha256": "f42d7add30ba968a24cda58436694f77e5030f46edcbd9a398cddf83e6fb8a97"
+    },
+    "ml_readiness_decision.json": {
+      "bytes": 627,
+      "sha256": "5e22fa33cab9d0def1335ecb2f756f56e7525052cf2485c9ab1bf9928d739a36"
+    },
+    "prediction_target_definition.json": {
+      "bytes": 1602,
+      "sha256": "34338ecee1aecba0f58535914e140e11f54724cee462bcabcccd8b5f1b857eb6"
+    },
+    "rainfall_availability_review.json": {
+      "bytes": 18568,
+      "sha256": "b8ba4ab8f2f55f633c287abf4bf1c1c095aba26d974c214d03489f5ce6b6e35f"
+    },
+    "safe_feature_sets.json": {
+      "bytes": 2946,
+      "sha256": "4bf86a8f6bf3b0faebb646d7130335aa2e3c87abbe3bc7c97ceb45e8833ebe45"
+    },
+    "source_disagreements.json": {
+      "bytes": 917,
+      "sha256": "48a66fceebc8f512525cdaf9fec0adf3d250ba86bf35dd95876279cdb31538f5"
+    },
+    "stage5_summary.json": {
+      "bytes": 1148,
+      "sha256": "3626df461c202cf9a1bf3057d1b74e1c9f4b2217d68464cb62ce7877a8436415"
+    },
+    "static_feature_review.json": {
+      "bytes": 13888,
+      "sha256": "aa344b71cee848e95a83ff973ce56c55e40af65fe3d14e99b373bcd33a00abfd"
+    },
+    "training_serving_parity_matrix.json": {
+      "bytes": 35302,
+      "sha256": "2aadbcd8d839b6b9d2e72f13f5fb0d48594df61a1d463a4ec1ca2d109ce88381"
+    },
+    "unresolved_questions.json": {
+      "bytes": 1092,
+      "sha256": "83d472ef8029dd65528a6d930e130ccbeed7e6026e044658eafe5b302fbda885"
+    }
+  },
+  "horizons": {
+    "assessments": [
+      {
+        "asof_training": "2005\u20132010positivecontexts lackconfirmedissued-runarchives",
+        "candidate": "onecalendarforecastday withinrequestedseven-day span",
+        "hydrology": "Globalmodeldailyforecastleadexists;version/cell/timecriticaldeliverygates",
+        "labels": "GFDmaxextentcannotidentifydailyoccurrence/onset",
+        "trainable": false,
+        "weather": "Provider leadexists;currentapp3days/modelnotpinned"
+      },
+      {
+        "asof_training": "No retainedprediction-issuedcounterpart at fourpositiveanchors",
+        "candidate": "sevenforecastdays aspiration",
+        "hydrology": "Leadcapacitydoesnotprovelocalriskvalidity",
+        "labels": "No explicit7daytarget/classesorbalancedtrainingevidence",
+        "trainable": false,
+        "weather": "API7daycapabilityexists;doesnotdefineone7dayfloodoutcome"
+      }
+    ],
+    "intent": "Sevenforecastdays withsixhourupdates;daily leadwindow withinspan isplausible but floodtarget/issuancecalendar boundaries undefined",
+    "not_adopted": [
+      "current-risknowcast",
+      "6h",
+      "12h",
+      "48h",
+      "72h"
+    ],
+    "not_adopted_reason": "Not separately defined byexistingrequirements;no silentnewhorizon target",
+    "recommended_primary_horizon": null,
+    "status": "prediction_horizon_not_yet_trainable"
+  },
+  "inputs": [
+    {
+      "bytes": 75014,
+      "path": "QandA.md",
+      "sha256": "e8bf7b25d63962ab06a2cd82747ee6eb24f51c7221a2ca88fa85023e1879a15b"
+    },
+    {
+      "bytes": 10227,
+      "path": "README.md",
+      "sha256": "f6765ad0bf2756924939fdebd981ad1e8b71c15777209f404fe5addf92ba297c"
+    },
+    {
+      "bytes": 6197,
+      "path": "backend/app/weather.py",
+      "sha256": "ccbf2287dc55c5c5cc1ec87567d5ff71c8c2d20a645262fa01ce986fc2828f80"
+    },
+    {
+      "bytes": 10522,
+      "path": "data/processed/udupi_drainage_gis_v1/manifest.json",
+      "sha256": "4bb23e30248024be833298e5baada4915099d82513c038bc25b8e1d53e329eb4"
+    },
+    {
+      "bytes": 98988,
+      "path": "data/raw/reference/stage5_v1/chirps_catalogue.html",
+      "sha256": "72551445cba4eea00b1afcf09169eacfeba3e73ba3c022a7e267954c53ce7d6c"
+    },
+    {
+      "bytes": 697,
+      "path": "data/raw/reference/stage5_v1/chirps_catalogue.html.json",
+      "sha256": "8ae111363ef7c270873970be11856d40e6813f5dce40a69d94cf9566065e51f6"
+    },
+    {
+      "bytes": 26608,
+      "path": "data/raw/reference/stage5_v1/chirps_faq.html",
+      "sha256": "a01655e1c4c8582f872217a5576b50800627c1db1721dfb13b5083b8a5ba3d4c"
+    },
+    {
+      "bytes": 603,
+      "path": "data/raw/reference/stage5_v1/chirps_faq.html.json",
+      "sha256": "18f68bf8a4b1507931d71d7955f2982366a5d1641bc280be566b08e1a883bbf1"
+    },
+    {
+      "bytes": 21264,
+      "path": "data/raw/reference/stage5_v1/chirps_producer.html",
+      "sha256": "b603421552b1a8e0ab2fb9373b6f8a463d4ea951d865ffcb4c15bbc5ef041811"
+    },
+    {
+      "bytes": 600,
+      "path": "data/raw/reference/stage5_v1/chirps_producer.html.json",
+      "sha256": "ae2d40c38f104e43a9ecfeb348ce0494a08e2d16486ad3f67ec403c7fe0af63d"
+    },
+    {
+      "bytes": 123046,
+      "path": "data/raw/reference/stage5_v1/dem_catalogue.html",
+      "sha256": "a3debfafa6a61b4f14e1ebd120a6fd5d45993d568dbafef7e0e2596640126ae4"
+    },
+    {
+      "bytes": 707,
+      "path": "data/raw/reference/stage5_v1/dem_catalogue.html.json",
+      "sha256": "175e2b54a2b985abe1b844c3d1733e07fc6ddd0adc2e9581c89d313b83c14189"
+    },
+    {
+      "bytes": 107776,
+      "path": "data/raw/reference/stage5_v1/gfd_catalogue.html",
+      "sha256": "68813ff856250e68679d211a4e9873fee12d353fe00fbb7ef44596b079c70c0e"
+    },
+    {
+      "bytes": 715,
+      "path": "data/raw/reference/stage5_v1/gfd_catalogue.html.json",
+      "sha256": "8f451859d506f5e81af2fe1a7b7f5167bab67c975aff1347770dc1466daf8aba"
+    },
+    {
+      "bytes": 70141,
+      "path": "data/raw/reference/stage5_v1/glofas_forcing.html",
+      "sha256": "04249530c7190c579aaa0850d22af3b6296b7b4808155b046f4990a5e0c2a3a0"
+    },
+    {
+      "bytes": 708,
+      "path": "data/raw/reference/stage5_v1/glofas_forcing.html.json",
+      "sha256": "cbda3ddf0919689999e299f9f82cd26b70e7de7f170df38226d0e72654724db0"
+    },
+    {
+      "bytes": 109767,
+      "path": "data/raw/reference/stage5_v1/glofas_forecast.html",
+      "sha256": "c4e125f4cc8ca0fbe70d00bc7b6675c1d9ff2b1ae693d251cb2a0f7838694b50"
+    },
+    {
+      "bytes": 689,
+      "path": "data/raw/reference/stage5_v1/glofas_forecast.html.json",
+      "sha256": "82e1b5de5fae80500ba3982a43fb494ccdb118105645f66319c662cf0f948a23"
+    },
+    {
+      "bytes": 95825,
+      "path": "data/raw/reference/stage5_v1/glofas_forecast_form.html",
+      "sha256": "b2f9968d00155a723629545b1f578cf326866c88e8faa68fb22d0688f7b2aa09"
+    },
+    {
+      "bytes": 693,
+      "path": "data/raw/reference/stage5_v1/glofas_forecast_form.html.json",
+      "sha256": "1e70c8614159c782db8c14b561d04b22b3ac1d39f8a1bdaf13415aaf8ac1f0d9"
+    },
+    {
+      "bytes": 111747,
+      "path": "data/raw/reference/stage5_v1/glofas_history.html",
+      "sha256": "e7ecce0bff256be55e53f78603fe98cd02319396fc4b41673517fdc1debfa5e1"
+    },
+    {
+      "bytes": 692,
+      "path": "data/raw/reference/stage5_v1/glofas_history.html.json",
+      "sha256": "2253544188f34f22e582406c9e7106f42b7c5d44ecf5eebe4558e776f9e8bd80"
+    },
+    {
+      "bytes": 107516,
+      "path": "data/raw/reference/stage5_v1/glofas_reforecast.html",
+      "sha256": "b2e4026d8e0bfd5f5e4857467757e0972b24bca0b666ed2b7cf4fbdcf72fa66b"
+    },
+    {
+      "bytes": 695,
+      "path": "data/raw/reference/stage5_v1/glofas_reforecast.html.json",
+      "sha256": "32577494ce506548e9d9e58fa8b85c7ed6c111f8ed54aa9c7c150378bf382a5e"
+    },
+    {
+      "bytes": 65724,
+      "path": "data/raw/reference/stage5_v1/glofas_v5_status.html",
+      "sha256": "7a481f1db8fd057150f8f7c0a060db76c0f9641d2c521c88292edb7fd22fb641"
+    },
+    {
+      "bytes": 770,
+      "path": "data/raw/reference/stage5_v1/glofas_v5_status.html.json",
+      "sha256": "94d01159cb405655031e89d112a53607074e18bb9867f5978f41039fd42a847f"
+    },
+    {
+      "bytes": 101631,
+      "path": "data/raw/reference/stage5_v1/jrc_catalogue.html",
+      "sha256": "1c76a936e956db968d2a01437f00b56c4021020823df175150c840b55504770c"
+    },
+    {
+      "bytes": 711,
+      "path": "data/raw/reference/stage5_v1/jrc_catalogue.html.json",
+      "sha256": "aa0925516ae81641afe393784a210c1bbfc0ff5acf906bd14bdb35da5dd7c32a"
+    },
+    {
+      "bytes": 531794,
+      "path": "data/raw/reference/stage5_v1/om_forecast.html",
+      "sha256": "759f4e4cfe52275f45aadb0f732ed8d3d3becec2a46289b83aaa5bcda67a098b"
+    },
+    {
+      "bytes": 591,
+      "path": "data/raw/reference/stage5_v1/om_forecast.html.json",
+      "sha256": "abae636465e0d5397b12e60b8948fe4440ec705db5204e90b80f5f83fa38356f"
+    },
+    {
+      "bytes": 489320,
+      "path": "data/raw/reference/stage5_v1/om_historical_forecast.html",
+      "sha256": "42e2a8e949e0eccff796ec64c62297712606e3f28431bbe302f7b12e78392c48"
+    },
+    {
+      "bytes": 650,
+      "path": "data/raw/reference/stage5_v1/om_historical_forecast.html.json",
+      "sha256": "53c4f1a9e5a33611968ccb4e6953bb612acc2a3980428d8bbdd87463b78ea39b"
+    },
+    {
+      "bytes": 356742,
+      "path": "data/raw/reference/stage5_v1/om_history.html",
+      "sha256": "44ec3b519619fbb57821f991f64aca8183ee2b75fb8b127b0f773201eadd65db"
+    },
+    {
+      "bytes": 636,
+      "path": "data/raw/reference/stage5_v1/om_history.html.json",
+      "sha256": "f24e4b9e0d2f1aab5194cfb270eb1caa49137092c6cd92ab44a77ec7360ec958"
+    },
+    {
+      "bytes": 585246,
+      "path": "data/raw/reference/stage5_v1/om_previous.html",
+      "sha256": "f555531589d16248eb5adb20fdb4518d5bad084cd9eeaf223738b585ffc312f3"
+    },
+    {
+      "bytes": 627,
+      "path": "data/raw/reference/stage5_v1/om_previous.html.json",
+      "sha256": "d82547bc64e3b3774e1629fe8f92977eb5cd9d50c388bd9fd6358a0733469224"
+    },
+    {
+      "bytes": 472753,
+      "path": "data/raw/reference/stage5_v1/om_single.html",
+      "sha256": "3a5a87143dc8872d3249622f0854d4bbf17db570ef436c4cbf8467d90b9cbc71"
+    },
+    {
+      "bytes": 621,
+      "path": "data/raw/reference/stage5_v1/om_single.html.json",
+      "sha256": "4ed3dec805d15421e9f13b49af6a84e510013d8d5e2e2de8ab4add44d62e1007"
+    },
+    {
+      "bytes": 37377,
+      "path": "data/raw/reference/stage5_v1/om_terms.html",
+      "sha256": "398a2ffce438b675897306988864a8eefeaf10a55bc86905b539451bfe396089"
+    },
+    {
+      "bytes": 589,
+      "path": "data/raw/reference/stage5_v1/om_terms.html.json",
+      "sha256": "e6ccf0080cb8cd9e834e34758f67eeb0d2f451af15b339454a93d2801514d437"
+    },
+    {
+      "bytes": 21314,
+      "path": "data/raw/reference/stage5_v1/osm_terms.html",
+      "sha256": "94e3bddb854bd98c735ce0bd6908ad75264504e447f8c8e2cc613b42dd511043"
+    },
+    {
+      "bytes": 606,
+      "path": "data/raw/reference/stage5_v1/osm_terms.html.json",
+      "sha256": "0b3142b66e80f6147082d900fa7f505e1caa5070494b481b85b6809064895d21"
+    },
+    {
+      "bytes": 709,
+      "path": "data/raw/reference/stage5_v1/research_scope.json",
+      "sha256": "b25d4cdfbb02eedb1328893fb122a8d432e09b7e17025b177d88cc344051eb4c"
+    },
+    {
+      "bytes": 11463,
+      "path": "data/raw/reference/stage5_v1/review_findings.json",
+      "sha256": "0ec6bc505e1c0811f23aa453ba1507e3e314c1a8379a60714d316456e652101b"
+    },
+    {
+      "bytes": 95517,
+      "path": "data/raw/reference/stage5_v1/worldcover_catalogue.html",
+      "sha256": "17d2e8f3ad3d1aabba57953a001bfe055af39f95ce42a73e7bc5a59e60c95afa"
+    },
+    {
+      "bytes": 697,
+      "path": "data/raw/reference/stage5_v1/worldcover_catalogue.html.json",
+      "sha256": "330c9c4f1fe7deb725e5e1c7ea693c23675c1a91ca13bc826b88f1624d07e194"
+    },
+    {
+      "bytes": 4965,
+      "path": "data/reference/karnataka_identity_policy_20261005_v1/publication_policy.json",
+      "sha256": "05838ce0787e921d4f99c9dba745a8a999596c06b0d79d0fda9be42fb8266c36"
+    },
+    {
+      "bytes": 9841,
+      "path": "data/working/belagavi_2021_incidence_audit_v1/manifest.json",
+      "sha256": "3cd9490d59955c34fd0a2b57f0d1cb241740b428fdd5038fd29948620805f941"
+    },
+    {
+      "bytes": 66668,
+      "path": "data/working/karnataka_chirps_soi2025_2025_v1/manifest.json",
+      "sha256": "b4753f713b707ba0a7cba067a99a2acc5bf720ede7436d07b56f3f6688011df7"
+    },
+    {
+      "bytes": 21166,
+      "path": "data/working/karnataka_event_comparison_v1/evidence.json",
+      "sha256": "d924d7435aff3629ff19e1c3310730eebbabe94e4b351594b89a8abe8d2cc7fa"
+    },
+    {
+      "bytes": 421081,
+      "path": "data/working/karnataka_event_comparison_v1/manifest.json",
+      "sha256": "0698d13f9ec403261c9f40f9a93786537ced6f134f36acee9476cc1c5a7f71bd"
+    },
+    {
+      "bytes": 9083,
+      "path": "data/working/karnataka_external_hydrology_closure_v1/manifest.json",
+      "sha256": "d1f1262d2b0e8d85c2698fa5a668c05bc67641ac22f84e6f6645866f8db7ea21"
+    },
+    {
+      "bytes": 9477,
+      "path": "data/working/karnataka_glofas_2019_pilot_v1/manifest.json",
+      "sha256": "8ab83036518a89dbb14d8aae8147dd499f3e34636c92ccbdc2636db285700afd"
+    },
+    {
+      "bytes": 883036,
+      "path": "data/working/karnataka_positive_event_rainfall_v1/manifest.json",
+      "sha256": "9a90be720fbde859b673261e41ffda61f2a07cbb9c45397834d5119567e7d8f7"
+    },
+    {
+      "bytes": 15173,
+      "path": "data/working/karnataka_sentinel1_flood_pilot_v2/manifest.json",
+      "sha256": "33f0ea0e8412435141ad220e6deb49fdc133cfcff2ed4e0900385ab247272941"
+    },
+    {
+      "bytes": 9481,
+      "path": "docs/COMPARISON_EVIDENCE_METHOD.md",
+      "sha256": "b0840cf391629d6b0aa2c8662c0b72813613a12fa5e3dd6fac1a613d437762da"
+    },
+    {
+      "bytes": 9096,
+      "path": "docs/EXTERNAL_HYDROLOGY_CLOSURE_METHOD.md",
+      "sha256": "d4bbc616b7c3c504a0ea577955fdd0c54d321905789b847bd8fc70d7652cf715"
+    },
+    {
+      "bytes": 6655,
+      "path": "docs/GLOFAS_PILOT_METHOD.md",
+      "sha256": "fc0dd2b508b31f39582b9c918ba01885b91e91b1ce2eae8166aad7e77b0888a3"
+    }
+  ],
+  "local_manifest_sha256": "ace383ceb53ae3a33f2f1848b4a7aee8fbbc0660dc335c7d8218c1220f85b16a",
+  "processing_code": {
+    "bytes": 43825,
+    "path": "scripts/review_prediction_availability.py",
+    "sha256": "f3fb307c558fb83bb68a2144b0980644032f245cb3a73501bbe29860cbf2ef1f"
+  },
+  "publication": "Permittedownmethodology/sourceIDs/URLs/checksums/counts only;sourcebinaries/restrictedtables/geometrystaylocal",
+  "readiness": {
+    "FEATURE_READINESS": "LIMITED",
+    "LABEL_READINESS": "NOT_READY",
+    "LICENCE_DEPLOYMENT_READINESS": "UNRESOLVED",
+    "SAMPLE_SIZE_READINESS": "NOT_READY",
+    "TEMPORAL_ALIGNMENT_READINESS": "NOT_READY",
+    "TRAINING_SERVING_PARITY": "NOT_READY",
+    "frozen_training_dataset_allowed": false,
+    "methodology_review_complete": true,
+    "model_training_allowed": false,
+    "next_stage": "Stage5A bounded operational-source/as-of archive validation and explicit target protocol, plus independently dated flood-positive/comparison evidence development. No model fitting or fabricated negatives.",
+    "status": "ml_training_not_ready"
+  },
+  "safe_sets": {
+    "asof_schema": [
+      "issued_at",
+      "initialized_at",
+      "available_at",
+      "retrieved_at",
+      "valid_interval_start",
+      "valid_interval_end",
+      "product_version",
+      "model_version",
+      "ensemble_member",
+      "geometry_version",
+      "units",
+      "mask_quality",
+      "first_available_evidence"
+    ],
+    "clock_rules": "UTCinstantspluslocalcalendarintervalswithoffset;retrieval!=initialization/publication/observation. Keeprequested versusactualsourcecoordinates/resolution. Current-day totals are not priorcomplete24h rainfall.",
+    "dimensions": {
+      "FEATURE_READINESS": "LIMITED",
+      "LABEL_READINESS": "NOT_READY",
+      "LICENCE_DEPLOYMENT_READINESS": "UNRESOLVED",
+      "SAMPLE_SIZE_READINESS": "NOT_READY",
+      "TEMPORAL_ALIGNMENT_READINESS": "NOT_READY",
+      "TRAINING_SERVING_PARITY": "NOT_READY",
+      "frozen_training_dataset_allowed": false,
+      "methodology_review_complete": true,
+      "model_training_allowed": false,
+      "next_stage": "Stage5A bounded operational-source/as-of archive validation and explicit target protocol, plus independently dated flood-positive/comparison evidence development. No model fitting or fabricated negatives.",
+      "status": "ml_training_not_ready"
+    },
+    "future_join_rule": "Joinbyreviewedscope/compatibleintervalandproductversion,notjustdate/stringstationname. Stationcatchments/districts/localitiesdiffer; includeupstreambeyondKarnataka infutureprotocol.",
+    "no_operational_substitution": "Reanalysis/Final/hindcasts mayserve researchonly unless separateas-of/causalinitialization/productdistribution validation;neverreplace measured gaps.",
+    "safe_now_scope": "ThreeexistingdatedUdupi staticresearchlayersonly,currentcontext. No safe supervised floodfeature setexists yet;all allowed_for_training false.",
+    "safe_sets": {
+      "PROHIBITED": [
+        "event_rainfall",
+        "gokak_discharge",
+        "water_level_threshold",
+        "cwc_model_skill",
+        "future_discharge_peak",
+        "invented_drain_capacity",
+        "gfd_extent",
+        "reported_ifi_event",
+        "post_event_sar",
+        "observed_zero",
+        "missing_as_negative"
+      ],
+      "RESEARCH_ONLY": [
+        "chirps_final_daily",
+        "antecedent_rainfall",
+        "om_reanalysis_precip",
+        "om_seamless_archive",
+        "sadalga_glofas_history",
+        "huvinhedgi_glofas_history",
+        "glofas_reforecast",
+        "cwc_daily_discharge",
+        "cwc_hourly_level",
+        "soi_district_geometry",
+        "osm_drain_context",
+        "jrc_history"
+      ],
+      "SAFE_AFTER_VALIDATION": [
+        "om_ifs_history",
+        "om_current_precip",
+        "om_forecast_precip",
+        "om_current_temperature_humidity",
+        "om_forecast_temperature",
+        "om_previous_runs",
+        "om_single_runs",
+        "glofas_intermediate",
+        "glofas_ensemble_forecast",
+        "v5_upstream_network",
+        "public_review_boundary"
+      ],
+      "SAFE_NOW": [
+        "surface_elevation",
+        "surface_slope",
+        "landcover_2021"
+      ]
+    }
+  },
+  "source_disagreements": [
+    {
+      "decision": "operational_v5_forecast_parity_unresolved",
+      "finding": "Currenthistoricalcataloguecallsv5operational;July2026notecallsv5preoperational/v4operational;forecastcataloguelistsv4. No sourcepreference orversionmixing.",
+      "sources": [
+        "glofas_history",
+        "glofas_v5_status",
+        "glofas_forecast"
+      ]
+    },
+    {
+      "decision": "Do notassignallhorizons tooneproduct",
+      "finding": "Currentmedium15day/subseasonal46dayproductsversusEWDSlegacy30dayarchiveare distinct;first15daysrelatedbutdelivery/versionmustbeverified",
+      "sources": [
+        "glofas_forcing",
+        "glofas_forecast"
+      ]
+    },
+    {
+      "decision": "No EXACTrainfalltraining-servingparity established",
+      "finding": "ERA5/IFSanalysis,stitchedforecasts,fixedleadarchivesandpinnedrunsdiffer evenwhenformatsmatch",
+      "sources": [
+        "om_history",
+        "om_historical_forecast",
+        "om_single"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "bytes": 26608,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "chirps_faq",
+      "path": "data/raw/reference/stage5_v1/chirps_faq.html",
+      "publisher": "UCSB Climate Hazards Center",
+      "retrieved_at": "2026-10-07T18:32:20.284586+00:00",
+      "section": "Latency section",
+      "sha256": "a01655e1c4c8582f872217a5576b50800627c1db1721dfb13b5083b8a5ba3d4c",
+      "title": "CHIRPS2 FAQ",
+      "url": "https://wiki.chc.ucsb.edu/CHIRPS2_FAQ",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "CHIRPS2; page version not stated"
+    },
+    {
+      "bytes": 21264,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "chirps_producer",
+      "path": "data/raw/reference/stage5_v1/chirps_producer.html",
+      "publisher": "UCSB Climate Hazards Center",
+      "retrieved_at": "2026-10-07T18:32:23.780792+00:00",
+      "section": "v2 background and retirement notice",
+      "sha256": "b603421552b1a8e0ab2fb9373b6f8a463d4ea951d865ffcb4c15bbc5ef041811",
+      "title": "CHIRPS v2 product description",
+      "url": "https://chc.ucsb.edu/data/chirps/",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "CHIRPSv2/current transition notice"
+    },
+    {
+      "bytes": 98988,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "chirps_catalogue",
+      "path": "data/raw/reference/stage5_v1/chirps_catalogue.html",
+      "publisher": "Google Earth Engine; producerCHC",
+      "retrieved_at": "2026-10-07T18:32:29.251250+00:00",
+      "section": "Dataset description, bands, terms",
+      "sha256": "72551445cba4eea00b1afcf09169eacfeba3e73ba3c022a7e267954c53ce7d6c",
+      "title": "CHIRPS Daily v2 Final Earth Engine catalogue",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "v2 Final"
+    },
+    {
+      "bytes": 531794,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_forecast",
+      "path": "data/raw/reference/stage5_v1/om_forecast.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:33.646955+00:00",
+      "section": "API parameters/current/hourly/daily/model tables",
+      "sha256": "759f4e4cfe52275f45aadb0f732ed8d3d3becec2a46289b83aaa5bcda67a098b",
+      "title": "Open-Meteo Weather Forecast API",
+      "url": "https://open-meteo.com/en/docs",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 356742,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_history",
+      "path": "data/raw/reference/stage5_v1/om_history.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:36.060141+00:00",
+      "section": "Dataset table and precipitation availability",
+      "sha256": "44ec3b519619fbb57821f991f64aca8183ee2b75fb8b127b0f773201eadd65db",
+      "title": "Open-Meteo Historical Weather API",
+      "url": "https://open-meteo.com/en/docs/historical-weather-api",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 489320,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_historical_forecast",
+      "path": "data/raw/reference/stage5_v1/om_historical_forecast.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:37.528086+00:00",
+      "section": "Which Historical Weather Data to Use",
+      "sha256": "42e2a8e949e0eccff796ec64c62297712606e3f28431bbe302f7b12e78392c48",
+      "title": "Open-Meteo Historical Forecast API",
+      "url": "https://open-meteo.com/en/docs/historical-forecast-api",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 585246,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_previous",
+      "path": "data/raw/reference/stage5_v1/om_previous.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:38.727236+00:00",
+      "section": "Data availability and offsets",
+      "sha256": "f555531589d16248eb5adb20fdb4518d5bad084cd9eeaf223738b585ffc312f3",
+      "title": "Open-Meteo Previous Model Runs API",
+      "url": "https://open-meteo.com/en/docs/previous-runs-api",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 472753,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_single",
+      "path": "data/raw/reference/stage5_v1/om_single.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:39.894216+00:00",
+      "section": "Provider table/run parameter",
+      "sha256": "3a5a87143dc8872d3249622f0854d4bbf17db570ef436c4cbf8467d90b9cbc71",
+      "title": "Open-Meteo Single Runs API",
+      "url": "https://open-meteo.com/en/docs/single-runs-api",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 37377,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "om_terms",
+      "path": "data/raw/reference/stage5_v1/om_terms.html",
+      "publisher": "Open-Meteo",
+      "retrieved_at": "2026-10-07T18:32:40.551154+00:00",
+      "section": "Non-commercial use and warranties",
+      "sha256": "398a2ffce438b675897306988864a8eefeaf10a55bc86905b539451bfe396089",
+      "title": "Open-Meteo Terms and Privacy",
+      "url": "https://open-meteo.com/en/terms",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Current terms;version date not stated"
+    },
+    {
+      "bytes": 111747,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_history",
+      "path": "data/raw/reference/stage5_v1/glofas_history.html",
+      "publisher": "Copernicus CEMS/ECMWF/JRC",
+      "retrieved_at": "2026-10-07T18:32:42.968582+00:00",
+      "section": "Description/data versions/update",
+      "sha256": "e7ecce0bff256be55e53f78603fe98cd02319396fc4b41673517fdc1debfa5e1",
+      "title": "GloFAS historical EWDS catalogue",
+      "url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-historical?tab=overview",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Catalogue update2026-10-07;v5/v4"
+    },
+    {
+      "bytes": 109767,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_forecast",
+      "path": "data/raw/reference/stage5_v1/glofas_forecast.html",
+      "publisher": "Copernicus CEMS/ECMWF/JRC",
+      "retrieved_at": "2026-10-07T18:32:44.412779+00:00",
+      "section": "Description/versions/time coverage",
+      "sha256": "c4e125f4cc8ca0fbe70d00bc7b6675c1d9ff2b1ae693d251cb2a0f7838694b50",
+      "title": "GloFAS forecasts EWDS catalogue",
+      "url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-forecast?tab=overview",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Catalogue update2026-10-07;listedv4.0"
+    },
+    {
+      "bytes": 95825,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_forecast_form",
+      "path": "data/raw/reference/stage5_v1/glofas_forecast_form.html",
+      "publisher": "Copernicus CEMS/ECMWF/JRC",
+      "retrieved_at": "2026-10-07T18:32:45.830169+00:00",
+      "section": "Download resource",
+      "sha256": "b2f9968d00155a723629545b1f578cf326866c88e8faa68fb22d0688f7b2aa09",
+      "title": "GloFAS forecasts EWDS download page",
+      "url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-forecast?tab=download",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Live form retrieved2026-10-08"
+    },
+    {
+      "bytes": 107516,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_reforecast",
+      "path": "data/raw/reference/stage5_v1/glofas_reforecast.html",
+      "publisher": "Copernicus CEMS/ECMWF/JRC",
+      "retrieved_at": "2026-10-07T18:32:47.354753+00:00",
+      "section": "Definition/temporal coverage",
+      "sha256": "b2e4026d8e0bfd5f5e4857467757e0972b24bca0b666ed2b7cf4fbdcf72fa66b",
+      "title": "GloFAS reforecasts EWDS catalogue",
+      "url": "https://ewds.climate.copernicus.eu/datasets/cems-glofas-reforecast?tab=overview",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Listedv4.0;catalogue update2025-04-02"
+    },
+    {
+      "bytes": 65724,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_v5_status",
+      "path": "data/raw/reference/stage5_v1/glofas_v5_status.html",
+      "publisher": "ECMWF/CEMS",
+      "retrieved_at": "2026-10-07T18:32:50.017111+00:00",
+      "section": "v4 operational/v5 testing note",
+      "sha256": "7a481f1db8fd057150f8f7c0a060db76c0f9641d2c521c88292edb7fd22fb641",
+      "title": "Changes to EWDS API Request for GloFAS Historical",
+      "url": "https://confluence.ecmwf.int/spaces/CEMS/pages/699325478/Changes+to+the+EWDS+API+Request+to+download+GloFAS+Historical",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "29July2026"
+    },
+    {
+      "bytes": 70141,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "glofas_forcing",
+      "path": "data/raw/reference/stage5_v1/glofas_forcing.html",
+      "publisher": "ECMWF/CEMS",
+      "retrieved_at": "2026-10-07T18:32:51.656003+00:00",
+      "section": "Medium range/subseasonal/seasonal/legacy30day",
+      "sha256": "04249530c7190c579aaa0850d22af3b6296b7b4808155b046f4990a5e0c2a3a0",
+      "title": "GloFAS meteorological forecasts",
+      "url": "https://confluence.ecmwf.int/spaces/CEMS/pages/265028598/GloFAS+meteorological+forecasts",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Current documentation retrieved2026-10-08"
+    },
+    {
+      "bytes": 123046,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "dem_catalogue",
+      "path": "data/raw/reference/stage5_v1/dem_catalogue.html",
+      "publisher": "Copernicus;Google Earth Engine",
+      "retrieved_at": "2026-10-07T18:32:53.152034+00:00",
+      "section": "Description/terms/datum",
+      "sha256": "a3debfafa6a61b4f14e1ebd120a6fd5d45993d568dbafef7e0e2596640126ae4",
+      "title": "Copernicus DEM GLO30 2024_1 catalogue",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/COPERNICUS_DEM_GLO30_2024_1",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "2024_1;acquisitions2010\u20132020"
+    },
+    {
+      "bytes": 95517,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "worldcover_catalogue",
+      "path": "data/raw/reference/stage5_v1/worldcover_catalogue.html",
+      "publisher": "ESA WorldCover;Google Earth Engine",
+      "retrieved_at": "2026-10-07T18:32:54.714668+00:00",
+      "section": "Description/terms",
+      "sha256": "17d2e8f3ad3d1aabba57953a001bfe055af39f95ce42a73e7bc5a59e60c95afa",
+      "title": "ESA WorldCover10m v200 catalogue",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/ESA_WorldCover_v200",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "2021v200;citation2022"
+    },
+    {
+      "bytes": 107776,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "gfd_catalogue",
+      "path": "data/raw/reference/stage5_v1/gfd_catalogue.html",
+      "publisher": "Cloud to Street/DFO;Google Earth Engine",
+      "retrieved_at": "2026-10-07T18:32:56.647293+00:00",
+      "section": "Description/bands/terms",
+      "sha256": "68813ff856250e68679d211a4e9873fee12d353fe00fbb7ef44596b079c70c0e",
+      "title": "Global Flood Database V1 catalogue",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "V1published2021;events2000\u20132018"
+    },
+    {
+      "bytes": 101631,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "jrc_catalogue",
+      "path": "data/raw/reference/stage5_v1/jrc_catalogue.html",
+      "publisher": "ECJRC;Google Earth Engine",
+      "retrieved_at": "2026-10-07T18:32:59.113966+00:00",
+      "section": "Description/terms",
+      "sha256": "1c76a936e956db968d2a01437f00b56c4021020823df175150c840b55504770c",
+      "title": "JRC Global Surface Water v1.4 catalogue",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/JRC_GSW1_4_GlobalSurfaceWater",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "v1.4;1984\u20132021"
+    },
+    {
+      "bytes": 21314,
+      "confidence": "high for documented product meaning; historical record-level release times and service parity unverified",
+      "id": "osm_terms",
+      "path": "data/raw/reference/stage5_v1/osm_terms.html",
+      "publisher": "OpenStreetMap contributors/Foundation",
+      "retrieved_at": "2026-10-07T18:33:03.694193+00:00",
+      "section": "Attribution/ODbL",
+      "sha256": "94e3bddb854bd98c735ce0bd6908ad75264504e447f8c8e2cc613b42dd511043",
+      "title": "OpenStreetMap Copyright and Licence",
+      "url": "https://www.openstreetmap.org/copyright",
+      "verification": "live_document_retrieved; no source observations retrieved",
+      "version": "Current policy;version date not stated"
+    }
+  ],
+  "summary": {
+    "approved_training_features": 0,
+    "candidate_count": 37,
+    "category_counts": {
+      "DESCRIPTIVE_ONLY": 2,
+      "EXCLUDED": 4,
+      "FORECAST": 5,
+      "MODELLED_PAST": 4,
+      "OBSERVED_PAST": 0,
+      "RETROSPECTIVE_ONLY": 8,
+      "STATIC": 6,
+      "TARGET_OR_LABEL": 5,
+      "UNRESOLVED": 3
+    },
+    "context_only_deployable_layers": 3,
+    "documentation_sources": 20,
+    "existing_positive_scopes": {
+      "2728": 33,
+      "2758": 329,
+      "3551": 23,
+      "3652": 2
+    },
+    "features_calculated": 0,
+    "horizon_status": "prediction_horizon_not_yet_trainable",
+    "methodology_review_complete": true,
+    "models_trained": 0,
+    "observations_extracted": 0,
+    "protected_hydrology_counts": {
+      "preserved_comparison_cases": 81,
+      "preserved_disagreements": 33,
+      "preserved_eligible_rows": 14,
+      "preserved_measured_rows": 1697
+    },
+    "quantitative_hydrology_comparisons": 0,
+    "safe_set_counts": {
+      "PROHIBITED": 11,
+      "RESEARCH_ONLY": 12,
+      "SAFE_AFTER_VALIDATION": 11,
+      "SAFE_NOW": 3
+    },
+    "selected_primary_horizon": null,
+    "stage": "5",
+    "status": "ml_training_not_ready",
+    "supervised_labels": 0,
+    "verified_negative_targets": 0
+  },
+  "target": {
+    "definition_gaps": [
+      "Riskclasses lackverified occurrence/impact/severitytargetandthresholds",
+      "Dailyonset/timewindow notobserved byGFDmaximumextent",
+      "No approveddistrict/locality correspondence orarea/timeaggregationrule"
+    ],
+    "geographic_unit": "Mixed31districtsandlocalityrefinementaspiration;no verified locality training unit",
+    "horizon_status": "prediction_horizon_not_yet_trainable",
+    "inconsistencies": [
+      "OriginalQandA obsoleteDoneclaims/proxylabels/seasonalsyntheticallocation conflict withcurrentread-onlyresearchREADME",
+      "Original3minuteTTLfreshnessdoesnotrepresentupstream6h/daily/monthlyproductlatency",
+      "Localitycentroid/disaggregation/drainagescore assumptions lackverifiedmeasurements",
+      "CurrentadapterfixedBengaluru3dayforecast,not31district169locality7dayriskservice"
+    ],
+    "intended_question": "What is district/locality flood risk over each of the next seven forecast days?",
+    "no_silent_target_choice": true,
+    "requested_forecast_span": "7dailyweatherforecastdays fromFR3;not a defined7dayfloodprobability",
+    "requested_outputs": [
+      "Low",
+      "Medium",
+      "High"
+    ],
+    "requested_update_frequency": "6hours fromFR5;not currentlyimplemented",
+    "selected_primary_horizon": null,
+    "source_sections": [
+      "QandA\u00a76FR1\u2013FR5",
+      "QandA\u00a77NFR7",
+      "QandA\u00a78/9assumptions/constraints",
+      "README sources/limitations"
+    ],
+    "status": "intended_product_known_operational_target_not_defined",
+    "supported_present_target": "Exploratoryevent-windowspatialpositiveevidenceonly;no daily flood/riskprobability target"
+  },
+  "version": "karnataka_prediction_methodology_v1"
+}

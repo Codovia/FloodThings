@@ -1,0 +1,86 @@
+{
+  "bounded_current_browser_checks": [
+    {
+      "finding": "Browser fetch failed/timeouts; retained pinned resource metadata used; not evidence source lacks documentation",
+      "url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42"
+    },
+    {
+      "finding": "Browser text exposes CSV/Other(Open); no detailed clock, datum or record QC dictionary established in this bounded review",
+      "url": "https://nwdp.nwic.gov.in/dataset/river-discharge-manual-dailly-central-water-commission-cwc/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3"
+    },
+    {
+      "finding": "Browser HTTP401; current delivery contact not verified",
+      "url": "https://cwc.gov.in/en/node/37619"
+    }
+  ],
+  "browser_receipt_limits": "No local response-body SHA asserted for browser text. Original local documents are independently hashed. Review on12October2026; live currency not claimed for dated policy/SOP.",
+  "native_field_findings": {
+    "datum_and_auxiliary_field_conversion": "UNRESOLVED_NO_OFFSET",
+    "discharge_units": "m3/sec in field header",
+    "method_record_flags": "ABSENT",
+    "native_format": "DD-MM-YYYY HH:MM",
+    "original_values_and_conflicts": "PRESERVED_PRIVATE_ALL_VARIANTS",
+    "record_QC_columns": [],
+    "selected_date_only_rows": 0,
+    "selected_invalid_timestamps": 0,
+    "selected_rows_with_minute_precision": 87526,
+    "stage_units": "meter in field header",
+    "time_field": "Data Acquisition Time",
+    "timestamp_role": "UNKNOWN",
+    "timezone": "UNDOCUMENTED"
+  },
+  "phase": "12G",
+  "request_review": {
+    "all_main_unresolved_categories_present": true,
+    "current_role_address_requires_reconfirmation": true,
+    "dispatches": 0,
+    "final_refinements": [
+      "exact dataset/resource IDs and fields",
+      "native mixed-clock structure",
+      "station-specific conflict counts",
+      "sparse2004/2012 source origin",
+      "full2013\u20132020 calendar clarification coverage"
+    ],
+    "previous_request": "docs/phase12f/CWC_STATION_DATA_REQUEST.md"
+  },
+  "rights": "Retained Other(Open) is not a standard licence; detailed CWC records/government geometry remain local. Only authored code/docs and aggregate diagnostics published.",
+  "source_reviews": [
+    {
+      "bytes": 6912793,
+      "current_browser_source_readable": true,
+      "local_visual_review_pages": [
+        3
+      ],
+      "new_local_download": false,
+      "original_redistributed": false,
+      "pdf_pages_one_based": [
+        3,
+        5,
+        7
+      ],
+      "retained_path": "data/raw/reference/stage4a_v1/cwc_hddp2018.pdf",
+      "review": "GENERAL seasonal stage frequency; unclassified-data route; not exact NWDP field dictionary",
+      "sha256": "16cecaf2c81fb6aa61879b39d96addd5ee4b39d0058e0ee249a6abeab6a64016",
+      "source": "CWC dissemination policy2018",
+      "url": "https://www.cwc.gov.in/sites/default/files/hddp2018_0.pdf"
+    },
+    {
+      "bytes": 4497148,
+      "current_browser_source_readable": true,
+      "local_visual_review_pages": [
+        38
+      ],
+      "new_local_download": false,
+      "original_redistributed": false,
+      "pdf_pages_one_based": [
+        23,
+        38
+      ],
+      "retained_path": "data/raw/reference/stage4a_v1/cwc_sop_april2025.pdf",
+      "review": "Official stage warning/danger columns and monitoring entries; historical datum/effective compatibility unresolved",
+      "sha256": "3d13601ef577c24f3e2d8688977f3d92447f349ffc45abcd1b04adb76d9ab5f4",
+      "source": "CWC SOP April2025",
+      "url": "https://cwc.gov.in/sites/default/files/sopapril2025.pdf"
+    }
+  ]
+}

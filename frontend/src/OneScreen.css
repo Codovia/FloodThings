@@ -1,0 +1,479 @@
+/* One-screen rule (20 Oct 2026): on laptops (16:9, e.g. 1508x761 page area) and phones, the app fills
+   exactly the viewport and nothing scrolls. Content that does not fit is split into tabs, steps or pages. */
+html,body{height:100%;overflow:hidden}
+#root,#root:has(:is(.page-report,.page-admin,.page-alerts,.page-how-it-works)){height:100dvh;min-height:0;display:flex;flex-direction:column;overflow:hidden}
+.app-header{flex-shrink:0;position:relative;z-index:1100}
+.header-inner{padding:8px 20px;gap:12px}
+.brand-mark{width:36px;height:38px;border-radius:11px}
+.brand-mark svg{width:24px;height:24px}
+.app-brand strong{font-size:21px}
+.app-brand small{margin-top:1px}
+main.app-content,main.app-content:is(.page-report,.page-admin,.page-alerts,.page-how-it-works){flex:1 1 auto;min-height:0;overflow:hidden;display:flex;flex-direction:column;width:100%;max-width:none;margin:0;padding:8px 16px}
+main.app-content>*{min-height:0}
+/* Page titles stay for screen readers and focus; the highlighted menu item names the page visually. */
+.page-intro{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0 0 0 0)!important;white-space:nowrap!important;border:0!important}
+.app-footer{flex-shrink:0;display:block;margin:0;padding:3px 16px;font-size:11px;line-height:1.35;background:#e9f0f9;border-top:1px solid #d4e1ef;color:#435d79}
+.app-footer p{margin:0}.app-footer strong{font-size:inherit;color:#1c416c}
+
+/* Shared tabs / steps (ScreenTabs.jsx). */
+.screen-tabs{display:flex;gap:4px;flex-shrink:0;margin:0 0 8px;padding:3px;background:#e8eef4;border-radius:10px;overflow:hidden}
+.screen-tabs button{flex:1 1 auto;min-width:0;min-height:40px;margin:0;padding:6px 8px;border:0;border-radius:8px;background:transparent;color:#29445f;font-size:13px;font-weight:600;box-shadow:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.screen-tabs button[aria-selected=true]{background:#fff;color:#0f4f63;box-shadow:0 1px 3px rgba(20,50,80,.2)}
+.screen-panel{min-height:0;flex:1 1 auto;display:flex;flex-direction:column}
+.screen-panel[hidden]{display:none!important}
+.pager{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;margin-top:6px;font-size:12px}
+.pager button{min-height:36px;margin:0;padding:6px 12px;font-size:12px}
+
+@media (max-width:1099px){
+ .header-inner{flex-wrap:nowrap;padding:6px 12px}
+ .app-brand small{display:none}
+ .brand-mark{width:32px;height:34px}
+ .app-brand strong{font-size:19px}
+ .nav-toggle{min-height:40px;padding:6px 12px}
+ /* The phone menu overlays the page instead of pushing it down. */
+ .primary-nav.expanded{position:absolute;top:100%;left:0;right:0;background:#fff;padding:6px 12px 12px;box-shadow:0 8px 20px rgba(15,40,70,.18);border-bottom:1px solid #dce6f1}
+ main.app-content,main.app-content:is(.page-report,.page-admin,.page-alerts,.page-how-it-works){padding:6px 10px}
+ .app-footer{font-size:10px;padding:2px 10px}
+}
+.screen-tabs-wrap{display:flex;flex-direction:column;flex:1 1 auto;min-height:0}
+
+/* Popup.jsx: details open in a dialog sized to the screen instead of growing the page. */
+.popup-backdrop{position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:12px;background:rgba(10,30,45,.45)}
+.popup{display:flex;flex-direction:column;width:min(780px,100%);max-height:100%;overflow:hidden;padding:12px 16px;border-radius:12px;background:#fff;box-shadow:0 10px 40px rgba(10,30,45,.35)}
+.popup:focus{outline:3px solid #087f83;outline-offset:2px}
+.popup-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0;margin-bottom:6px}
+.popup-head h3{margin:0;font-size:1.05rem}
+.popup-head button{min-height:36px;margin:0;padding:6px 14px}
+.popup-body{display:flex;flex-direction:column;min-height:0;flex:1 1 auto;font-size:.85rem;line-height:1.45}
+.popup-body p{margin:4px 0}
+.risk-why-popup{width:min(900px,100%)}
+.risk-why-body{display:flex;flex-direction:column;min-height:0;flex:1}
+.risk-why-body .risk-factors table{font-size:.8rem}
+.risk-why-body .risk-factors th small{display:block;font-weight:400;font-size:.72rem;line-height:1.3;color:#4b5f5a}
+.risk-why-body .risk-factors :is(th,td){padding:3px 6px}
+.risk-why-body .risk-factors h4{margin:2px 0 4px;font-size:.9rem}
+.risk-why button.link-button{text-align:left}
+
+/* Place search opens as a panel over the page (all pages that use it), never pushing content down. */
+.location-directory .directory-content{position:fixed;z-index:2900;top:50%;left:50%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 20px));max-height:calc(100dvh - 20px);overflow:hidden;display:flex;flex-direction:column;gap:4px;padding:12px 14px;background:#fff;border:1px solid #7897a5;border-radius:12px;box-shadow:0 12px 40px rgba(10,30,45,.35);text-align:left}
+.location-directory .directory-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.location-directory .directory-head h3{margin:0;font-size:1rem}
+.location-directory .directory-head button{min-height:36px;margin:0;padding:6px 14px}
+.location-directory .directory-content label{margin:.4rem 0 .2rem}
+.location-directory .directory-content :is(input,select){padding:.5rem;max-width:none}
+.location-directory .directory-content p{margin:2px 0;font-size:.8rem}
+.location-directory .directory-content ul{margin:2px 0;gap:4px}
+.location-directory .directory-content li button{min-height:36px;padding:6px 10px;font-size:.82rem;margin:0}
+.location-directory .place-provenance{font-size:.7rem!important}
+.footer-short,.label-short{display:none}
+@media (max-width:1099px){
+ .footer-long,.label-long{display:none}
+ .footer-short,.label-short{display:inline}
+ /* Home on phones: temperature and rain on one line; risk spots in two lines. */
+ .page-home .home-weather-line{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 10px}
+ .page-home .home-weather-line>p:not(.home-rain):not([role=alert]){display:none}
+ .page-home .home-temp{font-size:1.05rem}
+ .page-home .home-place p{font-size:.75rem}
+ .page-home .home-primary-actions .button-link{min-height:38px}
+ .risk-area-list button{padding:4px 8px}
+ .risk-area-list strong{font-size:.8rem}
+ .risk-area-list small{font-size:.68rem;line-height:1.25}
+ .page-home .outlook-card{padding:7px 10px}
+ .page-home .fine{font-size:.68rem;margin-top:4px}
+ .risk-why-body .risk-factors th small{font-size:.66rem}
+}
+.risk-area-controls{display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;margin:2px 0 4px}
+.risk-area-controls .risk-area-counts{margin:0}
+@media (max-width:1099px){
+ .page-home .home-primary-actions .button-link{min-height:36px;padding:4px 8px;line-height:1.2;margin:0}
+ .page-home .home-primary-actions{gap:6px}
+}
+@media (max-width:1099px){ .page-home .rain-window{display:none} }
+@media (max-width:1099px){
+ .page-home .home-emergency-dashboard,.page-home .home-body{gap:6px}
+ .screen-tabs{margin-bottom:6px}
+ .screen-tabs button{min-height:38px}
+ .page-home .home-location-bar{padding:6px 10px}
+}
+/* Beat older page-specific dropdown rules: the search panel is always the centred overlay. */
+.location-directory .directory-content,.page-home .home-location-actions .directory-content{position:fixed!important;top:50%!important;left:50%!important;right:auto!important;bottom:auto!important;transform:translate(-50%,-50%)!important;max-height:calc(100dvh - 20px)!important;overflow:hidden!important;width:min(560px,calc(100vw - 20px))!important}
+@media (min-width:1100px){
+ .page-home .home-body{grid-template-columns:minmax(0,1fr) minmax(0,1.15fr)}
+ .page-home .home-primary-actions .button-link{min-height:36px;padding:6px 10px}
+}
+.page-home .home-essential-status h2{position:absolute;width:1px;height:1px;margin:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@media (min-width:1100px){ .page-home .home-body{gap:6px 12px} .page-home .home-warnings>*+*{margin-top:6px} }
+@media (min-width:1100px){ .page-home .outlook-card{padding:7px 12px} }
+
+/* Flood Map: map + information tabs (laptop), or tabs including the map (phone). */
+.page-flood-map .intelligence-workspace{flex:1 1 auto;min-height:0;height:auto;display:flex;flex-direction:column}
+.page-flood-map .intelligence-toolbar{flex-shrink:0;display:flex;align-items:center;flex-wrap:nowrap;gap:8px;margin:0 0 8px;padding:6px 12px}
+.page-flood-map .intelligence-toolbar select{min-height:36px;padding:4px 8px}
+.page-flood-map .intelligence-layout{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,2.3fr) minmax(380px,1fr);gap:12px}
+.page-flood-map .intelligence-map-stage{display:flex;flex-direction:column;min-height:0;height:100%}
+.page-flood-map .intelligence-canvas{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-flood-map .intelligence-map{height:auto!important;flex:1 1 auto;min-height:0}
+.page-flood-map .intelligence-sidebar{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:8px 12px;background:#fff;border:1px solid #dce6f1;border-radius:12px}
+.page-flood-map .intelligence-coverage{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;font-size:.8rem}
+.page-flood-map .intelligence-sidebar p{font-size:.8rem;line-height:1.4;margin:3px 0}
+.page-flood-map .intelligence-card{margin:0 0 8px;padding:6px 10px}
+.page-flood-map .intelligence-glance-title{margin:0 0 6px}
+.page-flood-map .place-rows{margin:4px 0}
+.page-flood-map .place-rows>div{margin:0 0 4px}
+.page-flood-map .place-actions{display:flex;gap:8px;flex-wrap:wrap}
+.page-flood-map .place-actions .button-link{min-height:36px;padding:6px 10px;font-size:.8rem}
+.page-flood-map .intelligence-events p{font-size:.78rem}
+.page-flood-map .intelligence-attribution{font-size:.72rem!important}
+.intelligence-detail{margin:0}
+.intelligence-detail dl{display:grid;grid-template-columns:130px minmax(0,1fr);gap:4px 12px;margin:4px 0}
+@media (max-width:1099px){
+ .page-flood-map .intelligence-layout{display:flex;flex-direction:column}
+ .page-flood-map .intelligence-sidebar{flex:1 1 auto;padding:0;border:0;background:none}
+ .page-flood-map .intelligence-howto{display:none}
+ .page-flood-map .intelligence-toolbar{padding:4px 8px;margin-bottom:6px}
+ .page-flood-map .intelligence-toolbar>label{display:flex;font-size:.8rem;white-space:nowrap}
+ .page-flood-map .intelligence-toolbar select{flex:1;min-width:0;width:auto}
+ .page-flood-map .panel-map{position:relative}
+ .page-flood-map .intelligence-map-actions,.page-flood-map .intelligence-layers,.page-flood-map .intelligence-legend{position:absolute;box-shadow:0 2px 8px rgba(16,40,48,.2);margin:0}
+ .page-flood-map .intelligence-layers{top:8px;right:8px;left:auto;max-width:190px;padding:4px 8px;font-size:.72rem;grid-template-columns:1fr}
+ .page-flood-map .intelligence-layers label{min-height:22px}
+ .page-flood-map .intelligence-legend{left:8px;bottom:18px;max-width:calc(100% - 60px);padding:4px 8px;font-size:.66rem}
+ .page-flood-map .intelligence-map-actions{top:8px;left:8px}
+ .intelligence-detail dl{grid-template-columns:100px minmax(0,1fr)}
+}
+main.app-content>.wireframe-workspace{flex:1 1 auto;min-height:0}
+.page-flood-map .wireframe-workspace{display:flex;flex-direction:column}
+.page-flood-map .intelligence-workspace,.page-flood-map .intelligence-layout,.page-flood-map .intelligence-sidebar{min-width:0}
+@media (max-width:1099px){
+ .page-flood-map .intelligence-toolbar>label{flex:none}
+ .page-flood-map .intelligence-toolbar select{flex:1 1 auto;min-width:0}
+ /* "All of Karnataka" in the district list does the same on phones. */
+ .page-flood-map .intelligence-toolbar>button{display:none}
+}
+.intelligence-layers-toggle{position:absolute;top:8px;right:8px;z-index:600}
+.intelligence-layers-toggle>button{min-height:36px;margin:0;padding:6px 12px;font-size:.8rem;box-shadow:0 2px 8px rgba(16,40,48,.25)}
+.popup .intelligence-layers,.popup .intelligence-legend{position:static!important;max-width:none!important;box-shadow:none!important;margin:0 0 8px!important;font-size:.85rem}
+.page-flood-map select{max-width:100%}
+.page-flood-map .past-floods label{display:block}
+.page-flood-map .past-floods select{width:100%}
+@media (max-width:1099px){ .page-flood-map .intelligence-toolbar>label{flex:0 0 auto;width:auto;max-width:40%;white-space:nowrap} }
+.page-flood-map .wireframe-workspace{align-items:stretch}
+
+/* Place search sits above any popup that opened it (e.g. Change location). */
+.location-directory .directory-content{z-index:3100}
+
+/* Compact location line (Shelters, Weather). */
+.compact-location{flex-shrink:0;padding:6px 12px!important}
+.compact-location .location-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.compact-location .selected-point-name{margin:0;font-size:.85rem;overflow-wrap:anywhere}
+.compact-location .location-bar>button{min-height:36px;margin:0;padding:6px 12px;white-space:nowrap}
+
+/* Shelters: list (paged) left, map right on laptops; tabs on phones. */
+.page-shelters .wireframe-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr);gap:12px;align-items:stretch;height:100%}
+.page-shelters .workspace-information{display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden;padding:0}
+.page-shelters .shelter-sections{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-shelters .shelters-panel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:10px 14px;margin:0}
+.page-shelters .shelters-panel .panel-heading{margin:0 0 4px}
+.page-shelters .shelters-panel .panel-heading .eyebrow{display:none}
+.page-shelters .shelters-panel h2{font-size:1.05rem;margin:0}
+.page-shelters .shelter-origin{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px}
+.page-shelters .shelter-origin p{margin:0;font-size:.8rem}
+.page-shelters .shelter-origin button,.page-shelters .panel-heading button{min-height:34px;margin:0;padding:5px 10px;font-size:.8rem}
+.page-shelters .shelter-status p{margin:2px 0;font-size:.8rem}
+.page-shelters .shelter-summary{margin:2px 0 4px;font-size:.82rem}
+.page-shelters .shelter-list{margin:0;padding:0}
+.page-shelters .shelter-card{padding:8px 10px;margin:0}
+.page-shelters .shelter-card>*{margin:2px 0!important}
+.page-shelters .shelter-card p{font-size:.8rem;line-height:1.35}
+.page-shelters .shelter-card h3{font-size:.95rem;margin:0}
+.page-shelters .shelter-facilities{display:flex;flex-wrap:wrap;gap:4px;padding:0}
+.page-shelters .shelter-facilities li{font-size:.72rem;padding:1px 6px}
+.page-shelters .shelter-actions{display:flex;flex-wrap:wrap;gap:6px}
+.page-shelters .shelter-actions :is(button,.button-link){min-height:34px;margin:0;padding:5px 10px;font-size:.78rem}
+.page-shelters .shelter-safety{margin:4px 0;font-size:.75rem}
+.page-shelters .official-help{margin:6px 0 0;padding:6px 10px}
+.page-shelters .official-help h3{font-size:.85rem;margin:0}
+.page-shelters .official-help ul{display:flex;flex-wrap:wrap;gap:2px 12px;margin:2px 0;padding:0;list-style:none;font-size:.78rem}
+.page-shelters .official-help li span{display:none}
+.page-shelters .official-help p{margin:0;font-size:.72rem}
+.page-shelters .shelter-limits{margin:4px 0 0;font-size:.8rem}
+.page-shelters .shelter-map-stage{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:10px 12px;margin:0}
+.page-shelters .shelter-map-stage>h2{font-size:1rem;margin:0 0 6px}
+.page-shelters .shelter-map-stage .shelter-map{flex:1 1 auto;height:auto!important;min-height:0;margin:0}
+.page-shelters .shelter-map-stage>.muted{font-size:.72rem;margin:4px 0 0}
+.page-shelters .shelter-inline-map{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-shelters .shelter-inline-map .shelter-map{flex:1 1 auto;height:auto!important;min-height:140px;margin:0}
+/* The older stacked layout forces the panel to block display; keep the flex chain so the map fills its tab. */
+.page-shelters .workspace-information .shelter-sections>.shelters-panel{display:flex}
+/* Tile-failure notice stays readable but must not squeeze the map out. */
+.page-shelters :is(.shelter-inline-map,.shelter-map-stage)>.notice{flex-shrink:0;margin:4px 0 0;padding:4px 8px;font-size:.74rem}
+.page-shelters .shelter-usage p{font-size:.8rem;margin:4px 0}
+@media (max-width:1099px){
+ .page-shelters .wireframe-workspace{display:flex;flex-direction:column;gap:6px}
+ .page-shelters .workspace-information{flex:1 1 auto}
+ .page-shelters .official-help li span{display:inline}
+}
+.route-steps{margin:4px 0;padding-left:1.4em;font-size:.82rem;line-height:1.4}
+.route-summary{flex-shrink:0;margin:0 0 6px;padding:6px 10px;font-size:.8rem}
+.route-summary p{margin:2px 0}
+/* Navigation panel fills the map area: map stretches, text stays compact. */
+.page-shelters .shelter-navigation{display:flex;flex-direction:column;min-height:0;height:100%;gap:4px}
+.page-shelters .shelter-navigation-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.page-shelters .shelter-navigation-head .eyebrow{display:none}
+.page-shelters .shelter-navigation-head h2{font-size:1rem;margin:0}
+.page-shelters .shelter-navigation :is(p,.notice){margin:2px 0;font-size:.78rem}
+.page-shelters .shelter-navigation button,.page-shelters .shelter-navigation .button-link{min-height:34px;margin:0;padding:5px 10px;font-size:.8rem}
+.page-shelters .shelter-navigation-bar,.page-shelters .shelter-navigation-actions{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.page-shelters .shelter-navigation .shelter-map,.page-shelters .shelter-navigation-frame{flex:1 1 auto;height:auto!important;min-height:120px;margin:0}
+.district-context{flex-shrink:0;margin:0!important;padding:2px 12px;font-size:.78rem}
+.page-shelters .shelter-status .shelter-navigation-notice{padding:4px 8px;font-size:.76rem}
+.page-shelters .workspace-information{gap:6px}
+.page-shelters .shelters-panel{padding:8px 12px}
+.page-shelters .shelter-origin{margin:0 0 2px}
+.page-shelters .shelter-origin button,.page-shelters .panel-heading button{min-height:32px;padding:4px 10px}
+.page-shelters .shelter-card-head{min-height:0}
+/* Text-style buttons (Popup triggers inside sentences) on every page. */
+.link-button,button.link-button{display:inline;width:auto;min-height:0;margin:0;padding:0;border:0;background:none;box-shadow:none;color:#0b5d8c;font:inherit;text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.link-button:hover:not(:disabled){background:none;color:#073f60}
+.page-shelters .shelter-more{margin:2px 0;font-size:.78rem}
+.popup .shelter-facilities{display:flex;flex-wrap:wrap;gap:4px;padding:0;list-style:none}
+@media (max-width:1099px){
+ .page-shelters .shelters-panel{padding:6px 10px}
+ .page-shelters .shelter-card h3{font-size:.9rem}
+ .page-shelters .shelter-actions :is(button,.button-link){padding:4px 8px;font-size:.74rem}
+ .page-shelters .shelter-navigation-head h2{font-size:.92rem}
+ .page-shelters .shelter-navigation :is(p,.notice){font-size:.74rem}
+ .page-shelters .shelter-navigation .route-summary .notice{padding:4px 6px}
+ .compact-location .selected-point-name{font-size:.78rem}
+}
+@media (max-width:1099px){
+ .compact-location .location-bar{flex-wrap:nowrap}
+ .compact-location .location-bar>button{min-height:34px;padding:4px 10px;font-size:.78rem}
+ .page-shelters .shelters-panel .panel-heading{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:8px}
+ .page-shelters .shelters-panel h2{font-size:.95rem}
+ .page-shelters .shelter-origin{flex-wrap:nowrap;padding:4px 8px}
+ .page-shelters .shelter-origin p{font-size:.75rem}
+ .page-shelters .shelter-origin button,.page-shelters .panel-heading button{white-space:nowrap;font-size:.74rem;padding:4px 8px}
+ .page-shelters .shelter-actions{flex-wrap:nowrap}
+}
+.page-shelters .shelters-panel .panel-heading{flex-direction:row;text-align:left}
+@media (max-width:1099px){
+ .page-shelters:has(.shelters-panel.map-focus) :is(.compact-location,.district-context){display:none}
+ .page-shelters .shelters-panel.map-focus>:is(.panel-heading,.shelter-origin){display:none}
+ .page-shelters .shelter-navigation-bar{display:flex;flex-wrap:wrap;gap:4px 8px}
+ .page-shelters .shelter-navigation-bar>p{flex-basis:100%}
+ .page-shelters .shelter-navigation .risk-area-toggle button{min-height:30px;padding:3px 8px;font-size:.74rem}
+ .page-shelters .shelter-navigation-head .secondary{white-space:nowrap}
+}
+
+/* Weather: location line + tabs (Now, 7 days, Rain chart, Sources); point map on the right on laptops. */
+.page-weather .wireframe-workspace{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px;align-items:stretch;height:100%}
+.page-weather .workspace-information{display:flex;flex-direction:column;gap:6px;min-height:0;overflow:hidden;padding:0}
+.page-weather .weather-sections{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column}
+.page-weather .weather-sections>.panel:not(.weather-panel){display:none}
+.weather-panel{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;overflow:hidden;padding:8px 12px!important;margin:0}
+.weather-panel .panel-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 4px}
+.weather-panel .panel-heading .eyebrow{display:none}
+.weather-panel .panel-heading h2{font-size:1rem;margin:0}
+.weather-panel .panel-heading button{min-height:32px;margin:0;padding:4px 10px;font-size:.78rem}
+.weather-panel .weather-freshness{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 10px;margin:0 0 6px;padding:4px 8px;font-size:.76rem}
+.weather-panel .weather-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.weather-panel h3{font-size:.95rem;margin:4px 0}
+.weather-panel p{font-size:.8rem;margin:3px 0}
+.weather-panel .metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:6px 0}
+.weather-panel .metrics article{padding:8px}
+.weather-panel .daily-forecast h3{margin:0 0 2px}
+.weather-panel .forecast-days{display:grid;grid-template-columns:minmax(0,1fr);gap:3px;margin:4px 0}
+.weather-panel .forecast-days article{display:grid;grid-template-columns:7.5em minmax(0,1fr) auto;align-items:center;gap:2px 10px;padding:3px 8px;height:auto}
+.weather-panel .forecast-days h4{margin:0;font-size:.78rem}
+.weather-panel .forecast-condition{min-height:0;margin:0;font-size:.78rem}
+.weather-panel .forecast-days dl{display:flex;gap:10px;margin:0;font-size:.78rem}
+.weather-panel .forecast-days dl div{display:block;padding:0;border:0}
+.weather-panel .forecast-days dt{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.weather-panel .forecast-days dl div:nth-child(1) dd::before{content:"Min ";font-weight:400;color:#4e716e}
+.weather-panel .forecast-days dl div:nth-child(2) dd::before{content:"Max ";font-weight:400;color:#4e716e}
+.weather-panel .forecast-days dl div:nth-child(3) dd::before{content:"Rain ";font-weight:400;color:#4e716e}
+.weather-panel .metadata{margin:4px 0;font-size:.78rem}
+.weather-panel .metadata div{display:flex;gap:8px}
+.page-weather .workspace-map{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:10px 12px;margin:0}
+.page-weather .workspace-map .weather-location-map{flex:1 1 auto;height:auto!important;min-height:0}
+@media (max-width:1099px){
+ .page-weather .wireframe-workspace{display:flex;flex-direction:column}
+ .page-weather .workspace-map{display:none}
+ .weather-panel .forecast-days article{grid-template-columns:6em minmax(0,1fr);}
+ .weather-panel .forecast-days dl{grid-column:1/-1}
+}
+.weather-panel .rainfall-chart{margin:4px 0;padding:8px 10px}
+.weather-panel .rainfall-bars{margin-top:6px}
+.weather-panel .bar-track{height:110px}
+@media (max-width:1099px){
+ .weather-panel .weather-freshness>span{display:none}
+ .weather-panel .weather-freshness>span:first-of-type{display:inline}
+ .weather-panel .daily-forecast>p.muted:first-of-type{display:none}
+ .weather-panel .forecast-days article{padding:2px 6px;gap:0 8px}
+ .weather-panel .forecast-days dl{gap:8px;font-size:.74rem}
+ .weather-panel .bar-track{height:80px}
+ .weather-panel .rainfall-chart>p.muted{font-size:.72rem}
+}
+
+/* Report: four steps on the left, location map on the right (laptops); map inside step 1 on phones. */
+.page-report .report-workspace{flex:1 1 auto;min-height:0;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.page-report .report-form{display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:10px 14px;margin:0}
+.page-report .report-form>h2{font-size:1.05rem;margin:0}
+.page-report .report-form>p{margin:2px 0;font-size:.8rem}
+.page-report .report-emergency{padding:4px 10px;font-size:.78rem!important}
+.page-report .report-form>form{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-report .report-fields{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column;gap:0!important;margin:0}
+.page-report .report-steps .screen-tabs button{font-size:.78rem;padding:4px 6px}
+.page-report .report-steps .screen-panel{gap:6px}
+.page-report .report-steps .screen-panel>fieldset{gap:6px;padding:8px 10px;margin:0}
+.page-report .step-legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.page-report .report-step-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:auto;padding-top:6px}
+.page-report .report-step-nav button{min-height:38px;margin:0;padding:6px 14px}
+.page-report .report-form label{margin:2px 0;font-size:.85rem}
+.page-report .report-form textarea{min-height:70px;margin-top:2px}
+.page-report .report-form :is(input:not([type=checkbox]):not([type=radio]),select){margin-top:2px;padding:6px 8px}
+.page-report .report-form .form-readiness{margin:0;padding:6px 10px;font-size:.8rem}
+.page-report .gps-photo-card{margin:0;padding:6px 10px}
+.page-report .gps-photo-card h3{font-size:.9rem;margin:0}
+.page-report .gps-photo-card p{margin:0;font-size:.76rem}
+.page-report .gps-photo-card button{min-height:34px;margin:0;padding:4px 12px}
+.page-report .report-manual .report-chips{margin:0}
+.page-report .report-manual-more,.page-report .report-consent-terms{margin:0;font-size:.8rem}
+.page-report .report-details{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.page-report .report-review{display:flex;flex-direction:column;gap:2px;padding:8px 10px;margin:0}
+.page-report .report-review p{margin:2px 0;font-size:.82rem}
+.page-report .report-review button{min-height:38px;margin:4px 6px 0 0}
+.page-report #report-location-map{position:static;display:flex;flex-direction:column;min-height:0;overflow:hidden;padding:10px 12px;margin:0}
+.page-report #report-location-map>h2{font-size:1rem;margin:0 0 4px}
+.page-report #report-location-map .report-map-block{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-report #report-location-map .shelter-map{flex:1 1 auto;height:auto!important;min-height:0;margin:0}
+.page-report #report-location-map>.muted{font-size:.72rem;margin:4px 0 0}
+.page-report .report-photo-preview{max-height:110px}
+.page-report .report-photo-preview.small{max-height:80px}
+@media (max-width:1099px){
+ .page-report .report-workspace{display:flex;flex-direction:column}
+ .page-report .report-form{flex:1 1 auto;padding:6px 8px}
+ .page-report .report-form>p:not(.report-emergency){display:none}
+ .page-report .report-location{flex:1 1 auto;min-height:0;display:flex!important;flex-direction:column}
+ .page-report .report-location .report-map-block{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+ .page-report .report-location .report-map-block .shelter-map{flex:1 1 auto;height:auto!important;min-height:90px;margin:0}
+ .page-report .report-map-hint{display:none}
+ .page-report .report-steps .screen-tabs button{font-size:.72rem;padding:4px 2px}
+ .page-report .report-types{gap:6px}
+ .page-report .report-type{min-height:38px;padding:4px 8px}
+ .page-report .report-details{grid-template-columns:1fr}
+}
+@media (min-width:1100px){ .page-report .report-types{grid-template-columns:repeat(4,minmax(0,1fr))} .page-report .report-type{min-height:40px;padding:4px 8px;font-size:.82rem} }
+.page-report .report-form textarea{min-height:58px}
+.page-report .report-steps .screen-panel>fieldset{gap:4px}
+.page-report .report-form .report-chips{gap:6px}
+.page-report .report-form .chip{min-height:30px;padding:2px 10px}
+.page-report .panel-photo .report-photo-preview{max-height:64px;width:auto;margin:0}
+.page-report .panel-photo fieldset>p{font-size:.78rem}
+.page-report .panel-photo label{font-size:.8rem;line-height:1.35}
+.page-report .report-types legend{grid-column:1/-1;margin:0 0 2px;padding:0;font-size:.85rem}
+@media (max-width:1099px){
+ .page-report .report-types{grid-template-columns:1fr 1fr}
+ .page-report .report-form .report-chips{flex-wrap:nowrap;gap:4px}
+ .page-report .report-form .chip{flex:1 1 0;min-width:0;padding:2px 4px;font-size:.7rem;white-space:nowrap}
+ .page-report .report-details{grid-template-columns:1fr 1fr;gap:6px}
+ .page-report .report-details label{font-size:.74rem}
+}
+.page-report .report-types .report-type{margin:0;line-height:1.2;font-size:.82rem}
+@media (max-width:1099px){ .page-report .report-types .report-type{min-height:36px;padding:4px 6px} .page-report .report-types{gap:4px} }
+.page-report .report-types{padding:0!important;border:0!important}
+.page-report .report-types .report-type{display:flex;align-items:center;gap:6px}
+.page-report .report-types input[type=radio]{display:inline-block;width:auto;margin:0;padding:0;flex:none}
+.page-report .report-consent{gap:6px;padding:8px 10px;margin:0}
+.page-report .report-consent label{font-size:.85rem}
+@media (max-width:1099px){
+ .page-report .panel-photo fieldset>p{font-size:.74rem;line-height:1.35}
+ .page-report .panel-photo .report-actions{display:flex;flex-wrap:nowrap;gap:6px}
+ .page-report .panel-photo .report-actions button{flex:1 1 0;min-height:36px;padding:4px 8px;font-size:.8rem}
+ .page-report .panel-photo .report-photo-preview{max-height:52px}
+ .page-report .panel-photo label{font-size:.76rem}
+}
+
+/* Telegram alerts: two sections side by side (laptop) or tabs (phone). */
+.page-alerts .alerts-tabs.untabbed{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:stretch}
+.page-alerts .alerts-tabs .panel{margin:0;padding:12px 16px;height:100%;overflow:hidden}
+.page-alerts .alerts-tabs .panel h2{font-size:1.05rem;margin:0 0 6px}
+.page-alerts .alerts-tabs .panel h3{font-size:.95rem;margin:8px 0 4px}
+.page-alerts .alerts-tabs .panel p,.page-alerts .alerts-tabs .panel li{font-size:.84rem;line-height:1.45;margin:4px 0}
+.page-alerts .alert-steps{margin:6px 0;padding-left:1.3em}
+.page-alerts .official-help{margin-top:8px;padding:8px 12px}
+@media (max-width:1099px){
+ .page-alerts .alerts-tabs .panel{padding:8px 10px}
+ .page-alerts .alerts-tabs .panel p,.page-alerts .alerts-tabs .panel li{font-size:.8rem}
+}
+
+/* How it works: one tab per section. */
+.page-how-it-works .how{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.page-how-it-works .how .panel{margin:0;padding:12px 16px;height:100%;overflow:hidden;max-width:none}
+.page-how-it-works .how .panel h2{font-size:1.1rem;margin:0 0 8px}
+.page-how-it-works .how .panel :is(p,li,td,th){font-size:.86rem;line-height:1.45}
+.page-how-it-works .how-table td,.page-how-it-works .how-table th{padding:5px 8px}
+@media (max-width:1099px){
+ .page-how-it-works .how .panel{padding:8px 10px}
+ .page-how-it-works .how .panel :is(p,li,td,th){font-size:.76rem;line-height:1.35}
+ .page-how-it-works .screen-tabs button{font-size:.7rem;padding:4px 2px}
+ .page-how-it-works .how-pipeline{grid-template-columns:1fr 1fr}
+}
+.page-how-it-works .how-table{overflow:hidden}
+.page-how-it-works .how-table table{width:100%;table-layout:fixed;border-collapse:collapse}
+.page-how-it-works .how-table :is(td,th){overflow-wrap:anywhere;vertical-align:top}
+@media (max-width:1099px){
+ .page-how-it-works .how-table th:nth-child(1),.page-how-it-works .how-table td:nth-child(1){width:30%}
+ .page-how-it-works .how-table th:nth-child(3),.page-how-it-works .how-table td:nth-child(3){width:22%}
+ .page-how-it-works .how-table :is(td,th){padding:3px 4px;font-size:.7rem!important}
+}
+.page-flood-map .intelligence-coverage>[role=alert]{flex-shrink:0;margin:0 0 6px;padding:6px 8px;font-size:.78rem}
+.page-flood-map .intelligence-coverage>[role=status]{flex-shrink:0;margin:0 0 4px;font-size:.76rem}
+/* Fixed caption height so a longer place name never resizes (and so off-centres) the weather map. */
+.page-weather .weather-map-caption{flex-shrink:0;min-height:2.8em;margin:4px 0 0;font-size:.78rem;line-height:1.4}
+
+/* Safety net (useFitGuard): if content would be cut off, the page scrolls normally instead of hiding it.
+   Not triggered at the designed sizes; only for very short windows, heavy zoom, large text or unusual data. */
+html[data-fit=scroll],html[data-fit=scroll] body{height:auto;overflow:auto}
+html[data-fit=scroll] #root{height:auto!important;min-height:100dvh;overflow:visible!important}
+html[data-fit=scroll] main.app-content{flex:none!important;overflow:visible!important}
+/* Screen-reader-only text keeps its clipping, or it would widen the page. */
+html[data-fit=scroll] main.app-content :not(.leaflet-container,.leaflet-container *,.visually-hidden,.visually-hidden *,.page-intro,.page-intro *){overflow:visible!important;max-height:none!important}
+html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.shelter-map,.weather-location-map){min-height:320px!important}
+/* Phone directions: when several honest notices stack (demonstration, route failure, map tiles
+   unavailable), keep them compact so the map and safety line still fit one screen. */
+@media (max-width:1099px){
+ .page-shelters .shelter-navigation>:is(.notice,.shelter-safety){flex-shrink:0;margin:0;padding:3px 8px;font-size:.72rem;line-height:1.3}
+ .page-shelters .shelter-navigation-actions{gap:2px 8px}
+ .page-shelters .shelter-navigation-actions .muted{margin:0;font-size:.7rem;line-height:1.25}
+ .page-shelters .shelter-navigation-actions .button-link{min-height:32px;padding:4px 10px}
+ .page-shelters .shelter-navigation .shelter-safety .link-button{min-height:24px;padding:0}
+ .page-shelters .shelter-navigation .shelter-map{min-height:110px}
+}
+
+/* Phones: the IMD nowcast line stays compact so the Warnings tab fits one screen. */
+@media (max-width:1099px){
+ :is(.page-home,.page-weather) .imd-nowcast{margin:4px 0 0;padding:3px 6px;font-size:.74rem;line-height:1.3}
+}
+/* Flood Map "Rivers" tab: one compact row per checked river point. */
+.river-forecast h3{display:flex;align-items:center;gap:8px;font-size:.95rem;margin:0 0 6px}
+.river-list{list-style:none;margin:0 0 6px;padding:0;display:grid;gap:4px}
+.river-list li{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 8px;font-size:.82rem;padding:4px 6px;border:1px solid #e3eae8;border-radius:8px;background:#fbfdfc}
+.river-list li small{flex-basis:100%;color:#4b5f5a;font-size:.74rem}
+.river-list li .risk-chip{font-size:.72rem;padding:0 6px}
+.river-forecast>.muted{font-size:.74rem;margin:4px 0}
+@media (min-width:1100px){ .river-list li small{flex-basis:auto} }
+
+/* Tabs never clip their labels: on narrow screens they tighten, and wrap to a second row if still too wide. */
+.screen-tabs{flex-wrap:wrap}
+@media (max-width:1099px){ .screen-tabs button{padding:4px 6px;font-size:12.5px;min-height:36px} }
+.river-list li .ai-line{flex-basis:100%;font-size:.74rem;color:#33475b}
+.river-list li .ai-line[data-state="likely"]{color:#8a1c1c}
+.ai-eval{margin:4px 0;padding-left:1.2em;font-size:.82rem}
+/* Shelters: a location message is a short line, not a large banner. */
+.page-shelters .shelters-panel>.notice{font-size:.8rem;padding:6px 10px;margin:4px 0}
+/* Flood Map: layer sources list and the AI red-ring legend entry. */
+.intelligence-sources{margin:4px 0 6px;padding-left:1.1em;font-size:.8rem;line-height:1.4}
+.intelligence-sources li{margin:2px 0}
+.risk-legend .legend-ai-ring::before{background:transparent;border:2px dashed #b71c1c;border-radius:50%;box-sizing:border-box}

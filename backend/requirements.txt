@@ -1,3 +1,15 @@
 fastapi==0.135.1
 uvicorn==0.41.0
 httpx==0.28.1
+# Pinned so laptop and server trust the same certificate authorities (an unpinned update broke IMD/SACHET).
+certifi==2026.10.18
+
+SQLAlchemy==2.0.54
+alembic==1.20.0
+psycopg[binary]==3.3.6
+GeoAlchemy2==0.20.0
+
+numpy==2.5.3
+scikit-learn==1.8.0
+
+Pillow==12.3.0

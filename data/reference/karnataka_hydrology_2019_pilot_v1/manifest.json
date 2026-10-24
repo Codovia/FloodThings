@@ -1,0 +1,806 @@
+{
+  "auxiliary_source_metadata": [
+    {
+      "bytes": 13887255,
+      "cover_reuse_marking": "FOR OFFICIAL USE ONLY",
+      "http_status": 200,
+      "publication_edition": "March2021",
+      "publication_handling": "redistribution_unresolved; internal reuse permission not established by public access",
+      "retrieved_at": "2026-10-07T04:10:22.990621+00:00",
+      "sha256": "de0d9cab9cd3361952e69cf630dc5d404d8703b7c87f90bc64f60541463c815a",
+      "source_url": "https://cwc.gov.in/sites/default/files/stage-dischargecompressed.pdf",
+      "status": "retrieved",
+      "water_year": "June2019-May2020"
+    },
+    {
+      "bytes": 48441,
+      "http_status": 200,
+      "retrieved_at": "2026-10-07T04:09:31.851324+00:00",
+      "sha256": "265c9b6ffc83b913ad26afd6d691b1d595a622cc1d233031ee82152ccf6a1449",
+      "source_url": "https://www.nwdp.nwic.gov.in/footer/copyrightPolicy",
+      "status": "retrieved"
+    }
+  ],
+  "created_at": "2026-10-07T05:10:35.873849+00:00",
+  "files": {
+    "cross_source_comparison.csv": {
+      "bytes": 16212,
+      "sha256": "9422be71114b2548221a533cdec75d78b8a098a38efe431a0abbf4591b140d18"
+    },
+    "identity_evidence.json": {
+      "bytes": 18644,
+      "sha256": "51e830077eedb951e739836ff54889c07e9c1efcf7abbab88b9677fa8ea489db"
+    },
+    "observations.csv": {
+      "bytes": 1806784,
+      "sha256": "b406896d0265cf376c722042365336f7e8d928efcf60ca1c37d1ae4d8d4bd353"
+    },
+    "raw_source_registry.json": {
+      "bytes": 27783,
+      "sha256": "a885bcc09e03e4582af8c743990fba7aed3cb097284dd0264b020460fb0eb2ff"
+    },
+    "yearbook_context.csv": {
+      "bytes": 34469,
+      "sha256": "1c5409cde69b6e7cf8f8de39f0813fa47991e7e7855f2689f1352331a945e2f4"
+    }
+  },
+  "local_manifest_sha256": "bc641f645814cba7f46dd3a46e670b2b4f273dd3638806e51eeb5c20421bb6be",
+  "method": {
+    "availability": "availability_semantics_unverified; acquisition and retrieval times distinct",
+    "comparison": "Discharge by station/date; exact Decimal comparison, then published rounding; hourly WL versus Year Book daily mean not equivalent",
+    "coordinate_precision": "0.0005 degree is half a three-decimal metadata rounding step, used only to flag conflicts, never repair coordinates",
+    "daily": "Original manual daily discharge records retain actual acquisition timestamps and rates, not accumulated water volume",
+    "features": false,
+    "hourly": "Original manual-hourly rows retained at their actual timestamps, with no assumed complete 24-hour grid or resampling",
+    "identity": "ID first. CSVs without station IDs use explicitly reviewed CWC name/agency/river and independent Year Book gauge-opening dates; coordinates/legacy IDs retained separately",
+    "labels": false,
+    "models": false,
+    "reuse": "Other(Open) lacks detailed resource terms; CWC permission and NWDP third-party exception unresolved. All raw/detailed products local",
+    "state_network": "Distinct source station codes, agency and original non-LGD State Code retained; no CWC identity inferred from nearby names",
+    "thresholds": "No warning/danger comparisons: Stage4A threshold datum compatibility unverified",
+    "time_zone": "not_documented",
+    "window": [
+      "2019-07-25",
+      "2019-08-20"
+    ],
+    "yearbook": "VolumeI2019-20; daily WL is corresponding mean m.s.l.; Q is observed/computed; * computed and # discarded/rating-curve changed retained"
+  },
+  "processing_code": {
+    "bytes": 35124,
+    "path": "scripts/recover_karnataka_hydrology.py",
+    "sha256": "afb91b5c4a0994c57432deab9a93f6d8fbdc84c61d7797b9036c713e273c52e9"
+  },
+  "schema": {
+    "comparison": "date-level discharge source values, original computed/discarded flags, exact/rounding/discrepancy/unavailable classes",
+    "observations": "canonical/source identities, original timestamp/value/units/quality fields, actual frequency, separate retrieval/availability times, original row",
+    "yearbook": "original daily Q and corresponding mean WL; computed records never promoted to direct measurements"
+  },
+  "source_response_checksums": [
+    {
+      "bytes": 163301,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_dataset.html",
+      "sha256": "115ccf1531f2e44f7aa570fc6b72b131781e4a997a02bc153cb34f92aaefa5ca"
+    },
+    {
+      "bytes": 597,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_dataset.html.json",
+      "sha256": "2d6ab4c77feb5aa0de60e33ad5ea969a7507bd0c924f87412606b1acfeb0e945"
+    },
+    {
+      "bytes": 84267,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_metadata.json",
+      "sha256": "b0f89d716a25da8b667f79aae881d97081b32dd5671db11b4ad597cf20326e26"
+    },
+    {
+      "bytes": 653,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_metadata.json.json",
+      "sha256": "0864512eef25e435df431228fedcbd33f4f37cbc49b495f59e08c1c98555e823"
+    },
+    {
+      "bytes": 91018,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_resource.html",
+      "sha256": "48040707a07c380bc284d5bf1350f56d4289dbe0d039b846894339043689d037"
+    },
+    {
+      "bytes": 688,
+      "path": "data/raw/reference/stage4b_v1/cwc_discharge_resource.html.json",
+      "sha256": "5f846e16970dd97e419b5d3ce6d4d1f5029b82a7ff704b1572572719bae56f70"
+    },
+    {
+      "bytes": 183006,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_dataset.html",
+      "sha256": "e8db5413a22c1218e200a91d1a3fbf3945b144770bcd983ab230d595dc10918e"
+    },
+    {
+      "bytes": 579,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_dataset.html.json",
+      "sha256": "030042c1a157dc2806f737bfd0d0d4fce5f57b90ad894101ffa675715d7ebd95"
+    },
+    {
+      "bytes": 100714,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_metadata.json",
+      "sha256": "838a9f47e66719e2e40c42f7269f6c38a3f84cce23099bca529fee84ba7aeb22"
+    },
+    {
+      "bytes": 655,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_metadata.json.json",
+      "sha256": "a2be9b731946a4bbe4530e29fc379228bd434c057c82f0101fa9c8ab0142a902"
+    },
+    {
+      "bytes": 95928,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_resource.html",
+      "sha256": "67397237cee4b3ecca922e8da92193d9c47289010ed15c119b6579e72d15f11c"
+    },
+    {
+      "bytes": 670,
+      "path": "data/raw/reference/stage4b_v1/cwc_gauge_resource.html.json",
+      "sha256": "7eaf5ab9f4c3e2d5f59346b2413fa06b4cec0be50522f67b636b76df32fc5630"
+    },
+    {
+      "bytes": 157400,
+      "path": "data/raw/reference/stage4b_v1/cwc_publications.html",
+      "sha256": "b2e60bfec13f9158a41b15950872a37b7d40fb0abcc67591320749992ead50d3"
+    },
+    {
+      "bytes": 483,
+      "path": "data/raw/reference/stage4b_v1/cwc_publications.html.json",
+      "sha256": "919b2ac2142e42b8cfcdf1c03370c783f117a50b015080b0b291950d07e7d217"
+    },
+    {
+      "bytes": 55897980,
+      "path": "data/raw/reference/stage4b_v1/karnataka_discharge_gauge_daily_1972_to_2020.csv",
+      "sha256": "4e1fee194f158580c8d141ee303c84ce09e05e9f154a7a4afa4bd70ffe7e8a73"
+    },
+    {
+      "bytes": 1328,
+      "path": "data/raw/reference/stage4b_v1/karnataka_discharge_gauge_daily_1972_to_2020.csv.json",
+      "sha256": "590510147d4b8351253f3d7a6887e6e42ad83bbe04950bc9c649cc768c765838"
+    },
+    {
+      "bytes": 13887255,
+      "path": "data/raw/reference/stage4b_v1/krishna_wyb2019_20.pdf",
+      "sha256": "de0d9cab9cd3361952e69cf630dc5d404d8703b7c87f90bc64f60541463c815a"
+    },
+    {
+      "bytes": 669,
+      "path": "data/raw/reference/stage4b_v1/krishna_wyb2019_20.pdf.json",
+      "sha256": "ce601fa4bba6f8812f0ede6b816706b0840363306413045b54a2bd74f6a88437"
+    },
+    {
+      "bytes": 48441,
+      "path": "data/raw/reference/stage4b_v1/nwdp_copyright.html",
+      "sha256": "265c9b6ffc83b913ad26afd6d691b1d595a622cc1d233031ee82152ccf6a1449"
+    },
+    {
+      "bytes": 508,
+      "path": "data/raw/reference/stage4b_v1/nwdp_copyright.html.json",
+      "sha256": "7c4c7d30c687f4db0fd85d089c2be26528719187822e3c933619da4a21595f8a"
+    },
+    {
+      "bytes": 45415268,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_manual_daily_cwc_ka_2001_2025.csv",
+      "sha256": "30926ab6554d576a74efcbb389ffd4c7df8fbd9ee10ff5a212110cff13c5eb43"
+    },
+    {
+      "bytes": 1333,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_manual_daily_cwc_ka_2001_2025.csv.json",
+      "sha256": "cbb59db4a4c998d86208f960eb15d95f92ec57d6645475abe9869669a2f9a967"
+    },
+    {
+      "bytes": 97010960,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_tele_hr_karnataka_ka_1970_2025.csv",
+      "sha256": "fdd064010d905a1916acc5d0c179f72fa607313001efc82ecb74e4c6011e7b93"
+    },
+    {
+      "bytes": 1336,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_tele_hr_karnataka_ka_1970_2025.csv.json",
+      "sha256": "717a7cd451ec2d4f1453972be4bc5ab3e000dd0e4779278aad75e6234abf9e84"
+    },
+    {
+      "bytes": 388687530,
+      "path": "data/raw/reference/stage4b_v1/rwl_manual_hr_cwc_007_1991_2020.csv",
+      "sha256": "14c935761d82e60beddab8e87192be7842e45cb3d7a9895c758777aa44996e3e"
+    },
+    {
+      "bytes": 1280,
+      "path": "data/raw/reference/stage4b_v1/rwl_manual_hr_cwc_007_1991_2020.csv.json",
+      "sha256": "01278961acec495955ef89f63723e3cce7fa6bd752208bc4ebe0d829675c3f8a"
+    },
+    {
+      "bytes": 57724,
+      "path": "data/raw/reference/stage4b_v1/state_manual_dataset.html",
+      "sha256": "f4ee279505f78dd20627fb604928d61a315d57581f2a8eccc44479a2624bbb36"
+    },
+    {
+      "bytes": 540,
+      "path": "data/raw/reference/stage4b_v1/state_manual_dataset.html.json",
+      "sha256": "0a6acbd27b1ba6b574d572b2bbc26e8b8ebeb22e65f0e41eb2891fca94131e3a"
+    },
+    {
+      "bytes": 4136,
+      "path": "data/raw/reference/stage4b_v1/state_manual_metadata.json",
+      "sha256": "14f8de8cbf9eb90e2c6172e1fec3d119eb912e5a4447126f986ef2760da2f015"
+    },
+    {
+      "bytes": 651,
+      "path": "data/raw/reference/stage4b_v1/state_manual_metadata.json.json",
+      "sha256": "82912764b8e42fd0cfae9aa4f03481261cb6f80d4c4e6afd865a35518a1eed5b"
+    },
+    {
+      "bytes": 71409,
+      "path": "data/raw/reference/stage4b_v1/state_manual_resource.html",
+      "sha256": "508b12a4d5729a34c2bf4036cd118c34a0f6a89ea9cfcdac92d3bf9502447e34"
+    },
+    {
+      "bytes": 632,
+      "path": "data/raw/reference/stage4b_v1/state_manual_resource.html.json",
+      "sha256": "c4bc45fd6e287c3beea1b7fd1719e7d7c56f5a62f18cd21115b1601ec073d896"
+    },
+    {
+      "bytes": 60797,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_dataset.html",
+      "sha256": "bcce297920658bd3563fd9d86b53b20d1398077cb6df234baab35799fcc09fb3"
+    },
+    {
+      "bytes": 598,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_dataset.html.json",
+      "sha256": "a664d75fa610598fb5e95a7a2a5ba87b7bc6c3f171a4be5d84747ed8a172e37b"
+    },
+    {
+      "bytes": 18944,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_metadata.json",
+      "sha256": "9c6caa3569587b7e84b71ac89e95e9c311ed7effbb9548ab2b1425439abd3b88"
+    },
+    {
+      "bytes": 653,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_metadata.json.json",
+      "sha256": "753409300ff534e50da3d1ea9ded75974cdeac70763db04edc29c6ac5a92f710"
+    },
+    {
+      "bytes": 72075,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_resource.html",
+      "sha256": "5f668dd38652b06ef376584099502fc4ad9025843e821597324377dee6cb712e"
+    },
+    {
+      "bytes": 690,
+      "path": "data/raw/reference/stage4b_v1/state_telemetry_resource.html.json",
+      "sha256": "a79c359707d3fb173988adf952e03b0325ea8bc29f87f4c5211def3dac9cb426"
+    }
+  ],
+  "sources": [
+    {
+      "dataset_title": "River Discharge (Manual - Daily), Central Water Commission (CWC)",
+      "download": {
+        "bytes": 45415268,
+        "http_status": 200,
+        "md5": "180c3b4b17b245e8cd78838db18eec0e",
+        "original_filename": "river_discharge_manual_daily_cwc_ka_2001_2025.csv",
+        "retrieved_at": "2026-10-07T04:12:11.193660+00:00",
+        "sha256": "30926ab6554d576a74efcbb389ffd4c7df8fbd9ee10ff5a212110cff13c5eb43",
+        "status": "retrieved"
+      },
+      "download_url": "https://nwdp.nwic.gov.in/dataset/08fa3fd0-7861-471d-a295-27c1b239d1fa/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3/download/river_discharge_manual_daily_cwc_ka_2001_2025.csv",
+      "format": "CSV",
+      "frequency": "daily",
+      "licence_id": "other-open",
+      "portal_date_range_label": "River Discharge CWC Karnataka (2001 - 2025) Manual Daily",
+      "portal_hash": "180c3b4b17b245e8cd78838db18eec0e",
+      "portal_size": 45415268,
+      "portal_update": "2026-01-24T23:36:31.332749",
+      "producer": "CWC",
+      "publication_handling": "redistribution_unresolved",
+      "resource_id": "f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+      "resource_licence": "Other (Open)",
+      "resource_page_update": "January 24, 2026",
+      "resource_page_url": "https://www.nwdp.nwic.gov.in/dataset/river-discharge-manual-dailly-central-water-commission-cwc/resource/f95150ea-c8fc-4740-8815-d9c34c9d53a3",
+      "resource_title": "River Discharge CWC Karnataka (2001 - 2025) Manual Daily",
+      "retrieval_time": "2026-10-07T04:10:52.159913+00:00",
+      "source_census": {
+        "conflicting_station_timestamp_rows": 1277,
+        "distinct_station_names": 65,
+        "duplicate_station_timestamp_rows": 352,
+        "invalid_values": 24,
+        "malformed_dates": 0,
+        "missing_values": 0,
+        "original_columns": [
+          "SlNo",
+          "Station",
+          "Agency",
+          "State LGD Code",
+          "State",
+          "District LGD Code",
+          "District",
+          "Tehsil",
+          "Block",
+          "Village",
+          "River",
+          "Basin",
+          "Tributary",
+          "Subtributary",
+          "SubSubtributary",
+          "Local River",
+          "Latitude",
+          "Longitude",
+          "Data Acquisition Time",
+          "Manual Daily River Water Discharge (m3/sec)"
+        ],
+        "quality_columns": [],
+        "selected_rows": 55,
+        "total_source_rows": 301293,
+        "units_status": "source_field_verified"
+      },
+      "units": "m3/sec",
+      "variable": "discharge"
+    },
+    {
+      "dataset_title": "River Water Level (Manual - Hourly), Central Water Commission (CWC)",
+      "download": {
+        "bytes": 388687530,
+        "http_status": 200,
+        "md5": "2e5a72cfa7d9ee23e5606197395a6f9e",
+        "original_filename": "rwl_manual_hr_cwc_007_1991_2020.csv",
+        "retrieved_at": "2026-10-07T04:15:23.686289+00:00",
+        "sha256": "14c935761d82e60beddab8e87192be7842e45cb3d7a9895c758777aa44996e3e",
+        "status": "retrieved"
+      },
+      "download_url": "https://nwdp.nwic.gov.in/dataset/d951a09c-6cf8-470e-be77-e80116f13d34/resource/7778f459-0e82-4681-9638-5e494c36fd42/download/rwl_manual_hr_cwc_007_1991_2020.csv",
+      "format": "CSV",
+      "frequency": "hourly",
+      "licence_id": "other-open",
+      "portal_date_range_label": "River Water Level Manual Hourly CWC Krishna (1991-2020)",
+      "portal_hash": "2e5a72cfa7d9ee23e5606197395a6f9e",
+      "portal_size": 388687530,
+      "portal_update": "2025-02-20T09:13:48.141422",
+      "producer": "CWC",
+      "publication_handling": "redistribution_unresolved",
+      "resource_id": "7778f459-0e82-4681-9638-5e494c36fd42",
+      "resource_licence": "Other (Open)",
+      "resource_page_update": "February 20, 2025",
+      "resource_page_url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42",
+      "resource_title": "River Water Level Manual Hourly CWC Krishna (1991-2020)",
+      "retrieval_time": "2026-10-07T04:10:52.814745+00:00",
+      "source_census": {
+        "conflicting_station_timestamp_rows": 23726,
+        "distinct_station_names": 90,
+        "duplicate_station_timestamp_rows": 66370,
+        "invalid_values": 0,
+        "malformed_dates": 0,
+        "missing_values": 0,
+        "original_columns": [
+          "SlNo",
+          "Station",
+          "Agency",
+          "State LGD Code",
+          "State",
+          "District LGD Code",
+          "District",
+          "Tehsil",
+          "Block",
+          "Village",
+          "River",
+          "Basin",
+          "Tributary",
+          "Subtributary",
+          "SubSubtributary",
+          "Local River",
+          "Latitude",
+          "Longitude",
+          "Is_DischargeDataAvailable",
+          "RL_of_zeroGauge",
+          "MeanSeaLevel",
+          "Data Acquisition Time",
+          "River Water Level Manual Hourly (meter)"
+        ],
+        "quality_columns": [],
+        "selected_rows": 1642,
+        "total_source_rows": 2345277,
+        "units_status": "source_field_verified"
+      },
+      "units": "meter",
+      "variable": "water_level"
+    },
+    {
+      "dataset_title": "Discharge Gauge Daily Karnataka",
+      "download": {
+        "bytes": 55897980,
+        "http_status": 200,
+        "md5": "5b6a91db40fbe8c2c5b05aefb46349a1",
+        "original_filename": "karnataka_discharge_gauge_daily_1972_to_2020.csv",
+        "retrieved_at": "2026-10-07T04:12:44.422325+00:00",
+        "sha256": "4e1fee194f158580c8d141ee303c84ce09e05e9f154a7a4afa4bd70ffe7e8a73",
+        "status": "retrieved"
+      },
+      "download_url": "https://nwdp.nwic.gov.in/dataset/f5b49998-6208-4627-b88f-4d3b75238d78/resource/a21e8e48-d5e3-4a35-8274-007e52f92daf/download/karnataka_discharge_gauge_daily_1972_to_2020.csv",
+      "format": "CSV",
+      "frequency": "daily",
+      "licence_id": "other-open",
+      "portal_date_range_label": "Discharge Gauge Manual Daily Karnataka 1972 to 2020",
+      "portal_hash": "5b6a91db40fbe8c2c5b05aefb46349a1",
+      "portal_size": 55897980,
+      "portal_update": "2026-07-20T07:45:28.184740",
+      "producer": "Karnataka SW SF",
+      "publication_handling": "redistribution_unresolved",
+      "resource_id": "a21e8e48-d5e3-4a35-8274-007e52f92daf",
+      "resource_licence": "Other (Open)",
+      "resource_page_update": "July 20, 2026",
+      "resource_page_url": "https://www.nwdp.nwic.gov.in/en/dataset/kwris-discharge-gauge-daily/resource/a21e8e48-d5e3-4a35-8274-007e52f92daf",
+      "resource_title": "Discharge Gauge Manual Daily Karnataka 1972 to 2020",
+      "retrieval_time": "2026-10-07T04:10:53.314262+00:00",
+      "source_census": {
+        "conflicting_station_timestamp_rows": 0,
+        "distinct_station_names": 40,
+        "duplicate_station_timestamp_rows": 0,
+        "invalid_values": 0,
+        "malformed_dates": 0,
+        "missing_values": 0,
+        "original_columns": [
+          "Station Code",
+          "State",
+          "State Code",
+          "District",
+          "District Code",
+          "block_name",
+          "Block Code",
+          "Location Name",
+          "Location Code",
+          "Basin",
+          "Basin Code",
+          "Sub Basin",
+          "Sub Basin Code",
+          "Latitude",
+          "Longitude",
+          "Monitoring Date",
+          "Water Discharge"
+        ],
+        "quality_columns": [],
+        "selected_rows": 0,
+        "total_source_rows": 384732,
+        "units_status": "not_documented"
+      },
+      "units": null,
+      "variable": "discharge"
+    },
+    {
+      "dataset_title": "River Discharge (Telemetry - Hourly), Karnataka Water Department",
+      "download": {
+        "bytes": 97010960,
+        "http_status": 200,
+        "md5": "cdd38bef6b31476dce1f98f69634a4ff",
+        "original_filename": "river_discharge_tele_hr_karnataka_ka_1970_2025.csv",
+        "retrieved_at": "2026-10-07T04:13:57.771188+00:00",
+        "sha256": "fdd064010d905a1916acc5d0c179f72fa607313001efc82ecb74e4c6011e7b93",
+        "status": "retrieved"
+      },
+      "download_url": "https://nwdp.nwic.gov.in/dataset/dde02be7-8129-4c70-9822-86e4d3277b94/resource/68440116-aef8-49b6-83b4-f2a61d1ddf2b/download/river_discharge_tele_hr_karnataka_ka_1970_2025.csv",
+      "format": "CSV",
+      "frequency": "hourly",
+      "licence_id": "other-open",
+      "portal_date_range_label": "River Discharge Karnataka Karnataka (1970 - 2025) Telemetry Hourly",
+      "portal_hash": "cdd38bef6b31476dce1f98f69634a4ff",
+      "portal_size": 97010960,
+      "portal_update": "2026-01-24T23:37:20.242856",
+      "producer": "Karnataka SW",
+      "publication_handling": "redistribution_unresolved",
+      "resource_id": "68440116-aef8-49b6-83b4-f2a61d1ddf2b",
+      "resource_licence": "Other (Open)",
+      "resource_page_update": "January 24, 2026",
+      "resource_page_url": "https://www.nwdp.nwic.gov.in/dataset/river-discharge-telemetry-hourly-karnataka-water-department/resource/68440116-aef8-49b6-83b4-f2a61d1ddf2b",
+      "resource_title": "River Discharge Karnataka Karnataka (1970 - 2025) Telemetry Hourly",
+      "retrieval_time": "2026-10-07T04:10:53.771608+00:00",
+      "source_census": {
+        "conflicting_station_timestamp_rows": 143,
+        "distinct_station_names": 36,
+        "duplicate_station_timestamp_rows": 386,
+        "invalid_values": 1694,
+        "malformed_dates": 0,
+        "missing_values": 0,
+        "original_columns": [
+          "SlNo",
+          "Station",
+          "Agency",
+          "State LGD Code",
+          "State",
+          "District LGD Code",
+          "District",
+          "Tehsil",
+          "Block",
+          "Village",
+          "River",
+          "Basin",
+          "Tributary",
+          "Subtributary",
+          "SubSubtributary",
+          "Local River",
+          "Latitude",
+          "Longitude",
+          "Data Acquisition Time",
+          "Telemetry Hourly River Water Discharge (m3/sec)"
+        ],
+        "quality_columns": [],
+        "selected_rows": 0,
+        "total_source_rows": 799877,
+        "units_status": "source_field_verified"
+      },
+      "units": "m3/sec",
+      "variable": "discharge"
+    }
+  ],
+  "summary": {
+    "all_resources_verified": 4,
+    "availability_status": "availability_semantics_unverified",
+    "comparison_counts": {
+      "discrepancy": 33,
+      "exact_match": 2,
+      "rounding_equivalent": 20,
+      "unavailable_in_one_source": 26
+    },
+    "features": 0,
+    "labels": 0,
+    "measured_discharge_corroborated_rows": 14,
+    "observation_rows": 1697,
+    "pilot": [
+      {
+        "canonical_cwc_station_id": "CW1KRU000083",
+        "comparison_classes": {
+          "discrepancy": 25,
+          "exact_match": 1,
+          "rounding_equivalent": 1
+        },
+        "coordinate_status": "source_coordinate_conflict",
+        "variables": {
+          "discharge": {
+            "date_list": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-07-31",
+              "2019-08-01",
+              "2019-08-02",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-14",
+              "2019-08-15",
+              "2019-08-16",
+              "2019-08-17",
+              "2019-08-18",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "dates": 27,
+            "event_rows": 8,
+            "missing_dates": [],
+            "rows": 27,
+            "valid_rows": 27
+          },
+          "water_level": {
+            "date_list": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-07-31",
+              "2019-08-01",
+              "2019-08-02",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-16",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "dates": 23,
+            "event_rows": 168,
+            "missing_dates": [
+              "2019-08-14",
+              "2019-08-15",
+              "2019-08-17",
+              "2019-08-18"
+            ],
+            "rows": 552,
+            "valid_rows": 552
+          }
+        }
+      },
+      {
+        "canonical_cwc_station_id": "CW1KRU000212",
+        "comparison_classes": {
+          "discrepancy": 2,
+          "unavailable_in_one_source": 25
+        },
+        "coordinate_status": "verified_source_coordinate",
+        "variables": {
+          "discharge": {
+            "date_list": [
+              "2019-08-01",
+              "2019-08-02"
+            ],
+            "dates": 2,
+            "event_rows": 0,
+            "missing_dates": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-07-31",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-14",
+              "2019-08-15",
+              "2019-08-16",
+              "2019-08-17",
+              "2019-08-18",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "rows": 2,
+            "valid_rows": 2
+          },
+          "water_level": {
+            "date_list": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-07-31",
+              "2019-08-01",
+              "2019-08-02",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-14",
+              "2019-08-15",
+              "2019-08-18",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "dates": 25,
+            "event_rows": 161,
+            "missing_dates": [
+              "2019-08-16",
+              "2019-08-17"
+            ],
+            "rows": 573,
+            "valid_rows": 573
+          }
+        }
+      },
+      {
+        "canonical_cwc_station_id": "CW1KRU000339",
+        "comparison_classes": {
+          "discrepancy": 6,
+          "exact_match": 1,
+          "rounding_equivalent": 19,
+          "unavailable_in_one_source": 1
+        },
+        "coordinate_status": "source_coordinate_conflict",
+        "variables": {
+          "discharge": {
+            "date_list": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-08-01",
+              "2019-08-02",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-14",
+              "2019-08-15",
+              "2019-08-16",
+              "2019-08-17",
+              "2019-08-18",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "dates": 26,
+            "event_rows": 1,
+            "missing_dates": [
+              "2019-07-31"
+            ],
+            "rows": 26,
+            "valid_rows": 26
+          },
+          "water_level": {
+            "date_list": [
+              "2019-07-25",
+              "2019-07-26",
+              "2019-07-27",
+              "2019-07-28",
+              "2019-07-29",
+              "2019-07-30",
+              "2019-07-31",
+              "2019-08-01",
+              "2019-08-02",
+              "2019-08-03",
+              "2019-08-04",
+              "2019-08-05",
+              "2019-08-06",
+              "2019-08-07",
+              "2019-08-08",
+              "2019-08-09",
+              "2019-08-10",
+              "2019-08-11",
+              "2019-08-12",
+              "2019-08-13",
+              "2019-08-14",
+              "2019-08-16"
+            ],
+            "dates": 22,
+            "event_rows": 24,
+            "missing_dates": [
+              "2019-08-15",
+              "2019-08-17",
+              "2019-08-18",
+              "2019-08-19",
+              "2019-08-20"
+            ],
+            "rows": 517,
+            "valid_rows": 517
+          }
+        }
+      }
+    ],
+    "publication_counts": {
+      "redistribution_unresolved": 4
+    },
+    "readiness": "measured_event_hydrology_recovered",
+    "state_agency_cwc_matched_rows": 0,
+    "threshold_comparisons": 0,
+    "water_level_comparison": "hourly observations versus corresponding daily mean: not equivalent; no numeric comparison"
+  },
+  "version": "karnataka_hydrology_2019_pilot_v1"
+}

@@ -1,0 +1,778 @@
+{
+ "version": "river_flood_v1",
+ "target": "GloFAS v4 reanalysis flow above the 2-year flood level within 3 days",
+ "features": [
+  "rain_1d",
+  "rain_3d",
+  "rain_5d",
+  "rain_10d",
+  "rain_30d",
+  "wettest_cell_3d",
+  "season_sin",
+  "season_cos"
+ ],
+ "train_years": [
+  1997,
+  2015
+ ],
+ "test_years": [
+  2016,
+  2021
+ ],
+ "rivers": [
+  {
+   "id": "krishna_kudachi",
+   "river": "Krishna",
+   "place": "Kudachi",
+   "flood_level_2_year_m3s": 4313.7,
+   "catchment_cells": [
+    [
+     16.5,
+     74.75
+    ],
+    [
+     16.75,
+     74.0
+    ],
+    [
+     16.75,
+     74.25
+    ],
+    [
+     16.75,
+     74.5
+    ],
+    [
+     16.75,
+     74.75
+    ],
+    [
+     17.0,
+     73.75
+    ],
+    [
+     17.0,
+     74.0
+    ],
+    [
+     17.0,
+     74.25
+    ],
+    [
+     17.0,
+     74.5
+    ],
+    [
+     17.25,
+     73.75
+    ],
+    [
+     17.25,
+     74.0
+    ],
+    [
+     17.25,
+     74.25
+    ],
+    [
+     17.5,
+     73.75
+    ],
+    [
+     17.5,
+     74.0
+    ],
+    [
+     17.5,
+     74.25
+    ],
+    [
+     17.75,
+     73.5
+    ],
+    [
+     17.75,
+     73.75
+    ],
+    [
+     17.75,
+     74.0
+    ],
+    [
+     17.75,
+     74.25
+    ],
+    [
+     18.0,
+     73.5
+    ],
+    [
+     18.0,
+     73.75
+    ],
+    [
+     18.0,
+     74.0
+    ]
+   ],
+   "osm_sha256": "9c2e396da3ddf974807c89219eed986e7e12e3d873fd82dd4524f1d739db52c8",
+   "scaler": {
+    "mean": [
+     4.225399,
+     12.676198,
+     21.126996,
+     42.253993,
+     126.768559,
+     29.369609,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     9.370788,
+     25.229502,
+     39.304997,
+     71.318452,
+     174.539908,
+     55.025483,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    1.045824,
+    1.115209,
+    0.524433,
+    1.05874,
+    -0.04574,
+    -0.895508,
+    -5.119382,
+    -3.29454
+   ],
+   "intercept": -13.133949,
+   "decision_threshold": 3.785801,
+   "baseline_rule_rain_3d_mm": 114.3,
+   "train": {
+    "days": 6910,
+    "positives": 72
+   },
+   "test": {
+    "days": 2192,
+    "positives": 34,
+    "model": {
+     "tp": 24,
+     "fp": 10,
+     "fn": 10,
+     "precision": 0.706,
+     "recall": 0.706,
+     "f1": 0.706
+    },
+    "baseline_rule": {
+     "tp": 21,
+     "fp": 13,
+     "fn": 13,
+     "precision": 0.618,
+     "recall": 0.618,
+     "f1": 0.618
+    }
+   },
+   "documented_floods_in_test_years": [
+    {
+     "event_date": "2019-08-08",
+     "model_flagged_1_to_4_days_before": true,
+     "rule_flagged_1_to_4_days_before": true
+    }
+   ],
+   "parity_max_abs_difference": 9.336314608532348e-06,
+   "live_rain_scale": {
+    "factor": 1.0042,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 5769.1,
+    "forecast_model_catchment_total_mm": 5745.1,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  },
+  {
+   "id": "ghataprabha_gokak",
+   "river": "Ghataprabha",
+   "place": "Gokak",
+   "flood_level_2_year_m3s": 891.6,
+   "catchment_cells": [
+    [
+     15.75,
+     74.25
+    ],
+    [
+     15.75,
+     74.5
+    ],
+    [
+     16.0,
+     74.0
+    ],
+    [
+     16.0,
+     74.25
+    ],
+    [
+     16.0,
+     74.5
+    ],
+    [
+     16.0,
+     74.75
+    ],
+    [
+     16.25,
+     74.0
+    ],
+    [
+     16.25,
+     74.25
+    ],
+    [
+     16.25,
+     74.5
+    ],
+    [
+     16.25,
+     74.75
+    ]
+   ],
+   "osm_sha256": "74316c0d1e12f3e6f0ae5354111f7bfbd800cd466163fe1471768c37591c3e64",
+   "scaler": {
+    "mean": [
+     4.465392,
+     13.396177,
+     22.326961,
+     44.653922,
+     133.967444,
+     26.870579,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     9.337954,
+     24.745413,
+     38.549926,
+     70.064694,
+     172.861552,
+     48.077948,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    0.631314,
+    2.406289,
+    0.597007,
+    0.553189,
+    -0.342209,
+    -2.742033,
+    -0.423921,
+    -2.248474
+   ],
+   "intercept": -4.178026,
+   "decision_threshold": 3.555511,
+   "baseline_rule_rain_3d_mm": 112.9,
+   "train": {
+    "days": 6910,
+    "positives": 63
+   },
+   "test": {
+    "days": 2192,
+    "positives": 40,
+    "model": {
+     "tp": 18,
+     "fp": 12,
+     "fn": 22,
+     "precision": 0.6,
+     "recall": 0.45,
+     "f1": 0.514
+    },
+    "baseline_rule": {
+     "tp": 21,
+     "fp": 11,
+     "fn": 19,
+     "precision": 0.656,
+     "recall": 0.525,
+     "f1": 0.583
+    }
+   },
+   "documented_floods_in_test_years": [
+    {
+     "event_date": "2019-08-09",
+     "model_flagged_1_to_4_days_before": true,
+     "rule_flagged_1_to_4_days_before": true
+    }
+   ],
+   "parity_max_abs_difference": 8.878258775268932e-06,
+   "live_rain_scale": {
+    "factor": 1.1282,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 5940.9,
+    "forecast_model_catchment_total_mm": 5265.6,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  },
+  {
+   "id": "kabini_nanjangud",
+   "river": "Kabini",
+   "place": "Nanjangud",
+   "flood_level_2_year_m3s": 707.2,
+   "catchment_cells": [
+    [
+     11.75,
+     76.0
+    ],
+    [
+     11.75,
+     76.25
+    ],
+    [
+     11.75,
+     76.5
+    ],
+    [
+     12.0,
+     76.25
+    ],
+    [
+     12.0,
+     76.5
+    ],
+    [
+     12.0,
+     76.75
+    ],
+    [
+     12.25,
+     76.75
+    ]
+   ],
+   "osm_sha256": "aca2497a303d8f0951b30807ef571421962d9b70aac0b808c046d936a7d09bba",
+   "scaler": {
+    "mean": [
+     3.46173,
+     10.385191,
+     17.308652,
+     34.6173,
+     103.835565,
+     24.499899,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     6.10854,
+     15.498875,
+     23.318994,
+     39.693068,
+     93.932446,
+     34.167587,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    0.358351,
+    0.755356,
+    -0.305997,
+    -0.318728,
+    0.892524,
+    0.298059,
+    -0.233031,
+    -0.181213
+   ],
+   "intercept": -2.362366,
+   "decision_threshold": 3.621205,
+   "baseline_rule_rain_3d_mm": 85.5,
+   "train": {
+    "days": 6910,
+    "positives": 49
+   },
+   "test": {
+    "days": 2192,
+    "positives": 28,
+    "model": {
+     "tp": 13,
+     "fp": 4,
+     "fn": 15,
+     "precision": 0.765,
+     "recall": 0.464,
+     "f1": 0.578
+    },
+    "baseline_rule": {
+     "tp": 7,
+     "fp": 4,
+     "fn": 21,
+     "precision": 0.636,
+     "recall": 0.25,
+     "f1": 0.359
+    }
+   },
+   "documented_floods_in_test_years": [
+    {
+     "event_date": "2018-08-18",
+     "model_flagged_1_to_4_days_before": true,
+     "rule_flagged_1_to_4_days_before": true
+    }
+   ],
+   "parity_max_abs_difference": 2.8501663216218276e-06,
+   "live_rain_scale": {
+    "factor": 0.9571,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 4036.3,
+    "forecast_model_catchment_total_mm": 4217.2,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  },
+  {
+   "id": "netravati_bantwal",
+   "river": "Netravati",
+   "place": "Bantwal",
+   "flood_level_2_year_m3s": 1124.8,
+   "catchment_cells": [
+    [
+     12.75,
+     75.0
+    ],
+    [
+     12.75,
+     75.25
+    ],
+    [
+     12.75,
+     75.5
+    ],
+    [
+     12.75,
+     75.75
+    ],
+    [
+     13.0,
+     75.0
+    ],
+    [
+     13.0,
+     75.25
+    ],
+    [
+     13.25,
+     75.25
+    ]
+   ],
+   "osm_sha256": "e80d71ca79514d0b480e986db311e2b2f36a9761b3ef95c4dbf7d33403a47f65",
+   "scaler": {
+    "mean": [
+     8.098625,
+     24.29588,
+     40.493134,
+     80.98627,
+     242.944681,
+     33.472388,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     13.355202,
+     36.649399,
+     57.778731,
+     105.603519,
+     270.846351,
+     48.441289,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    0.713666,
+    0.534523,
+    -0.262062,
+    0.538885,
+    1.327774,
+    0.172522,
+    -2.025921,
+    -2.933749
+   ],
+   "intercept": -8.996527,
+   "decision_threshold": 3.496622,
+   "baseline_rule_rain_3d_mm": 143.8,
+   "train": {
+    "days": 6910,
+    "positives": 94
+   },
+   "test": {
+    "days": 2192,
+    "positives": 41,
+    "model": {
+     "tp": 20,
+     "fp": 9,
+     "fn": 21,
+     "precision": 0.69,
+     "recall": 0.488,
+     "f1": 0.571
+    },
+    "baseline_rule": {
+     "tp": 18,
+     "fp": 27,
+     "fn": 23,
+     "precision": 0.4,
+     "recall": 0.439,
+     "f1": 0.419
+    }
+   },
+   "documented_floods_in_test_years": [
+    {
+     "event_date": "2019-08-10",
+     "model_flagged_1_to_4_days_before": true,
+     "rule_flagged_1_to_4_days_before": true
+    }
+   ],
+   "parity_max_abs_difference": 5.1652828059189915e-06,
+   "live_rain_scale": {
+    "factor": 0.845,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 9551.9,
+    "forecast_model_catchment_total_mm": 11304.0,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  },
+  {
+   "id": "tungabhadra_hampi",
+   "river": "Tungabhadra",
+   "place": "Hampi",
+   "flood_level_2_year_m3s": 2355.2,
+   "catchment_cells": [
+    [
+     14.25,
+     75.0
+    ],
+    [
+     14.5,
+     75.0
+    ],
+    [
+     14.5,
+     75.25
+    ],
+    [
+     14.75,
+     75.25
+    ],
+    [
+     14.75,
+     75.5
+    ],
+    [
+     15.0,
+     75.25
+    ],
+    [
+     15.0,
+     75.5
+    ],
+    [
+     15.0,
+     75.75
+    ],
+    [
+     15.0,
+     76.0
+    ],
+    [
+     15.25,
+     76.0
+    ],
+    [
+     15.25,
+     76.25
+    ],
+    [
+     15.25,
+     76.5
+    ]
+   ],
+   "osm_sha256": "7febec73f54978e2bd44138d5156c507dbc91a96c5731203ccf2643c538e9cc7",
+   "scaler": {
+    "mean": [
+     2.360157,
+     7.08047,
+     11.800784,
+     23.601568,
+     70.816415,
+     16.686469,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     4.904224,
+     12.597891,
+     19.149903,
+     33.134061,
+     78.871211,
+     28.030304,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    0.887063,
+    -1.270312,
+    0.067373,
+    2.781537,
+    3.798825,
+    0.998361,
+    -5.878732,
+    1.594953
+   ],
+   "intercept": -19.914007,
+   "decision_threshold": 3.501189,
+   "baseline_rule_rain_3d_mm": 63.8,
+   "train": {
+    "days": 6910,
+    "positives": 46
+   },
+   "test": {
+    "days": 2192,
+    "positives": 40,
+    "model": {
+     "tp": 31,
+     "fp": 31,
+     "fn": 9,
+     "precision": 0.5,
+     "recall": 0.775,
+     "f1": 0.608
+    },
+    "baseline_rule": {
+     "tp": 16,
+     "fp": 16,
+     "fn": 24,
+     "precision": 0.5,
+     "recall": 0.4,
+     "f1": 0.444
+    }
+   },
+   "documented_floods_in_test_years": [],
+   "parity_max_abs_difference": 8.261119766928005e-06,
+   "live_rain_scale": {
+    "factor": 1.0535,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 3299.3,
+    "forecast_model_catchment_total_mm": 3131.8,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  },
+  {
+   "id": "kali_dandeli",
+   "river": "Kali",
+   "place": "Dandeli",
+   "flood_level_2_year_m3s": 542.5,
+   "catchment_cells": [
+    [
+     15.25,
+     74.25
+    ],
+    [
+     15.25,
+     74.5
+    ],
+    [
+     15.25,
+     74.75
+    ]
+   ],
+   "osm_sha256": "6d57914c701d625d8db7dbc61858461c32dc6eba841e6501a9e8a03b835d9a74",
+   "scaler": {
+    "mean": [
+     5.490352,
+     16.471056,
+     27.451761,
+     54.903521,
+     164.714187,
+     25.524197,
+     -0.001057,
+     -0.004125
+    ],
+    "scale": [
+     10.830675,
+     29.83378,
+     47.2149,
+     86.791943,
+     217.933922,
+     45.51707,
+     0.708381,
+     0.705817
+    ]
+   },
+   "coefficients": [
+    0.83221,
+    0.399824,
+    0.48461,
+    0.401942,
+    0.567784,
+    0.011847,
+    -4.415116,
+    -7.118387
+   ],
+   "intercept": -15.916566,
+   "decision_threshold": 3.792244,
+   "baseline_rule_rain_3d_mm": 122.3,
+   "train": {
+    "days": 6910,
+    "positives": 96
+   },
+   "test": {
+    "days": 2192,
+    "positives": 29,
+    "model": {
+     "tp": 16,
+     "fp": 5,
+     "fn": 13,
+     "precision": 0.762,
+     "recall": 0.552,
+     "f1": 0.64
+    },
+    "baseline_rule": {
+     "tp": 16,
+     "fp": 18,
+     "fn": 13,
+     "precision": 0.471,
+     "recall": 0.552,
+     "f1": 0.508
+    }
+   },
+   "documented_floods_in_test_years": [
+    {
+     "event_date": "2019-08-06",
+     "model_flagged_1_to_4_days_before": true,
+     "rule_flagged_1_to_4_days_before": true
+    }
+   ],
+   "parity_max_abs_difference": 1.1066620416499973e-05,
+   "live_rain_scale": {
+    "factor": 1.0072,
+    "period": [
+     "2023-01-01",
+     "2025-12-31"
+    ],
+    "era5_catchment_total_mm": 6854.2,
+    "forecast_model_catchment_total_mm": 6805.4,
+    "method": "ERA5 total / Open-Meteo forecast-model total over the same catchment cells and days"
+   }
+  }
+ ]
+}

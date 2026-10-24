@@ -244,13 +244,14 @@ footer {
 }
 .map-legend {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 .water-swatch {
   display: inline-block;
   width: 14px;
   height: 14px;
+  margin-top: 4px;
   background: #dc6047;
   border: 1px solid #9c3627;
   flex-shrink: 0;
@@ -356,3 +357,435 @@ footer {
     padding-top: 32px;
   }
 }
+
+/* Shared FloodPulse application shell. Existing feature controls retain their contracts. */
+:root { color: #172f4e; background: #f3f7fc; --blue: #165eab; --teal: #087f83; --ink: #172f4e; --muted: #50647b; }
+[hidden] { display: none !important; }
+html { scroll-padding-top: 110px; }
+body { min-width: 320px; }
+a { color: #155ba2; }
+button, .button-link { background: var(--blue); border-radius: 10px; min-height: 44px; }
+button:hover:not(:disabled), .button-link:hover { background: #104b89; }
+button:disabled { cursor: not-allowed; }
+button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #087f83; outline-offset: 4px; }
+.skip-link { position: absolute; top: -80px; left: 16px; z-index: 2000; background: white; padding: 14px; border-radius: 8px; }
+.skip-link:focus { top: 8px; }
+.app-header { padding: 0; background: white; border-bottom: 1px solid #dce6f1; position: sticky; top: 0; z-index: 1100; }
+.header-inner { max-width: 1400px; padding: 20px 32px; margin: auto; width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+.app-brand { display: flex; gap: 12px; align-items: center; color: #163861; text-decoration: none; flex-shrink: 0; }
+.app-brand strong { display: block; font-size: 25px; letter-spacing: -.6px; }
+.app-brand small { display: block; font-size: 11px; color: #546880; font-weight: 500; letter-spacing: 0; margin-top: 4px; }
+.app-header span { letter-spacing: 0; }
+.brand-mark { width: 44px; height: 48px; background: #eaf5fa; border-radius: 15px; display: grid; place-items: center; color: #087f83; }
+.brand-mark svg { width: 28px; height: 28px; }
+.primary-nav { display: flex; gap: 6px; }
+.primary-nav a { display: flex; align-items: center; gap: 7px; padding: 12px 13px; border-radius: 10px; text-decoration: none; color: #405573; font-size: 14px; font-weight: 600; white-space: nowrap; }
+.primary-nav svg { width: 18px; height: 18px; }
+.primary-nav a:hover { background: #f0f5fb; }
+.primary-nav a[aria-current=page] { background: #e6f1fe; color: #165eab; box-shadow: inset 0 -2px #165eab; }
+.nav-toggle { display: none; }
+main.app-content { max-width: 1340px; padding: 0 32px 40px; }
+.page-intro { padding: 35px 0 24px; }
+.page-intro h1 { font-size: clamp(30px, 4vw, 42px); color: #183960; letter-spacing: -.035em; }
+.page-intro h1:focus { outline: none; }
+.page-intro > div > p:last-child { color: var(--muted); max-width: 780px; }
+.eyebrow { color: #08757b; font-size: 11px; }
+.home-hero { margin: 26px 0 24px; padding: 32px; border: 1px solid #d5e7f7; border-radius: 22px; background: linear-gradient(120deg,#eaf3ff,#e9f7f7); display: grid; grid-template-columns: 1fr 240px; gap: 32px; align-items: center; }
+.home-hero h1 { font-size: clamp(38px, 5vw, 56px); margin-bottom: 8px; }
+.hero-subtitle { font-size: 18px; font-weight: 600; color: #254d76; margin-top: 0; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+.button-link { display: inline-flex; align-items: center; justify-content: center; color: white; text-decoration: none; padding: 12px 18px; font-weight: 600; font-size: 14px; }
+.button-link.secondary { background: white; color: #155ba2; border: 1px solid #a7c4e0; }
+.hero-art { color: #165eab; text-align: center; }
+.hero-art svg { width: 100%; fill: #c5e1f4; stroke: #087f83; stroke-width: 3; stroke-linecap: round; }
+.hero-art span { font-size: 13px; color: #315e7d; }
+.overview-links { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px; margin-bottom: 26px; }
+.overview-links a { background: white; padding: 20px; border: 1px solid #d9e4f0; border-radius: 14px; text-decoration: none; box-shadow: 0 3px 12px #17313c04; }
+.overview-links a:hover { border-color: #5a99c6; }
+.overview-links strong { display: block; font-size: 17px; color: #1d4e7f; }
+.overview-links span { display: block; font-size: 13px; color: var(--muted); margin-top: 8px; line-height: 1.5; }
+.panel { border-color: #dce5ef; border-radius: 18px; box-shadow: 0 4px 24px #18396006; margin-bottom: 24px; }
+.panel h2, .panel h3 { color: #1c416c; }
+.weather-location-map { height: 420px; }
+.selection-summary { margin: 0 0 24px; padding: 16px 20px; background: #e9f4f7; border-radius: 12px; color: #27586c; overflow-wrap: anywhere; }
+.metrics article { border-color: #d9e7f7; background: #f2f7fd; border-radius: 14px; }
+.metrics article strong { color: #165eab; }
+.weather-freshness { border-color: #087f83; background: #edf8f7; border-radius: 10px; }
+.metadata { border-top: 1px solid #dfebf4; }
+.tag { background: #e8f4f5; color: #17636b; border-radius: 6px; }
+.forecast-days { grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); }
+.forecast-days article { padding: 16px 12px; background: #f5f9ff; border-color: #d9e5f3; border-radius: 12px; }
+.forecast-days h4 { font-size: 14px; color: #194d7e; }
+.forecast-days dl div { display: grid; gap: 4px; }
+.forecast-days dd { font-size: 15px; color: #194d7e; }
+.notice { border-radius: 10px; }
+.rainfall-chart { margin-top: 28px; padding: 20px; background: #f6fafc; border: 1px solid #dfe9ef; border-radius: 14px; }
+.chart-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+.chart-heading h3 { margin: 0; }
+.rainfall-bars { display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 12px; margin-top: 22px; }
+.rainfall-bars > div { text-align: center; min-width: 0; }
+.rainfall-bars strong, .rainfall-bars time { display: block; font-size: 12px; color: #355373; overflow-wrap: anywhere; }
+.bar-track { display: flex; align-items: end; justify-content: center; height: 120px; border-bottom: 1px solid #ccdce8; margin: 8px 0; }
+.bar-track > div { width: min(70%,44px); border-radius: 6px 6px 0 0; background: #198c99; }
+.layer-control { display: flex; gap: 12px; align-items: center; font-weight: 600; }
+.layer-control input { width: 18px; height: 18px; accent-color: #165eab; }
+.page-flood-map .historical-map { height: min(65vh,660px); min-height: 390px; }
+.page-flood-map .research-map { height: 520px; }
+.shelter-map { border-radius: 12px; }
+.admin-shell { margin: 0; max-width: none; padding: 0; }
+.admin-shell > h2 { margin-top: 20px; }
+.admin-shell > button { margin-bottom: 24px; }
+.admin-shell .shelter-form:not([aria-label]) { max-width: 560px; }
+.shelter-form input, .shelter-form textarea, .shelter-form select { border-color: #9bb4d0; border-radius: 8px; }
+.shelter-form fieldset { border-color: #9bb4d0; border-radius: 12px; padding: 20px; }
+.app-footer { margin: 0; padding: 28px max(32px,calc((100vw - 1276px)/2)); background: #e9f0f9; border-top: 1px solid #d4e1ef; display: grid; grid-template-columns: 1fr 2fr; gap: 40px; font-size: 12px; color: #435d79; }
+.app-footer strong { color: #1c416c; font-size: 18px; }
+.app-footer p { margin: 8px 0; }
+@media (max-width: 1100px) {
+ .header-inner { flex-wrap: wrap; gap: 16px; padding: 16px 24px; }
+ .primary-nav { width: 100%; justify-content: space-between; }
+ .app-header { position: relative; }
+ .forecast-days { grid-template-columns: repeat(auto-fit,minmax(180px,1fr)); }
+}
+@media (max-width: 700px) {
+ main.app-content { padding: 0 16px 28px; }
+ .header-inner { padding: 14px 16px; gap: 14px; }
+ .app-brand strong { font-size: 21px; }
+ .app-brand small { font-size: 9px; max-width: 215px; line-height: 1.5; }
+ .brand-mark { width: 34px; height: 40px; border-radius: 10px; }
+ .nav-toggle { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 13px; }
+ .nav-toggle span { font-size: 20px; color: white; }
+ .primary-nav { display: none; flex-direction: column; align-items: stretch; padding: 8px 0; }
+ .primary-nav.expanded { display: flex; }
+ .primary-nav a { min-height: 46px; }
+ .page-intro { padding: 24px 0 18px; }
+ .home-hero { display: block; padding: 24px; margin-top: 18px; }
+ .hero-art { display: none; }
+ .overview-links { grid-template-columns: minmax(0,1fr); gap: 10px; }
+ .overview-links a { padding: 16px; }
+ .panel { padding: 20px 16px; }
+ .panel-heading { flex-wrap: wrap; }
+ .weather-location-map { height: 340px; }
+ .forecast-days { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+ .forecast-days article { padding: 14px 10px; }
+ .forecast-condition { min-height: 42px; }
+ .rainfall-chart { padding: 14px 8px; }
+ .rainfall-bars { gap: 5px; }
+ .rainfall-bars strong { min-height: 34px; font-size: 10px; }
+ .rainfall-bars time { font-size: 10px; }
+ .page-flood-map .historical-map, .page-flood-map .research-map { height: 440px; min-height: 0; }
+ .app-footer { padding: 24px 16px; grid-template-columns: 1fr; gap: 12px; }
+}
+@media (max-width: 360px) { .app-brand small { max-width: 155px; } .brand-mark { display: none; } }
+.point-selector-body > * { min-width: 0; }
+.point-selector-body:has(.point-map) { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1.7fr); gap: 24px; }
+.weather-coordinate-form { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.weather-coordinate-form label { min-width: 0; }
+.weather-coordinate-form button { grid-column: 1/-1; }
+.shelter-empty { background: #f0f7fb; border: 1px dashed #9fbfd8; padding: 32px 24px; border-radius: 14px; text-align: center; color: #355777; font-weight: 600; }
+@media (max-width: 900px) { .point-selector-body:has(.point-map) { grid-template-columns: minmax(0,1fr); } }
+@media (max-width: 500px) { .weather-coordinate-form { grid-template-columns: 1fr; } }
+
+/* Sprint 11: primary evidence map before compact, separate context panels. */
+.intelligence-toolbar {display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:20px}
+.intelligence-toolbar>label {display:flex;gap:8px;align-items:center;font-weight:600}
+.intelligence-toolbar select,.intelligence-cell-selector select {padding:10px;border:1px solid #adbfcc;border-radius:8px;background:white;color:#15395f;max-width:100%;min-height:44px}
+.intelligence-toolbar fieldset {flex-basis:100%;display:flex;flex-wrap:wrap;gap:18px;border:0;padding:8px 0;margin:0}
+.intelligence-toolbar legend {font-weight:600;margin-bottom:6px}
+.intelligence-toolbar fieldset label {display:flex;gap:8px;align-items:center;min-height:32px}
+.intelligence-map {height:620px;border:1px solid #b7ccd4;border-radius:12px}
+.intelligence-coverage {font-size:.94rem}
+.intelligence-cell-selector {display:grid;gap:8px;margin:20px 0}
+.intelligence-detail {margin-top:20px}
+.intelligence-detail dl {display:grid;grid-template-columns:180px minmax(0,1fr);gap:12px 18px;overflow-wrap:anywhere}
+.intelligence-detail dt {font-weight:700}.intelligence-detail dd {margin:0}
+.intelligence-events {margin:18px 0}.intelligence-events summary {cursor:pointer;min-height:32px}
+@media(max-width:650px){.intelligence-toolbar>label {display:grid;width:100%}.intelligence-toolbar select {width:100%}.intelligence-toolbar fieldset{display:grid;gap:6px}.intelligence-map{height:440px}.intelligence-detail dl{grid-template-columns:1fr;gap:6px}.intelligence-detail dd{margin-bottom:12px}}
+.intelligence-events p {overflow-wrap:anywhere}
+.intelligence-cell-selector {min-width:0}
+.intelligence-cell-selector select {min-width:0;width:100%}
+
+/* Route-specific composition, retaining one shared location/weather session. */
+.dashboard-content > * {min-width:0}
+.location-bar {display:flex;align-items:center;justify-content:space-between;gap:16px}
+.location-bar h2 {font-size:18px;margin:0}
+.location-bar p {margin:6px 0}
+.selected-point-name {color:#365773;font-size:14px;overflow-wrap:anywhere}
+.compact-location {padding:18px 22px}
+.location-editor {margin:12px 0 0;border-top:1px solid #dde7ef;padding-top:12px}
+.location-editor summary {cursor:pointer;color:#155ba2;font-weight:600;min-height:32px;padding:6px 0}
+.location-editor[open] {margin-bottom:18px}
+.compact-location .point-map {margin-top:16px}
+.compact-location .weather-location-map {height:340px}
+.weather-source-details summary {cursor:pointer;color:#315b7c;font-size:13px;margin-top:20px}
+.page-home .home-hero {padding:24px 28px;grid-template-columns:1fr 170px;gap:24px}
+.page-home .home-hero h1 {font-size:42px}
+.page-home .hero-actions {margin-top:14px}
+.page-home .overview-links {gap:12px;margin-bottom:20px}
+.page-home .overview-links a {padding:14px 18px}
+.page-home .overview-links span {margin-top:5px}
+.page-home .dashboard-content {display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:0 24px;align-items:start}
+.page-home .weather-sections {grid-column:2}
+.page-home .location-side {grid-column:1}
+.page-home .weather-location-map {height:410px}
+.page-home .weather-sections .panel {padding:22px}
+.page-home .weather-sections p {font-size:13px;line-height:1.5}
+.page-home .weather-freshness small {font-size:11px}
+.page-home .metrics {gap:8px}
+.page-home .metrics article {padding:14px 10px}
+.page-home .metrics article strong {font-size:23px}
+.forecast-preview .forecast-days {grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+.forecast-preview .forecast-days article {padding:12px 8px}
+.forecast-preview .forecast-condition {font-size:12px;min-height:0}
+.forecast-preview-values {margin:6px 0;color:#315b7c}
+.forecast-preview > p.muted {font-size:11px}
+.page-shelters .compact-location {margin-bottom:18px}
+@media(max-width:1000px){.page-home .dashboard-content {grid-template-columns:1fr}.page-home .weather-sections,.page-home .location-side {grid-column:auto;grid-row:auto}}
+@media(max-width:700px){.page-home .home-hero {display:block;padding:22px}.location-bar {flex-wrap:wrap;gap:10px}.page-home .weather-sections .panel {padding:20px 16px}.page-home .weather-location-map,.compact-location .weather-location-map {height:300px}.compact-location {padding:16px}.forecast-preview .forecast-days {grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Desktop application workspaces; every detailed panel remains scrollable. */
+.admin-tabs {display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.admin-tabs [aria-pressed=true] {background:#075a67}
+.admin-entrance-panel label {display:block;font-weight:600;margin:10px 0 5px}
+.admin-entrance-panel :is(input,select) {width:100%;min-width:0;padding:9px;font:inherit;border:1px solid #7897a5;border-radius:6px}
+.admin-entrance-panel button {margin:6px 0}
+.admin-entrance-panel :focus-visible {outline:3px solid #286fba;outline-offset:3px}
+.intelligence-layout>* {min-width:0}
+.place-provenance summary {cursor:pointer;font-weight:600}
+@media(min-width:1100px) and (min-height:740px) {
+ #root {height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+ .app-header {flex-shrink:0}
+ main.app-content {flex:1;min-height:0;overflow:auto;width:100%;max-width:none;margin:0;padding:12px 24px;display:flex;flex-direction:column}
+ .page-intro,.page-home .home-hero {margin:0 0 10px;padding:10px 16px;flex-shrink:0;gap:12px}
+ .page-intro h1,.page-home .home-hero h1 {font-size:26px;margin:0 0 4px}
+ .page-intro p,.page-home .hero-subtitle {margin:3px 0;font-size:12px;line-height:1.35}
+ .page-home .home-hero {display:block}
+ .hero-art,.page-home .hero-actions,.page-home .overview-links {display:none}
+ .app-footer {flex-shrink:0;padding:5px 24px;gap:20px;font-size:10px;grid-template-columns:1fr 3fr}
+ .app-footer strong {font-size:12px}.app-footer p {margin:2px 0}
+ .dashboard-content {flex:1;min-height:0}
+ .panel {margin:0;padding:16px;border-radius:12px;min-width:0}
+ .panel h2 {font-size:18px}.panel p {font-size:12px;line-height:1.45;margin:8px 0}
+ .panel-heading {gap:8px;margin-bottom:8px}
+ .panel-heading button {font-size:12px;padding:9px 12px}
+ .page-home .dashboard-content {align-items:stretch;grid-template-rows:minmax(0,1fr);gap:12px;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr)}
+ .page-home .location-side,.page-home .weather-sections {display:grid;grid-template-rows:minmax(0,2.4fr) minmax(0,1fr);gap:12px;min-height:0}
+ .page-home :is(.location-context,.shelter-sections) {min-height:0;overflow:auto}
+ .page-home .location-context>.panel {height:100%;display:flex;flex-direction:column;overflow:auto}
+ .page-home .weather-sections>.panel,.page-home .shelter-sections>.panel {height:100%;overflow:auto;padding:16px}
+ .page-home .point-map {min-height:130px;flex:1;display:flex;flex-direction:column}
+ .page-home .weather-location-map {height:auto;min-height:130px;flex:1}
+ .page-home .point-map>.muted {font-size:10px;margin:4px 0}
+ .page-home .weather-map-actions {margin-top:5px;gap:6px}.page-home .weather-map-actions button {font-size:11px;padding:7px}
+ .page-home .location-bar .eyebrow {display:none}
+ .page-home .compact-location {padding:12px 16px}
+ .page-home .location-editor {margin-top:4px;padding-top:4px}
+ .page-home .weather-sections p {font-size:11px}
+ .page-home .weather-overview {display:flex;flex-direction:column}
+ .page-home .weather-overview>.weather-freshness {order:1}
+ .page-home .weather-overview>div[aria-live] {order:2}
+ .page-home .weather-overview>p {order:3}
+ .page-home .weather-freshness {margin:8px 0;padding:8px;gap:2px;font-size:11px}
+ .page-home .weather-freshness span {font-size:11px}
+ .page-home .weather-sections h3 {font-size:15px;margin:10px 0 4px}
+ .page-home .metrics small {font-size:9px}
+ .page-home .shelters-overview {display:flex;flex-direction:column}
+ .page-home .shelters-overview>p {order:2}
+ .page-home .shelters-overview>div[aria-live] {order:1}
+ .page-home .shelter-empty {padding:12px;font-size:12px}
+ .page-home .metrics article {padding:8px}.page-home .metrics article strong {font-size:20px}
+ .page-home .forecast-days {grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+ .page-home .forecast-days article {padding:8px 5px}.page-home .forecast-days h4 {font-size:10px}.page-home .forecast-days p {font-size:10px}
+ .page-weather .dashboard-content {display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px}
+ .page-weather .location-side {max-height:200px;overflow:auto}
+ .page-weather .location-context>.panel {padding:10px 16px}
+ .page-weather .location-bar .eyebrow {display:none}
+ .page-weather .location-editor {margin-top:6px;padding-top:6px}
+ .page-weather .weather-freshness {padding:8px 12px;margin:8px 0;gap:3px;font-size:11px}
+ .page-weather .weather-freshness small {font-size:10px}
+ .page-weather .weather-sections h3 {margin:10px 0 4px;font-size:16px}
+ .page-weather .weather-sections .metrics article {padding:8px}
+ .page-weather .weather-sections .metrics strong {font-size:22px}
+ .page-weather .weather-sections {display:grid;grid-template-columns:minmax(0,2.2fr) minmax(280px,1fr);gap:12px;min-height:0}
+ .page-weather .weather-sections>.panel {min-height:0;overflow:auto}
+ .page-weather .metrics {gap:10px}.page-weather .metrics article {padding:12px}
+ .page-weather .forecast-days {grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+ .page-weather .forecast-days article {padding:8px}.page-weather .forecast-days h4 {font-size:11px}
+ .page-weather .forecast-days dl div {display:block}.page-weather .forecast-days dd {margin:3px 0}
+ .page-shelters .dashboard-content,.page-shelters .location-side {display:flex;flex-direction:column;gap:12px;min-height:0}
+ .page-shelters .location-side {flex:1}.page-shelters .location-context {flex-shrink:0;max-height:200px;overflow:auto}
+ .page-shelters .shelter-sections {flex:1;min-height:0;overflow:auto}
+ .page-shelters .selection-summary {display:none}.page-shelters .compact-location {margin:0}
+ .location-editor[open] {max-height:190px;overflow:auto}
+ .location-directory {margin:8px 0}.location-directory p {font-size:11px}
+ #location-directory-content {display:grid;grid-template-columns:minmax(0,1fr);gap:4px}
+ #location-directory-content>h3,#location-directory-content>p,#location-directory-content>ul,#location-directory-content>details,#location-directory-content>div {grid-column:1}
+ #location-directory-content>label {margin:3px 0}.location-directory ul {max-height:130px;overflow:auto;margin:4px 0}
+ .page-flood-map .location-side {display:none}
+ .intelligence-workspace {height:100%;min-height:0;display:flex;flex-direction:column}
+ .intelligence-workspace>h2 {font-size:16px;margin:0 0 6px}
+ .intelligence-toolbar {padding:8px 12px;gap:8px;flex-shrink:0;margin-bottom:10px}
+ .intelligence-toolbar fieldset {flex-basis:auto;flex:1;gap:10px;padding:0}.intelligence-toolbar legend {font-size:11px}
+ .intelligence-toolbar fieldset label {font-size:11px}.intelligence-toolbar select {padding:6px;font-size:12px;min-height:36px}
+ .intelligence-toolbar>label:first-child {font-size:12px}
+ .intelligence-toolbar>button {font-size:11px;padding:8px}
+ .intelligence-layout {display:grid;grid-template-columns:minmax(0,2.5fr) minmax(460px,1fr);gap:12px;flex:1;min-height:0}
+ .intelligence-map-stage {display:flex;flex-direction:column;min-height:0}
+ .page-flood-map .intelligence-map {height:auto;flex:1;min-height:180px}
+ .intelligence-map-stage>.map-legend {font-size:11px;margin:6px 0;line-height:1.35}
+ .intelligence-map-stage>.notice {font-size:11px;margin:5px 0;padding:7px;line-height:1.35}
+ .intelligence-map-stage>.map-actions {margin:0 0 8px;gap:8px}
+ .intelligence-map-stage>.map-actions button {font-size:11px;padding:8px;min-height:36px}
+ .intelligence-sidebar {overflow:auto;min-height:0;background:white;border:1px solid #dce6f1;border-radius:12px;padding:14px;font-size:12px}
+ .intelligence-sidebar p {font-size:12px;line-height:1.5}.intelligence-sidebar .panel {padding:12px}
+ .intelligence-sidebar .intelligence-detail dl {display:block}.intelligence-sidebar .intelligence-detail dd {margin:4px 0 12px}
+ .page-admin .dashboard-content {display:none}
+ .page-admin .admin-shell {flex:1;min-height:0;overflow:auto;width:100%;max-width:none;margin:0;padding:0}
+ .admin-shell>h2 {font-size:18px;margin:8px 0}.admin-shell>p {font-size:12px;margin:6px 0}
+ .admin-management {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);grid-template-rows:150px minmax(0,1fr);gap:12px;height:calc(100% - 145px);min-height:280px}
+ .admin-assignments {grid-column:1;grid-row:1;overflow:auto}
+ .admin-entrance-panel {grid-column:1;grid-row:2;overflow:auto;min-height:0}
+ .admin-management>.shelter-form {grid-column:2;grid-row:1/3;overflow:auto;min-height:0;align-content:start;grid-template-columns:1fr 1fr;gap:12px}
+ .admin-management>.shelter-form>:is(h2,p,fieldset,.shelter-map,button) {grid-column:1/-1}
+ .admin-notifications {height:calc(100% - 145px);overflow:auto}
+ .admin-shell .shelter-form:not([aria-label]) {margin:24px auto}
+}
+
+/* Original photographed wireframes: information left, geographic workspace right.
+   One full-height information pane scrolls; critical cards are not tiny panes. */
+.wireframe-workspace {display:grid;grid-template-columns:minmax(340px,.95fr) minmax(0,1.35fr);gap:18px;align-items:start}
+.workspace-information {display:flex;flex-direction:column;gap:14px;min-width:0}
+.workspace-information .weather-sections {display:flex;flex-direction:column;gap:14px}
+.workspace-information .panel {margin:0}
+.workspace-map {min-width:0;display:flex;flex-direction:column}
+.workspace-map .weather-location-map,.workspace-map .shelter-map {height:560px;min-height:280px}
+.workspace-map .weather-map-actions {flex-shrink:0}
+.workspace-map .map-legend {font-size:12px;color:#435e72;line-height:1.5}
+.overview-status-grid {display:grid;gap:10px}
+.overview-status-grid article {border-left:3px solid #157f8c;background:#f1f7fa;padding:10px 14px;border-radius:0 8px 8px 0}
+.overview-status-grid h3 {margin:0;font-size:14px}.overview-status-grid p {font-weight:700;margin:5px 0}
+.overview-status-grid small {font-size:12px;color:#445e6d}
+.district-context {padding:10px 14px;border:1px solid #cddfe5;border-radius:10px;background:#ecf6f8;font-size:13px;margin:0}
+.page-flood-map .wireframe-workspace {display:block}
+.page-flood-map .workspace-information[hidden],.workspace-information [hidden] {display:none!important}
+.workspace-information .forecast-days {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.workspace-information .forecast-days article {padding:10px}
+.workspace-information .metrics article {padding:12px}
+.workspace-information .metrics strong {font-size:24px}
+.workspace-information .location-editor[open] {max-height:none;overflow:visible}
+.workspace-information .location-directory ul {max-height:none}
+.workspace-information .compact-location {padding:14px 18px}
+.workspace-information .weather-source-details[open] {margin-top:10px}
+.workspace-information .weather-sections>.panel {height:auto}
+.admin-information {display:flex;flex-direction:column;gap:12px;min-width:0}
+.admin-assignments select {width:100%;padding:10px;font:inherit;border:1px solid #7897a5;border-radius:6px;margin-top:6px}
+.admin-assignments label {display:block;font-weight:600;margin-top:12px}
+.admin-management {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);gap:16px}
+.admin-information .shelter-form {grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:12px}
+.admin-information .shelter-form>:is(h2,p,fieldset,button) {grid-column:1/-1}
+.admin-information .shelter-form>button {position:sticky;bottom:0;z-index:2;border:2px solid white}
+.admin-entrance-panel {min-width:0;display:flex;flex-direction:column}
+.admin-entrance-panel .shelter-map {min-height:320px;flex:1}
+.admin-entrance-panel h3 {margin:0 0 12px}
+.inspection-limitations {margin-top:10px}.inspection-limitations summary {cursor:pointer;min-height:32px;font-weight:600}
+@media(min-width:1100px) and (min-height:740px){
+ .wireframe-workspace {flex:1;min-height:0;align-items:stretch;gap:16px}
+ .workspace-information {min-height:0;overflow:auto;padding-right:4px;scrollbar-gutter:stable}
+ .workspace-map {min-height:0;height:100%;padding:16px}
+ .workspace-map .weather-location-map,.workspace-map .shelter-map {height:auto;flex:1;min-height:240px}
+ .workspace-map .weather-map-actions {margin:8px 0}
+ .workspace-map>.muted {margin:5px 0;font-size:11px}
+ .workspace-information .weather-sections {grid-template-columns:none;grid-template-rows:none;flex-shrink:0;overflow:visible}
+ .workspace-information .weather-sections>.panel {height:auto;overflow:visible}
+ .workspace-information .weather-overview>p {order:initial}
+ .workspace-information .shelters-overview {height:auto;overflow:visible}
+ .workspace-information .forecast-days {grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+ .workspace-information .forecast-days h4 {font-size:12px}.workspace-information .forecast-days p {font-size:12px}
+ .workspace-information .forecast-days article {padding:12px 8px}
+ .workspace-information .forecast-days dl div {display:flex}.workspace-information .forecast-days dd {margin:0}
+ .workspace-information .panel p {font-size:13px;line-height:1.5}
+ .workspace-information .panel h2 {font-size:20px}
+ .workspace-information .metrics strong {font-size:24px}
+ .workspace-information .metrics small {font-size:11px}
+ .workspace-information .weather-source-details:not([open]) {display:block}
+ .page-flood-map .wireframe-workspace {height:100%}
+ .page-admin .admin-management {grid-template-rows:minmax(0,1fr);grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);height:calc(100% - 160px);min-height:320px}
+ .admin-information {grid-column:1;grid-row:1;overflow:auto;min-height:0;scrollbar-gutter:stable}
+ .admin-information .admin-assignments {overflow:visible;grid-column:auto;grid-row:auto}
+ .admin-entrance-panel {grid-column:2;grid-row:1;overflow:auto;min-height:0}
+ .admin-information .shelter-form {overflow:visible;min-height:auto}
+ .admin-entrance-panel .shelter-map {min-height:270px}
+}
+@media(max-width:1099px), (max-height:739px){
+ .wireframe-workspace {grid-template-columns:minmax(0,1fr)}
+ .workspace-map .weather-location-map,.workspace-map .shelter-map {height:420px}
+ .admin-management {grid-template-columns:minmax(0,1fr)}
+ .admin-information .shelter-form {grid-template-columns:minmax(0,1fr)}
+ .workspace-information .forecast-days {grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(min-width:1100px) and (min-height:740px){
+ .workspace-information .location-bar h2 {font-size:15px}
+ .workspace-information .compact-location {padding:10px 16px}
+ .workspace-information .location-bar p {margin:4px 0}
+ .workspace-information .location-editor {margin-top:6px;padding-top:6px}
+ .page-home .overview-status-grid {grid-template-columns:1fr 1fr}
+ .page-home .overview-status-grid article:first-child {grid-column:1/-1}
+ .overview-status-grid article {padding:8px 10px}
+ .overview-status-grid h3 {font-size:13px}
+}
+.workspace-information > * {flex-shrink:0}
+.workspace-information .shelter-sections {min-height:auto;overflow:visible}
+.workspace-information .shelter-sections>.panel {height:auto;overflow:visible;display:block}
+.workspace-information .shelters-overview>p,.workspace-information .shelters-overview>div[aria-live] {order:initial}
+.page-home .workspace-information>.emergency-overview {order:1}
+.page-home .workspace-information>.shelter-sections {order:2}
+.page-home .workspace-information>.weather-sections {order:3}
+.shelter-usage summary {cursor:pointer;font-size:13px;font-weight:600;min-height:32px;padding:6px 0}
+.admin-identity-bar {display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.admin-identity-bar h2 {margin:4px 0;font-size:18px}
+.admin-identity-bar span {font-size:13px}
+.admin-identity-bar button {margin-left:10px}
+.building-search-options summary {cursor:pointer;font-weight:600;min-height:32px;padding:6px 0}
+@media(min-width:1100px) and (min-height:740px){
+ .page-admin .admin-shell {display:flex;flex-direction:column;overflow:hidden}
+ .admin-identity-bar {flex-shrink:0}
+ .page-admin .admin-shell>.notice {flex-shrink:0;margin:6px 0;padding:8px;font-size:12px}
+ .page-admin .admin-shell>.admin-access-note,.page-admin .admin-shell>.admin-session-note {font-size:11px;margin:4px 0}
+ .page-admin .admin-shell>.admin-tabs {margin:6px 0;flex-shrink:0}
+ .page-admin .admin-management {flex:1;height:auto;min-height:0}
+ .page-admin .admin-notifications {flex:1;height:auto;min-height:0}
+ .admin-entrance-panel>.location-directory {margin:4px 0}
+ .admin-entrance-panel>.notice {padding:8px;margin:8px 0}
+ .admin-entrance-panel .shelter-map {min-height:190px;flex:1;margin:8px 0}
+ .admin-entrance-panel h3 {font-size:18px;margin-bottom:4px}
+ .admin-entrance-panel label {margin:6px 0 3px}
+}
+.admin-identity-title {display:flex;align-items:center;flex-wrap:wrap;gap:12px}
+.admin-map-controls {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:end}
+.admin-map-controls>* {min-width:0}
+.admin-map-controls:has(.directory-content) {grid-template-columns:minmax(0,1fr)}
+@media(min-width:1100px) and (min-height:740px){
+ .page-admin .page-intro .eyebrow {display:none}
+ .page-admin .page-intro {padding:6px 16px;margin-bottom:6px}
+ .admin-identity-title a {font-size:12px}
+ .admin-identity-bar button,.admin-map-controls button {padding:8px 12px;font-size:12px}
+ .admin-map-controls .location-directory {margin:0}
+ .admin-map-controls label {font-size:12px;margin:0 0 4px}
+ .admin-map-controls select {padding:7px;min-height:36px}
+ .admin-map-controls button {min-height:36px;margin:0}
+ .page-admin .admin-entrance-panel>.notice {font-size:11px;padding:6px;line-height:1.4;margin:6px 0}
+ .admin-entrance-panel .building-search-options summary,.admin-entrance-panel .inspection-limitations summary {font-size:12px;min-height:26px;padding:4px 0}
+ .admin-entrance-panel .inspection-limitations {margin:4px 0 0}
+}
+@media(max-width:500px){.admin-map-controls {grid-template-columns:minmax(0,1fr)}}
+.admin-inspection-options {display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.admin-inspection-options:has(details[open]) {grid-template-columns:minmax(0,1fr)}
+@media(min-width:1100px) and (min-height:740px){
+ .page-admin .page-intro>div {display:flex;align-items:center;gap:20px;min-height:34px}
+ .page-admin .page-intro h1 {margin:0;font-size:24px;white-space:nowrap}
+ .page-admin .admin-tabs button {padding:8px 12px;font-size:12px;min-height:36px}
+ .admin-inspection-options summary {font-size:11px!important;line-height:1.3}
+}
+@media(max-width:500px){.admin-inspection-options {grid-template-columns:minmax(0,1fr)}}
+
+.demo-environment-badge{display:inline-block;margin-left:8px;font-size:.625rem;line-height:1.2;vertical-align:middle;padding:3px 5px;border:1px solid #93622b;border-radius:4px;color:#75430a;background:#fff4d8;white-space:nowrap}

@@ -1,0 +1,582 @@
+{
+  "created_at": "2026-10-07T07:22:49.252549+00:00",
+  "files": {
+    "clarification_package.json": {
+      "bytes": 8336,
+      "sha256": "67b78983ce174f53efcda34b5d97fd60b8456b1b880436c9e242636825737fb5"
+    },
+    "coordinate_provenance.json": {
+      "bytes": 17471,
+      "sha256": "4c7b76020866c096bebbec9bfac609faa11c2fef938805019f6a3c3929cf1991"
+    },
+    "datum_findings.json": {
+      "bytes": 5054,
+      "sha256": "75fbfae4d6b0e6fbbd671bf8f3ddd9b03ad87f6a9f80d54182579cb45bd614c4"
+    },
+    "measurement_semantics.json": {
+      "bytes": 2744,
+      "sha256": "77f0edc7da4299013c1920c6d2354e02749c616fde4ea28a15ffee973cc5e61b"
+    },
+    "nwdp_resource_metadata.json": {
+      "bytes": 3641,
+      "sha256": "9be669bc55480551c011eb9385d8259b67b82febc8912df5ad0ead9d7535cff7"
+    },
+    "reuse_policy.json": {
+      "bytes": 3219,
+      "sha256": "b452daaa41ac00cfc7d3e7f6d2313f21087cefe1ddc337efac2f17463ce38d79"
+    },
+    "source_documents.json": {
+      "bytes": 9928,
+      "sha256": "b7ae62ec060891cf6679b054a79ed8cfed8fecd537fd642e396f90f969acc45b"
+    },
+    "source_lineage.json": {
+      "bytes": 44847,
+      "sha256": "d38cd6672e8f3f427708f04f21646e25befa628f013327e2b05dcfdbdfa7e21e"
+    },
+    "stage4d_readiness.json": {
+      "bytes": 2938,
+      "sha256": "b2f4eb3b46ac886fbb1f1465c80d4e6a1538da33e8eef740011adc4c8861cf00"
+    },
+    "unresolved_questions.json": {
+      "bytes": 1229,
+      "sha256": "c20b6f885d09b169a8e54cff5f9a5e2a71ce25a083882ccc2300a9179c88544a"
+    }
+  },
+  "inputs": [
+    {
+      "bytes": 18510624,
+      "path": "data/raw/reference/stage3e3_v1/cwc_station_metadata.pdf",
+      "sha256": "b44e4cf9a419d87730d9e79098f60cd70cc32fa042ad684d1333ffe583bc1c13"
+    },
+    {
+      "bytes": 6912793,
+      "path": "data/raw/reference/stage4a_v1/cwc_hddp2018.pdf",
+      "sha256": "16cecaf2c81fb6aa61879b39d96addd5ee4b39d0058e0ee249a6abeab6a64016"
+    },
+    {
+      "bytes": 4497148,
+      "path": "data/raw/reference/stage4a_v1/cwc_sop_april2025.pdf",
+      "sha256": "3d13601ef577c24f3e2d8688977f3d92447f349ffc45abcd1b04adb76d9ab5f4"
+    },
+    {
+      "bytes": 55897980,
+      "path": "data/raw/reference/stage4b_v1/karnataka_discharge_gauge_daily_1972_to_2020.csv",
+      "sha256": "4e1fee194f158580c8d141ee303c84ce09e05e9f154a7a4afa4bd70ffe7e8a73"
+    },
+    {
+      "bytes": 13887255,
+      "path": "data/raw/reference/stage4b_v1/krishna_wyb2019_20.pdf",
+      "sha256": "de0d9cab9cd3361952e69cf630dc5d404d8703b7c87f90bc64f60541463c815a"
+    },
+    {
+      "bytes": 45415268,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_manual_daily_cwc_ka_2001_2025.csv",
+      "sha256": "30926ab6554d576a74efcbb389ffd4c7df8fbd9ee10ff5a212110cff13c5eb43"
+    },
+    {
+      "bytes": 97010960,
+      "path": "data/raw/reference/stage4b_v1/river_discharge_tele_hr_karnataka_ka_1970_2025.csv",
+      "sha256": "fdd064010d905a1916acc5d0c179f72fa607313001efc82ecb74e4c6011e7b93"
+    },
+    {
+      "bytes": 388687530,
+      "path": "data/raw/reference/stage4b_v1/rwl_manual_hr_cwc_007_1991_2020.csv",
+      "sha256": "14c935761d82e60beddab8e87192be7842e45cb3d7a9895c758777aa44996e3e"
+    },
+    {
+      "bytes": 3009635,
+      "path": "data/raw/reference/stage4c2_v1/cwc_closed2026.pdf",
+      "sha256": "92a4edf1221c46565843119d67cd790eb09a65a79b6eb46201dd280d5647db7d"
+    },
+    {
+      "bytes": 591,
+      "path": "data/raw/reference/stage4c2_v1/cwc_closed2026.pdf.json",
+      "sha256": "685f69b6aa4c930ca8966643a2dcd4fa1698b8b12291ca76238d8f9f5d71a363"
+    },
+    {
+      "bytes": 159349,
+      "path": "data/raw/reference/stage4c2_v1/cwc_copyright.html",
+      "sha256": "4c0c520a8ea7593b6963d2288d09736d40160e275f92fa6716e6958a65d0e3a1"
+    },
+    {
+      "bytes": 524,
+      "path": "data/raw/reference/stage4c2_v1/cwc_copyright.html.json",
+      "sha256": "93fcaa2de87adb9eb6f48f41eec3b29aa17c8bf4256788064f9ad9b04e11a3be"
+    },
+    {
+      "bytes": 4138957,
+      "path": "data/raw/reference/stage4c2_v1/cwc_handbook2020.pdf",
+      "sha256": "15b90a865555f653fdb5256af18687cac18c98d658a3e8058576038e1505140f"
+    },
+    {
+      "bytes": 619,
+      "path": "data/raw/reference/stage4c2_v1/cwc_handbook2020.pdf.json",
+      "sha256": "61cb6b20227bcb8a8e3e5816739f13004594add5b01b3ca798b0c6e5315f488a"
+    },
+    {
+      "bytes": 134160,
+      "path": "data/raw/reference/stage4c2_v1/cwc_hddp2013.pdf",
+      "sha256": "8232fa468034d1a180e0d12f1a29b46b2807cb28b4433d0d691f47d7b9d8b9f0"
+    },
+    {
+      "bytes": 564,
+      "path": "data/raw/reference/stage4c2_v1/cwc_hddp2013.pdf.json",
+      "sha256": "c211eb84584f462531cf29ed3edc984e13211d91eb9f472e468cc0a144cc2d44"
+    },
+    {
+      "bytes": 160820,
+      "path": "data/raw/reference/stage4c2_v1/cwc_ho.html",
+      "sha256": "cf1ab2ec9156797ec5edc947ea5523ac37ae4a0be3024a4ffbeb4e1718bbe656"
+    },
+    {
+      "bytes": 550,
+      "path": "data/raw/reference/stage4c2_v1/cwc_ho.html.json",
+      "sha256": "fca86e9c20d9b61c94c41c338fadb2f0057fbb8015bd965293855aaeb21f6b7a"
+    },
+    {
+      "bytes": 18104918,
+      "path": "data/raw/reference/stage4c2_v1/cwc_ho2026.pdf",
+      "sha256": "64957dea697b5654823ca171e4ea2e75d50244599a8e3bfd867362f8c365bccb"
+    },
+    {
+      "bytes": 590,
+      "path": "data/raw/reference/stage4c2_v1/cwc_ho2026.pdf.json",
+      "sha256": "b6473eb588f9cf79a44778b581bd6ebcd4afe9bd95e19881b3ac628df1f07be8"
+    },
+    {
+      "bytes": 160253,
+      "path": "data/raw/reference/stage4c2_v1/cwc_metadata_index.html",
+      "sha256": "0b4efe22aaf5c47cf92f34b3c19c99f3749f2516d6280f42ace9a746724c945b"
+    },
+    {
+      "bytes": 512,
+      "path": "data/raw/reference/stage4c2_v1/cwc_metadata_index.html.json",
+      "sha256": "e8fcfc9fae006eea792a8aca598e58f08b64fe7029f001c760fd837bc91b30fc"
+    },
+    {
+      "bytes": 100714,
+      "path": "data/raw/reference/stage4c2_v1/krishna_catalogue.json",
+      "sha256": "838a9f47e66719e2e40c42f7269f6c38a3f84cce23099bca529fee84ba7aeb22"
+    },
+    {
+      "bytes": 660,
+      "path": "data/raw/reference/stage4c2_v1/krishna_catalogue.json.json",
+      "sha256": "1bf1431c750635c00c73aa8fd922581f5525318fc131c8f410370754d8e951b1"
+    },
+    {
+      "bytes": 34559,
+      "path": "data/raw/reference/stage4c2_v1/krishna_preview.html",
+      "sha256": "5f919f986e2becabfc05dcaa1ac9a2931d3ccdbd5515494018fab6a8775be87e"
+    },
+    {
+      "bytes": 791,
+      "path": "data/raw/reference/stage4c2_v1/krishna_preview.html.json",
+      "sha256": "587cc66368ba8c83b3508036f79467c0f73042f022aea7e88d0435c9e14b602f"
+    },
+    {
+      "bytes": 95928,
+      "path": "data/raw/reference/stage4c2_v1/krishna_resource.html",
+      "sha256": "020ebca8d681144da76dbee2821701408546f32089f8646c02250e4136dfbacf"
+    },
+    {
+      "bytes": 707,
+      "path": "data/raw/reference/stage4c2_v1/krishna_resource.html.json",
+      "sha256": "ec083eff9d723b99fc8a11df8fc37ddfb5b4624c2853bbe0da22a751120d0b0e"
+    },
+    {
+      "bytes": 50158,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_api.html",
+      "sha256": "f91328b69eae7c9c82f76ef97e21a1902e6ae01fdce3f92c48521e3c3449052b"
+    },
+    {
+      "bytes": 553,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_api.html.json",
+      "sha256": "161d76beb663edf4fc8a3bb01af8fb77be5becaf28e60c248611dfc002de0835"
+    },
+    {
+      "bytes": 48441,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_copyright.html",
+      "sha256": "78d02b7da0cfe2ec625a57e5b5cee4902d02f0b240e037420c49acf0edc2b247"
+    },
+    {
+      "bytes": 545,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_copyright.html.json",
+      "sha256": "85d502ed242026d8912a284654d7e0be8c88ad3a16b1f0a1afaf0f66c3c4a982"
+    },
+    {
+      "bytes": 1922346,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_water_policy.pdf",
+      "sha256": "5f78048a1b324768040b365ec11d4d453b96ea8ff30267ea2aa0e68fa82e26dc"
+    },
+    {
+      "bytes": 559,
+      "path": "data/raw/reference/stage4c2_v1/nwdp_water_policy.pdf.json",
+      "sha256": "5e7a2aaf5ad614c4e874f7ff060853b0fca4f66cb7e18cb5c5af986496272119"
+    },
+    {
+      "bytes": 16212,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/cross_source_comparison.csv",
+      "sha256": "9422be71114b2548221a533cdec75d78b8a098a38efe431a0abbf4591b140d18"
+    },
+    {
+      "bytes": 18644,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/identity_evidence.json",
+      "sha256": "51e830077eedb951e739836ff54889c07e9c1efcf7abbab88b9677fa8ea489db"
+    },
+    {
+      "bytes": 18544,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/manifest.json",
+      "sha256": "bc641f645814cba7f46dd3a46e670b2b4f273dd3638806e51eeb5c20421bb6be"
+    },
+    {
+      "bytes": 1806784,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/observations.csv",
+      "sha256": "b406896d0265cf376c722042365336f7e8d928efcf60ca1c37d1ae4d8d4bd353"
+    },
+    {
+      "bytes": 27783,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/raw_source_registry.json",
+      "sha256": "a885bcc09e03e4582af8c743990fba7aed3cb097284dd0264b020460fb0eb2ff"
+    },
+    {
+      "bytes": 34469,
+      "path": "data/working/karnataka_hydrology_2019_pilot_v1/yearbook_context.csv",
+      "sha256": "1c5409cde69b6e7cf8f8de39f0813fa47991e7e7855f2689f1352331a945e2f4"
+    },
+    {
+      "bytes": 7489,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/datum_compatibility.json",
+      "sha256": "8f8f93243a0253a6c655a7d6db051b3f4adf0d450b94e464a5bd93402c981c29"
+    },
+    {
+      "bytes": 42669,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/discharge_reconciliation.csv",
+      "sha256": "1ba0dd8fbd4b842bbbefb55a13477da9eeb1dc61b20134bc5b305a841d2ffab5"
+    },
+    {
+      "bytes": 6493,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/hourly_coverage.csv",
+      "sha256": "6a56980b76b755309799c054cd81a78543eb7c7b8d8d84a6fcefc7ed6e73db88"
+    },
+    {
+      "bytes": 21242,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/manifest.json",
+      "sha256": "2e4c9241da107b13f724d6479f35c6a16a492c6207911e6ce9b19622cf0e1821"
+    },
+    {
+      "bytes": 2054142,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/observation_quality.csv",
+      "sha256": "9a0429d13fc24a5c7532482812bd4a8d06bf3e9228237ba5da73a2f9ba2c456d"
+    },
+    {
+      "bytes": 8418,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/publication_policy.json",
+      "sha256": "d13e268d2ae462069b388ec2dbc4cb72c6e6b0568d348fc63fa4c8ae2a68e542"
+    },
+    {
+      "bytes": 2610,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/rules.json",
+      "sha256": "a666ce3ae3695a569a67bca17c6a94f2bdc99c03a48bcd0e2335dbdf6ef28467"
+    },
+    {
+      "bytes": 23062,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/source_notes.json",
+      "sha256": "f591fda428c5a379b42a8639957b47dbfccf3c54ca53a261f46d65093bffbbed"
+    },
+    {
+      "bytes": 13352,
+      "path": "data/working/karnataka_hydrology_2019_reconciled_v1/station_identity.json",
+      "sha256": "7fa311fb4e9c3756c368492be571881aa699acdddbb307534c867b34646813a8"
+    }
+  ],
+  "local_manifest_sha256": "97b7147126d7be1e73d1127d70a346909373563dd5ee202c4253a908d64da8c2",
+  "processing_code": {
+    "bytes": 26939,
+    "path": "scripts/resolve_hydrology_semantics.py",
+    "sha256": "a0c7e743a98daec3238a7515c8b2a01331ee183970c09b32671826652b4ec65b"
+  },
+  "publication": "Code, questions template, source references and aggregate provenance only; detailed source values/coordinates and documents remain local",
+  "source_documents": [
+    {
+      "attempts": 1,
+      "byte_ceiling": 20000000,
+      "bytes": 3009635,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "error": null,
+      "final_url": "https://cwc.gov.in/sites/default/files/Final_signed_HO_Closed_Book_2026.pdf",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_closed2026.pdf",
+      "retrieved_at": "2026-10-07T07:13:23.757134+00:00",
+      "returncode": 0,
+      "sha256": "92a4edf1221c46565843119d67cd790eb09a65a79b6eb46201dd280d5647db7d",
+      "source_url": "https://cwc.gov.in/sites/default/files/Final_signed_HO_Closed_Book_2026.pdf",
+      "started_at": "2026-10-07T07:13:21.764892+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 159349,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://cwc.gov.in/en/copyright-policy",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_copyright.html",
+      "retrieved_at": "2026-10-07T07:08:36.450780+00:00",
+      "returncode": 0,
+      "sha256": "4c0c520a8ea7593b6963d2288d09736d40160e275f92fa6716e6958a65d0e3a1",
+      "source_url": "https://cwc.gov.in/en/copyright-policy",
+      "started_at": "2026-10-07T07:08:33.006878+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 52428800,
+      "bytes": 4138957,
+      "content_type": "application/pdf",
+      "deadline_seconds": 90,
+      "error": null,
+      "final_url": "https://cwc.gov.in/sites/default/files/hand-book-hydro-meteorological-observations._1.pdf",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_handbook2020.pdf",
+      "retrieved_at": "2026-10-07T07:08:25.687394+00:00",
+      "returncode": 0,
+      "sha256": "15b90a865555f653fdb5256af18687cac18c98d658a3e8058576038e1505140f",
+      "source_url": "https://cwc.gov.in/sites/default/files/hand-book-hydro-meteorological-observations._1.pdf",
+      "started_at": "2026-10-07T07:08:22.178054+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 10485760,
+      "bytes": 134160,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "error": null,
+      "final_url": "https://cwc.gov.in/sites/default/files/hddp2013-annexure-5.pdf",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_hddp2013.pdf",
+      "retrieved_at": "2026-10-07T07:08:39.471728+00:00",
+      "returncode": 0,
+      "sha256": "8232fa468034d1a180e0d12f1a29b46b2807cb28b4433d0d691f47d7b9d8b9f0",
+      "source_url": "https://cwc.gov.in/sites/default/files/hddp2013-annexure-5.pdf",
+      "started_at": "2026-10-07T07:08:39.002743+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 160820,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://cwc.gov.in/hydro-meteorological-observation",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_ho.html",
+      "retrieved_at": "2026-10-07T07:08:33.005912+00:00",
+      "returncode": 0,
+      "sha256": "cf1ab2ec9156797ec5edc947ea5523ac37ae4a0be3024a4ffbeb4e1718bbe656",
+      "source_url": "https://cwc.gov.in/hydro-meteorological-observation",
+      "started_at": "2026-10-07T07:08:31.469772+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 30000000,
+      "bytes": 18104918,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "error": null,
+      "final_url": "https://cwc.gov.in/sites/default/files/Final%20signed%20HO%20Book_2026.pdf",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_ho2026.pdf",
+      "retrieved_at": "2026-10-07T07:13:21.695881+00:00",
+      "returncode": 0,
+      "sha256": "64957dea697b5654823ca171e4ea2e75d50244599a8e3bfd867362f8c365bccb",
+      "source_url": "https://cwc.gov.in/sites/default/files/Final%20signed%20HO%20Book_2026.pdf",
+      "started_at": "2026-10-07T07:13:17.002331+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 160253,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://cwc.gov.in/en/node/37619",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/cwc_metadata_index.html",
+      "retrieved_at": "2026-10-07T07:08:39.001633+00:00",
+      "returncode": 0,
+      "sha256": "0b4efe22aaf5c47cf92f34b3c19c99f3749f2516d6280f42ace9a746724c945b",
+      "source_url": "https://cwc.gov.in/en/node/37619",
+      "started_at": "2026-10-07T07:08:37.050282+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 100714,
+      "content_type": "application/json;charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/api/3/action/package_search?q=id:d951a09c-6cf8-470e-be77-e80116f13d34&rows=1",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/krishna_catalogue.json",
+      "retrieved_at": "2026-10-07T07:08:31.061780+00:00",
+      "returncode": 0,
+      "sha256": "838a9f47e66719e2e40c42f7269f6c38a3f84cce23099bca529fee84ba7aeb22",
+      "source_url": "https://www.nwdp.nwic.gov.in/api/3/action/package_search?q=id:d951a09c-6cf8-470e-be77-e80116f13d34&rows=1",
+      "started_at": "2026-10-07T07:08:28.089956+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 34559,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42/view/cf526e66-e003-4226-8614-c88a1f3257ec",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/krishna_preview.html",
+      "retrieved_at": "2026-10-07T07:13:17.001497+00:00",
+      "returncode": 0,
+      "sha256": "5f919f986e2becabfc05dcaa1ac9a2931d3ccdbd5515494018fab6a8775be87e",
+      "source_url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42/view/cf526e66-e003-4226-8614-c88a1f3257ec",
+      "started_at": "2026-10-07T07:13:16.087804+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 95928,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/krishna_resource.html",
+      "retrieved_at": "2026-10-07T07:08:28.089168+00:00",
+      "returncode": 0,
+      "sha256": "020ebca8d681144da76dbee2821701408546f32089f8646c02250e4136dfbacf",
+      "source_url": "https://nwdp.nwic.gov.in/en/dataset/river-water-level-manual-hourly-cwc-subernarekha/resource/7778f459-0e82-4681-9638-5e494c36fd42",
+      "started_at": "2026-10-07T07:08:25.704297+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 50158,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/en/dataset_api/home_api_page",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/nwdp_api.html",
+      "retrieved_at": "2026-10-07T07:08:31.469178+00:00",
+      "returncode": 0,
+      "sha256": "f91328b69eae7c9c82f76ef97e21a1902e6ae01fdce3f92c48521e3c3449052b",
+      "source_url": "https://nwdp.nwic.gov.in/en/dataset_api/home_api_page",
+      "started_at": "2026-10-07T07:08:31.063017+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 2097152,
+      "bytes": 48441,
+      "content_type": "text/html; charset=utf-8",
+      "deadline_seconds": 30,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/footer/copyrightPolicy",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/nwdp_copyright.html",
+      "retrieved_at": "2026-10-07T07:08:37.049764+00:00",
+      "returncode": 0,
+      "sha256": "78d02b7da0cfe2ec625a57e5b5cee4902d02f0b240e037420c49acf0edc2b247",
+      "source_url": "https://www.nwdp.nwic.gov.in/footer/copyrightPolicy",
+      "started_at": "2026-10-07T07:08:36.451670+00:00",
+      "status": "retrieved"
+    },
+    {
+      "attempts": 1,
+      "byte_ceiling": 10000000,
+      "bytes": 1922346,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "error": null,
+      "final_url": "https://nwdp.nwic.gov.in/pdf/national-water-data-policy.pdf",
+      "http_status": "200",
+      "local_path": "data/raw/reference/stage4c2_v1/nwdp_water_policy.pdf",
+      "retrieved_at": "2026-10-07T07:13:25.362063+00:00",
+      "returncode": 0,
+      "sha256": "5f78048a1b324768040b365ec11d4d453b96ea8ff30267ea2aa0e68fa82e26dc",
+      "source_url": "https://nwdp.nwic.gov.in/pdf/national-water-data-policy.pdf",
+      "started_at": "2026-10-07T07:13:23.768669+00:00",
+      "status": "retrieved"
+    },
+    {
+      "bytes": 6912793,
+      "content_type": "application/pdf",
+      "deadline_seconds": 60,
+      "edition": "November2018",
+      "final_url": "https://www.cwc.gov.in/sites/default/files/hddp2018_0.pdf",
+      "http_status": 200,
+      "inspected_pdf_pages": [
+        2,
+        5
+      ],
+      "last_modified": "Tue, 18 Jun 2019 10:55:44 GMT",
+      "local_path": "data/raw/reference/stage4a_v1/cwc_hddp2018.pdf",
+      "max_bytes": 8388608,
+      "redistribution": "unresolved; local only",
+      "retrieved_at": "2026-10-06T18:26:58.128304+00:00",
+      "reused_original": true,
+      "sha256": "16cecaf2c81fb6aa61879b39d96addd5ee4b39d0058e0ee249a6abeab6a64016",
+      "source_url": "https://www.cwc.gov.in/sites/default/files/hddp2018_0.pdf",
+      "started_at": "2026-10-06T18:26:52.657710+00:00",
+      "status": "retrieved"
+    }
+  ],
+  "summary": {
+    "clarification": "prepared_not_sent",
+    "coordinate_status": {
+      "CW1KRU000083": "coordinate_conflict_unresolved",
+      "CW1KRU000212": "coordinate_conflict_unresolved",
+      "CW1KRU000339": "coordinate_conflict_unresolved"
+    },
+    "datum_status": {
+      "CW1KRU000083": "nwdp_datum_unresolved",
+      "CW1KRU000212": "nwdp_datum_unresolved",
+      "CW1KRU000339": "nwdp_datum_unresolved"
+    },
+    "disagreement_categories": {
+      "source_value_conflict": 21,
+      "yearbook_computed_vs_nwdp": 12
+    },
+    "features_created": 0,
+    "labels_created": 0,
+    "newer_metadata_coordinate_change": {
+      "CW1KRU000083": true,
+      "CW1KRU000212": false,
+      "CW1KRU000339": false
+    },
+    "preserved_comparisons": 81,
+    "preserved_eligible_rows": 14,
+    "preserved_observations": 1697,
+    "readiness": "Limited14-row discharge subset retained; absolute/threshold levels blocked; within-station change scientifically conditional, not yet approved for feature construction",
+    "reuse_status": "policy_conflict_unresolved",
+    "source_lineage_status": "revision_possible_record_lineage_unverified",
+    "source_values_changed": 0,
+    "threshold_compatibility": {
+      "CW1KRU000083": "datum_unresolved",
+      "CW1KRU000212": "datum_unresolved",
+      "CW1KRU000339": "datum_unresolved"
+    },
+    "unresolved_disagreements": 33
+  },
+  "version": "karnataka_hydrology_semantics_v1"
+}

@@ -1,95 +1,84 @@
 import React, { useEffect, useRef, useState } from 'react'
-import HistoricalFloodMap from './HistoricalFloodMap.jsx'
-import DrainageResearchLayers from './DrainageResearchLayers.jsx'
+import useWeatherSession from './useWeatherSession.js'
+import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
+import WeatherPanel from './WeatherPanel.jsx'
+import PublicShelters from './PublicShelters.jsx'
+import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
+import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
+import AdminShelters from './AdminShelters.jsx'
+import CitizenReport from './CitizenReport.jsx'
+import AlertSubscription from './AlertSubscription.jsx'
+import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
+import HowItWorks from './HowItWorks.jsx'
+import { useWide } from './ScreenTabs.jsx'
+import useFitGuard from './useFitGuard.js'
+import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.js'
 
-const formatTime = (time) => time ? new Intl.DateTimeFormat('en-IN', {
-  timeZone: 'Asia/Kolkata', dateStyle: 'medium', timeStyle: 'short',
-}).format(new Date(time)) + ' IST' : 'Unavailable'
-const value = (reading, unit) => reading == null ? 'Unavailable' : `${reading} ${unit}`
+const pageInfo={
+ '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
+ '/weather': ['POINT WEATHER','Weather details','Seven-day forecast, rainfall chart and source details for your selected point.'],
+ '/flood-map': ['OFFICIAL WARNINGS · LIVE RISK · HISTORY','Flood Map','Official IMD district warnings, an experimental statewide rain-risk grid, and historical satellite flood extents.'],
+ '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
+ '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
+ '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Tell us what you see. Your location is found automatically; photos are optional.'],
+ '/how-it-works': ['PREDICTION · EVIDENCE','How FloodPulse predicts','How the flood and drainage risk is calculated, and why it is a rule-based index rather than a trained flood model.'],
+ '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Review citizen evidence, manage shelters and control project notifications.'],
+}
 
 export default function App() {
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const activeRequest = useRef(null)
-
-  async function load() {
-    activeRequest.current?.abort()
-    const controller = new AbortController()
-    activeRequest.current = controller
-    setLoading(true)
-    setData(null)
-    setError(null)
-    const timeout = setTimeout(() => controller.abort(), 15000)
-    try {
-      const response = await fetch('/api/weather', { signal: controller.signal })
-      const body = await response.json()
-      if (!response.ok || body.status === 'unavailable') {
-        throw new Error(body.message || 'Weather is unavailable. Try again later.')
-      }
-      setData(body)
-    } catch (err) {
-      if (activeRequest.current === controller) {
-        setError(err.name === 'AbortError' ? 'Weather request timed out. Try again.' : err.message)
-      }
-    } finally {
-      clearTimeout(timeout)
-      if (activeRequest.current === controller) setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    load()
-    return () => { activeRequest.current?.abort(); activeRequest.current = null }
-  }, [])
-
-  return <main>
-    <header><a className="brand" href="/">◉ FloodPulse</a><span>KARNATAKA · WEATHER</span></header>
-    <section className="intro">
-      <p className="eyebrow">ENVIRONMENTAL CONDITIONS</p>
-      <h1>A clearer view of the weather.</h1>
-      <p>Current model estimates and a three-day forecast for Bengaluru.</p>
-    </section>
-    <section className="panel" aria-labelledby="location-title">
-      <div className="panel-heading">
-        <div><p className="eyebrow">SELECTED LOCATION</p><h2 id="location-title">Bengaluru, Karnataka</h2></div>
-        <button onClick={load} disabled={loading}>{loading ? 'Loading…' : 'Refresh weather'}</button>
-      </div>
-      <p className="muted">Reference point: 12.9767936° N, 77.5900820° E · <a href="https://wiki.openstreetmap.org/wiki/Bengaluru">OpenStreetMap location source</a></p>
-      <div aria-live="polite" aria-busy={loading}>
-        {loading && <p className="notice">Fetching weather through FloodPulse…</p>}
-        {error && <p className="notice error" role="alert">Weather unavailable. {error}</p>}
-        {data && <>
-          {data.message && <p className="notice">{data.message} Missing values are shown as unavailable.</p>}
-          {data.current.stale && <p className="notice error">Current model estimate is older than 90 minutes. Check its valid time below.</p>}
-          <h3>Current conditions <span className="tag">MODEL ESTIMATE</span></h3>
-          <p className="muted">Valid at {formatTime(data.current.valid_at)}</p>
-          <div className="metrics">
-            <article><p>Temperature</p><strong>{value(data.current.temperature_c, '°C')}</strong><small>At 2 metres</small></article>
-            <article><p>Relative humidity</p><strong>{value(data.current.humidity_percent, '%')}</strong><small>At 2 metres</small></article>
-            <article><p>Precipitation</p><strong>{value(data.current.precipitation_mm, 'mm')}</strong><small>Preceding {data.current.interval_seconds / 60} minutes</small></article>
-          </div>
-          <h3>Three-day forecast</h3>
-          <p className="muted">Daily totals and temperature ranges · Asia/Kolkata</p>
-          <div className="table-wrap"><table>
-            <thead><tr><th scope="col">Forecast date (IST)</th><th scope="col">Precipitation</th><th scope="col">Min temperature</th><th scope="col">Max temperature</th></tr></thead>
-            <tbody>{data.forecast.map(day => <tr key={day.date}><th scope="row">{day.date}</th><td>{value(day.precipitation_mm, 'mm')}</td><td>{value(day.temperature_min_c, '°C')}</td><td>{value(day.temperature_max_c, '°C')}</td></tr>)}</tbody>
-          </table></div>
-          <dl className="metadata">
-            <div><dt>Retrieved through FastAPI</dt><dd>{formatTime(data.retrieved_at)}</dd></div>
-            <div><dt>Station observation time</dt><dd>Unavailable — model data</dd></div>
-            <div><dt>Forecast issue time</dt><dd>Unavailable — provider does not supply it here</dd></div>
-            <div><dt>Provider grid point</dt><dd>{data.grid_location.latitude}° N, {data.grid_location.longitude}° E</dd></div>
-          </dl>
-        </>}
-      </div>
-    </section>
-    <HistoricalFloodMap />
-    <DrainageResearchLayers />
-    <footer>
-      <p>Weather data by <a href="https://open-meteo.com/">Open-Meteo</a> · <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a> · <a href="https://open-meteo.com/en/docs">API documentation</a></p>
-      <p>Weather model output; no station observations are supplied in this slice. This point does not represent all of Karnataka.</p>
-      <p>Flood prediction, drainage assessment, alerts and shelter navigation are planned. This dashboard provides weather information, historical satellite flood evidence and optional GIS research layers.</p>
-    </footer>
+ const {path,navigate,heading}=usePage()
+ const wide=useWide()  // phones show page maps inside tabs (one-screen rule)
+ useFitGuard(path)
+ const [deploymentMode,setDeploymentMode]=useState(null)
+ useEffect(()=>{const controller=new AbortController();void(async()=>{try{const response=await fetch('/api/environment',{signal:controller.signal});const body=await response.json();if(response.ok&&['live','demonstration'].includes(body.mode)&&!controller.signal.aborted)setDeploymentMode(body.mode)}catch{/* Mode failure never invents operational readiness. */}})();return()=>controller.abort()},[])
+ // Three separate identities: district evidence filter, weather point, map cell.
+ // A district without a verified point never changes weather coordinates.
+ const [selectedPoint,setSelectedPoint]=useState(null)
+ const [districtId,setDistrictId]=useState(''),[district,setDistrict]=useState(null)
+ const [evidenceFeature,setEvidenceFeature]=useState(null)
+ const [shelterMapTarget,setShelterMapTarget]=useState(null)
+ const [nearestRequest,setNearestRequest]=useState(0)
+ // A spot handed from Home's map to Report ("Report flooding here"); used once.
+ const [reportSpot,setReportSpot]=useState(null)
+ const [contextVisible,setContextVisible]=useState(true)
+ const weatherPage=path==='/' || path==='/weather'
+ const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_WEATHER_ACCURACY_M)
+ const homePoint=homeGpsUnusable?null:selectedPoint
+ const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!homePoint))
+ const manualRevision=useRef(0)
+ const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
+ const point=selectedPoint || DEFAULT_POINT
+ const publicPage=path !== '/admin' && !!pageInfo[path]
+ const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'
+ const sheltersPage=path==='/shelters'
+ const info=pageInfo[path]
+ function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
+ function filterDistrict(id,record){manualRevision.current++;homeLocation.cancel();setDistrictId(id);setDistrict(record||null);setEvidenceFeature(null)}
+ function choosePoint(next){manualRevision.current++;homeLocation.cancel();if(next.district_id)setDistrictId(next.district_id);if(next.latitude===point.latitude&&next.longitude===point.longitude&&weatherPage)session.refresh(next);setSelectedPoint({...next})}
+ return <>
+  <AppHeader path={path} navigate={navigate} mode={deploymentMode} />
+  <main id="page-content" className={'app-content page-'+(path==='/'?'home':path.slice(1))}>
+   <section className={'page-intro'+(['/','/flood-map','/admin'].includes(path)?' visually-hidden':'')}><div><p className="eyebrow">{info?.[0] || 'PAGE NOT FOUND'}</p><h1 ref={heading} tabIndex={-1}>{info?.[1] || 'This page is unavailable'}</h1><p>{info?.[2] || 'Choose a page from the navigation to continue.'}</p></div></section>
+   {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate} onNearestShelter={()=>{setNearestRequest(n=>n+1);navigate('/shelters')}} onReportHere={spot=>{setReportSpot({name:spot.name,latitude:spot.latitude,longitude:spot.longitude});navigate('/report')}}/> }
+   {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
+    <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
+     <WeatherLocationSelector point={point} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
+     {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>.</p>}
+     <div hidden={!weatherPage} className="weather-sections">
+      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false} active={weatherPage}/>
+     </div>
+     <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} nearestRequest={nearestRequest} active={sheltersPage} overview={false} mapTarget={path==='/shelters'&&wide?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
+    </div>
+    {path==='/weather'&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{contextVisible&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={null}/>}<p className="map-legend weather-map-caption">Selected point: {point.name}.</p></section>}
+    {path==='/shelters'&&wide&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}
+    {path==='/flood-map'&&<FloodIntelligenceMap point={selectedPoint} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
+   </div>}
+   {path==='/alerts'&&<AlertSubscription navigate={navigate}/>}
+   {path==='/how-it-works'&&<HowItWorks navigate={navigate}/>}
+   {path==='/report'&&<CitizenReport navigate={navigate} suggestedSpot={reportSpot} onSpotUsed={()=>setReportSpot(null)}/>}
+   {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
+   {!info&&<nav className="not-found" aria-label="Suggested pages"><PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink><PageLink to="/flood-map" navigate={navigate}>Flood Map</PageLink><PageLink to="/shelters" navigate={navigate}>Shelters</PageLink><PageLink to="/report" navigate={navigate}>Report an incident</PageLink></nav>}
   </main>
+  <footer className="app-footer"><p><strong>FloodPulse</strong> · <span className="footer-long">Weather, river and elevation data: </span><span className="footer-short">Data: </span><a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · <span className="footer-long">Risk levels are experimental, not an official warning. Follow IMD, KSNDMC and district advice.</span><span className="footer-short">Experimental, not an official warning.</span></p></footer>
+ </>
 }

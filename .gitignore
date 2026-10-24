@@ -27,6 +27,12 @@ exports/
 *.zip
 
 # Cloud credentials and private keys must never be staged.
+.cdsapirc
+.ecmwfapirc
+.ewds*
+.bash_history
+.zsh_history
+cookies*.txt
 .config/earthengine/
 .aws/
 .gcloud/
@@ -48,3 +54,12 @@ coverage/
 playwright-report/
 test-results/
 *.log
+
+# Database backups made on the server
+deploy/backups/
+
+# Public CA root certificate pinned for IMD/SACHET (not a secret; see backend/app/official.py)
+!backend/app/certs/emsign-root-ca-g1.pem
+
+# Claude Code personal settings
+.claude/settings.local.json

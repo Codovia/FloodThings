@@ -74,6 +74,7 @@ class HistoricalStore:
                                "qualified_pixel_count": count, "processing_scale_m": 250,
                                "extent_semantics": manifest["extent_semantics"],
                                "retrieved_at": event["download"]["retrieved_at"],
+                               "geometry_sha256": manifest["files"][event["geometry_file"]]["sha256"],
                                "geometry_url": f"/api/historical-floods/{eid}"})
                 geometries[eid] = geometry
             return {"status": "available", "dataset_version": VERSION, "district": "Udupi", "notice": NOTICE,

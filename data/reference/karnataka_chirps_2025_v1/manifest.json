@@ -1,0 +1,1502 @@
+{
+  "version": "karnataka_chirps_soi2025_2025_v1",
+  "created_at": "2026-10-05T06:45:01.546632+00:00",
+  "year": 2025,
+  "stage_1_complete": false,
+  "source": {
+    "collection": "UCSB-CHG/CHIRPS/DAILY",
+    "version": "CHIRPS v2.0 Final",
+    "band": "precipitation",
+    "units": "mm/day",
+    "url": "https://developers.google.com/earth-engine/datasets/catalog/UCSB-CHG_CHIRPS_DAILY",
+    "license": "Public domain",
+    "license_checked_on": "2026-10-04",
+    "citation": "Funk et al. (2015), doi:10.1038/sdata.2015.66",
+    "native_resolution_degrees": 0.05
+  },
+  "geometry_provenance": {
+    "edition": "2025",
+    "source_id": "SOI/ABDB/VECTOR/50000/2025/DISTRICT/INDIA",
+    "soi_archive_sha256": "b8325e5d9dd0f04a6663d775363fe38cd2f23bd9dbae3fb7118b4e6e0ce0bcb7",
+    "original_district_shp_sha256": "05efac0a02c113f25cd55df3f01a4aee7201bfc9b299f73bb3e273b9aa7e3740",
+    "working_district_shp_sha256": "89eb1ff0363d5bca6ccc6cbcd8ebad5b883ab64ed3d4f1bd3f485d75451d6344",
+    "working_manifest_sha256": "0e913708a25db36616a1c43ced7619a87835d678a7416f07430ee08f922684ba",
+    "identities": [
+      {
+        "source_record_index": 268,
+        "source_objectid": 344,
+        "district_name_original": "B<galkot",
+        "district_lgd_code_as_supplied_by_soi": "556",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6563.00620878778,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 269,
+        "source_objectid": 345,
+        "district_name_original": "Bengal#ru (Rural)",
+        "district_lgd_code_as_supplied_by_soi": "583",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 2298.053375183859,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 270,
+        "source_objectid": 346,
+        "district_name_original": "Belag<vi",
+        "district_lgd_code_as_supplied_by_soi": "555",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 13405.07300939293,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 271,
+        "source_objectid": 347,
+        "district_name_original": "Chikkamagal#ru",
+        "district_lgd_code_as_supplied_by_soi": "570",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 7213.636981852976,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 272,
+        "source_objectid": 348,
+        "district_name_original": "Ball<ri",
+        "district_lgd_code_as_supplied_by_soi": "565",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4245.864916655512,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 273,
+        "source_objectid": 349,
+        "district_name_original": "Ch<mar<janagara",
+        "district_lgd_code_as_supplied_by_soi": "578",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5640.669646332363,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 274,
+        "source_objectid": 350,
+        "district_name_original": "Chitradurga",
+        "district_lgd_code_as_supplied_by_soi": "566",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8436.691346107767,
+        "nic_exact_name": "Chitradurga",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 275,
+        "source_objectid": 351,
+        "district_name_original": "Koppal",
+        "district_lgd_code_as_supplied_by_soi": "560",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5578.633319511963,
+        "nic_exact_name": "Koppal",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 276,
+        "source_objectid": 352,
+        "district_name_original": "Vijayanagara",
+        "district_lgd_code_as_supplied_by_soi": "761",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5647.66535617508,
+        "nic_exact_name": "Vijayanagara",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 277,
+        "source_objectid": 353,
+        "district_name_original": "Raich#r",
+        "district_lgd_code_as_supplied_by_soi": "559",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8438.80668616617,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 278,
+        "source_objectid": 354,
+        "district_name_original": "Chikkaball<pura",
+        "district_lgd_code_as_supplied_by_soi": "582",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4244.231581448191,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 279,
+        "source_objectid": 355,
+        "district_name_original": "D<vanagere",
+        "district_lgd_code_as_supplied_by_soi": "567",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4482.6437230494885,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 280,
+        "source_objectid": 356,
+        "district_name_original": "Dh<rw<d",
+        "district_lgd_code_as_supplied_by_soi": "562",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4258.386166734271,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 281,
+        "source_objectid": 357,
+        "district_name_original": "Gadag",
+        "district_lgd_code_as_supplied_by_soi": "561",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4658.243351091693,
+        "nic_exact_name": "Gadag",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 282,
+        "source_objectid": 358,
+        "district_name_original": "H<veri",
+        "district_lgd_code_as_supplied_by_soi": "564",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4821.387879791073,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 283,
+        "source_objectid": 359,
+        "district_name_original": "H<ssan",
+        "district_lgd_code_as_supplied_by_soi": "574",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6821.106717539691,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 284,
+        "source_objectid": 360,
+        "district_name_original": "Kalaburagi",
+        "district_lgd_code_as_supplied_by_soi": "579",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10954.536297515162,
+        "nic_exact_name": "Kalaburagi",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 285,
+        "source_objectid": 361,
+        "district_name_original": "Bengal#ru (Urban)",
+        "district_lgd_code_as_supplied_by_soi": "572",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 2194.050134823002,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 286,
+        "source_objectid": 362,
+        "district_name_original": "Kol<ra",
+        "district_lgd_code_as_supplied_by_soi": "581",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3979.8178081860015,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 287,
+        "source_objectid": 363,
+        "district_name_original": "Mandya",
+        "district_lgd_code_as_supplied_by_soi": "573",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4955.132933207565,
+        "nic_exact_name": "Mandya",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 288,
+        "source_objectid": 364,
+        "district_name_original": "Mys#ru",
+        "district_lgd_code_as_supplied_by_soi": "577",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 6310.0378331659,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 289,
+        "source_objectid": 365,
+        "district_name_original": "Shivamogga",
+        "district_lgd_code_as_supplied_by_soi": "568",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 8478.926129967973,
+        "nic_exact_name": "Shivamogga",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 290,
+        "source_objectid": 366,
+        "district_name_original": "Dakshina Kannada",
+        "district_lgd_code_as_supplied_by_soi": "575",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4847.364442371039,
+        "nic_exact_name": "Dakshina Kannada",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 291,
+        "source_objectid": 367,
+        "district_name_original": "Uttara Kannada",
+        "district_lgd_code_as_supplied_by_soi": "563",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10299.013875686225,
+        "nic_exact_name": "Uttara Kannada",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 292,
+        "source_objectid": 368,
+        "district_name_original": "Vijayapura",
+        "district_lgd_code_as_supplied_by_soi": "557",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10491.605732885402,
+        "nic_exact_name": "Vijayapura",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 293,
+        "source_objectid": 369,
+        "district_name_original": "Y<dgir",
+        "district_lgd_code_as_supplied_by_soi": "580",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5275.218101058992,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 294,
+        "source_objectid": 370,
+        "district_name_original": "R<managara",
+        "district_lgd_code_as_supplied_by_soi": "584",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3519.890805572589,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 295,
+        "source_objectid": 371,
+        "district_name_original": "Udupi",
+        "district_lgd_code_as_supplied_by_soi": "569",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 3579.071215901866,
+        "nic_exact_name": "Udupi",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 296,
+        "source_objectid": 372,
+        "district_name_original": "Tumak#ru",
+        "district_lgd_code_as_supplied_by_soi": "571",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 10599.894566251203,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 297,
+        "source_objectid": 373,
+        "district_name_original": "Kodagu",
+        "district_lgd_code_as_supplied_by_soi": "576",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 4100.897651217361,
+        "nic_exact_name": "Kodagu",
+        "name_status": "exact_name_candidate",
+        "current_lgd_export_verified": false
+      },
+      {
+        "source_record_index": 298,
+        "source_objectid": 374,
+        "district_name_original": "B\\dar",
+        "district_lgd_code_as_supplied_by_soi": "558",
+        "state_lgd_code_as_supplied_by_soi": "29",
+        "area_km2": 5444.231274444466,
+        "nic_exact_name": null,
+        "name_status": "unresolved_original_spelling_or_rename",
+        "current_lgd_export_verified": false
+      }
+    ],
+    "current_lgd_reconciled": false,
+    "nic_exact_matches": 12,
+    "unresolved_matches": 19,
+    "external_geometry_transmission": false
+  },
+  "download_parameters": {
+    "crs": "EPSG:4326",
+    "crs_transform": [
+      0.05,
+      0.0,
+      73.5,
+      0.0,
+      -0.05,
+      19.0
+    ],
+    "dimensions": [
+      110,
+      160
+    ],
+    "format": "GEO_TIFF",
+    "bands": [
+      "precipitation",
+      "valid_mask"
+    ],
+    "filePerBand": false
+  },
+  "daily_method": "unweighted arithmetic mean/min/max of valid native CHIRPS cell centres strictly inside original local SOI polygons; boundary-centre pixels excluded; no area weighting, interpolation or centroid substitution",
+  "totals_method": "sum of native-cell-centre district daily means; not station measurements; total unavailable unless all days have complete pixel coverage",
+  "temporal_semantics": "daily accumulated precipitation in mm/day, UTC observation windows; historical estimates, not gauges or prediction-time availability",
+  "geometry_temporal_limit": "2025-edition geometry used; not claimed to represent each historical observation year's boundaries",
+  "identity_limit": "SOI supplied DIST_LGD identifiers pending independent current-LGD verification; NIC exact-name matches are candidates only",
+  "reuse": {
+    "chirps": "Public domain",
+    "soi_policy_url": "https://surveyofindia.gov.in/pages/copyright-policy",
+    "district_aggregate_publication": "permission not established; local only",
+    "geometry_publication": false
+  },
+  "monthly_partitions": [
+    {
+      "month": 1,
+      "version": "karnataka_chirps_soi2025_202501_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202501_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202501_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71313,
+        "sha256": "fb2ee754e428f3c952f4455eb1be0d2c527e3b3c7667106df805201eb2a507ab"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 344995,
+        "sha256": "6eed7eef4ad9ef96762703ec8a019327404d22ba80451be1fa412bda5dbe89c0"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 59734,
+        "sha256": "fa93a67656c5d1761d35b143e0641b9014d54bce2bf2456c1846eb98c1cbe3dc"
+      },
+      "retrieval_start": "2026-10-04T16:04:24.451176+00:00",
+      "retrieval_end": "2026-10-04T16:06:13.314897+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250101",
+        "UCSB-CHG/CHIRPS/DAILY/20250102",
+        "UCSB-CHG/CHIRPS/DAILY/20250103",
+        "UCSB-CHG/CHIRPS/DAILY/20250104",
+        "UCSB-CHG/CHIRPS/DAILY/20250105",
+        "UCSB-CHG/CHIRPS/DAILY/20250106",
+        "UCSB-CHG/CHIRPS/DAILY/20250107",
+        "UCSB-CHG/CHIRPS/DAILY/20250108",
+        "UCSB-CHG/CHIRPS/DAILY/20250109",
+        "UCSB-CHG/CHIRPS/DAILY/20250110",
+        "UCSB-CHG/CHIRPS/DAILY/20250111",
+        "UCSB-CHG/CHIRPS/DAILY/20250112",
+        "UCSB-CHG/CHIRPS/DAILY/20250113",
+        "UCSB-CHG/CHIRPS/DAILY/20250114",
+        "UCSB-CHG/CHIRPS/DAILY/20250115",
+        "UCSB-CHG/CHIRPS/DAILY/20250116",
+        "UCSB-CHG/CHIRPS/DAILY/20250117",
+        "UCSB-CHG/CHIRPS/DAILY/20250118",
+        "UCSB-CHG/CHIRPS/DAILY/20250119",
+        "UCSB-CHG/CHIRPS/DAILY/20250120",
+        "UCSB-CHG/CHIRPS/DAILY/20250121",
+        "UCSB-CHG/CHIRPS/DAILY/20250122",
+        "UCSB-CHG/CHIRPS/DAILY/20250123",
+        "UCSB-CHG/CHIRPS/DAILY/20250124",
+        "UCSB-CHG/CHIRPS/DAILY/20250125",
+        "UCSB-CHG/CHIRPS/DAILY/20250126",
+        "UCSB-CHG/CHIRPS/DAILY/20250127",
+        "UCSB-CHG/CHIRPS/DAILY/20250128",
+        "UCSB-CHG/CHIRPS/DAILY/20250129",
+        "UCSB-CHG/CHIRPS/DAILY/20250130",
+        "UCSB-CHG/CHIRPS/DAILY/20250131"
+      ]
+    },
+    {
+      "month": 2,
+      "version": "karnataka_chirps_soi2025_202502_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202502_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202502_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 66328,
+        "sha256": "ff2759b036320c288d3fe1c5feab72def851ceab97b8d38faebcc9c6d0be1f16"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 311592,
+        "sha256": "45bce065d2b275d88b3ab7dbde046c97f5748063818ef514a31d88488140a980"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 53960,
+        "sha256": "94428835ded35d1bc27558d23339c679a0aae36e77f190999de5b241bf769e0c"
+      },
+      "retrieval_start": "2026-10-04T16:07:23.011244+00:00",
+      "retrieval_end": "2026-10-04T16:08:55.408225+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250201",
+        "UCSB-CHG/CHIRPS/DAILY/20250202",
+        "UCSB-CHG/CHIRPS/DAILY/20250203",
+        "UCSB-CHG/CHIRPS/DAILY/20250204",
+        "UCSB-CHG/CHIRPS/DAILY/20250205",
+        "UCSB-CHG/CHIRPS/DAILY/20250206",
+        "UCSB-CHG/CHIRPS/DAILY/20250207",
+        "UCSB-CHG/CHIRPS/DAILY/20250208",
+        "UCSB-CHG/CHIRPS/DAILY/20250209",
+        "UCSB-CHG/CHIRPS/DAILY/20250210",
+        "UCSB-CHG/CHIRPS/DAILY/20250211",
+        "UCSB-CHG/CHIRPS/DAILY/20250212",
+        "UCSB-CHG/CHIRPS/DAILY/20250213",
+        "UCSB-CHG/CHIRPS/DAILY/20250214",
+        "UCSB-CHG/CHIRPS/DAILY/20250215",
+        "UCSB-CHG/CHIRPS/DAILY/20250216",
+        "UCSB-CHG/CHIRPS/DAILY/20250217",
+        "UCSB-CHG/CHIRPS/DAILY/20250218",
+        "UCSB-CHG/CHIRPS/DAILY/20250219",
+        "UCSB-CHG/CHIRPS/DAILY/20250220",
+        "UCSB-CHG/CHIRPS/DAILY/20250221",
+        "UCSB-CHG/CHIRPS/DAILY/20250222",
+        "UCSB-CHG/CHIRPS/DAILY/20250223",
+        "UCSB-CHG/CHIRPS/DAILY/20250224",
+        "UCSB-CHG/CHIRPS/DAILY/20250225",
+        "UCSB-CHG/CHIRPS/DAILY/20250226",
+        "UCSB-CHG/CHIRPS/DAILY/20250227",
+        "UCSB-CHG/CHIRPS/DAILY/20250228"
+      ]
+    },
+    {
+      "month": 3,
+      "version": "karnataka_chirps_soi2025_202503_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202503_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202503_recovered_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 72189,
+        "sha256": "f8b52dea4625a31af4ec77f446144a56e8b4d59b6a2bebe08ec5b54625f8284d"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 345731,
+        "sha256": "8a5e205c0c3b84ba80d8e32ff0a81d91180a2af2a7c03dd12cd6f87daba94def"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 62124,
+        "sha256": "828f4ca9f031738e8f40dfe0bcccae463048deff7b2cd99d91d8520cbe85e3a8"
+      },
+      "retrieval_start": "2026-10-04T16:10:02.373963+00:00",
+      "retrieval_end": "2026-10-04T16:40:53.144384+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250301",
+        "UCSB-CHG/CHIRPS/DAILY/20250302",
+        "UCSB-CHG/CHIRPS/DAILY/20250303",
+        "UCSB-CHG/CHIRPS/DAILY/20250304",
+        "UCSB-CHG/CHIRPS/DAILY/20250305",
+        "UCSB-CHG/CHIRPS/DAILY/20250306",
+        "UCSB-CHG/CHIRPS/DAILY/20250307",
+        "UCSB-CHG/CHIRPS/DAILY/20250308",
+        "UCSB-CHG/CHIRPS/DAILY/20250309",
+        "UCSB-CHG/CHIRPS/DAILY/20250310",
+        "UCSB-CHG/CHIRPS/DAILY/20250311",
+        "UCSB-CHG/CHIRPS/DAILY/20250312",
+        "UCSB-CHG/CHIRPS/DAILY/20250313",
+        "UCSB-CHG/CHIRPS/DAILY/20250314",
+        "UCSB-CHG/CHIRPS/DAILY/20250315",
+        "UCSB-CHG/CHIRPS/DAILY/20250316",
+        "UCSB-CHG/CHIRPS/DAILY/20250317",
+        "UCSB-CHG/CHIRPS/DAILY/20250318",
+        "UCSB-CHG/CHIRPS/DAILY/20250319",
+        "UCSB-CHG/CHIRPS/DAILY/20250320",
+        "UCSB-CHG/CHIRPS/DAILY/20250321",
+        "UCSB-CHG/CHIRPS/DAILY/20250322",
+        "UCSB-CHG/CHIRPS/DAILY/20250323",
+        "UCSB-CHG/CHIRPS/DAILY/20250324",
+        "UCSB-CHG/CHIRPS/DAILY/20250325",
+        "UCSB-CHG/CHIRPS/DAILY/20250326",
+        "UCSB-CHG/CHIRPS/DAILY/20250327",
+        "UCSB-CHG/CHIRPS/DAILY/20250328",
+        "UCSB-CHG/CHIRPS/DAILY/20250329",
+        "UCSB-CHG/CHIRPS/DAILY/20250330",
+        "UCSB-CHG/CHIRPS/DAILY/20250331"
+      ]
+    },
+    {
+      "month": 4,
+      "version": "karnataka_chirps_soi2025_202504_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202504_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202504_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 70065,
+        "sha256": "270daef983a6dea5b145eaf144db48ed075a38c0bdaf00cbf1b762ae62950404"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 340681,
+        "sha256": "d0bce7899e9420e342a07bef5af31687b537c2b3706a4c3c90c3c15530e736e2"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 57826,
+        "sha256": "858b71728bcba94e7dec12d667a02e1f644f4cb4cae28b5f7dc3e4033e574746"
+      },
+      "retrieval_start": "2026-10-04T17:04:32.319729+00:00",
+      "retrieval_end": "2026-10-04T17:06:11.139993+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250401",
+        "UCSB-CHG/CHIRPS/DAILY/20250402",
+        "UCSB-CHG/CHIRPS/DAILY/20250403",
+        "UCSB-CHG/CHIRPS/DAILY/20250404",
+        "UCSB-CHG/CHIRPS/DAILY/20250405",
+        "UCSB-CHG/CHIRPS/DAILY/20250406",
+        "UCSB-CHG/CHIRPS/DAILY/20250407",
+        "UCSB-CHG/CHIRPS/DAILY/20250408",
+        "UCSB-CHG/CHIRPS/DAILY/20250409",
+        "UCSB-CHG/CHIRPS/DAILY/20250410",
+        "UCSB-CHG/CHIRPS/DAILY/20250411",
+        "UCSB-CHG/CHIRPS/DAILY/20250412",
+        "UCSB-CHG/CHIRPS/DAILY/20250413",
+        "UCSB-CHG/CHIRPS/DAILY/20250414",
+        "UCSB-CHG/CHIRPS/DAILY/20250415",
+        "UCSB-CHG/CHIRPS/DAILY/20250416",
+        "UCSB-CHG/CHIRPS/DAILY/20250417",
+        "UCSB-CHG/CHIRPS/DAILY/20250418",
+        "UCSB-CHG/CHIRPS/DAILY/20250419",
+        "UCSB-CHG/CHIRPS/DAILY/20250420",
+        "UCSB-CHG/CHIRPS/DAILY/20250421",
+        "UCSB-CHG/CHIRPS/DAILY/20250422",
+        "UCSB-CHG/CHIRPS/DAILY/20250423",
+        "UCSB-CHG/CHIRPS/DAILY/20250424",
+        "UCSB-CHG/CHIRPS/DAILY/20250425",
+        "UCSB-CHG/CHIRPS/DAILY/20250426",
+        "UCSB-CHG/CHIRPS/DAILY/20250427",
+        "UCSB-CHG/CHIRPS/DAILY/20250428",
+        "UCSB-CHG/CHIRPS/DAILY/20250429",
+        "UCSB-CHG/CHIRPS/DAILY/20250430"
+      ]
+    },
+    {
+      "month": 5,
+      "version": "karnataka_chirps_soi2025_202505_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202505_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202505_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71780,
+        "sha256": "bea484ed47f2e3b6850c442c4e13a8478e57f36518b5121edb86feaa07dbb43b"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 361916,
+        "sha256": "57ec1551391cc244deac048112871463b534a49acd7040a2c8110565cc9ced97"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 59798,
+        "sha256": "897d1a68d79db1fd6d376ea626840c9d4f870a9099ce75b0751ded646a283aa4"
+      },
+      "retrieval_start": "2026-10-04T17:12:19.019626+00:00",
+      "retrieval_end": "2026-10-04T17:14:06.790171+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250501",
+        "UCSB-CHG/CHIRPS/DAILY/20250502",
+        "UCSB-CHG/CHIRPS/DAILY/20250503",
+        "UCSB-CHG/CHIRPS/DAILY/20250504",
+        "UCSB-CHG/CHIRPS/DAILY/20250505",
+        "UCSB-CHG/CHIRPS/DAILY/20250506",
+        "UCSB-CHG/CHIRPS/DAILY/20250507",
+        "UCSB-CHG/CHIRPS/DAILY/20250508",
+        "UCSB-CHG/CHIRPS/DAILY/20250509",
+        "UCSB-CHG/CHIRPS/DAILY/20250510",
+        "UCSB-CHG/CHIRPS/DAILY/20250511",
+        "UCSB-CHG/CHIRPS/DAILY/20250512",
+        "UCSB-CHG/CHIRPS/DAILY/20250513",
+        "UCSB-CHG/CHIRPS/DAILY/20250514",
+        "UCSB-CHG/CHIRPS/DAILY/20250515",
+        "UCSB-CHG/CHIRPS/DAILY/20250516",
+        "UCSB-CHG/CHIRPS/DAILY/20250517",
+        "UCSB-CHG/CHIRPS/DAILY/20250518",
+        "UCSB-CHG/CHIRPS/DAILY/20250519",
+        "UCSB-CHG/CHIRPS/DAILY/20250520",
+        "UCSB-CHG/CHIRPS/DAILY/20250521",
+        "UCSB-CHG/CHIRPS/DAILY/20250522",
+        "UCSB-CHG/CHIRPS/DAILY/20250523",
+        "UCSB-CHG/CHIRPS/DAILY/20250524",
+        "UCSB-CHG/CHIRPS/DAILY/20250525",
+        "UCSB-CHG/CHIRPS/DAILY/20250526",
+        "UCSB-CHG/CHIRPS/DAILY/20250527",
+        "UCSB-CHG/CHIRPS/DAILY/20250528",
+        "UCSB-CHG/CHIRPS/DAILY/20250529",
+        "UCSB-CHG/CHIRPS/DAILY/20250530",
+        "UCSB-CHG/CHIRPS/DAILY/20250531"
+      ]
+    },
+    {
+      "month": 6,
+      "version": "karnataka_chirps_soi2025_202506_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202506_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202506_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 70107,
+        "sha256": "e8317b04b4968c3f3cceaf1d4912b55347f769eb46f2c8b7ba23cf1b168015d1"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 342329,
+        "sha256": "fed8bc7e9681f8fdbf4add8066a0f378cf30ef7d88d293b7ac0ffb023c55aad4"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 57834,
+        "sha256": "fccd2f3d5fe7ca55a6e0e4f38e7ead007f778c739e4cc53897b4ae0712a12abe"
+      },
+      "retrieval_start": "2026-10-04T17:18:51.463618+00:00",
+      "retrieval_end": "2026-10-04T17:20:28.552981+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250601",
+        "UCSB-CHG/CHIRPS/DAILY/20250602",
+        "UCSB-CHG/CHIRPS/DAILY/20250603",
+        "UCSB-CHG/CHIRPS/DAILY/20250604",
+        "UCSB-CHG/CHIRPS/DAILY/20250605",
+        "UCSB-CHG/CHIRPS/DAILY/20250606",
+        "UCSB-CHG/CHIRPS/DAILY/20250607",
+        "UCSB-CHG/CHIRPS/DAILY/20250608",
+        "UCSB-CHG/CHIRPS/DAILY/20250609",
+        "UCSB-CHG/CHIRPS/DAILY/20250610",
+        "UCSB-CHG/CHIRPS/DAILY/20250611",
+        "UCSB-CHG/CHIRPS/DAILY/20250612",
+        "UCSB-CHG/CHIRPS/DAILY/20250613",
+        "UCSB-CHG/CHIRPS/DAILY/20250614",
+        "UCSB-CHG/CHIRPS/DAILY/20250615",
+        "UCSB-CHG/CHIRPS/DAILY/20250616",
+        "UCSB-CHG/CHIRPS/DAILY/20250617",
+        "UCSB-CHG/CHIRPS/DAILY/20250618",
+        "UCSB-CHG/CHIRPS/DAILY/20250619",
+        "UCSB-CHG/CHIRPS/DAILY/20250620",
+        "UCSB-CHG/CHIRPS/DAILY/20250621",
+        "UCSB-CHG/CHIRPS/DAILY/20250622",
+        "UCSB-CHG/CHIRPS/DAILY/20250623",
+        "UCSB-CHG/CHIRPS/DAILY/20250624",
+        "UCSB-CHG/CHIRPS/DAILY/20250625",
+        "UCSB-CHG/CHIRPS/DAILY/20250626",
+        "UCSB-CHG/CHIRPS/DAILY/20250627",
+        "UCSB-CHG/CHIRPS/DAILY/20250628",
+        "UCSB-CHG/CHIRPS/DAILY/20250629",
+        "UCSB-CHG/CHIRPS/DAILY/20250630"
+      ]
+    },
+    {
+      "month": 7,
+      "version": "karnataka_chirps_soi2025_202507_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202507_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202507_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71764,
+        "sha256": "cd5ccc7a63ef761f8b4e88b987b8a003309ba1edce6c72c97bd7acb50f86eff0"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 357695,
+        "sha256": "fb388d236c50238679d18745bf485dd01286216db87b81e51683a573916e8c84"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 59772,
+        "sha256": "8b1e63d309b1aa4b5f3ef8da5fcb8655076ccf8c627aa2141b335bf4a31962e6"
+      },
+      "retrieval_start": "2026-10-04T17:47:37.519135+00:00",
+      "retrieval_end": "2026-10-04T17:49:15.378469+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250701",
+        "UCSB-CHG/CHIRPS/DAILY/20250702",
+        "UCSB-CHG/CHIRPS/DAILY/20250703",
+        "UCSB-CHG/CHIRPS/DAILY/20250704",
+        "UCSB-CHG/CHIRPS/DAILY/20250705",
+        "UCSB-CHG/CHIRPS/DAILY/20250706",
+        "UCSB-CHG/CHIRPS/DAILY/20250707",
+        "UCSB-CHG/CHIRPS/DAILY/20250708",
+        "UCSB-CHG/CHIRPS/DAILY/20250709",
+        "UCSB-CHG/CHIRPS/DAILY/20250710",
+        "UCSB-CHG/CHIRPS/DAILY/20250711",
+        "UCSB-CHG/CHIRPS/DAILY/20250712",
+        "UCSB-CHG/CHIRPS/DAILY/20250713",
+        "UCSB-CHG/CHIRPS/DAILY/20250714",
+        "UCSB-CHG/CHIRPS/DAILY/20250715",
+        "UCSB-CHG/CHIRPS/DAILY/20250716",
+        "UCSB-CHG/CHIRPS/DAILY/20250717",
+        "UCSB-CHG/CHIRPS/DAILY/20250718",
+        "UCSB-CHG/CHIRPS/DAILY/20250719",
+        "UCSB-CHG/CHIRPS/DAILY/20250720",
+        "UCSB-CHG/CHIRPS/DAILY/20250721",
+        "UCSB-CHG/CHIRPS/DAILY/20250722",
+        "UCSB-CHG/CHIRPS/DAILY/20250723",
+        "UCSB-CHG/CHIRPS/DAILY/20250724",
+        "UCSB-CHG/CHIRPS/DAILY/20250725",
+        "UCSB-CHG/CHIRPS/DAILY/20250726",
+        "UCSB-CHG/CHIRPS/DAILY/20250727",
+        "UCSB-CHG/CHIRPS/DAILY/20250728",
+        "UCSB-CHG/CHIRPS/DAILY/20250729",
+        "UCSB-CHG/CHIRPS/DAILY/20250730",
+        "UCSB-CHG/CHIRPS/DAILY/20250731"
+      ]
+    },
+    {
+      "month": 8,
+      "version": "karnataka_chirps_soi2025_202508_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202508_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202508_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71447,
+        "sha256": "2b89b9f3496b82c4faaf901db92332a9a384d2b731cad42db360c4a3f76d7bca"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 360589,
+        "sha256": "efc7a7d16bf8617876505a6d19195e635508066693ef714104dee986a454a2cb"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 61020,
+        "sha256": "477a0619385cd01023ef964cbe90cf32290df51ec98e6db1f198c4174e37e47b"
+      },
+      "retrieval_start": "2026-10-04T11:54:03.710680+00:00",
+      "retrieval_end": "2026-10-04T12:11:49.790756+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250801",
+        "UCSB-CHG/CHIRPS/DAILY/20250802",
+        "UCSB-CHG/CHIRPS/DAILY/20250803",
+        "UCSB-CHG/CHIRPS/DAILY/20250804",
+        "UCSB-CHG/CHIRPS/DAILY/20250805",
+        "UCSB-CHG/CHIRPS/DAILY/20250806",
+        "UCSB-CHG/CHIRPS/DAILY/20250807",
+        "UCSB-CHG/CHIRPS/DAILY/20250808",
+        "UCSB-CHG/CHIRPS/DAILY/20250809",
+        "UCSB-CHG/CHIRPS/DAILY/20250810",
+        "UCSB-CHG/CHIRPS/DAILY/20250811",
+        "UCSB-CHG/CHIRPS/DAILY/20250812",
+        "UCSB-CHG/CHIRPS/DAILY/20250813",
+        "UCSB-CHG/CHIRPS/DAILY/20250814",
+        "UCSB-CHG/CHIRPS/DAILY/20250815",
+        "UCSB-CHG/CHIRPS/DAILY/20250816",
+        "UCSB-CHG/CHIRPS/DAILY/20250817",
+        "UCSB-CHG/CHIRPS/DAILY/20250818",
+        "UCSB-CHG/CHIRPS/DAILY/20250819",
+        "UCSB-CHG/CHIRPS/DAILY/20250820",
+        "UCSB-CHG/CHIRPS/DAILY/20250821",
+        "UCSB-CHG/CHIRPS/DAILY/20250822",
+        "UCSB-CHG/CHIRPS/DAILY/20250823",
+        "UCSB-CHG/CHIRPS/DAILY/20250824",
+        "UCSB-CHG/CHIRPS/DAILY/20250825",
+        "UCSB-CHG/CHIRPS/DAILY/20250826",
+        "UCSB-CHG/CHIRPS/DAILY/20250827",
+        "UCSB-CHG/CHIRPS/DAILY/20250828",
+        "UCSB-CHG/CHIRPS/DAILY/20250829",
+        "UCSB-CHG/CHIRPS/DAILY/20250830",
+        "UCSB-CHG/CHIRPS/DAILY/20250831"
+      ]
+    },
+    {
+      "month": 9,
+      "version": "karnataka_chirps_soi2025_202509_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202509_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202509_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 70056,
+        "sha256": "5d8abce9f7eb01a54a0c6cb6cf7ef80968a14554b638f51bcc0c19cca671f2be"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 343243,
+        "sha256": "ed6ad6e3cfa70b7220df68ca287a442dc86a63df1a5bbebec3be686d00547cfe"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 57838,
+        "sha256": "87b9374e92c2b829955136e035919e54a5ca836ef5d711442249f9625c9997a5"
+      },
+      "retrieval_start": "2026-10-04T17:52:23.729340+00:00",
+      "retrieval_end": "2026-10-04T17:53:48.223663+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20250901",
+        "UCSB-CHG/CHIRPS/DAILY/20250902",
+        "UCSB-CHG/CHIRPS/DAILY/20250903",
+        "UCSB-CHG/CHIRPS/DAILY/20250904",
+        "UCSB-CHG/CHIRPS/DAILY/20250905",
+        "UCSB-CHG/CHIRPS/DAILY/20250906",
+        "UCSB-CHG/CHIRPS/DAILY/20250907",
+        "UCSB-CHG/CHIRPS/DAILY/20250908",
+        "UCSB-CHG/CHIRPS/DAILY/20250909",
+        "UCSB-CHG/CHIRPS/DAILY/20250910",
+        "UCSB-CHG/CHIRPS/DAILY/20250911",
+        "UCSB-CHG/CHIRPS/DAILY/20250912",
+        "UCSB-CHG/CHIRPS/DAILY/20250913",
+        "UCSB-CHG/CHIRPS/DAILY/20250914",
+        "UCSB-CHG/CHIRPS/DAILY/20250915",
+        "UCSB-CHG/CHIRPS/DAILY/20250916",
+        "UCSB-CHG/CHIRPS/DAILY/20250917",
+        "UCSB-CHG/CHIRPS/DAILY/20250918",
+        "UCSB-CHG/CHIRPS/DAILY/20250919",
+        "UCSB-CHG/CHIRPS/DAILY/20250920",
+        "UCSB-CHG/CHIRPS/DAILY/20250921",
+        "UCSB-CHG/CHIRPS/DAILY/20250922",
+        "UCSB-CHG/CHIRPS/DAILY/20250923",
+        "UCSB-CHG/CHIRPS/DAILY/20250924",
+        "UCSB-CHG/CHIRPS/DAILY/20250925",
+        "UCSB-CHG/CHIRPS/DAILY/20250926",
+        "UCSB-CHG/CHIRPS/DAILY/20250927",
+        "UCSB-CHG/CHIRPS/DAILY/20250928",
+        "UCSB-CHG/CHIRPS/DAILY/20250929",
+        "UCSB-CHG/CHIRPS/DAILY/20250930"
+      ]
+    },
+    {
+      "month": 10,
+      "version": "karnataka_chirps_soi2025_202510_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202510_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202510_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71732,
+        "sha256": "b0765470278fb4ff4a9644ce760f54d53343a19467bd7682db93a5c838c201f9"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 358230,
+        "sha256": "7ebe1d3a94a89f0a95fb0c489d81507a0ec852071e599528f309812463bc727e"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 59790,
+        "sha256": "ba58c9232bef1316ad652ffae3c64be0a5a763053403de3422e0d52aaba5ff9e"
+      },
+      "retrieval_start": "2026-10-05T05:18:47.194272+00:00",
+      "retrieval_end": "2026-10-05T05:20:08.992021+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20251001",
+        "UCSB-CHG/CHIRPS/DAILY/20251002",
+        "UCSB-CHG/CHIRPS/DAILY/20251003",
+        "UCSB-CHG/CHIRPS/DAILY/20251004",
+        "UCSB-CHG/CHIRPS/DAILY/20251005",
+        "UCSB-CHG/CHIRPS/DAILY/20251006",
+        "UCSB-CHG/CHIRPS/DAILY/20251007",
+        "UCSB-CHG/CHIRPS/DAILY/20251008",
+        "UCSB-CHG/CHIRPS/DAILY/20251009",
+        "UCSB-CHG/CHIRPS/DAILY/20251010",
+        "UCSB-CHG/CHIRPS/DAILY/20251011",
+        "UCSB-CHG/CHIRPS/DAILY/20251012",
+        "UCSB-CHG/CHIRPS/DAILY/20251013",
+        "UCSB-CHG/CHIRPS/DAILY/20251014",
+        "UCSB-CHG/CHIRPS/DAILY/20251015",
+        "UCSB-CHG/CHIRPS/DAILY/20251016",
+        "UCSB-CHG/CHIRPS/DAILY/20251017",
+        "UCSB-CHG/CHIRPS/DAILY/20251018",
+        "UCSB-CHG/CHIRPS/DAILY/20251019",
+        "UCSB-CHG/CHIRPS/DAILY/20251020",
+        "UCSB-CHG/CHIRPS/DAILY/20251021",
+        "UCSB-CHG/CHIRPS/DAILY/20251022",
+        "UCSB-CHG/CHIRPS/DAILY/20251023",
+        "UCSB-CHG/CHIRPS/DAILY/20251024",
+        "UCSB-CHG/CHIRPS/DAILY/20251025",
+        "UCSB-CHG/CHIRPS/DAILY/20251026",
+        "UCSB-CHG/CHIRPS/DAILY/20251027",
+        "UCSB-CHG/CHIRPS/DAILY/20251028",
+        "UCSB-CHG/CHIRPS/DAILY/20251029",
+        "UCSB-CHG/CHIRPS/DAILY/20251030",
+        "UCSB-CHG/CHIRPS/DAILY/20251031"
+      ]
+    },
+    {
+      "month": 11,
+      "version": "karnataka_chirps_soi2025_202511_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202511_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202511_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 70078,
+        "sha256": "b8132f110accaba2000350f6c01f0c92474dad13b6d7020026e3e5435b282b52"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 336890,
+        "sha256": "59c6442f721226eb8e44fbce8311053e375c78a3d0872b4e16d1c5cd590b0955"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 57850,
+        "sha256": "4896dbfc014ab80ccd1226fbd209794f5b13fed871a529742cf48b6ddb0e096a"
+      },
+      "retrieval_start": "2026-10-05T06:02:57.771205+00:00",
+      "retrieval_end": "2026-10-05T06:04:25.140863+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20251101",
+        "UCSB-CHG/CHIRPS/DAILY/20251102",
+        "UCSB-CHG/CHIRPS/DAILY/20251103",
+        "UCSB-CHG/CHIRPS/DAILY/20251104",
+        "UCSB-CHG/CHIRPS/DAILY/20251105",
+        "UCSB-CHG/CHIRPS/DAILY/20251106",
+        "UCSB-CHG/CHIRPS/DAILY/20251107",
+        "UCSB-CHG/CHIRPS/DAILY/20251108",
+        "UCSB-CHG/CHIRPS/DAILY/20251109",
+        "UCSB-CHG/CHIRPS/DAILY/20251110",
+        "UCSB-CHG/CHIRPS/DAILY/20251111",
+        "UCSB-CHG/CHIRPS/DAILY/20251112",
+        "UCSB-CHG/CHIRPS/DAILY/20251113",
+        "UCSB-CHG/CHIRPS/DAILY/20251114",
+        "UCSB-CHG/CHIRPS/DAILY/20251115",
+        "UCSB-CHG/CHIRPS/DAILY/20251116",
+        "UCSB-CHG/CHIRPS/DAILY/20251117",
+        "UCSB-CHG/CHIRPS/DAILY/20251118",
+        "UCSB-CHG/CHIRPS/DAILY/20251119",
+        "UCSB-CHG/CHIRPS/DAILY/20251120",
+        "UCSB-CHG/CHIRPS/DAILY/20251121",
+        "UCSB-CHG/CHIRPS/DAILY/20251122",
+        "UCSB-CHG/CHIRPS/DAILY/20251123",
+        "UCSB-CHG/CHIRPS/DAILY/20251124",
+        "UCSB-CHG/CHIRPS/DAILY/20251125",
+        "UCSB-CHG/CHIRPS/DAILY/20251126",
+        "UCSB-CHG/CHIRPS/DAILY/20251127",
+        "UCSB-CHG/CHIRPS/DAILY/20251128",
+        "UCSB-CHG/CHIRPS/DAILY/20251129",
+        "UCSB-CHG/CHIRPS/DAILY/20251130"
+      ]
+    },
+    {
+      "month": 12,
+      "version": "karnataka_chirps_soi2025_202512_v1",
+      "local_directory": "data/working/karnataka_chirps_soi2025_202512_v1",
+      "raw_directory": "data/raw/chirps/karnataka_window_202512_verified_v1",
+      "manifest": {
+        "original_name": "manifest.json",
+        "bytes": 71714,
+        "sha256": "728312841540cf07d440576ab6a123dc0b37e5bed6dcd6fbcea340fbe34bcef2"
+      },
+      "table": {
+        "original_name": "daily_rainfall.csv",
+        "bytes": 342372,
+        "sha256": "4a56012fcb56c405494f4ea91eef56a07edb620806bd139ae40c51aa088f53a2"
+      },
+      "raw_retrieval_log": {
+        "original_name": "retrieval.jsonl",
+        "bytes": 59720,
+        "sha256": "8f019dc559d9d97108a1d8656c1221236589f62379145e680fe6d532c28d4897"
+      },
+      "retrieval_start": "2026-10-05T06:09:52.252135+00:00",
+      "retrieval_end": "2026-10-05T06:11:11.388164+00:00",
+      "source_image_ids": [
+        "UCSB-CHG/CHIRPS/DAILY/20251201",
+        "UCSB-CHG/CHIRPS/DAILY/20251202",
+        "UCSB-CHG/CHIRPS/DAILY/20251203",
+        "UCSB-CHG/CHIRPS/DAILY/20251204",
+        "UCSB-CHG/CHIRPS/DAILY/20251205",
+        "UCSB-CHG/CHIRPS/DAILY/20251206",
+        "UCSB-CHG/CHIRPS/DAILY/20251207",
+        "UCSB-CHG/CHIRPS/DAILY/20251208",
+        "UCSB-CHG/CHIRPS/DAILY/20251209",
+        "UCSB-CHG/CHIRPS/DAILY/20251210",
+        "UCSB-CHG/CHIRPS/DAILY/20251211",
+        "UCSB-CHG/CHIRPS/DAILY/20251212",
+        "UCSB-CHG/CHIRPS/DAILY/20251213",
+        "UCSB-CHG/CHIRPS/DAILY/20251214",
+        "UCSB-CHG/CHIRPS/DAILY/20251215",
+        "UCSB-CHG/CHIRPS/DAILY/20251216",
+        "UCSB-CHG/CHIRPS/DAILY/20251217",
+        "UCSB-CHG/CHIRPS/DAILY/20251218",
+        "UCSB-CHG/CHIRPS/DAILY/20251219",
+        "UCSB-CHG/CHIRPS/DAILY/20251220",
+        "UCSB-CHG/CHIRPS/DAILY/20251221",
+        "UCSB-CHG/CHIRPS/DAILY/20251222",
+        "UCSB-CHG/CHIRPS/DAILY/20251223",
+        "UCSB-CHG/CHIRPS/DAILY/20251224",
+        "UCSB-CHG/CHIRPS/DAILY/20251225",
+        "UCSB-CHG/CHIRPS/DAILY/20251226",
+        "UCSB-CHG/CHIRPS/DAILY/20251227",
+        "UCSB-CHG/CHIRPS/DAILY/20251228",
+        "UCSB-CHG/CHIRPS/DAILY/20251229",
+        "UCSB-CHG/CHIRPS/DAILY/20251230",
+        "UCSB-CHG/CHIRPS/DAILY/20251231"
+      ]
+    }
+  ],
+  "august_record_preservation": {
+    "records": 961,
+    "offset_bytes": 2402659,
+    "bytes": 360209,
+    "original_record_bytes_sha256": "675de82ea5fd48b89249ec6742e298345c2492862f1a3bb68754f9bca27a4341",
+    "annual_ordered_record_bytes_sha256": "cb02079b3ec9305b26a8b15d5691285aa7442595bee83c9d23b34a8936d215ad",
+    "source_order_preserved": false,
+    "original_table": {
+      "original_name": "daily_rainfall.csv",
+      "bytes": 360589,
+      "sha256": "efc7a7d16bf8617876505a6d19195e635508066693ef714104dee986a454a2cb"
+    },
+    "original_records_unchanged": true
+  },
+  "validation": {
+    "requested_records": 11315,
+    "records": 11315,
+    "valid_records": 11315,
+    "complete_pixel_coverage_records": 11315,
+    "partial_pixel_coverage_records": 0,
+    "missing_observations": [],
+    "monthly_total_records": 372,
+    "complete_monthly_totals": 372,
+    "annual_total_records": 31,
+    "complete_annual_totals": 31,
+    "contributing_months": 12,
+    "unique_dates": 365,
+    "unique_districts": 31,
+    "duplicate_keys": 0,
+    "missing_rainfall_values": 0,
+    "coverage_status": "complete"
+  },
+  "schemas": {
+    "daily_rainfall.csv": [
+      "source_state_lgd_code",
+      "source_district_lgd_code",
+      "district_name_original",
+      "nic_exact_name",
+      "identity_status",
+      "geometry_edition",
+      "geometry_source_id",
+      "geometry_version",
+      "date",
+      "source_collection",
+      "source_image_id",
+      "source_time_start_ms",
+      "source_time_end_ms",
+      "image_asset_version",
+      "units",
+      "mean_mm_per_day",
+      "min_mm_per_day",
+      "max_mm_per_day",
+      "expected_pixel_count",
+      "valid_pixel_count",
+      "valid_fraction",
+      "status",
+      "retrieved_at"
+    ],
+    "monthly_totals.csv": [
+      "source_district_lgd_code",
+      "district_name_original",
+      "nic_exact_name",
+      "identity_status",
+      "geometry_edition",
+      "period_start",
+      "period_end",
+      "units",
+      "expected_days",
+      "valid_days",
+      "complete_pixel_coverage_days",
+      "total_mm",
+      "status"
+    ],
+    "annual_totals.csv": [
+      "source_district_lgd_code",
+      "district_name_original",
+      "nic_exact_name",
+      "identity_status",
+      "geometry_edition",
+      "period_start",
+      "period_end",
+      "units",
+      "expected_days",
+      "valid_days",
+      "complete_pixel_coverage_days",
+      "total_mm",
+      "status"
+    ]
+  },
+  "processing_code": {
+    "original_name": "assemble_karnataka_annual.py",
+    "bytes": 22264,
+    "sha256": "8d543e12ee59ad9c3a57aa89573e73a36c86557ae4824d1ce147c1cf5c77b364"
+  },
+  "assembly_method": "copy each original CSV record once, without serialization or value changes; order by observation date and numeric SOI-supplied district identifier; no raster recalculation or external requests",
+  "record_order": [
+    "date",
+    "numeric source_district_lgd_code"
+  ],
+  "boundary_identifier_fields": [
+    "source_state_lgd_code",
+    "source_district_lgd_code"
+  ],
+  "monthly_equality_checks": [
+    {
+      "month": 1,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 2,
+      "records": 868,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 3,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 4,
+      "records": 930,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 5,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 6,
+      "records": 930,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 7,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 8,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 9,
+      "records": 930,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 10,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 11,
+      "records": 930,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    },
+    {
+      "month": 12,
+      "records": 961,
+      "logical_equality": true,
+      "original_record_bytes_preserved": true,
+      "statistics_equal": true
+    }
+  ],
+  "district_coverage_checks": [
+    {
+      "source_district_lgd_code": "555",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "556",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "557",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "558",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "559",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "560",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "561",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "562",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "563",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "564",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "565",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "566",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "567",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "568",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "569",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "570",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "571",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "572",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "573",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "574",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "575",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "576",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "577",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "578",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "579",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "580",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "581",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "582",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "583",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "584",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    },
+    {
+      "source_district_lgd_code": "761",
+      "observations": 365,
+      "unique_dates": 365,
+      "missing_dates": 0,
+      "duplicate_dates": 0
+    }
+  ],
+  "files": {
+    "daily_rainfall.csv": {
+      "original_name": "daily_rainfall.csv",
+      "bytes": 4142083,
+      "sha256": "b67ad94d07e4e633b286e7c11015fef98fee31e2601d475985a9568741728819"
+    },
+    "monthly_totals.csv": {
+      "original_name": "monthly_totals.csv",
+      "bytes": 53518,
+      "sha256": "2ef84a4de9fc48938f7eb8ff32aa6e29e418cb49bd9ea1ef91af9b2b21823574"
+    },
+    "annual_totals.csv": {
+      "original_name": "annual_totals.csv",
+      "bytes": 4732,
+      "sha256": "380a40b3c3a0e7cbab922f9516286aae67622b23105f46217557643180e808d7"
+    }
+  },
+  "local_manifest": {
+    "original_name": "manifest.json",
+    "bytes": 66668,
+    "sha256": "b4753f713b707ba0a7cba067a99a2acc5bf720ede7436d07b56f3f6688011df7"
+  },
+  "published_content": "provenance, coverage and checksums only; rainfall tables, statistics and SOI geometry local only"
+}

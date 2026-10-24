@@ -1,0 +1,21 @@
+# Keep secrets, local data and build output out of the image build context.
+.git
+**/.env
+**/.env.*
+**/node_modules
+**/.venv
+**/__pycache__
+**/.pytest_cache
+frontend/dist
+frontend/test-results
+data/tmp
+data/raw
+data/working
+data/exports
+data/recovery
+docs
+deploy/.env
+*.tif
+*.nc
+*.zip
+deploy/backups

@@ -1,0 +1,330 @@
+{
+  "access": {
+    "initialization_succeeded": true,
+    "metadata_inventory_succeeded": true,
+    "minimal_metadata_succeeded": true,
+    "raster_batch_succeeded": false
+  },
+  "candidate_summary": {
+    "ambiguous_ifi_events": 19,
+    "candidate_relationships": 89,
+    "daily_labels_created": 0,
+    "ifi_confirmations": 0,
+    "ifi_temporal_counts": {
+      "invalid_reversed": 1,
+      "outside_gfd_coverage": 257,
+      "undated": 1,
+      "within_gfd_coverage": 235
+    },
+    "ifi_with_candidates": 63,
+    "no_candidate_ifi_events": 172,
+    "selected_gfd_ids": [
+      3160,
+      2690,
+      4382,
+      3652,
+      4508
+    ]
+  },
+  "code_sha256": {
+    "scripts/verify_karnataka_satellite.py": "8465f959074bda54bddc14176603f5f2b1c1d5ab76138a210910eef6dc8802d1"
+  },
+  "completion_status": "blocked_raster_pixel_grid_discrepancy",
+  "created_at": "2026-10-06T04:15:48.699513+00:00",
+  "declared_processing_parameters": {
+    "backoff_seconds": [
+      2,
+      4
+    ],
+    "bestEffort": false,
+    "cell_chunk": 300,
+    "crs": "EPSG:32643",
+    "deadline_seconds": 60,
+    "maxPixels": 300000,
+    "max_attempts": 3,
+    "max_partitions_per_event": 24,
+    "scale_m": 250,
+    "tileScale": 2,
+    "total_seconds": 900,
+    "transform": [
+      250,
+      0,
+      0,
+      0,
+      -250,
+      0
+    ],
+    "zero_evidence_valid_fraction_gate": 0.95
+  },
+  "earth_engine_project": "floodpulse",
+  "event_batch": [
+    {
+      "complete_raster_computation": false,
+      "evidence_status": "insufficient_observation",
+      "gfd_end_inclusive": "2007-08-15",
+      "gfd_id": 3160,
+      "gfd_start": "2007-08-08",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2007-08-12",
+      "ifi_source_event_id": "UEI-IMD-FL-2007-0070",
+      "ifi_start": "2007-08-08",
+      "qualifying_pixels": null,
+      "review_region_name": "Chikkaballapura",
+      "review_region_shapeID": "76128533B80772392204057",
+      "valid_observation_pixels": null
+    },
+    {
+      "complete_raster_computation": false,
+      "evidence_status": "not_reviewed",
+      "gfd_end_inclusive": "2005-07-27",
+      "gfd_id": 2690,
+      "gfd_start": "2005-07-07",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2005-07-28",
+      "ifi_source_event_id": "UEI-IMD-FL-2005-0053",
+      "ifi_start": "2005-07-22",
+      "qualifying_pixels": null,
+      "review_region_name": "Dharwad",
+      "review_region_shapeID": "76128533B75110579117636",
+      "valid_observation_pixels": null
+    },
+    {
+      "complete_raster_computation": false,
+      "evidence_status": "not_reviewed",
+      "gfd_end_inclusive": "2016-08-26",
+      "gfd_id": 4382,
+      "gfd_start": "2016-07-25",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2016-08-09",
+      "ifi_source_event_id": "UEI-IMD-FL-2016-0071",
+      "ifi_start": "2016-08-05",
+      "qualifying_pixels": null,
+      "review_region_name": "Raichur",
+      "review_region_shapeID": "76128533B284680734793",
+      "valid_observation_pixels": null
+    },
+    {
+      "complete_raster_computation": false,
+      "evidence_status": "not_reviewed",
+      "gfd_end_inclusive": "2010-05-24",
+      "gfd_id": 3652,
+      "gfd_start": "2010-05-18",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2010-05-20",
+      "ifi_source_event_id": "UEI-IMD-FL-2010-0056",
+      "ifi_start": "2010-05-20",
+      "qualifying_pixels": null,
+      "review_region_name": "Chitradurga",
+      "review_region_shapeID": "76128533B47594161132413",
+      "valid_observation_pixels": null
+    },
+    {
+      "complete_raster_computation": false,
+      "evidence_status": "not_reviewed",
+      "gfd_end_inclusive": "2017-08-26",
+      "gfd_id": 4508,
+      "gfd_start": "2017-08-10",
+      "ifi_confirmation": false,
+      "ifi_end_inclusive": "2017-08-15",
+      "ifi_source_event_id": "UEI-IMD-FL-2017-0051",
+      "ifi_start": "2017-08-14",
+      "qualifying_pixels": null,
+      "review_region_name": "Gadag",
+      "review_region_shapeID": "76128533B33966968116377",
+      "valid_observation_pixels": null
+    }
+  ],
+  "failure": {
+    "bounded_diagnostic_repetitions": 1,
+    "exact_provider_message": "Image.reduceRegion: Too many pixels in the region. Found 561368, but maxPixels allows only 300000.",
+    "grid_interpretation": "unresolved; no resolution/ceiling change or further live batch attempted",
+    "intended_max_partition_cells": 90000,
+    "maxPixels": 300000,
+    "operation": "reduce:3160:0",
+    "reported_region_pixels": 561368,
+    "type": "EEException"
+  },
+  "limitations": [
+    "Modern public review boundaries are not historical district identities or current-LGD reconciliation.",
+    "Search window includes neighbouring states; footprint or date overlap alone does not establish Karnataka floodwater.",
+    "95% observation gate is a conservative research criterion, not validated non-flood evidence.",
+    "GFD 250 m classification; catalogue storage grid does not imply finer accuracy.",
+    "Current LGD independent reconciliation and SOI publication permission remain unresolved.",
+    "Before-interruption temporary integrity inventory was lost; exact hash/size/nsmtime comparisons cover the resumed checkpoint, plus manifest verification of existing sources."
+  ],
+  "local_files": {
+    "data/raw/flood_satellite/stage3b_access_v1/access.json": {
+      "bytes": 850,
+      "sha256": "973cf58f33dc942f3e89caff33542467b4e434e7daae3614ed5959bae982b6b8"
+    },
+    "data/raw/flood_satellite/stage3b_access_v1/gfd_inventory.json": {
+      "bytes": 15731,
+      "sha256": "bffd634b7e3e1e281594185ce3f1a8be93c68219f46447afb15e74fd6f5ffb3c"
+    },
+    "data/raw/flood_satellite/stage3b_access_v1/minimal_gfd_metadata.json": {
+      "bytes": 336,
+      "sha256": "e9d1346abedf4749323c0938be75efd39b633480374bac6384fa147541587913"
+    },
+    "data/raw/flood_satellite/stage3b_access_v1/offline_subset.json": {
+      "bytes": 18895,
+      "sha256": "bb1154a69925fb66ff15aef6e366bfaab9016296747f188d09184c994bd06342"
+    },
+    "data/raw/flood_satellite/stage3b_access_v1/public_boundary_inventory.json": {
+      "bytes": 5070,
+      "sha256": "4d58194696ca95697b874dbbc573d77ca3c844e42a47c9e9ab1efb56a6d01bca"
+    },
+    "data/raw/flood_satellite/stage3b_access_v1/requests.jsonl": {
+      "bytes": 1720,
+      "sha256": "ebd77d770b572a89c2443d2d009da379719ab8e07ae3d6c6c52c934e9674f52f"
+    },
+    "data/raw/flood_satellite/stage3b_diagnostic_v1/access.json": {
+      "bytes": 430,
+      "sha256": "d631b36c7592a7cd1633879f7a041e65edc48a375a43e8e62eceb8c66949962f"
+    },
+    "data/raw/flood_satellite/stage3b_diagnostic_v1/progress.jsonl": {
+      "bytes": 1869,
+      "sha256": "99306570a21cb3d137abb97650e70ceebbb0c1ebb5a892d65848895bb1e0ac71"
+    },
+    "data/raw/flood_satellite/stage3b_diagnostic_v1/provider_error.json": {
+      "bytes": 487,
+      "sha256": "40fbef3d3f771f1a21f71d42521c7d1b84a6efc890843b0e7a76ff895903094e"
+    },
+    "data/raw/flood_satellite/stage3b_diagnostic_v1/requests.jsonl": {
+      "bytes": 1060,
+      "sha256": "ec66eac1f23f8921c568ce298de2133c0db2b95242d06f8b7f9c3dbc67be581f"
+    },
+    "data/raw/flood_satellite/stage3b_review_v1/access.json": {
+      "bytes": 430,
+      "sha256": "a759a087a34851ff15f54cc4fdbfbbe561467fe6c73bc7c29e3bc5864dfba819"
+    },
+    "data/raw/flood_satellite/stage3b_review_v1/progress.jsonl": {
+      "bytes": 4705,
+      "sha256": "bdb5d3c6a163907f5512469211ded8c1ef7b6cc61bd76441672181f89ce61955"
+    },
+    "data/raw/flood_satellite/stage3b_review_v1/requests.jsonl": {
+      "bytes": 1060,
+      "sha256": "866e8b107a6f03563c5062902690e53e9f9deebb57897b4bafc6d47f5908a465"
+    },
+    "data/working/karnataka_satellite_event_evidence_v1/candidates.json": {
+      "bytes": 420298,
+      "sha256": "a907c74f532633ad5d791a45d04ca742b06edb895dd6f9bc814055d421e44578"
+    },
+    "data/working/karnataka_satellite_event_evidence_v1/event_evidence.json": {
+      "bytes": 5819,
+      "sha256": "cfde53e3f1c4ab9d90a441664d11d3952becf96e453af17f5bc78fdcd887a918"
+    },
+    "data/working/karnataka_satellite_event_evidence_v1/manifest.json": {
+      "bytes": 5751,
+      "sha256": "6edac6a20f3c5f9c280be3d596e92bb16530562c6c7dd4dab00593a6bc2670d7"
+    }
+  },
+  "local_research_bytes": 484511,
+  "next_task": "Stage 3B recovery: diagnose the first GFD reduction grid/region discrepancy; retain 250 m, maxPixels=300000 and bestEffort=False, then resume only the five selected events in a new version after validation.",
+  "partition_rule": "250 m anchored UTM grid, half-open integer column/row windows, genuine public district intersections, centre-in-region unweighted sum",
+  "previous_verified_commit": "68affd62b6ae0175df77a62901d68e21afa8947b",
+  "publication_scope": "Code, tests, source references, schema, checksums, aggregate metadata only. Detailed IFI/GFD candidates/evidence and all restricted SOI geometry/rainfall remain local; non-commercial conditions retained.",
+  "qualification": "flooded==1 AND jrc_perm_water==0 AND all three input masks valid AND clear_views>0",
+  "raster_method_live_validated": false,
+  "raster_summary": {
+    "attempted_unique_events": 1,
+    "candidate_mismatch": 0,
+    "completed_events": 0,
+    "insufficient_observation_due_to_computation_failure": 1,
+    "not_reviewed": 4,
+    "note": "Local partial journal uses empty accumulated sums with lower-bound flags. No source pixel counts were returned; null here denotes unavailable counts, never zero-water observations.",
+    "observed_no_qualifying_floodwater": 0,
+    "qualifying_pixel_total": null,
+    "satellite_positive": 0,
+    "selected": 5,
+    "successful_reductions": 0,
+    "valid_observation_total": null
+  },
+  "schema": {
+    "candidate_table": [
+      "ifi_project_event_id",
+      "ifi_source_event_id",
+      "ifi_original_start",
+      "ifi_original_end",
+      "ifi_start",
+      "ifi_end_inclusive",
+      "ifi_district_tokens_original",
+      "gfd_id",
+      "image_id",
+      "gfd_start",
+      "gfd_end_inclusive",
+      "original_properties",
+      "temporal_overlap",
+      "candidate_status",
+      "reason",
+      "satellite_confirmation",
+      "association_status"
+    ],
+    "reviewed_event_evidence": [
+      "gfd_id",
+      "ifi_project_event_id",
+      "ifi_source_event_id",
+      "ifi_start",
+      "ifi_end_inclusive",
+      "gfd_start",
+      "gfd_end_inclusive",
+      "image_id",
+      "review_region",
+      "partitions",
+      "evidence_status",
+      "statistics",
+      "computation_complete",
+      "counts_are_lower_bounds",
+      "processing_scale_m",
+      "retrieved_at"
+    ]
+  },
+  "selection_rule": "Eligible: IFI Karnataka-only, original exact comma-separated district token has one public geoBoundaries feature, IFI temporal coverage >=80%; exclude reference IDs 2728/3551. Greedy prefer new years then new regions, fewer Jaccard temporal overlap, fewer source district tokens, greater IFI overlap fraction, shorter GFD window; tie-break GFD ID, IFI ID, exact region name. One region per new GFD ID; no raster outcomes enter selection.",
+  "semantics": "Event-window maximum evidence; duration is source 3-day-composite evidence, never daily labels. Temporal IFI associations remain provisional.",
+  "sources": {
+    "gfd": {
+      "actual_metadata_images": 41,
+      "attribution": "Cloud to Street / Dartmouth Flood Observatory; Tellman et al. (2021), doi:10.1038/s41586-021-03695-w",
+      "availability_inclusive": [
+        "2000-02-17",
+        "2018-12-10"
+      ],
+      "collection": "GLOBAL_FLOOD_DB/MODIS_EVENTS/V1",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "metadata_ceiling": 128,
+      "public_search_window": [
+        73.5,
+        11,
+        79,
+        19
+      ],
+      "retrieved_at": "2026-10-05T17:03:00.286404+00:00",
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/GLOBAL_FLOOD_DB_MODIS_EVENTS_V1"
+    },
+    "ifi": {
+      "attribution": "CC BY-NC 4.0; Saharia et al., India Flood Inventory, doi:10.5281/zenodo.16994648",
+      "doi": "10.5281/zenodo.16994648",
+      "license": "CC BY-NC 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nc/4.0/",
+      "original_filename": "India_Flood_Inventory_v3.csv",
+      "source_md5": "fea75a9ff9eba8fb328eaddfacd21d67",
+      "source_sha256": "ef9ab2cd0db7bf917dcc22c7cb094ec599f5013ef1b96ba525d816f26ff1b108",
+      "url": "https://zenodo.org/records/16994648"
+    },
+    "public_review_boundary": {
+      "attribution": "William & Mary geoLab / geoBoundaries",
+      "collection": "WM/geoLab/geoBoundaries/600/ADM2",
+      "historical_administrative_identity_verified": false,
+      "license": "CC BY 4.0",
+      "queried_exact_names": 73,
+      "returned_features": 22,
+      "url": "https://developers.google.com/earth-engine/datasets/catalog/WM_geoLab_geoBoundaries_600_ADM2",
+      "version": "6.0.0 (2023 composite)"
+    }
+  },
+  "udupi_read_only_regression": {
+    "2728": 33,
+    "3551": 23
+  },
+  "version": "karnataka_satellite_stage3b_v1"
+}

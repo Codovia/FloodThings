@@ -43,6 +43,12 @@ def test_parse_preserves_null_zero_units_and_provenance(payload):
 
 def test_complete_response(payload):
     payload["daily"]["precipitation_sum"][2] = 1
+    from datetime import timedelta
+    payload["daily"]["time"] = [(NOW.date() + timedelta(days=i)).isoformat() for i in range(7)]
+    for field in ("precipitation_sum", "temperature_2m_max", "temperature_2m_min"):
+        payload["daily"][field] += [payload["daily"][field][-1]] * 4
+    payload["daily"]["weather_code"] = [0] * 7
+    payload["daily_units"]["weather_code"] = "wmo code"
     assert parse_weather(payload, NOW)["status"] == "available"
 
 

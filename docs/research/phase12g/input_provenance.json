@@ -1,0 +1,42 @@
+{
+  "data/raw/reference/stage4a_v1/cwc_hddp2018.pdf": {
+    "bytes": 6912793,
+    "sha256": "16cecaf2c81fb6aa61879b39d96addd5ee4b39d0058e0ee249a6abeab6a64016"
+  },
+  "data/raw/reference/stage4a_v1/cwc_sop_april2025.pdf": {
+    "bytes": 4497148,
+    "sha256": "3d13601ef577c24f3e2d8688977f3d92447f349ffc45abcd1b04adb76d9ab5f4"
+  },
+  "data/working/karnataka_hydrology_2019_pilot_v1/raw_source_registry.json": {
+    "bytes": 27783,
+    "sha256": "a885bcc09e03e4582af8c743990fba7aed3cb097284dd0264b020460fb0eb2ff"
+  },
+  "data/working/karnataka_hydrology_2019_reconciled_v1/datum_compatibility.json": {
+    "bytes": 7489,
+    "sha256": "8f8f93243a0253a6c655a7d6db051b3f4adf0d450b94e464a5bd93402c981c29"
+  },
+  "data/working/karnataka_hydrology_2019_reconciled_v1/station_identity.json": {
+    "bytes": 13352,
+    "sha256": "7fa311fb4e9c3756c368492be571881aa699acdddbb307534c867b34646813a8"
+  },
+  "data/working/karnataka_hydrology_semantics_v1/measurement_semantics.json": {
+    "bytes": 2744,
+    "sha256": "77f0edc7da4299013c1920c6d2354e02749c616fde4ea28a15ffee973cc5e61b"
+  },
+  "data/working/karnataka_hydrology_semantics_v1/reuse_policy.json": {
+    "bytes": 3219,
+    "sha256": "b452daaa41ac00cfc7d3e7f6d2313f21087cefe1ddc337efac2f17463ce38d79"
+  },
+  "docs/phase12f/measured_series_inventory.json": {
+    "bytes": 8051,
+    "sha256": "02c0ff085374f770cd787749d58491bbba49ec10a3a06d73fc89f27bfe3f0b1b"
+  },
+  "docs/phase12f/measured_station_year_coverage.json": {
+    "bytes": 42745,
+    "sha256": "01df7d845cc79b581b686770ffa5e47c323fefaccc6fe27d7f392d4debcf7e06"
+  },
+  "docs/phase12f/target_protocol.json": {
+    "bytes": 3205,
+    "sha256": "44879ed41b3d66565811d3b6d4258d70d76d7e2ba9a73707d86dd679265fa912"
+  }
+}

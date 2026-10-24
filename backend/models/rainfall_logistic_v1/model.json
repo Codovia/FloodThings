@@ -1,0 +1,64 @@
+{
+  "classes": [
+    0,
+    1
+  ],
+  "decision_rule": "class 1 if trained decision function > 0; no calibrated probability exposed",
+  "feature_order": [
+    "rain_24h_mm",
+    "rain_72h_mm",
+    "max_hourly_rain_24h_mm",
+    "temperature_mean_24h_c",
+    "humidity_mean_24h_percent",
+    "pressure_mean_24h_hpa",
+    "season_sin",
+    "season_cos"
+  ],
+  "features": {
+    "humidity_mean_24h_percent": "%",
+    "max_hourly_rain_24h_mm": "mm",
+    "pressure_mean_24h_hpa": "hPa",
+    "rain_24h_mm": "mm",
+    "rain_72h_mm": "mm",
+    "season_cos": "dimensionless",
+    "season_sin": "dimensionless",
+    "temperature_mean_24h_c": "°C"
+  },
+  "logistic_regression": {
+    "coefficients": [
+      0.9431381165209526,
+      -0.17738504851870493,
+      -0.010594380589484916,
+      -0.07855550889162106,
+      1.2880900513957427,
+      -0.8738468199624422,
+      -0.11758413764942839,
+      0.30335010177826377
+    ],
+    "intercept": -1.9579353608966426
+  },
+  "scaler": {
+    "mean": [
+      8.175008558712742,
+      24.525196850393677,
+      1.2027730229373523,
+      27.541298642017598,
+      81.32341949104163,
+      1006.9086385940888,
+      5.889171991420637e-06,
+      -0.00034232001763322416
+    ],
+    "scale": [
+      16.600844874256452,
+      44.26563058610171,
+      2.056630424259636,
+      1.273673196797121,
+      8.122382903399487,
+      2.6605795118826827,
+      0.7072277689926528,
+      0.7069856897759668
+    ]
+  },
+  "threshold_mm": 64.5,
+  "version": "rainfall_logistic_v1"
+}
