@@ -18,6 +18,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 
 from .home_sources import SourceFailure, read_json
+from .river_flood_model import RiverFloodModel
 
 router = APIRouter()
 POINTS_FILE = Path(__file__).resolve().parents[2] / 'data/reference/karnataka_river_points_v1/points.json'
@@ -77,9 +78,11 @@ def assess_point(point, daily):
 
 
 class RiverForecast:
-    def __init__(self, client, points=None, clock=time.monotonic):
+    def __init__(self, client, points=None, clock=time.monotonic, model=None):
         self.client, self.clock = client, clock
         self.points = points if points is not None else load_points()
+        # The trained AI model runs next to GloFAS; its failure never hides the GloFAS forecast.
+        self.model = model if model is not None else RiverFloodModel(client)
         self.cache, self.lock = None, asyncio.Lock()
 
     async def forecast(self):
@@ -102,6 +105,9 @@ class RiverForecast:
                     if row.get('daily_units', {}).get('river_discharge_member01') not in (None, 'm³/s') or len(row['daily']['time']) != DAYS:
                         raise ValueError('Unexpected units or forecast length')
                     results.append(assess_point(point, row['daily']))
+                ai = await self.model.assess([p['id'] for p in results]) if self.model else {}
+                for result in results:
+                    result['ai_model'] = ai.get(result['id'], {'status': 'not_trained'})
                 body = {'status': 'available', 'label': LABEL, 'source': SOURCE, 'model': MODEL, 'forecast_days': DAYS,
                         'retrieved_at': datetime.now(timezone.utc).isoformat(), 'response_sha256': sha,
                         'date_semantics': 'GloFAS daily dates (UTC days)', 'points': results}

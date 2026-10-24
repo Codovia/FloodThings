@@ -8,7 +8,7 @@ import { PageLink } from './AppNavigation.jsx'
 import { useRiskGrid, useOfficialDistricts, useRiverForecast, LEVEL_COLORS, LEVEL_NAMES } from './useRisk.js'
 import { OFFICIAL_COLOURS } from './OfficialWarnings.jsx'
 import './RiskPanel.css'
-import ScreenTabs, { useWide } from './ScreenTabs.jsx'
+import ScreenTabs, { useWide, usePaged, Pager } from './ScreenTabs.jsx'
 import Popup from './Popup.jsx'
 
 const hazardNotice='No verified potential flood-prone zone dataset is available, so no flood-prone zones are shown.'
@@ -49,6 +49,15 @@ function useEvidence(url, retry=0){
   return()=>{active=false;clearTimeout(timer);controller.abort()}
  },[url,retry])
  return !url?{data:null,error:null,loading:false}:state.url===url?state:{data:null,error:null,loading:true}
+}
+
+// FloodPulse's own trained model, next to GloFAS: a 3-day flood flag from upstream rain.
+function AiModelLine({ai}){
+ if(!ai||ai.status==='not_trained')return null
+ if(ai.status==='not_used')return <small className="ai-line" data-state="not_used">AI: not used here (a simple rain rule tested better)</small>
+ if(ai.status!=='available')return <small className="ai-line" data-state={ai.status}>AI: unavailable{ai.message?` — ${ai.message}`:''}</small>
+ const day=ai.first_flagged_date&&new Intl.DateTimeFormat('en-IN',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'}).format(new Date(ai.first_flagged_date+'T00:00:00Z'))
+ return <small className="ai-line" data-state={ai.flood_likely?'likely':'calm'}>AI: {ai.flood_likely?<strong>flood likely within 3 days of {day}</strong>:'not likely this week'} · {Math.round(ai.peak_upstream_rain_3d_mm)} mm upstream in 3 days</small>
 }
 
 function IntelligenceGeography({district,history,shelters,risk,official,rivers,point,popup,onPoint,onFeature,children}){
@@ -147,6 +156,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  function check(next){setChecked(next);onPoint?.(next);setTab('place')}
  const [layers,setLayers]=useState({official:true,risk:true,rivers:true,history:true,shelters:false})
  const riskGrid=useRiskGrid(layers.risk),officialDistricts=useOfficialDistricts(true),riverForecast=useRiverForecast(layers.rivers)
+ const riverPage=usePaged(riverForecast.data?.points||[],3)  // one screen: three rivers per page at every size
  const directory=useEvidence('/api/flood-map/districts',retry)
  const query=new URLSearchParams(districtId?{district_id:districtId}:{})
  const historicalQuery=new URLSearchParams(query);if(eventId)historicalQuery.set('event_id',eventId)
@@ -217,12 +227,18 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
    {!layers.rivers?<p className="muted">River forecast hidden. Turn on "River flood forecast" in the map layers.</p>
     :riverForecast.loading&&!riverForecast.data?<p role="status">Loading the river forecast…</p>
     :riverForecast.error||!riverForecast.data?<p role="status">River forecast unavailable{riverForecast.error?` (${riverForecast.error})`:''}. This does not mean rivers are normal; check CWC and KSNDMC.</p>
-    :<ul className="river-list" aria-label="River flood forecast, next 7 days">{riverForecast.data.points.map(r=><li key={r.id} data-level={r.level}>
+    :<><ul className="river-list" aria-label="River flood forecast, next 7 days">{riverPage.items.map(r=><li key={r.id} data-level={r.level}>
       <span className="risk-chip" style={{'--swatch':LEVEL_COLORS[r.level]}}>{LEVEL_NAMES[r.level]}</span>
       <strong>{r.river}</strong> at {r.place} <span className="muted">({r.district})</span>
-      <small>{Math.round(r.peak.share_above['2_year']*100)}% of runs above the 2-year flood level · {Math.round(r.peak.share_above['5_year']*100)}% above 5-year</small></li>)}</ul>}
-   <p className="muted">Modelled river flow from Copernicus GloFAS (50 forecast runs) at {riverForecast.data?.points.length||6} river points checked against OpenStreetMap and past floods. Not observed water levels or an official warning; dam releases are only approximated.</p>
-   <p className="muted"><Popup label="How the river forecast was checked" title="How the river forecast works">
+      <small>GloFAS: {Math.round(r.peak.share_above['2_year']*100)}% of runs above 2-year flood level · {Math.round(r.peak.share_above['5_year']*100)}% above 5-year</small>
+      <AiModelLine ai={r.ai_model} /></li>)}</ul><Pager paged={riverPage} label="More rivers"/></>}
+   <p className="muted">Modelled river flow (Copernicus GloFAS, 50 runs) and the FloodPulse AI model at {riverForecast.data?.points.length||6} checked river points. Not observed water levels or an official warning.</p>
+   <p className="muted"><Popup label="How the AI model was tested" title="FloodPulse AI river flood model">
+    <p>A model trained by FloodPulse predicts whether each river will rise above its 2-year flood level within 3 days, from rain over the river's upstream catchment (traced along OpenStreetMap rivers, e.g. up to Mahabaleshwar for the Krishna). It uses no river readings.</p>
+    <p>Trained on 1997–2015 ERA5 rain against GloFAS reanalysis river flow (measured Karnataka river levels are not available), and tested on 2016–2021, which it never saw:</p>
+    {riverForecast.data&&<ul className="ai-eval">{riverForecast.data.points.filter(r=>r.ai_model?.evaluation).map(r=><li key={r.id}><strong>{r.river}</strong>: model F1 {r.ai_model.evaluation.model_f1.toFixed(2)} vs a simple rain rule {r.ai_model.evaluation.rain_rule_f1.toFixed(2)}{r.ai_model.evaluation.documented_floods_flagged.length?` · flagged the documented flood of ${r.ai_model.evaluation.documented_floods_flagged.join(', ')} 1–4 days ahead`:''}{r.ai_model.status==='not_used'?' · not used (the rule did better)':''}</li>)}</ul>}
+    <p>Live rain comes from Open-Meteo forecasts, converted to the training rain's scale with a factor per catchment fitted on 2023–2025. It cannot be more accurate than GloFAS, whose river flow it learned from; dam operations are not modelled. Experimental: not an official warning.</p>
+   </Popup> · <Popup label="How the river forecast was checked" title="How the river forecast works">
     <p>Each point is the GloFAS model cell on a named river near a town. A point was kept only if OpenStreetMap shows that river within 3 km and the model's largest past flows (1997–2021) fall within 3 days of a documented flood, such as the Krishna and Ghataprabha floods of August 2019 and the Kabini flood of August 2018.</p>
     <p>Flood levels (2-, 5- and 10-year) come from each cell's own 25 yearly maxima, as GloFAS does. "High" means most of the 50 forecast runs exceed the 2-year level; "Severe", the 5-year level; "Moderate", at least 1 in 5 runs above the 2-year level. These cut-offs are the project's choice.</p>
     <p>Not shown: Bhima at Afzalpur and Kaveri at Srirangapatna did not pass the past-flood check, so they are not forecast here. Source: Copernicus GloFAS v4 via Open-Meteo (CC BY 4.0); river lines © OpenStreetMap contributors.</p>

@@ -12,7 +12,8 @@ const history={status:'available',geojson:{type:'FeatureCollection',features:[fe
 const reply=(data,ok=true)=>Promise.resolve({ok,json:async()=>data})
 // TEST FIXTURE ONLY: shape of /api/river-forecast; invented values.
 const rivers={status:'available',label:'TEST',points:[{id:'test_river',river:'Testriver',place:'Fixtureville',district:'Udupi',grid:{latitude:13.125,longitude:74.875},level:'high',
- meaning:'TEST',peak:{date:'2026-10-25',median_m3s:150,share_above:{'2_year':.62,'5_year':.08,'10_year':0}},days:[],flood_levels_m3s:{'2_year':100,'5_year':200,'10_year':300}}]}
+ meaning:'TEST',peak:{date:'2026-10-25',median_m3s:150,share_above:{'2_year':.62,'5_year':.08,'10_year':0}},days:[],flood_levels_m3s:{'2_year':100,'5_year':200,'10_year':300},
+ ai_model:{status:'available',flood_likely:true,first_flagged_date:'2026-10-26',peak_upstream_rain_3d_mm:212.4,evaluation:{model_f1:.71,rain_rule_f1:.62,documented_floods_flagged:['2019-08-08']}}}]}
 // The river forecast points are the only circle markers; no flood or shelter record is turned into a point.
 const onlyRiverMarkers=()=>mock.circleMarker.mock.calls.every(([latlng])=>latlng[0]===13.125&&latlng[1]===74.875)
 function responses(url){
@@ -67,7 +68,11 @@ it('Rivers tab lists the checked river points with the share of forecast runs ab
  await start()
  fireEvent.click(screen.getByRole('tab',{name:'Rivers'}))
  const list=await screen.findByRole('list',{name:'River flood forecast, next 7 days'})
- expect(list.textContent).toMatch(/High.*Testriver.*Fixtureville.*62% of runs above the 2-year flood level · 8% above 5-year/)
+ expect(list.textContent).toMatch(/High.*Testriver.*Fixtureville.*GloFAS: 62% of runs above 2-year flood level · 8% above 5-year/)
+ expect(list.textContent).toMatch(/AI: flood likely within 3 days of Mon, 26 Oct · 212 mm upstream in 3 days/)
+ fireEvent.click(screen.getByRole('button',{name:'How the AI model was tested'}))
+ expect(screen.getByRole('dialog').textContent).toMatch(/Testriver: model F1 0\.71 vs a simple rain rule 0\.62 · flagged the documented flood of 2019-08-08 1–4 days ahead/)
+ fireEvent.click(screen.getByRole('button',{name:'Close'}))
  expect(screen.getByText(/Not observed water levels or an official warning/)).toBeTruthy()
  expect(mock.circleMarker.mock.calls.some(([latlng])=>latlng[0]===13.125&&latlng[1]===74.875)).toBe(true)
  fireEvent.click(screen.getByLabelText('River flood forecast, 7 days'))

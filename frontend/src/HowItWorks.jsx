@@ -4,7 +4,7 @@ import { LEVEL_COLORS } from './useRisk.js'
 import './HowItWorks.css'
 import ScreenTabs from './ScreenTabs.jsx'
 
-// Explains the risk index and why it is rule-based rather than a trained flood model.
+// Explains the risk index, the river flood forecast and which machine-learning models failed or work.
 const PIPELINE = [
   ['Live data', 'Forecast rain, river flow, ground height (Open-Meteo); official warnings (IMD, NDMA SACHET); approved citizen reports'],
   ['Prediction', 'Flood and drainage risk index for the next 24 hours; 7-day river flood forecast (Copernicus GloFAS) for six checked rivers'],
@@ -44,17 +44,13 @@ export default function HowItWorks({ navigate }) {
       <p className="muted">Separately, the Flood Map's <strong>Rivers</strong> tab compares the 50-run GloFAS river forecast with each river's own 2-, 5- and 10-year flood levels at six points (Krishna, Ghataprabha, Kabini, Netravati, Tungabhadra, Kali). Each point was kept only because its model cell lies on that river in OpenStreetMap and its largest past flows match documented floods.</p>
     </section>
       </> },
-      { id: 'ml', label: 'Why not ML', content: <>
+      { id: 'ml', label: 'AI models', content: <>
     <section className="panel" aria-labelledby="how-ml">
-      <h2 id="how-ml">The machine-learning experiment</h2>
-      <p>Before building the index, we tested whether machine learning could predict flood days for Karnataka's districts from historical weather and the India Flood Inventory's flood records.</p>
-      <h3>Result: the models did not beat a simple rainfall rule, and the records cannot support a trained flood model</h3>
-      <ul>
-        <li><strong>No confirmed "no flood" days exist.</strong> The flood inventory lists reported floods; a day without a report is unknown, not dry.</li>
-        <li><strong>Reporting grew about 24 times</strong> (0.39% of days in 1969–94, 9.31% in 2011–23), so the labels partly measure reporting, not flooding.</li>
-        <li><strong>No historical river-gauge data</strong> is available to train on.</li>
-      </ul>
-      <p>So FloodPulse uses the explainable index above instead of a trained flood model, and labels it experimental.</p>
+      <h2 id="how-ml">Machine learning: what failed and what works</h2>
+      <h3>Failed: predicting district "flood days" from flood reports</h3>
+      <p>The India Flood Inventory has no confirmed "no flood" days, and reporting grew about 24 times (0.39% of days in 1969–94, 9.31% in 2011–23), so the labels partly measure reporting. Those models did not beat a simple rainfall rule, so the risk index above stays rule-based.</p>
+      <h3>Works: the AI river flood model</h3>
+      <p>A model trained by FloodPulse predicts whether a river will rise above its 2-year flood level within 3 days, from rain over its upstream catchment (e.g. near Mahabaleshwar for the Krishna — in August 2019 Kudachi had 196 mm while the upstream catchment had 1,513 mm). Trained on 1997–2015, tested on 2016–2021: it beat a simple rain rule on 5 of 6 rivers and flagged all 5 documented floods in those years 1–4 days ahead. It learned from GloFAS river flow, because measured Karnataka gauge data are not available, so it cannot be more accurate than GloFAS. See Flood Map → Rivers.</p>
     </section>
       </> },
       { id: 'next', label: 'Next steps', content: <>
