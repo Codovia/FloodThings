@@ -2611,3 +2611,11 @@ Request: remove automatic updates after the outage; update by hand to avoid site
 - Server order (user, no access from here): `./auto-update.sh --off` first (removes only its crontab line), recover the site, and only then pull this change; afterwards delete the leftovers `deploy/auto-update.log` and `deploy/.auto-update.*`.
 
 Verification: no references left outside this log; backend suite 552/552 (the 9 auto-update tests removed with the script).
+
+## 2026-10-25 — Release procedure written (docs/RELEASE_PROCEDURE.md)
+
+Request: a correct procedure for taking a code change to the server, now that updates are manual.
+
+`docs/RELEASE_PROCEDURE.md`: work on `floodpulse-v2` → try it with `./floodpulse.sh` (laptop and phone width) → backend tests, frontend unit tests, build, browser tests, and a local server-image build when deployment files change → `update.md`, commit only the change's files, push, confirm the remote hash → pull request into `main` with a merge commit → on the server: no edits on the server, on `main`, note the current commit, `./backup.sh`, `git pull --ff-only`, `./setup.sh` → check `docker compose ps`, app log, `/api/health/ready` and the site on a phone → going back: previous commit, and restore the backup first when the update added a migration (otherwise `alembic upgrade head` fails on the newer database revision). Linked from the README and both hosting guides.
+
+Checked here: the image check commands (`docker build`, then `import app.main` as the container's user 10001) work, ~11 s with cache; `npm test`, `npm run build`, `npm run test:map` and `./floodpulse.sh` are the project's real commands; `setup.sh` runs `alembic upgrade head`, which is why the rollback order matters. The server steps themselves could not be run from here.

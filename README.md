@@ -62,7 +62,7 @@ cd backend && .venv/bin/python -B -m app.provision_shelter_admin --username NAME
 
 ## Host it (Azure or any Linux server)
 
-One server runs the database, the app and automatic HTTPS with Docker: `cd deploy && ./setup.sh`. Step-by-step guides: **[AWS Lightsail](docs/AWS_HOSTING.md)** · **[Azure for Students](docs/AZURE_HOSTING.md)**.
+One server runs the database, the app and automatic HTTPS with Docker: `cd deploy && ./setup.sh`. Step-by-step guides: **[AWS Lightsail](docs/AWS_HOSTING.md)** · **[Azure for Students](docs/AZURE_HOSTING.md)**. Every later change goes live through **[the release procedure](docs/RELEASE_PROCEDURE.md)**.
 
 ## Test
 

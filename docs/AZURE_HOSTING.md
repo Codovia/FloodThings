@@ -149,8 +149,9 @@ The static address and domain stay the same.
 
 ## Updating (manual)
 
-Updates are run by hand, so nothing changes on the server unless you are watching it. After a change is
-merged into `main` on GitHub:
+Updates are run by hand, so nothing changes on the server unless you are watching it. The full
+procedure, from testing to going back after a failed update, is in `RELEASE_PROCEDURE.md`. After a change
+is merged into `main` on GitHub:
 ```
 cd ~/floodpulse/deploy
 ./backup.sh && git pull && ./setup.sh
