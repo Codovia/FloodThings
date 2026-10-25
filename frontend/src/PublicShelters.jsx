@@ -1,5 +1,6 @@
 import OfficialHelp from './OfficialHelp.jsx'
 import React,{useEffect,useRef,useState} from 'react'
+import AddressLine,{usePlaceLookup} from './AddressLine.jsx'
 import {createPortal} from 'react-dom'
 import ShelterMap from './ShelterMap.jsx'
 import ShelterNavigation from './ShelterNavigation.jsx'
@@ -40,6 +41,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const wide=useWide(),[tab,setTab]=useState('list')
   const selectedPoint=point
   point=usableNavigationOrigin(point)
+  const placeLookup=usePlaceLookup(point)
   const approx=approximateStart(point)
   // An imprecise GPS fix is still shown as an area (blue circle) so the person can tap the exact start inside it.
   const mapOrigin=point||(selectedPoint?.kind==='gps'&&Number.isFinite(selectedPoint.accuracy_m)?{...selectedPoint,showAccuracy:true}:null)
@@ -197,7 +199,7 @@ export default function PublicShelters({point=null,active,overview=false,mapTarg
   const roughness=selectedPoint?.kind==='network'?'Your location is only an approximate city estimate.':selectedPoint?.kind==='gps'&&!(selectedPoint.accuracy_m<=MAX_START_ACCURACY_M)?`Your device located you only to ±${Math.round(selectedPoint.accuracy_m)} m; directions need ±${MAX_START_ACCURACY_M} m or better. Laptops often cannot do better.`:'Your GPS fix is older than five minutes; update your location for directions.'
   return <section className={(overview?"panel shelters-overview":"panel shelters-panel")+(!wide&&tab==='map'?' map-focus':'')} aria-labelledby="public-shelters-title">
     <div className="panel-heading"><div><p className="eyebrow">VERIFIED BY ADMINISTRATORS</p><h2 id="public-shelters-title">Open shelters near you</h2></div><button className="secondary" onClick={()=>enabled?current.refresh():setOpen(true)} disabled={current.loading}>{current.loading?'Loading shelters…':enabled?'Refresh shelters':'Find open shelters'}</button></div>
-    <div className="shelter-origin">{point?<p>{`Distances from ${point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m${approx?', approximate':''})`:''}.`}</p>:<p>{awaitingPermission?'Allow location access in your browser\'s prompt (next to the address bar) to list the nearest shelters.':'Set your location to list the nearest shelters first.'}</p>}
+    <div className="shelter-origin">{point?<><p>{`Distances from ${placeLookup.place||point.name}${point.kind==='gps'?` (GPS ±${Math.round(point.accuracy_m)} m${approx?', approximate':''})`:''}.`}</p><AddressLine lookup={placeLookup}/></>:<p>{awaitingPermission?'Allow location access in your browser\'s prompt (next to the address bar) to list the nearest shelters.':'Set your location to list the nearest shelters first.'}</p>}
       {onLocate&&<button type="button" onClick={()=>locate()} disabled={locating}>{locating?(awaitingPermission?'Allow location…':locatingAccuracy!==null?`±${locatingAccuracy} m, improving…`:'Finding you…'):point?'Update my location':'Use my location'}</button>}</div>
     {locateError&&!point&&<p role="status" className="notice">{locateError}</p>}
     {selectedPoint && !point && !locating && <p role="status" className="notice">{roughness}{!pickingStart&&onLocate&&<> <button type="button" className="link-button" onClick={()=>startPicking('locate')}>Tap my start on the map</button></>}</p>}

@@ -27,6 +27,7 @@ function responses(url){
  if(u.pathname==='/api/official/districts')return reply({status:'available',official:true,label:'TEST',retrieved_at:'2026-10-16T00:00:00Z',districts:[{district:'Udupi',imd_name:'UDUPI',status:'available',issued_date:'2026-10-16',days:[{date:'2026-10-16',level:'orange',warnings:['Very heavy rain'],status:'available'}],geometry:{type:'Polygon',coordinates:[[[74.6,13.5],[74.9,13.5],[74.9,13.8],[74.6,13.5]]]}}]})
  if(u.pathname==='/api/risk/grid')return reply({status:'available',experimental:true,cell_size_degrees:0.25,retrieved_at:'2026-10-16T00:00:00Z',note:'Rain-only test grid',cells:[{id:'g1',latitude:13.625,longitude:74.625,level:'moderate',score:2,rain_24h_mm:70,rain_5d_mm:10,peak_mmh:8}]})
  if(u.pathname==='/api/river-forecast')return reply(rivers)
+ if(u.pathname==='/api/location/address')return reply({status:'not_found',message:'No address is mapped near this point.'})
  throw Error('Unexpected test request '+url)
 }
 beforeEach(()=>{

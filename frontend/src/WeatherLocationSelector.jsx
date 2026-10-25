@@ -24,7 +24,7 @@ export function WeatherPointMap({ point, onSelect, navigationBounds, historical 
     view.on('click', event => {
       const { lat, lng } = event.latlng
       const longitude = lng < -180 || lng > 180 ? ((lng + 180) % 360 + 360) % 360 - 180 : lng
-      select.current({ name: 'Selected map point', latitude: lat, longitude })
+      select.current({ name: 'Selected map point', kind: 'map', latitude: lat, longitude })
     })
     return () => { view.remove(); map.current = null; marker.current = null }
   }, [])

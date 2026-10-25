@@ -72,7 +72,7 @@ it('GPS is requested only after a click and has permission-denied/map fallback',
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   expect(screen.getByRole('alert').textContent).toContain('Location permission denied')
   expect(selected).not.toHaveBeenCalled()
-  coordinates(); expect(selected).toHaveBeenCalledWith({ name: 'Selected map point', latitude: 13.34, longitude: 74.74 })
+  coordinates(); expect(selected).toHaveBeenCalledWith({ name: 'Selected map point', kind: 'map', latitude: 13.34, longitude: 74.74 })
 })
 
 it('GPS preserves device uncertainty and ignores callbacks after a newer map selection', () => {
@@ -85,7 +85,7 @@ it('GPS preserves device uncertainty and ignores callbacks after a newer map sel
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   coordinates('14', '75')
   act(() => success({ coords: { latitude: 13, longitude: 74, accuracy: 50 } }))
-  expect(selected).toHaveBeenLastCalledWith({ name: 'Selected map point', latitude: 14, longitude: 75 })
+  expect(selected).toHaveBeenLastCalledWith({ name: 'Selected map point', kind: 'map', latitude: 14, longitude: 75 })
 })
 
 it('public coordinate fields are absent and invalid GPS is rejected while zero is valid',()=>{
@@ -185,7 +185,7 @@ it('compact name controls start collapsed and point selection uses the map',()=>
  expect(screen.queryByRole('dialog')).toBeNull()
  expect(screen.queryByRole('button',{name:'Get point weather'})).toBeNull()
  fireEvent.click(screen.getByRole('button',{name:'Change location'}));expect(screen.getByRole('dialog',{name:'Change location'})).toBeTruthy()
- fireEvent.click(screen.getByRole('button',{name:'Close'}));coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Selected map point',latitude:14,longitude:75})
+ fireEvent.click(screen.getByRole('button',{name:'Close'}));coordinates('14','75');expect(selected).toHaveBeenCalledWith({name:'Selected map point',kind:'map',latitude:14,longitude:75})
 })
 it('home preview shows the real selectable point map without showing coordinate controls',()=>{
  render(<WeatherLocationSelector compact overview onSelect={vi.fn()}/>);

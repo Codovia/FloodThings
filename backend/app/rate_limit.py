@@ -17,7 +17,7 @@ from collections import OrderedDict, deque
 
 from fastapi.responses import JSONResponse
 
-EXPENSIVE = ('/api/risk/area', '/api/route', '/api/ai/rainfall-outlook', '/api/admin/place')
+EXPENSIVE = ('/api/risk/area', '/api/route', '/api/ai/rainfall-outlook', '/api/admin/place', '/api/location/address')
 EXCLUDED_PREFIXES = ('/api/health', '/api/telegram/webhook', '/api/admin/', '/api/reports')
 MAX_TRACKED = 20_000
 

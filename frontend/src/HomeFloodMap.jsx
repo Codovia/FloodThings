@@ -44,7 +44,7 @@ export default function HomeFloodMap({ fitViewport, point, navigate, onReportHer
     view.attributionControl.addAttribution('<a href="https://www.geoboundaries.org/">geoBoundaries</a> / DataMeet / Election Commission of India · <a href="https://creativecommons.org/licenses/by/2.5/in/">CC BY 2.5 IN</a> · Warnings: <a href="https://mausam.imd.gov.in/">IMD</a>')
     view.on('click', event => {
       const { lat, lng } = event.latlng
-      L.popup().setLatLng(event.latlng).setContent(choosePopup([['p', 'Check the experimental flood and drainage risk for this spot and the area around it.']], 'Check risk here', () => { view.closePopup(); actions.current.onChoose({ name: 'Selected map point', latitude: lat, longitude: lng }) })).openOn(view)
+      L.popup().setLatLng(event.latlng).setContent(choosePopup([['p', 'Check the experimental flood and drainage risk for this spot and the area around it.']], 'Check risk here', () => { view.closePopup(); actions.current.onChoose({ name: 'Selected map point', kind: 'map', latitude: lat, longitude: lng }) })).openOn(view)
     })
     return () => { view.remove(); map.current = null }
   }, [])

@@ -1,6 +1,7 @@
 """Administrator entrance lookup: district from IMD boundaries, place/address suggestion from OSM Nominatim.
 
-Only for an administrator's explicit map click on a facility entrance (never citizen GPS).
+The lookup below is shared with the public address button (location_address.py), so both stay within
+one application-wide limit.
 Nominatim usage policy (https://operations.osmfoundation.org/policies/nominatim/): at most one
 request per second for the whole application, an identifying User-Agent, cached results,
 visible OpenStreetMap attribution, no automatic/bulk/grid lookups. Results are suggestions the
@@ -24,7 +25,7 @@ from .shelters import authorized
 router = APIRouter()
 NOMINATIM_URL = 'https://nominatim.openstreetmap.org/reverse'
 POLICY_URL = 'https://operations.osmfoundation.org/policies/nominatim/'
-USER_AGENT = 'FloodPulse/2 (college project; administrator shelter entrance lookup)'
+USER_AGENT = 'FloodPulse/2 (college project; Karnataka flood app; place and address lookup on user request)'
 ATTRIBUTION = 'Place and address suggestion: © OpenStreetMap contributors, ODbL 1.0 (via Nominatim).'
 NAMED_CATEGORIES = {'amenity', 'building', 'tourism', 'leisure', 'historic', 'office', 'healthcare', 'religion', 'education'}
 CACHE_SIZE, CACHE_SECONDS, MIN_INTERVAL = 512, 24 * 3600, 1.1
@@ -68,22 +69,28 @@ def district_names(display_name):
 class PlaceLookup:
     def __init__(self, client, clock=time.monotonic, sleep=asyncio.sleep):
         self.client, self.clock, self.sleep = client, clock, sleep
-        self.cache, self.lock, self.last = OrderedDict(), asyncio.Lock(), None
+        self.cache, self.lock, self.last, self.waiting = OrderedDict(), asyncio.Lock(), None, 0
 
-    async def nominatim(self, latitude, longitude, layer):
-        key = (round(latitude, 5), round(longitude, 5), layer)
+    async def nominatim(self, latitude, longitude, layer, zoom=18, max_waiting=None):
+        key = (round(latitude, 5), round(longitude, 5), layer, zoom)
         hit = self.cache.get(key)
         if hit and self.clock() - hit[0] < CACHE_SECONDS:
             self.cache.move_to_end(key)
             return hit[1]
-        async with self.lock:  # one request at a time, at most one per ~second, application-wide
-            if self.last is not None and (wait := MIN_INTERVAL - (self.clock() - self.last)) > 0:
-                await self.sleep(wait)
-            self.last = self.clock()
-            raw = await read_bounded(self.client, NOMINATIM_URL, params={
-                'format': 'jsonv2', 'lat': f'{latitude:.6f}', 'lon': f'{longitude:.6f}', 'zoom': 18,
-                'addressdetails': 1, 'accept-language': 'en', 'layer': layer}, limit=256 * 1024, timeout=10,
-                headers={'User-Agent': USER_AGENT})
+        if max_waiting is not None and self.waiting >= max_waiting:
+            raise OfficialUnavailable('busy')
+        self.waiting += 1
+        try:
+            async with self.lock:  # one request at a time, at most one per ~second, application-wide
+                if self.last is not None and (wait := MIN_INTERVAL - (self.clock() - self.last)) > 0:
+                    await self.sleep(wait)
+                self.last = self.clock()
+                raw = await read_bounded(self.client, NOMINATIM_URL, params={
+                    'format': 'jsonv2', 'lat': f'{latitude:.6f}', 'lon': f'{longitude:.6f}', 'zoom': zoom,
+                    'addressdetails': 1, 'accept-language': 'en', 'layer': layer}, limit=256 * 1024, timeout=10,
+                    headers={'User-Agent': USER_AGENT})
+        finally:
+            self.waiting -= 1
         body = json.loads(raw)
         if not isinstance(body, dict) or body.get('error'):
             raise OfficialUnavailable('no place found here')
