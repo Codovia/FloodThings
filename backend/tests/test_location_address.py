@@ -142,3 +142,20 @@ def test_an_unnamed_road_gives_an_area_not_a_street(lookup):
 def test_taluk_and_district_words_are_not_repeated(lookup):
     app, _, _ = lookup(body={**VILLAGE_ROAD, 'address': {**VILLAGE_ROAD['address'], 'county': 'Udupi taluku', 'state_district': 'Udupi District'}})
     assert post(app, **UDUPI, accuracy_m=8).json()['address'] == 'TEST Village, Udupi taluku, Udupi District, Karnataka 576279'
+
+
+def test_short_place_name_with_pin_code(lookup):
+    app, _, _ = lookup()
+    body = post(app, **UDUPI, accuracy_m=8).json()
+    assert (body['place'], body['postcode']) == ('TEST Ward, Udupi 576101', '576101')
+    app, _, _ = lookup(body=VILLAGE_ROAD)
+    assert post(app, **UDUPI, accuracy_m=8).json()['place'] == 'TEST Village, TEST Taluk 576279'   # no town: taluk
+
+
+@pytest.mark.parametrize('postcode, expected', [('576 101', '576101'), ('110001', None), ('57610', None), ('PIN 576101', None), (None, None)])
+def test_only_valid_karnataka_pin_codes_are_shown(lookup, postcode, expected):
+    app, _, _ = lookup(body={**PLACE, 'address': {**PLACE['address'], 'postcode': postcode}})
+    body = post(app, **UDUPI, accuracy_m=8).json()
+    assert body['postcode'] == expected
+    assert body['place'] == 'TEST Ward, Udupi' + (f' {expected}' if expected else '')
+    assert body['address'].endswith(f'Karnataka {expected}' if expected else 'Karnataka')

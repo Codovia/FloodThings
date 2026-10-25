@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import AddressLine from './AddressLine.jsx'
+import AddressLine, { usePlaceLookup } from './AddressLine.jsx'
 import L from 'leaflet'
 import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
@@ -79,7 +79,7 @@ function IntelligenceGeography({district,outline,history,shelters,risk,official,
   // Prediction zones are blurred in their own pane so the statewide grid reads as soft areas, not squares.
   const pane=view.createPane?.('riskZones');if(pane)pane.style.zIndex=350  // below overlays, so evidence polygons stay clickable
   zoneRenderer.current=L.svg?.({pane:'riskZones',padding:0.5})
-  view.on('click',e=>select.current?.({name:'Selected map point',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
+  view.on('click',e=>select.current?.({name:'Selected map point',kind:'map',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}))
   // Fit Karnataka again once the flex layout has given the map its final height.
   const settle=setTimeout(()=>{if(map.current===view&&!districtRef.current){view.invalidateSize?.();view.fitBounds(KARNATAKA_BOUNDS,{padding:[8,8],animate:false})}},200)
   return()=>{clearTimeout(settle);view.remove();map.current=null}
@@ -103,7 +103,7 @@ function IntelligenceGeography({district,outline,history,shelters,risk,official,
     if(cell.level==='unavailable')add(L.circleMarker([cell.latitude,cell.longitude],{radius:2.5,color:'#8a8f98',weight:1,fillOpacity:.6,interactive:false}))
     const box=L.circle([cell.latitude,cell.longitude],{renderer:zoneRenderer.current||undefined,radius,stroke:false,fillColor:LEVEL_COLORS[cell.level]||LEVEL_COLORS.unavailable,fillOpacity:ZONE[cell.level]||0.001,bubblingMouseEvents:false})
     const text=document.createElement('span');text.textContent=`Rain risk ${LEVEL_NAMES[cell.level]||'Unavailable'} · next 24 h ${cell.rain_24h_mm??'–'} mm · past 5 days ${cell.rain_5d_mm??'–'} mm · peak ${cell.peak_mmh??'–'} mm/h`
-    box.bindTooltip(text);box.on('click',e=>select.current?.({name:'Selected map point',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}));add(box)
+    box.bindTooltip(text);box.on('click',e=>select.current?.({name:'Selected map point',kind:'map',latitude:e.latlng.lat,longitude:((e.latlng.lng+180)%360+360)%360-180}));add(box)
    }}
   if(official?.districts)for(const d of official.districts){
    const today=d.days[0],colour=OFFICIAL_COLOURS[today?.level]||'#8a8f98'
@@ -187,6 +187,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
  // With a district selected, the rain-risk summary counts only the grid areas inside its IMD outline.
  const scopeCells=riskGrid.data?(district&&districtImd?riskGrid.data.cells.filter(c=>inGeometry(c.longitude,c.latitude,districtImd.geometry)):riskGrid.data.cells):[]
  const riskCounts=['severe','high','moderate'].map(l=>[l,scopeCells.filter(c=>c.level===l).length]).filter(([,n])=>n)
+ const placeLookup=usePlaceLookup(checked)
  const place=placeCheck(checked,{official:officialDistricts.data,risk:layers.risk?riskGrid.data:null,history:safeHistory})
  const today=place?.imd&&place.imd.status!=='stale'?place.imd.days[0]:null
  const popup=place?[place.imd?`${place.imd.district} district`:'Outside Karnataka districts',`Official IMD warning today: ${today?levelName(today.level):'unavailable'}`,place.cell?`Rain risk next 24 h: ${LEVEL_NAMES[place.cell.level]||'Unavailable'} (experimental)`:null].filter(Boolean):null
@@ -223,8 +224,8 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
      <p>{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E is outside Karnataka's districts. FloodPulse covers Karnataka only — tap a place inside the state.</p>
     </section>:place?<section className="intelligence-card place-check" aria-labelledby="place-check-title">
      <div className="place-check-head"><h3 id="place-check-title">{place.imd?`Checked place · ${place.imd.district}`:'Checked place'}</h3><button className="link-button" onClick={()=>setChecked(null)}>Clear</button></div>
-     <p className="muted">{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E{!place.imd&&officialDistricts.data?' · outside Karnataka district boundaries':''}</p>
-     <AddressLine point={{kind:'map',latitude:checked.latitude,longitude:checked.longitude}}/>
+     <p className="muted">{placeLookup.place&&<><strong className="place-name">{placeLookup.place}</strong> · </>}{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E{!place.imd&&officialDistricts.data?' · outside Karnataka district boundaries':''}</p>
+     <AddressLine lookup={placeLookup}/>
      <dl className="place-rows">
       <div><dt>Official IMD warning today</dt><dd>{today?<><span className="official-chip" data-level={today.level} style={{background:OFFICIAL_COLOURS[today.level]}}>{levelName(today.level)}</span> {today.warnings?.length?today.warnings.join(', '):'No warning (Green)'}</>:place.imd?.status==='stale'?'IMD bulletin is out of date — check IMD directly.':officialDistricts.error?'Could not be checked. This does not mean there is no warning.':officialDistricts.data?'Not available for this point.':'Checking…'}</dd></div>
       <div><dt>Rain risk, next 24 h <small>experimental</small></dt><dd>{!layers.risk?'Turn on "Rain risk, next 24 h" to see it.':place.cell?<><span className="risk-chip" style={{'--swatch':LEVEL_COLORS[place.cell.level]}}>{LEVEL_NAMES[place.cell.level]||'Unavailable'}</span> {place.cell.rain_24h_mm??'–'} mm rain forecast</>:riskGrid.data?'Outside the statewide grid.':'Checking…'}</dd></div>

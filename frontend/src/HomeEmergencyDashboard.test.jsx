@@ -16,7 +16,7 @@ it('shows weather and exact unavailable flood wording while removing Home histor
  expect(screen.getByRole('heading',{name:'27 °C'})).toBeTruthy();expect(screen.getByText(/At your location: unavailable/)).toBeTruthy();expect(screen.getByLabelText('Current weather and rain').textContent).toContain('Unavailable rain forecast in the next 24 h')
  expect(screen.queryByText(/Verified Open shelters|56 reviewed/)).toBeNull();expect(screen.queryByRole('button',{name:'Refresh shelters'})).toBeNull()
  expect(screen.getByRole('link',{name:'Historical flood evidence'}).getAttribute('href')).toBe('/flood-map');expect(screen.getByRole('link',{name:'Report flooding or blocked drainage'})).toBeTruthy()
- expect(fetch.mock.calls.map(([u])=>u.split('?')[0]).sort()).toEqual(['/api/official/districts','/api/official/warnings','/api/risk','/api/risk/area']);expect(mapProps.current.river).toBeUndefined();expect(screen.queryByText(/Reviewed river outlook/)).toBeNull();expect(mapProps.current.features).toBeUndefined();expect(mapProps.current.shelters).toBeUndefined()
+ expect(fetch.mock.calls.map(([u])=>u.split('?')[0]).sort()).toEqual(['/api/location/address','/api/official/districts','/api/official/warnings','/api/risk','/api/risk/area']);expect(mapProps.current.river).toBeUndefined();expect(screen.queryByText(/Reviewed river outlook/)).toBeNull();expect(mapProps.current.features).toBeUndefined();expect(mapProps.current.shelters).toBeUndefined()
 })
 it('district-only fallback cannot display cached default weather or invent a point',async()=>{
  const p=props();render(<HomeEmergencyDashboard {...p} point={null} districtId="fixture" district={{name:'Fixture district'}}/>);
@@ -40,7 +40,7 @@ it('shows WMO current conditions, optional fields and a complete hourly total wi
  p.session.data.hourly_precipitation={status:'available',timezone:'Asia/Kolkata',unit:'mm',interval_seconds:3600,interval_semantics:'preceding_hour',source:{name:'Open-Meteo'},intervals:Array.from({length:24},(_,i)=>({start:new Date(begin+i*3600000).toISOString(),end:new Date(begin+(i+1)*3600000).toISOString(),precipitation_mm:.5,unit:'mm'}))}
  render(<HomeEmergencyDashboard {...p}/>);await settle()
  expect(screen.getByLabelText('Current weather and rain').textContent).toContain('12 mm rain forecast in the next 24 h');expect(screen.getByText(/Humidity: 70%\. Wind: 12 km\/h/)).toBeTruthy();expect(screen.getAllByText(/Slight rain/)).toHaveLength(1)
- expect(screen.getByText(/At your location: unavailable/)).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(4);expect(fetch.mock.calls.some(([u])=>u.startsWith('/api/risk?'))).toBe(true)
+ expect(screen.getByText(/At your location: unavailable/)).toBeTruthy();expect(fetch).toHaveBeenCalledTimes(5);expect(fetch.mock.calls.some(([u])=>u.startsWith('/api/risk?'))).toBe(true)
 })
 it('missing temperature preserves other valid current fields',async()=>{
  const p=props();p.session.data.current.temperature_c=null;p.session.data.current.humidity_percent=70

@@ -2574,3 +2574,18 @@ Live checks (Chrome, live app): Flood Map tap near Haladi → "Area: Haladi, Kun
 Tests: backend 554/554 (16 new: precision levels, rounding, no lookup when rough/outside/off, cache, failures, queue cap, village/taluk wording); frontend unit 299/299 (5 new); build passes; Playwright 81 passed, 8 skipped (database), 1 failed once (`location-weather.spec.js:93`, Weather page, untouched here) and then passed 12/12 on repeat, so intermittent; the admin form test passed this run.
 
 Found, not yet fixed (slice 2): Home asks the browser once and falls back to a network city estimate after 10 s even while the permission prompt is still open (Shelters already waits); Home also takes the first fix instead of refining it like Shelters.
+
+## 2026-10-25 — Place name with PIN code shown automatically ("Brahmagiri, Udupi 576101")
+
+Request: show the location at PIN-code level, automatically, so it looks real.
+
+Source check (2026-10-25): India Post's official PIN-code boundaries (Department of Posts, Open Government License – India, dated 30 Jun 2025) exist on AIKosh but need an account to download; the data.gov.in resource shows 0 bytes and its catalog "No Result Found". DataMeet's copy covers six cities only (CC BY-SA). So the PIN comes from the existing OpenStreetMap Nominatim lookup for now, labelled "approximate, not verified"; an official India Post lookup on our own server is possible once the file is downloaded.
+
+Reconciled control (supersedes the tap-only rule of the previous entry): the lookup now runs automatically, once per point, after the person has allowed location (Home, Shelters) or tapped the map (Flood Map, Home map, weather map). All other limits are unchanged (rounded to ~11 m, POST body, not stored, shared 1 request/s, queue cap, rate limit, attribution, off switch). The Home privacy note says so. The full street address is still behind "Show address" and comes from the same answer (no second request).
+
+- Backend: `/api/location/address` also returns `place` (locality, town or taluk, PIN) and `postcode`; PIN codes are accepted only as six digits in the Karnataka range 56xxxx–59xxxx ("576 101" normalised; anything else dropped, also from the full address).
+- Frontend: `usePlaceLookup(point)` in `AddressLine.jsx`; Home heading, Shelters "Distances from …" and the Flood Map checked-place line use the place name; Home's status line credits OpenStreetMap when its name is shown. Map taps now carry `kind: 'map'` (Flood Map, Home map, weather map); every existing `kind` check compares only `gps`/`network`, so nothing else changes.
+
+Live checks (Chrome): Home ±12 m stand-in fix at Udupi Sri Krishna Matha → "Brahmagiri, Udupi 576101"; Flood Map tap in Dakshina Kannada → "Gadiyara, Bantwal taluk 574253", carried to Home by "Full check on Home"; Shelters "Distances from Brahmagiri, Udupi 576101 (GPS ±12 m)"; one screen on laptop and phone; no console errors.
+
+Tests: backend 560/560 (new: place name, PIN normalisation and rejection); frontend unit 299/299 (AddressLine tests rewritten for the automatic lookup; Home/Flood Map/weather-selector tests updated for the extra request and `kind: 'map'`); build passes; Playwright 81 passed, 8 skipped, 1 known failure (admin form not one-screen: 756 px > 723 px).
