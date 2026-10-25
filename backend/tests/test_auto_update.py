@@ -106,6 +106,19 @@ def test_new_commit_is_backed_up_pulled_set_up_and_checked(server):
     assert run(srv, env).returncode == 0 and len(calls(record)) == 3   # up to date: nothing more
 
 
+def test_updated_files_stay_readable_inside_the_docker_image(server):
+    """Regression: a private umask made updated code unreadable to the container's user (PermissionError on main.py)."""
+    dev, srv, env, _ = server
+    push(dev, env, 'new_module.py')
+    (dev / '.gitignore').write_text((dev / '.gitignore').read_text() + 'extra/\n')   # a changed file is rewritten too
+    sh('git', 'commit', '-qam', 'change', cwd=dev, env=env)
+    sh('git', 'push', '-q', 'origin', 'main', cwd=dev, env=env)
+    assert run(srv, env).returncode == 0
+    for name in ('new_module.py', '.gitignore'):
+        assert (srv / name).stat().st_mode & 0o044 == 0o044, name
+    assert (srv / 'deploy/auto-update.log').stat().st_mode & 0o077 == 0   # the script's own log stays private
+
+
 def test_changes_made_on_the_server_are_never_overwritten(server):
     dev, srv, env, record = server
     old = head(srv, env)

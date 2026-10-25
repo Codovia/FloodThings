@@ -2589,3 +2589,14 @@ Reconciled control (supersedes the tap-only rule of the previous entry): the loo
 Live checks (Chrome): Home ±12 m stand-in fix at Udupi Sri Krishna Matha → "Brahmagiri, Udupi 576101"; Flood Map tap in Dakshina Kannada → "Gadiyara, Bantwal taluk 574253", carried to Home by "Full check on Home"; Shelters "Distances from Brahmagiri, Udupi 576101 (GPS ±12 m)"; one screen on laptop and phone; no console errors.
 
 Tests: backend 560/560 (new: place name, PIN normalisation and rejection); frontend unit 299/299 (AddressLine tests rewritten for the automatic lookup; Home/Flood Map/weather-selector tests updated for the extra request and `kind: 'map'`); build passes; Playwright 81 passed, 8 skipped, 1 known failure (admin form not one-screen: 756 px > 723 px).
+
+## 2026-10-25 — Production outage after the first automatic update: fixed (my bug in auto-update.sh)
+
+What happened: the server (following `main`, auto-update on) updated cb85aaf → d98f8ef at 12:35 UTC; `setup.sh` failed and the site returned 502. The app log showed `PermissionError: [Errno 13] Permission denied: '/app/backend/app/main.py'`. Cause: `deploy/auto-update.sh` set `umask 077` (to keep its log private), so `git merge` rewrote every changed file as mode 600; Docker copies file modes into the image, where the app runs as uid 10001 and could not read its own code. The tests had checked the update steps but not file modes.
+
+Fix:
+- `deploy/auto-update.sh`: `umask 022`; only the script's own log and lock are made private (`chmod 600`).
+- `Dockerfile`: `RUN chmod -R a+rX /app` before switching to the app user, so the image works whatever modes the server's copy has (adds ~4 MB).
+- Regression test `test_updated_files_stay_readable_inside_the_docker_image` (failed before the fix with mode 600, passes after); log still private.
+
+Verification: auto-update tests 9/9; production image built locally with `main.py` deliberately set to 600: the app user (uid 10001) can read it. Server recovery (run by the user, no access from here): `git ls-files -z | xargs -0 chmod a+r` in `~/floodpulse`, then `rm -f deploy/.auto-update.failed` and `./setup.sh`.

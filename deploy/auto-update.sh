@@ -11,7 +11,9 @@
 # It never rolls back by itself: a failed update is logged and not retried until a newer commit arrives.
 set -euo pipefail
 cd "$(dirname "$0")"
-umask 077
+# Git writes the code with this umask and Docker copies the modes into the image, where the app runs as another
+# user: the code must stay readable (umask 077 here once made main.py unreadable and took the site down).
+umask 022
 export PATH="$PATH:/usr/local/bin:/usr/bin:/bin" GIT_TERMINAL_PROMPT=0
 HERE=$(pwd -P)
 LOG=auto-update.log
@@ -29,6 +31,7 @@ update() {
   if [[ -f "$LOG" ]] && (( $(wc -l < "$LOG") > 5000 )); then
     tail -n 2000 "$LOG" > "$LOG.tmp" && mv "$LOG.tmp" "$LOG"
   fi
+  touch "$LOG" && chmod 600 "$LOG" .auto-update.lock   # the script's own files stay private
 
   local branch old new
   branch=$(git symbolic-ref --quiet --short HEAD) || { log 'FAILED: the server copy is not on a branch; nothing changed.'; exit 1; }
