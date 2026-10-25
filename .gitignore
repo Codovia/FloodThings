@@ -57,8 +57,6 @@ test-results/
 
 # Database backups made on the server
 deploy/backups/
-# Automatic update state on the server
-deploy/.auto-update.*
 
 # Public CA root certificate pinned for IMD/SACHET (not a secret; see backend/app/official.py)
 !backend/app/certs/emsign-root-ca-g1.pem

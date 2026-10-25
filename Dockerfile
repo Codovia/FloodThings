@@ -24,6 +24,8 @@ COPY data/reference data/reference
 COPY frontend/src/data/karnatakaHomeBoundary.json frontend/src/data/karnatakaHomeBoundary.json
 COPY --from=web /src/frontend/dist frontend/dist
 COPY deploy/telegram_webhook.py deploy-tools/telegram_webhook.py
+# Readable by the app user whatever file modes the server's copy has (a private umask once broke this).
+RUN chmod -R a+rX /app
 RUN useradd --system --uid 10001 --home /nonexistent floodpulse && mkdir -p /cache && chown floodpulse /cache
 USER floodpulse
 WORKDIR /app/backend

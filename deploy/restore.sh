@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Restore the FloodPulse database from a backup made by ./backup.sh. This REPLACES current data.
-# Usage:  ./restore.sh backups/floodpulse-YYYYMMDD-HHMMSS.dump   (or backups/pre-update-....dump)
+# Usage:  ./restore.sh backups/floodpulse-YYYYMMDD-HHMMSS.dump
 set -euo pipefail
 cd "$(dirname "$0")"
 [[ $# -eq 1 && -s "$1" ]] || { echo 'Usage: ./restore.sh backups/floodpulse-....dump' >&2; exit 2; }

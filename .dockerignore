@@ -19,5 +19,3 @@ deploy/.env
 *.nc
 *.zip
 deploy/backups
-deploy/auto-update.log
-deploy/.auto-update.*
