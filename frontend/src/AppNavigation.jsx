@@ -1,13 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export const PAGES = [
-  {path:'/',name:'Home',icon:'home'},
+  {path:'/',name:'Home',icon:'home'}, {path:'/weather',name:'Weather',icon:'weather'},
   {path:'/flood-map',name:'Flood Map',icon:'map'}, {path:'/shelters',name:'Shelters',icon:'shelter'},
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
   {path:'/how-it-works',name:'How it works',icon:'info'},
   {path:'/admin',name:'Admin',icon:'admin'},
-  // Detail page reached from Home only; kept out of the main navigation.
-  {path:'/weather',name:'Weather details',icon:'weather',hidden:true},
 ]
 const currentPath=()=>window.location.pathname.replace(/\/+$/, '') || '/'
 export function usePage(){

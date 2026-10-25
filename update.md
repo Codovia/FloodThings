@@ -2619,3 +2619,13 @@ Request: a correct procedure for taking a code change to the server, now that up
 `docs/RELEASE_PROCEDURE.md`: work on `floodpulse-v2` → try it with `./floodpulse.sh` (laptop and phone width) → backend tests, frontend unit tests, build, browser tests, and a local server-image build when deployment files change → `update.md`, commit only the change's files, push, confirm the remote hash → pull request into `main` with a merge commit → on the server: no edits on the server, on `main`, note the current commit, `./backup.sh`, `git pull --ff-only`, `./setup.sh` → check `docker compose ps`, app log, `/api/health/ready` and the site on a phone → going back: previous commit, and restore the backup first when the update added a migration (otherwise `alembic upgrade head` fails on the newer database revision). Linked from the README and both hosting guides.
 
 Checked here: the image check commands (`docker build`, then `import app.main` as the container's user 10001) work, ~11 s with cache; `npm test`, `npm run build`, `npm run test:map` and `./floodpulse.sh` are the project's real commands; `setup.sh` runs `alembic upgrade head`, which is why the rollback order matters. The server steps themselves could not be run from here.
+
+## 2026-10-25 — Weather page back in the main menu
+
+Request: "weather page not in the application". The page existed at `/weather` but was hidden from the menu (since 3990a83, when the 16 October plan folded Weather into Home); only Home's "7-day forecast" link reached it. Reconciled: on the user's request it is a menu item again ("Weather", after Home); the plan's decision that Home carries the forecast and risk is unchanged.
+
+- `AppNavigation.jsx`: Weather in the menu (eight items). Tab title is now "Weather · FloodPulse"; the page heading stays "Weather details".
+- `OneScreen.css`: eight items did not fit one header line at 1100–1279 px (at 1100 px the menu ran to 1184 px and "Admin" was cut off); the small menu icons are hidden only in that range.
+- Checked in Chrome: one header line with nothing cut off at 1100 (right edge 1080), 1280 (1260) and 1366 px (1346); phone menu lists all eight; Weather marked as the current page; no sideways scrolling.
+
+Tests: frontend unit 299/299 (navigation tests updated for eight items and the visible Weather entry); navigation, end-to-end and weather browser tests 7 passed, 1 skipped (database); build passes.
