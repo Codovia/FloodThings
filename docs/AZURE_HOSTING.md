@@ -120,13 +120,12 @@ Create your administrator account (you type the password privately, 16–128 cha
 
 | Task | Command |
 |---|---|
-| Update to the latest code | `git pull && ./setup.sh` |
-| Automatic updates on / off / status | `./auto-update.sh --on` / `--off` / `--status` (see below) |
+| Update to the latest code | `./backup.sh && git pull && ./setup.sh` (see Updating below) |
 | See status | `docker compose ps` |
 | Read the app's log | `docker compose logs --tail 100 app` |
 | Restart | `docker compose restart app` |
 | Back up the database now | `./backup.sh` (saved privately in `deploy/backups/`, newest 14 kept) |
-| Restore a backup (replaces current data) | `./restore.sh backups/floodpulse-YYYYMMDD-HHMMSS.dump` (or a `pre-update-…` one) |
+| Restore a backup (replaces current data) | `./restore.sh backups/floodpulse-YYYYMMDD-HHMMSS.dump` |
 | Check the app and database | `curl https://YOUR-DOMAIN/api/health/ready` |
 | Reset an admin password | `./create-admin.sh nandan --reset-password` |
 | Stop everything | `docker compose down` (data is kept) |
@@ -148,31 +147,18 @@ The static address and domain stay the same.
 3. **Errors.** Unexpected errors are logged with an error ID (the visitor sees only the ID):
    `docker compose logs app | grep "unhandled error"`. Logs are capped at 30 MB per service.
 
-## Automatic updates
+## Updating (manual)
 
-`./auto-update.sh --on` makes the server check GitHub every 5 minutes for new commits on the branch
-it follows. On a new commit it backs up the database (`backups/pre-update-*.dump`, newest 14 kept
-apart from the daily backups), updates the code, runs `./setup.sh` and waits up to 2 minutes for
-`/api/health/ready`. Each step is written to `deploy/auto-update.log`.
-
-**Follow `main`, so the site changes only when a pull request is merged** (once, on the server):
+Updates are run by hand, so nothing changes on the server unless you are watching it. After a change is
+merged into `main` on GitHub:
 ```
 cd ~/floodpulse/deploy
-git fetch && git checkout main && git pull --ff-only && ./setup.sh
-./auto-update.sh --on
-./auto-update.sh --status      # on/off, branch, and the last updates (OK or FAILED)
+./backup.sh && git pull && ./setup.sh
+docker compose ps                               # app should be "Up", not "Restarting"
+curl https://YOUR-DOMAIN/api/health/ready       # {"status":"ok", ...}
 ```
-Staying on `floodpulse-v2` instead makes every push to that branch go live.
-
-What it will not do:
-- **Run the tests.** Whatever is merged goes live; run the tests before merging.
-- **Undo a failed update.** A failure is logged as `FAILED` and that commit is not tried again; the
-  next commit is. Fix forward with a new commit, or restore the `pre-update` backup by hand.
-- **Overwrite changes made on the server.** If a file tracked by Git was edited there, or the branch
-  history was rewritten, it stops and logs why; sort it out by hand, then it carries on.
-
-Each update restarts the app, so the site is unavailable for a few seconds. `./auto-update.sh --off`
-removes only its own crontab line (the daily backup line stays).
+If the app keeps restarting, read why with `docker compose logs --tail 40 app`. The site is unavailable
+for a few seconds while the app restarts; avoid updating during a demo.
 
 ## Limits (optional settings in `deploy/.env`)
 

@@ -2600,3 +2600,14 @@ Fix:
 - Regression test `test_updated_files_stay_readable_inside_the_docker_image` (failed before the fix with mode 600, passes after); log still private.
 
 Verification: auto-update tests 9/9; production image built locally with `main.py` deliberately set to 600: the app user (uid 10001) can read it. Server recovery (run by the user, no access from here): `git ls-files -z | xargs -0 chmod a+r` in `~/floodpulse`, then `rm -f deploy/.auto-update.failed` and `./setup.sh`.
+
+## 2026-10-25 — Automatic updates removed; updates are manual again
+
+Request: remove automatic updates after the outage; update by hand to avoid site failures.
+
+- Deleted `deploy/auto-update.sh` and `backend/tests/test_auto_update.py`; `deploy/backup.sh` and `deploy/restore.sh` restored byte-for-byte to their versions before 76297e8 (no `pre-update` kind; existing `pre-update-*.dump` files on the server remain restorable with `./restore.sh <file>`); `.gitignore`/`.dockerignore` entries for its state files removed.
+- Kept: the `Dockerfile` `chmod -R a+rX /app` from the outage fix, which also protects manual updates made with a private umask.
+- Docs: the hosting guide's "Automatic updates" section is replaced by "Updating (manual)": `./backup.sh && git pull && ./setup.sh`, then check `docker compose ps` and `/api/health/ready`.
+- Server order (user, no access from here): `./auto-update.sh --off` first (removes only its crontab line), recover the site, and only then pull this change; afterwards delete the leftovers `deploy/auto-update.log` and `deploy/.auto-update.*`.
+
+Verification: no references left outside this log; backend suite 552/552 (the 9 auto-update tests removed with the script).

@@ -86,7 +86,7 @@ The same as the Azure guide (`docs/AZURE_HOSTING.md`, step 7): add `https://YOUR
 Google key's website restrictions, point Telegram at the server with
 `docker compose run --rm --no-deps app python -B /app/deploy-tools/telegram_webhook.py`, and add
 and verify shelters again in `/admin`. Everyday commands, **daily backups, the uptime monitor,
-automatic updates and limit settings** are also in that guide; set up the daily backup and the uptime monitor before the demo.
+updating and limit settings** are also in that guide; set up the daily backup and the uptime monitor before the demo.
 
 ## Cost notes
 
