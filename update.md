@@ -2629,3 +2629,18 @@ Request: "weather page not in the application". The page existed at `/weather` b
 - Checked in Chrome: one header line with nothing cut off at 1100 (right edge 1080), 1280 (1260) and 1366 px (1346); phone menu lists all eight; Weather marked as the current page; no sideways scrolling.
 
 Tests: frontend unit 299/299 (navigation tests updated for eight items and the visible Weather entry); navigation, end-to-end and weather browser tests 7 passed, 1 skipped (database); build passes.
+
+## 2026-10-25 — Place names everywhere, and village names where only the taluk showed
+
+Request (with screenshot): Home showed "3.7 km SW" instead of a place; some taps or "Use my location" showed only the taluk; the place name should be used on all pages.
+
+Causes and fixes:
+- "3.7 km SW": a risk spot chosen on Home's map ("Full assessment here") had no `kind`, so no lookup ran. It is now a map point (`kind: 'map'`) → e.g. "Korankara Padi, Udupi 576101".
+- Taluk only: sampling 8 rural points showed Nominatim's detailed answer (zoom 18) is often an unnamed road with only the county (13.1, 75.9 → "Beluru taluk"), while the village-level answer (zoom 14) names the place ("Madhaghatta"). When the detailed answer has no locality or no PIN, the server now makes one village-level lookup and fills only those gaps (the detailed PIN wins when both exist, e.g. 585369 vs 585216); a failed second lookup changes nothing. → "Madhaghatta, Beluru taluk 573115". Two of eight sampled points have no PIN in OpenStreetMap at all; then none is shown (never invented).
+- All pages: App looks up the selected point once and shows its place name in the shared location bar (Weather, Shelters) and the Weather heading; Home, Shelters and Flood Map already used it. Lookups are shared per point in the browser (one request however many places show it).
+- Report page unchanged on purpose: its rule (tested) is that nothing reaches FloodPulse before review and consent, so a spot picked on the map stays unnamed until submission; your own GPS location there is already named with a PIN by BigDataCloud on the device.
+- Browser tests: the isolated test backend had been calling the real Nominatim with test points since the automatic lookup (a few requests per run); `playwright.config.js` now sets `FLOODPULSE_ADDRESS_LOOKUP=off` for it.
+
+Checks (Chrome, live app, stand-in GPS at a public landmark): risk spot → "Korankara Padi, Udupi 576101" on Home, then the same name on Weather (bar and heading), Shelters (bar and "Distances from"), Flood Map; phone Weather page fits one screen.
+
+Tests: backend 556/556 (4 new: village fill-in, PIN preference, failed second lookup, no second lookup when complete); frontend unit 300/300 (shared-lookup test); build; Playwright 81 passed, 8 skipped, 1 known admin layout failure.

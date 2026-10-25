@@ -8,6 +8,28 @@ export const addressable = point => (point?.kind === 'gps' || point?.kind === 'm
 const UNAVAILABLE = 'Address lookup is unavailable right now.'
 const text = (value, limit) => typeof value === 'string' && value.trim() && value.length <= limit && !/[\x00-\x1f]/.test(value) ? value.trim() : null
 
+// One request per point, shared by every page that shows it (Home, the location bar, Shelters…). Answers live in
+// memory for this visit only; failures are forgotten so "Try again" asks again.
+const answers = new Map()
+export function forgetPlaces() { answers.clear() }
+function lookupOnce(key, point, accuracy) {
+  if (!answers.has(key)) {
+    const job = fetch('/api/location/address', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ latitude: point.latitude, longitude: point.longitude, ...(Number.isFinite(accuracy) ? { accuracy_m: accuracy } : {}) }) })
+      .then(response => response.json())
+      .then(body => {
+        const address = text(body?.address, 1000)
+        return body?.status === 'available' && address && ['street', 'area'].includes(body.precision)
+          ? { status: 'available', address, precision: body.precision, place: text(body.place, 200) }
+          : { status: 'failed', message: text(body?.message, 200) || UNAVAILABLE }
+      }, () => ({ status: 'failed', message: UNAVAILABLE }))
+    answers.set(key, job)
+    job.then(answer => { if (answer.status !== 'available') answers.delete(key) })
+    if (answers.size > 50) answers.delete(answers.keys().next().value)
+  }
+  return answers.get(key)
+}
+
 export function usePlaceLookup(point) {
   const [state, setState] = useState({ status: 'idle' })
   const [attempt, setAttempt] = useState(0)
@@ -15,19 +37,10 @@ export function usePlaceLookup(point) {
   const key = addressable(point) ? `${point.latitude},${point.longitude},${accuracy ?? ''}` : null
   useEffect(() => {
     if (!key) { setState({ status: 'idle' }); return }
-    const controller = new AbortController()
+    let current = true
     setState({ status: 'loading' })
-    fetch('/api/location/address', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
-      body: JSON.stringify({ latitude: point.latitude, longitude: point.longitude, ...(Number.isFinite(accuracy) ? { accuracy_m: accuracy } : {}) }) })
-      .then(response => response.json())
-      .then(body => {
-        if (controller.signal.aborted) return
-        const address = text(body?.address, 1000)
-        if (body?.status === 'available' && address && ['street', 'area'].includes(body.precision)) setState({ status: 'available', address, precision: body.precision, place: text(body.place, 200) })
-        else setState({ status: 'failed', message: text(body?.message, 200) || UNAVAILABLE })
-      })
-      .catch(() => { if (!controller.signal.aborted) setState({ status: 'failed', message: UNAVAILABLE }) })
-    return () => controller.abort()
+    lookupOnce(key, point, accuracy).then(answer => { if (current) setState(answer) })
+    return () => { current = false }
   }, [key, attempt]) // the key holds the point's values
   return { ...state, retry: () => setAttempt(n => n + 1) }
 }

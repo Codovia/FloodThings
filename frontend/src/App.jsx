@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useWeatherSession from './useWeatherSession.js'
 import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
 import WeatherPanel from './WeatherPanel.jsx'
@@ -10,6 +10,7 @@ import CitizenReport from './CitizenReport.jsx'
 import AlertSubscription from './AlertSubscription.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
 import HowItWorks from './HowItWorks.jsx'
+import { usePlaceLookup } from './AddressLine.jsx'
 import { useWide } from './ScreenTabs.jsx'
 import useFitGuard from './useFitGuard.js'
 import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.js'
@@ -48,6 +49,9 @@ export default function App() {
  const manualRevision=useRef(0)
  const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
+ // A located or tapped point is shown by its place name and PIN code on every page; weather still uses selectedPoint.
+ const place=usePlaceLookup(selectedPoint)
+ const shownPoint=useMemo(()=>place.place&&selectedPoint?{...point,name:place.place}:point,[point,place.place,selectedPoint])
  const publicPage=path !== '/admin' && !!pageInfo[path]
  const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'
  const sheltersPage=path==='/shelters'
@@ -62,10 +66,10 @@ export default function App() {
    {path==='/'&&<HomeEmergencyDashboard point={homePoint} district={district} districtId={districtId} session={session} location={homeGpsUnusable?{...homeLocation,status:'coarse',gps:null,message:'Approximate location — select your town. This GPS accuracy cannot support local Home weather or river focus.'}:homeLocation} choosePoint={choosePoint} chooseDistrict={chooseDistrict} navigate={navigate} onNearestShelter={()=>{setNearestRequest(n=>n+1);navigate('/shelters')}} onReportHere={spot=>{setReportSpot({name:spot.name,latitude:spot.latitude,longitude:spot.longitude});navigate('/report')}}/> }
    {publicPage&&path!=='/'&&path!=='/report'&&path!=='/alerts'&&<div className="wireframe-workspace">
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
-     <WeatherLocationSelector point={point} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
+     <WeatherLocationSelector point={shownPoint} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>.</p>}
      <div hidden={!weatherPage} className="weather-sections">
-      <WeatherPanel point={point} selectedPoint={selectedPoint} session={session} overview={false} active={weatherPage}/>
+      <WeatherPanel point={shownPoint} selectedPoint={selectedPoint} session={session} overview={false} active={weatherPage}/>
      </div>
      <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} nearestRequest={nearestRequest} active={sheltersPage} overview={false} mapTarget={path==='/shelters'&&wide?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>

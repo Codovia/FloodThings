@@ -15,12 +15,13 @@ PLACE = {'category': 'place', 'type': 'house', 'lat': '13.3409', 'lon': '74.7421
                      'state_district': 'Udupi', 'state': 'Karnataka', 'postcode': '576101', 'country_code': 'in'}}
 
 
-def make(status=200, body=PLACE):
+def make(status=200, body=PLACE, by_zoom=None):
     seen = []
 
     def handler(request):
         seen.append(request)
-        return httpx.Response(status, json=body)
+        reply = (by_zoom or {}).get(request.url.params['zoom'], body)
+        return reply if isinstance(reply, httpx.Response) else httpx.Response(status, json=reply)
 
     client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
     clock = {'t': 1_760_000_000.0}
@@ -159,3 +160,36 @@ def test_only_valid_karnataka_pin_codes_are_shown(lookup, postcode, expected):
     assert body['postcode'] == expected
     assert body['place'] == 'TEST Ward, Udupi' + (f' {expected}' if expected else '')
     assert body['address'].endswith(f'Karnataka {expected}' if expected else 'Karnataka')
+
+
+ROAD_ONLY = {'category': 'highway', 'type': 'tertiary', 'lat': '13.3409', 'lon': '74.7421',
+             'address': {'road': 'TEST Road', 'county': 'TEST Beluru taluk', 'state_district': 'Hassan', 'state': 'Karnataka', 'country_code': 'in'}}
+VILLAGE = {'category': 'place', 'type': 'village', 'lat': '13.3420', 'lon': '74.7430',
+           'address': {'village': 'TEST Madhaghatta', 'county': 'TEST Beluru taluk', 'state_district': 'Hassan', 'state': 'Karnataka',
+                       'postcode': '573115', 'country_code': 'in'}}
+
+
+def test_a_road_without_a_village_is_named_from_the_village_level_answer(lookup):
+    app, _, seen = lookup(by_zoom={'18': ROAD_ONLY, '14': VILLAGE})
+    body = post(app, **UDUPI).json()   # spot tapped on the map
+    assert [r.url.params['zoom'] for r in seen] == ['18', '14']
+    assert body['place'] == 'TEST Madhaghatta, TEST Beluru taluk 573115' and body['postcode'] == '573115'
+    assert body['address'] == 'TEST Road, TEST Madhaghatta, TEST Beluru taluk, Hassan district, Karnataka 573115'
+
+
+def test_the_detailed_pin_code_is_kept_when_both_answers_have_one(lookup):
+    detailed = {**ROAD_ONLY, 'address': {**ROAD_ONLY['address'], 'postcode': '585369'}}
+    app, _, _ = lookup(by_zoom={'18': detailed, '14': {**VILLAGE, 'address': {**VILLAGE['address'], 'postcode': '585216'}}})
+    assert post(app, **UDUPI).json()['postcode'] == '585369'
+
+
+def test_a_failed_village_level_lookup_keeps_the_first_answer(lookup):
+    app, _, seen = lookup(by_zoom={'18': ROAD_ONLY, '14': httpx.Response(503)})
+    body = post(app, **UDUPI).json()
+    assert len(seen) == 2 and body['status'] == 'available' and body['place'] == 'TEST Beluru taluk' and body['postcode'] is None
+
+
+def test_a_complete_answer_needs_no_second_lookup(lookup):
+    app, _, seen = lookup()
+    post(app, **UDUPI, accuracy_m=8)
+    assert [r.url.params['zoom'] for r in seen] == ['18']

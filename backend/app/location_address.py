@@ -23,6 +23,8 @@ from .risk import inside, load_boundary
 router = APIRouter()
 HOUSE_NUMBER_M, STREET_M, AREA_M = 20, 250, 1000
 MAX_WAITING = 3  # requests queued behind the 1-per-second limit; more are told to try again
+PLACE_ZOOM = 14  # Nominatim's village/suburb level: names the place when the detailed answer does not
+LOCALITY_KEYS = ('neighbourhood', 'quarter', 'suburb', 'hamlet', 'village', 'city_district', 'city', 'town', 'municipality')
 
 
 class AddressPoint(BaseModel):
@@ -89,6 +91,23 @@ def precision(accuracy_m):
     return 14, 'area', ('house_number', 'road')
 
 
+async def fill_place(lookup, point, address):
+    """Village/locality and PIN from the place-level answer where the detailed one has none; failures change nothing."""
+    try:
+        body = await lookup.nominatim(round(point.latitude, 4), round(point.longitude, 4), 'address', zoom=PLACE_ZOOM, max_waiting=MAX_WAITING)
+    except (OfficialUnavailable, ValueError, json.JSONDecodeError):
+        return address
+    place = body.get('address') if isinstance(body.get('address'), dict) else {}
+    if str(place.get('country_code', '')).lower() != 'in':
+        return address
+    filled = dict(address)
+    if not any(clean(address.get(k)) for k in LOCALITY_KEYS):
+        filled.update({k: place[k] for k in LOCALITY_KEYS if clean(place.get(k))})
+    if not pin(address) and pin(place):
+        filled['postcode'] = place['postcode']
+    return filled
+
+
 @router.post('/api/location/address')
 async def location_address(point: AddressPoint, request: Request):
     headers = {'Cache-Control': 'no-store'}
@@ -119,6 +138,9 @@ async def location_address(point: AddressPoint, request: Request):
         drop = ('house_number', 'road')
     if 'road' in drop or not clean(address.get('road')):
         level = 'area'
+    if zoom != PLACE_ZOOM and (not any(clean(address.get(k)) for k in LOCALITY_KEYS) or not pin(address)):
+        # The detailed answer is often an unnamed road with only the taluk; the village-level answer names the place.
+        address = await fill_place(request.app.state.place_lookup, point, address)
     text = compose({k: v for k, v in address.items() if k not in drop})
     if not text or str(address.get('country_code', '')).lower() != 'in':
         return JSONResponse({**base, 'status': 'not_found', 'message': 'No address is mapped near this point.'}, headers=headers)
