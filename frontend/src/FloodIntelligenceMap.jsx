@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
+import AddressLine from './AddressLine.jsx'
 import L from 'leaflet'
 import { addBasemap, BASEMAP_NOTICE } from './mapBasemap.js'
 import 'leaflet/dist/leaflet.css'
@@ -223,6 +224,7 @@ export default function FloodIntelligenceMap({point,onPoint,navigate,selectedDis
     </section>:place?<section className="intelligence-card place-check" aria-labelledby="place-check-title">
      <div className="place-check-head"><h3 id="place-check-title">{place.imd?`Checked place · ${place.imd.district}`:'Checked place'}</h3><button className="link-button" onClick={()=>setChecked(null)}>Clear</button></div>
      <p className="muted">{checked.latitude.toFixed(4)}°N, {checked.longitude.toFixed(4)}°E{!place.imd&&officialDistricts.data?' · outside Karnataka district boundaries':''}</p>
+     <AddressLine point={{kind:'map',latitude:checked.latitude,longitude:checked.longitude}}/>
      <dl className="place-rows">
       <div><dt>Official IMD warning today</dt><dd>{today?<><span className="official-chip" data-level={today.level} style={{background:OFFICIAL_COLOURS[today.level]}}>{levelName(today.level)}</span> {today.warnings?.length?today.warnings.join(', '):'No warning (Green)'}</>:place.imd?.status==='stale'?'IMD bulletin is out of date — check IMD directly.':officialDistricts.error?'Could not be checked. This does not mean there is no warning.':officialDistricts.data?'Not available for this point.':'Checking…'}</dd></div>
       <div><dt>Rain risk, next 24 h <small>experimental</small></dt><dd>{!layers.risk?'Turn on "Rain risk, next 24 h" to see it.':place.cell?<><span className="risk-chip" style={{'--swatch':LEVEL_COLORS[place.cell.level]}}>{LEVEL_NAMES[place.cell.level]||'Unavailable'}</span> {place.cell.rain_24h_mm??'–'} mm rain forecast</>:riskGrid.data?'Outside the statewide grid.':'Checking…'}</dd></div>

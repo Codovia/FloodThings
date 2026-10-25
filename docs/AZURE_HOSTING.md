@@ -183,6 +183,7 @@ removes only its own crontab line (the daily backup line stays).
 | `FLOODPULSE_ROUTE_DAILY_LIMIT` | `1500` | In-app routes per day (OpenRouteService free quota is 2,000) |
 | `FLOODPULSE_LOGIN_LIMIT_PER_ACCOUNT` / `_PER_ADDRESS` | `5` / `20` | Admin sign-in attempts per 15 minutes |
 | `FLOODPULSE_REPORT_LIMIT_PER_ADDRESS` / `_TOTAL` | `5` / `60` | Citizen reports per 15 minutes |
+| `FLOODPULSE_ADDRESS_LOOKUP` | `on` | "Show address" via OpenStreetMap Nominatim; `off` switches it off (for example if OpenStreetMap asks) |
 
 Change a value, then run `docker compose up -d app` to apply it.
 

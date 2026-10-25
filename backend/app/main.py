@@ -24,6 +24,7 @@ from .river_forecast import router as river_forecast_router, RiverForecast
 from .risk import router as risk_router, RiskService
 from .official import router as official_router, OfficialService, official_tls_context
 from .admin_place import router as admin_place_router, PlaceLookup
+from .location_address import router as location_address_router
 from .routing import router as routing_router
 
 
@@ -65,6 +66,7 @@ app.include_router(river_forecast_router)
 app.include_router(risk_router)
 app.include_router(official_router)
 app.include_router(admin_place_router)
+app.include_router(location_address_router)
 app.include_router(routing_router)
 
 
