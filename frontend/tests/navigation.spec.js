@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
 import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import {test,expect} from '@playwright/test'
@@ -14,7 +15,7 @@ async function setup(page){
   }
   return route.continue()
  })
- await emptyShelterDirectory(page)
+ await emptyShelterDirectory(page);await withoutLiveRisk(page)
  return ()=>requests
 }
 const nav=page=>page.getByRole('navigation',{name:'Main navigation'})

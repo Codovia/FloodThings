@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
 import {test,expect} from '@playwright/test'
 import {readFileSync} from 'node:fs'
@@ -27,7 +28,7 @@ async function setup(page,missing=false){
   }
   if(u.pathname==='/api/shelters')return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',mode:'live',shelters:[],retrieved_at:reference})})
   return route.continue()
- });return calls
+ });await withoutLiveRisk(page);return calls
 }
 for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:1920,height:1080},{width:390,height:844}])test(`current weather and hourly rainfall preserve ${viewport.width}x${viewport.height} workspace`,async({page})=>{
  const calls=await setup(page);await page.setViewportSize(viewport);await page.goto('/')

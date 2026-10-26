@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import {test,expect} from '@playwright/test'
 import {emptyShelterDirectory} from './shelterFixture.js'
 import {openTab,expectOneScreen} from './oneScreen.js'
@@ -56,3 +57,6 @@ test('mobile splits Home into Warnings/Risk/Map tabs, and exposes honest warning
  // On phones the map is its own tab; past-flood polygons must be drawn once it is shown.
  await openTab(page,'Map');await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

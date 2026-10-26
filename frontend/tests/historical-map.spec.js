@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
@@ -57,3 +58,6 @@ test('district view, mobile layout and historical warning remain usable', async 
   await openTab(page, 'Past floods'); await expect(page.getByText(/not current flooding/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

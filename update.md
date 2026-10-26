@@ -2662,3 +2662,15 @@ Tests: unit 299/299 (new: WeatherStrip ×5, selector component tests for map cli
 
 Request: remove `--lan` ("it is giving problem"; plain `./floodpulse.sh` works) and do not use it when checking the site. Reverted 6e223be and a51cae9: `floodpulse.sh`, the launchers, `vite.config.js` (back to the plain `/api` proxy, no HTTPS, no forwarded addresses), README and tests are as before; `scripts/lan_tls.py` and `tests/test_lan_tls.py` deleted, and the locally generated certificate folder `data/tmp/launcher/tls/` (untracked) removed. Any device where its certificate was installed should remove "FloodPulse local test CA" from its trusted certificates.
 
+
+## 2026-10-26 — Weather "No weather data available" (Open-Meteo HTTP 429): cause and fix
+
+Report (screenshot, local app): Home's strip said "No weather data available · Automatic retry no earlier than 9:32 pm"; the bar said "Open-Meteo request returned HTTP 429".
+
+Cause (checked): Open-Meteo answered this laptop's IP with `{"reason":"Hourly API request limit exceeded..."}` (free tier: 600/min, 5,000/hour, 10,000/day per IP, open-meteo.com/en/terms). The flood API still answered. The live server on AWS is a different IP and was unaffected (its /api/weather returned Udupi weather, 25.9 °C, 7 days). The allowance was spent by this evening's work on this laptop: every Playwright run starts a fresh test backend, and after the Home/Weather merge 26 more browser tests choose a place on Home, so each made the test backend fetch live risk (rain, river flow, elevation) from Open-Meteo; several full runs plus repeats, and app restarts that refetch the statewide grid (kept in memory only), exceeded 5,000 calls in an hour. Nothing was broken in the app; it showed the outage honestly and keeps retrying.
+
+Fix:
+- `frontend/tests/liveData.js` `withoutLiveRisk(page)`: browser tests that are not about risk answer `/api/risk`, `/api/risk/area`, `/api/risk/grid`, `/api/river-forecast` and `/api/ai/*` in the browser ("TEST: live risk is not requested"), registered after each spec's catch-all route (15 specs). `risk-features.spec.js` stays the one deliberate live check. Verified with a temporary test: all four risk/river requests got the stand-in, none reached the test backend; the whole suite except the live test passed while Open-Meteo was still refusing this IP (80 passed, 8 skipped, 1 known admin layout failure).
+- `backend/app/weather.py`: a 429 now reads "Open-Meteo's free usage limit for this network was reached (HTTP 429); weather returns automatically once it resets." instead of only the status code.
+
+Still possible: restarting the local app repeatedly refetches the statewide risk grid (256 cells), because that cache is in memory only.

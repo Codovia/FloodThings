@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
 import {test,expect} from '@playwright/test'
 import { choosePlaceForHome } from './pointSelection.js'
@@ -29,3 +30,6 @@ test('name-only district selection persists into Flood Map without inventing a w
  await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByLabel('Go to district',{exact:true})).toHaveValue('nic:kodagu.nic.in');await openTab(page,'Past floods');await expect(page.getByText(/No past floods are mapped for this district/)).toBeVisible();expect(requests).toBe(before)
  await page.getByRole('button',{name:'Show all Karnataka'}).click();await expect(page.getByLabel('Go to district',{exact:true})).toHaveValue('')
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

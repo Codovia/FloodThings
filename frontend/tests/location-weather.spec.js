@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import { choosePlaceForHome } from './pointSelection.js'
 import { expect, test } from '@playwright/test'
@@ -113,3 +114,6 @@ test('short and empty forecast coverage is explicit without invented dates, then
   await expect(page.getByRole('heading', { name: 'Current weather unavailable' })).toBeVisible()
   await expect(page.getByRole('status', { name: 'Weather data freshness' })).toContainText('Stale — previously retrieved information')
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

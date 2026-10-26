@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import { expect, test } from '@playwright/test'
@@ -176,3 +177,6 @@ test('database directory outage leaves manual point weather and seven-day freshn
   await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toBeVisible()
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

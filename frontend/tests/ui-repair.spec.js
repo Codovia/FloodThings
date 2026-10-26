@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import {test,expect} from '@playwright/test'
 import {emptyShelterDirectory} from './shelterFixture.js'
@@ -25,3 +26,6 @@ test('tile DOM carries origin-only identification while application response kee
  await page.route('https://tile.openstreetmap.org/**',route=>route.fulfill({status:200,contentType:'image/png',body:Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aS1cAAAAASUVORK5CYII=','base64')}));
  const response=await page.goto('/flood-map');expect(response.headers()['referrer-policy']).toBe('same-origin');await expect(page.locator('.intelligence-map img.leaflet-tile').first()).toHaveAttribute('referrerpolicy','origin');await expect(page.locator('.intelligence-map .leaflet-control-attribution')).toContainText('OpenStreetMap');await expect(page.locator('.intelligence-map path[fill="#dc6047"]')).toHaveCount(56)
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

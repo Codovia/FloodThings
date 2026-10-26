@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
 import { test, expect } from '@playwright/test'
 async function setup(page, mode='pending') {
@@ -18,6 +19,7 @@ async function setup(page, mode='pending') {
   }
   return route.continue()
  })
+ await withoutLiveRisk(page)
  return requests
 }
 async function locate(page,latitude=13.34,longitude=74.74,accuracy=40){await page.evaluate(({latitude,longitude,accuracy})=>window.__gpsSuccess({coords:{latitude,longitude,accuracy},timestamp:Date.now()}),{latitude,longitude,accuracy})}

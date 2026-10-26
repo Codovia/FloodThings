@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import {test,expect} from '@playwright/test'
 // Every named GPS/river success below is an isolated fixture, not an actual review.
 async function setup(page,{accuracy=40,delayName=false,river='unsupported'}={}){
@@ -22,7 +23,7 @@ async function setup(page,{accuracy=40,delayName=false,river='unsupported'}={}){
    return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify(body)})
   }
   return route.continue()
- });return {calls,release:()=>release?.()}
+ });await withoutLiveRisk(page);return {calls,release:()=>release?.()}
 }
 test('accepted precise GPS gets a verified fixture name without snapping or duplicate weather calls',async({page})=>{
  const {calls}=await setup(page);await page.goto('/');await expect(page.getByRole('heading',{name:'TEST ONLY GPS town, TEST ONLY context',exact:true})).toBeVisible();await expect(page.getByRole('heading',{name:'27 °C',exact:true})).toBeVisible()

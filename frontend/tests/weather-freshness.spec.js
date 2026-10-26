@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import { expect, test } from '@playwright/test'
@@ -29,6 +30,7 @@ async function setup(page) {
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload(point, state.timestampMissing ? null : timestamp)) })
   })
   // Home shows weather for a chosen place (the Weather page was merged into Home).
+  await withoutLiveRisk(page)
   await page.goto('/shelters')
   await choosePlaceForHome(page, 12.9767936, 77.590082)
   return state
