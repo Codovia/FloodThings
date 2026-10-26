@@ -5,6 +5,7 @@ ownership; pidfds prevent signalling a recycled PID. Unknown listeners are untou
 """
 import ctypes
 import errno
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -23,6 +24,11 @@ TERM_TIMEOUT = 5
 KILL_TIMEOUT = 3
 MARKER = 'FLOODPULSE_LAUNCH_ID'
 SECRET_KEYS = {'DATABASE_URL', 'SHELTER_DATABASE_URL', 'LOCATION_DIRECTORY_ADMIN_URL', 'OPENROUTESERVICE_API_KEY', 'GOOGLE_MAPS_EMBED_API_KEY', 'MAPTILER_PUBLIC_KEY'}
+# --lan opens only the website port to the local network; the API stays on loopback behind Vite's /api proxy.
+LAN_LIMITS = ('viewing only: plain HTTP, so GPS, camera, report sending and admin sign-in work only on this laptop '
+              '(or on the HTTPS server)')
+LAN_MISSING = ('--lan needs a private Wi-Fi/LAN address (10.x, 172.16-31.x or 192.168.x) and none was found; '
+               'connect to the Wi-Fi first. Nothing was opened to the network.')
 
 
 class LaunchError(Exception):
@@ -94,6 +100,17 @@ def ensure_ports_available(ports):
                     raise LaunchError(f'Cannot bind {label} port {port}; check local socket permissions.') from None
     if conflicts:
         raise LaunchError(' '.join(conflicts) + ' No unrelated process was stopped; ports were not changed.')
+
+
+def lan_address():
+    """This laptop's private address on its current network, or None. UDP connect picks a route; no packet is sent."""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as probe:
+            probe.connect(('192.0.2.1', 9))
+            address = ipaddress.ip_address(probe.getsockname()[0])
+    except (OSError, ValueError):
+        return None
+    return str(address) if address.is_private and not address.is_loopback and not address.is_link_local else None
 
 
 def receipt_path(root):
@@ -296,6 +313,9 @@ def run(root):
             time.sleep(0.1)
         raise LaunchError(f'{label} readiness timed out; inspect its private launcher log.')
     try:
+        lan = lan_address() if os.environ.get('FLOODPULSE_LAN') == '1' else None
+        if os.environ.get('FLOODPULSE_LAN') == '1' and not lan:
+            raise LaunchError(LAN_MISSING)
         save_receipt(root, state)
         print('[4/5] Starting FastAPI on loopback...', flush=True)
         backend = start('backend', [str(root / 'backend/.venv/bin/python'), '-B', '-m', 'uvicorn',
@@ -304,13 +324,15 @@ def run(root):
         base = 'http://127.0.0.1:' + str(state['ports']['backend'])
         for path in ('health', 'locations/districts', 'shelters'):
             ready(backend, base + '/api/' + path, 'FastAPI')
-        print('[5/5] Starting React/Vite on loopback...', flush=True)
-        frontend = start('frontend', ['npm', 'run', 'dev', '--', '--host', '127.0.0.1',
+        print('[5/5] Starting React/Vite on ' + ('loopback and the local network...' if lan else 'loopback...'), flush=True)
+        frontend = start('frontend', ['npm', 'run', 'dev', '--', '--host', '0.0.0.0' if lan else '127.0.0.1',
                          '--port', str(state['ports']['frontend']), '--strictPort'], root / 'frontend', True)
         origin = os.environ['SHELTER_PUBLIC_ORIGIN']
         ready(frontend, origin, 'React/Vite')
-        print(f'\nApplication: {origin}\nAdmin:       {origin}/admin\nBackend:     {base}\n'
-              '\nPress Ctrl+C to stop FloodPulse. No refresh while the browser is closed.', flush=True)
+        print(f'\nApplication: {origin}\nAdmin:       {origin}/admin\nBackend:     {base}', flush=True)
+        if lan:
+            print(f'Same Wi-Fi:  http://{lan}:{state["ports"]["frontend"]} ({LAN_LIMITS})', flush=True)
+        print('\nPress Ctrl+C to stop FloodPulse. No refresh while the browser is closed.', flush=True)
         while all(child.poll() is None for child in children):
             time.sleep(0.1)
         raise LaunchError('A web service exited unexpectedly; both owned services will stop.')

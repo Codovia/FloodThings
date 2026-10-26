@@ -29,6 +29,7 @@ Prerequisites: Python 3.12+, Node 22.12+ (or 20.19+), Docker (existing `floodpul
 ./floodpulse.sh --check     # read-only readiness check; starts nothing
 ./floodpulse.sh --stop      # stop the running app
 ./floodpulse.sh --telegram  # also point the Telegram bot at this laptop (asks first: it takes the bot from the server)
+./floodpulse.sh --lan       # also let phones/laptops on the same Wi-Fi open the website (viewing only)
 ```
 
 `floodpulse.sh` is the single entry point. It reads Telegram settings only from `.env` (ignoring outdated copies
@@ -40,6 +41,8 @@ and then runs the existing launchers below with all their checks.
 | App | http://127.0.0.1:14180 |
 | Admin | http://127.0.0.1:14180/admin |
 | API | http://127.0.0.1:18050 (interactive docs at `/docs`) |
+
+**On other devices on the same Wi-Fi:** `./floodpulse.sh --lan` also prints a `Same Wi-Fi: http://<laptop address>:14180` link. Only the website port opens to the network; the API stays on the laptop behind the website's `/api` proxy. It is plain HTTP, so on other devices it is for **viewing only**: phones allow GPS and the camera only on secure (HTTPS) pages, and sending a report or signing in as admin is refused (`Same-origin request required`) because those checks accept only the laptop's own address. Use the HTTPS server ([docs/AZURE_HOSTING.md](docs/AZURE_HOSTING.md)) for the full app on phones. Anyone on that Wi-Fi can open it, so prefer a home network or hotspot over a shared college network. If the firewall is on (`ufw`), allow the port for your Wi-Fi only, e.g. `sudo ufw allow from 10.73.242.0/24 to any port 14180 proto tcp` (use your own network from `ip -4 addr`), and remove it afterwards with `sudo ufw delete allow from 10.73.242.0/24 to any port 14180 proto tcp`.
 
 **With Telegram:** put `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_DESTINATIONS` and `TELEGRAM_WEBHOOK_SECRET` in a private `0600` root `.env`, then run `./floodpulse.sh --telegram` (app + webhook proxy + Cloudflare Quick Tunnel). Internally it runs `scripts/full_launcher.py`, which supervises `scripts/app_launcher.sh` (database, port and dependency checks, then backend and frontend).
 

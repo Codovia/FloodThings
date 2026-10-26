@@ -17,7 +17,8 @@ import threading
 import time
 
 from launcher_config import APP_LAUNCHER, private_file
-from launcher_processes import identity, same_process, signal_process, ensure_ports_available, LaunchError, reap
+from launcher_processes import (identity, same_process, signal_process, ensure_ports_available, LaunchError, reap,
+                                lan_address, LAN_LIMITS, LAN_MISSING)
 from telegram_webhook_setup import (SetupError, atomic_private_json, load_configuration, register,
                                     tunnel_url, resolve_public, public_status, public_environment, TelegramAPI)
 from telegram_webhook_setup import deadline
@@ -353,8 +354,11 @@ def locked_run(root, folder, environment, telegram, cloudflared):
             pulse()
             register(telegram, TelegramAPI(telegram), output.origin, folder / 'webhook.json', root)
             pulse()
-        print('\nApplication: http://127.0.0.1:14180\nAdmin:       http://127.0.0.1:14180/admin\n'
-              'Backend/frontend: verified; database managed only by the app launcher.', flush=True)
+        print('\nApplication: http://127.0.0.1:14180\nAdmin:       http://127.0.0.1:14180/admin', flush=True)
+        lan = lan_address() if environment.get('FLOODPULSE_LAN') == '1' else None
+        if lan:
+            print(f'Same Wi-Fi:  http://{lan}:14180 ({LAN_LIMITS})', flush=True)
+        print('Backend/frontend: verified; database managed only by the app launcher.', flush=True)
         if telegram:
             print('Public webhook hostname: ' + output.origin.split('/')[2] + '\nBot: @' + telegram.username
                   + '\nProxy/DNS/HTTPS ingress: verified. Telegram webhook registration: verified. No alert sent.', flush=True)
@@ -401,6 +405,8 @@ def main():
     try:
         args = parser.parse_args()
         fixed_environment(os.environ)
+        if os.environ.get('FLOODPULSE_LAN') == '1' and not args.check and not lan_address():
+            raise SetupError(LAN_MISSING)
         config = load_configuration(ROOT, os.environ) if args.telegram else None
         binary = shutil.which('cloudflared') if args.telegram else None
         if args.telegram and not binary:

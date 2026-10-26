@@ -12,6 +12,8 @@ import time
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / 'scripts'))
+import launcher_processes as processes
 
 # These executables simulate only launcher dependencies inside a temporary tree.
 # Application/provider behavior is checked separately by a genuine smoke run.
@@ -21,7 +23,7 @@ from pathlib import Path
 root=Path(os.environ['FAKE_ROOT']);kind=Path(sys.argv[0]).name
 if kind=='python' and any(a.endswith('/scripts/'+name) for a in sys.argv for name in ['launcher_config.py','launcher_processes.py']):
  os.execv(sys.executable,[sys.executable,*sys.argv[2:]])
-with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind=='docker' else '')+'\n')
+with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind in ('docker','npm') else '')+'\n')
 if kind=='python' and 'preflight' in sys.argv:
  sys.stdin.read();assert os.environ['VIRTUAL_ENV']==str(root/'backend/.venv')
  assert os.environ.get('DATABASE_URL') and os.environ.get('SHELTER_DATABASE_URL')
@@ -316,3 +318,25 @@ def test_npm_parent_exit_still_cleans_worker_listener(project):
     result=run(project,EXIT_FRONTEND_PARENT='1',DETACH_WORKER='1')
     assert result.returncode!=0
     no_orphans(root);assert_released(ports)
+
+
+@pytest.mark.parametrize('lan', [False, True])
+def test_website_listens_on_the_network_only_with_lan(project, lan):
+    root, env = project
+    if lan:
+        env['FLOODPULSE_LAN'] = '1'
+    address = processes.lan_address()
+    if lan and not address:
+        result = run(project)
+        assert result.returncode != 0 and 'private Wi-Fi/LAN address' in result.stderr and 'npm' not in (root/'events').read_text()
+        return
+    proc = launch_until_ready(project)
+    try:
+        output = (root/'terminal.log').read_text()
+        events = (root/'events').read_text()
+        assert ('--host 0.0.0.0' in events) == lan and ('--host 127.0.0.1' in events) != lan
+        assert ('Same Wi-Fi:  http://' + str(address) + ':' + env['FLOODPULSE_FRONTEND_PORT'] in output) == lan
+        assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in output
+    finally:
+        proc.send_signal(signal.SIGINT);proc.wait(timeout=15)
+        no_orphans(root)

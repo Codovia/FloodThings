@@ -2644,3 +2644,16 @@ Causes and fixes:
 Checks (Chrome, live app, stand-in GPS at a public landmark): risk spot → "Korankara Padi, Udupi 576101" on Home, then the same name on Weather (bar and heading), Shelters (bar and "Distances from"), Flood Map; phone Weather page fits one screen.
 
 Tests: backend 556/556 (4 new: village fill-in, PIN preference, failed second lookup, no second lookup when complete); frontend unit 300/300 (shared-lookup test); build; Playwright 81 passed, 8 skipped, 1 known admin layout failure.
+
+## 2026-10-26 — Open the website on other devices on the same Wi-Fi (`--lan`)
+
+Request: `./floodpulse.sh` gives only a localhost link; make the app visible on all devices on the same Wi-Fi.
+
+Acceptance test: without `--lan` nothing changes (Vite on 127.0.0.1); with `--lan` Vite listens on all interfaces and the launcher prints `Same Wi-Fi: http://<private address>:14180`; the backend stays on loopback; with no private address, nothing is opened.
+
+- `floodpulse.sh --lan` sets `FLOODPULSE_LAN=1` (cleared first, so only the option enables it). `launcher_processes.py` then starts Vite with `--host 0.0.0.0` and prints the address; `full_launcher.py` (which hides the app launcher's output) prints it too and refuses `--lan` early when no private address exists. `lan_address()` asks the routing table via an unsent UDP connect and accepts only private, non-loopback, non-link-local IPv4.
+- Security controls unchanged on purpose: `SHELTER_PUBLIC_ORIGIN` stays the loopback origin and insecure cookies stay loopback-only, so on other devices reports, report withdrawal and admin sign-in are refused (403 `Same-origin request required`); GPS/camera need HTTPS. Labelled "viewing only" in the output and README; the HTTPS server is the route for the full app on phones.
+
+Checked here: a separate Vite on spare port 14199 started with the launcher's new arguments, the running app left untouched — `ss` shows `0.0.0.0:14199`; via `http://10.73.242.93:14199` the page returns 200 and `/api/health` through the proxy returns 200; a report POST with that origin returns 403 `Same-origin request required`; the backend on `10.73.242.93:18050` refuses connections. Not checked: a real phone (the firewall is `ufw`, active; its rules need sudo and loopback tests do not pass through it), and a full `./floodpulse.sh --lan` run, which would have restarted the running app.
+
+Tests: launcher suites 101/101 (new: npm host argument and printed address with and without `--lan`, or refusal when no private address; `lan_address` for private, public, loopback, link-local and no-route cases).
