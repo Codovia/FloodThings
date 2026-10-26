@@ -118,3 +118,8 @@
 .shelter-pick-start{margin:4px 0 8px}
 .shelter-pick-banner{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 12px;margin:6px 0;border-radius:8px;background:#fff1dc;border:2px solid #d9822b}
 .shelter-pick-banner button{min-height:32px;padding:4px 12px}
+/* Administrator sign-in: the password field with its Show/Hide button on one row. */
+.admin-login .password-field { display: flex; gap: 8px; align-items: stretch; }
+.admin-login .password-field input { flex: 1; }
+.admin-login .password-field button { margin: 0; min-width: 76px; }
+.admin-login > label[for=admin-password] { margin-bottom: -6px; }

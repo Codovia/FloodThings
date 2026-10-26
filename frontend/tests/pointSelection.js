@@ -14,8 +14,11 @@ export async function goInApp(page, path) {
  await page.evaluate(next => { window.history.pushState(null, '', next); window.dispatchEvent(new PopStateEvent('popstate')) }, path)
 }
 export async function choosePlaceForHome(page, latitude, longitude) {
+ // Set the position first: Shelters may locate on its own as soon as it opens, and must find the same point.
+ await page.context().grantPermissions(['geolocation']); await page.context().setGeolocation({ latitude, longitude, accuracy: 40 })
  await goInApp(page, '/shelters'); await selectPoint(page, latitude, longitude)
- await page.locator('.selected-point-name').filter({ hasText: `${Number(latitude.toFixed(4))}°` }).first().waitFor()   // the place is set before Home opens (the bar rounds to 4 decimals)
+ // The place is set before Home opens. The bar rounds to 4 decimals; phones hide the coordinates, so read the text, not visibility.
+ await page.waitForFunction(expected => document.querySelector('.selected-point-name')?.textContent.includes(expected), `${Number(latitude.toFixed(4))}°`)
  await goInApp(page, '/')
 }
 // Shelters may also locate on its own once permission is granted, naming the same GPS point "Your GPS location".

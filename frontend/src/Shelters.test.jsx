@@ -70,7 +70,7 @@ it('separate admin login protects Pending creation, CSRF and logout',async()=>{
  fireEvent.click(screen.getByRole('button',{name:'Sign out'}));await screen.findByRole('button',{name:'Sign in'});expect(screen.getByLabelText('Password').value).toBe('')
 })
 it('failed login clears the password and displays a generic error',async()=>{
- fetch.mockImplementation(url=>url==='/api/admin/session'?reply({},false,401):reply({detail:'Invalid administrator credentials'},false,401));render(<AdminShelters />);await screen.findByRole('button',{name:'Sign in'});fireEvent.change(screen.getByLabelText('Username'),{target:{value:'test-admin'}});fireEvent.change(screen.getByLabelText('Password'),{target:{value:'WRONG TEST PASSWORD'}});fireEvent.click(screen.getByRole('button',{name:'Sign in'}));await screen.findByText('Invalid administrator credentials');expect(screen.getByLabelText('Password').value).toBe('')
+ fetch.mockImplementation(url=>url==='/api/admin/session'?reply({},false,401):reply({detail:'Invalid administrator credentials'},false,401));render(<AdminShelters />);await screen.findByRole('button',{name:'Sign in'});fireEvent.change(screen.getByLabelText('Username'),{target:{value:'test-admin'}});fireEvent.change(screen.getByLabelText('Password'),{target:{value:'WRONG TEST PASSWORD'}});fireEvent.click(screen.getByRole('button',{name:'Sign in'}));await screen.findByText(/^Username or password is incorrect\. Check both and try again\./);expect(screen.getByLabelText('Password').value).toBe('');expect(document.body.textContent).not.toContain('WRONG TEST PASSWORD')
 })
 
 it('malformed district contract stays an explicit error rather than crashing or enabling assignment',async()=>{
