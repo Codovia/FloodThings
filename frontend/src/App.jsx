@@ -1,10 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useWeatherSession from './useWeatherSession.js'
 import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
-import WeatherPanel from './WeatherPanel.jsx'
 import PublicShelters from './PublicShelters.jsx'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
-import WeatherLocationSelector, { DEFAULT_POINT, WeatherPointMap } from './WeatherLocationSelector.jsx'
+import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
 import AdminShelters from './AdminShelters.jsx'
 import CitizenReport from './CitizenReport.jsx'
 import AlertSubscription from './AlertSubscription.jsx'
@@ -17,7 +16,6 @@ import useHomeGeolocation, {MAX_WEATHER_ACCURACY_M} from './useHomeGeolocation.j
 
 const pageInfo={
  '/': ['KARNATAKA · ENVIRONMENT & RESPONSE','FloodPulse','Emergency overview · verified evidence and response resources.'],
- '/weather': ['POINT WEATHER','Weather details','Seven-day forecast, rainfall chart and source details for your selected point.'],
  '/flood-map': ['OFFICIAL WARNINGS · LIVE RISK · HISTORY','Flood Map','Official IMD district warnings, an experimental statewide rain-risk grid, and historical satellite flood extents.'],
  '/shelters': ['MANUALLY VERIFIED DESTINATIONS','Emergency Shelters','Find administrator-verified open shelters and directions to their verified entrances.'],
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
@@ -41,11 +39,10 @@ export default function App() {
  const [nearestRequest,setNearestRequest]=useState(0)
  // A spot handed from Home's map to Report ("Report flooding here"); used once.
  const [reportSpot,setReportSpot]=useState(null)
- const [contextVisible,setContextVisible]=useState(true)
- const weatherPage=path==='/' || path==='/weather'
+ const weatherPage=path==='/'  // Home shows the weather (the separate Weather page was merged into it)
  const homeGpsUnusable=selectedPoint?.kind==='gps'&&(!Number.isFinite(selectedPoint.accuracy_m)||selectedPoint.accuracy_m>MAX_WEATHER_ACCURACY_M)
  const homePoint=homeGpsUnusable?null:selectedPoint
- const session=useWeatherSession(selectedPoint,path==='/weather'||(path==='/'&&!!homePoint))
+ const session=useWeatherSession(selectedPoint,path==='/'&&!!homePoint)
  const manualRevision=useRef(0)
  const homeLocation=useHomeGeolocation(path==='/',manualRevision,!!selectedPoint||!!districtId,next=>setSelectedPoint(next))
  const point=selectedPoint || DEFAULT_POINT
@@ -68,12 +65,8 @@ export default function App() {
     <div hidden={!selectorPage} className="workspace-information" aria-label="Selected district and services">
      <WeatherLocationSelector point={shownPoint} chosen={!!selectedPoint||weatherPage} onSelect={choosePoint} compact externalMap active={selectorPage} selectedDistrictId={districtId} onDistrict={chooseDistrict}/>
      {districtId&&<p className="district-context" role="status">District filter: <strong>{district?.name||districtId.replace(/^nic:|\.nic\.in$/g,'')}</strong>.</p>}
-     <div hidden={!weatherPage} className="weather-sections">
-      <WeatherPanel point={shownPoint} selectedPoint={selectedPoint} session={session} overview={false} active={weatherPage}/>
-     </div>
      <div hidden={!sheltersPage} className="shelter-sections"><PublicShelters point={selectedPoint} onLocate={choosePoint} nearestRequest={nearestRequest} active={sheltersPage} overview={false} mapTarget={path==='/shelters'&&wide?shelterMapTarget:null} districtId={districtId} navigationBounds={district?.navigation_bounds}/></div>
     </div>
-    {path==='/weather'&&<section className="panel workspace-map" aria-labelledby="context-map-title"><div className="panel-heading"><div><p className="eyebrow">GEOGRAPHIC CONTEXT</p><h2 id="context-map-title">{district?.name||'Selected-point context'}</h2></div>{path==='/weather'&&<button onClick={()=>setContextVisible(v=>!v)} aria-expanded={contextVisible}>{contextVisible?'Hide geographic context':'Show geographic context'}</button>}</div>{contextVisible&&<WeatherPointMap point={point} onSelect={choosePoint} navigationBounds={district?.navigation_bounds} historical={null}/>}<p className="map-legend weather-map-caption">Selected point: {point.name}.</p></section>}
     {path==='/shelters'&&wide&&<section className="panel workspace-map shelter-map-stage" ref={setShelterMapTarget} aria-label="Shelter geographic context"/>}
     {path==='/flood-map'&&<FloodIntelligenceMap point={selectedPoint} onPoint={choosePoint} navigate={navigate} selectedDistrictId={districtId} onDistrictChange={filterDistrict} selectedFeatureId={evidenceFeature} onFeatureChange={setEvidenceFeature}/>}
    </div>}

@@ -1,5 +1,5 @@
 import { openTab } from './oneScreen.js'
-import {selectPoint} from './pointSelection.js'
+import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import { expect, test } from '@playwright/test'
 
 // Browser-only fixtures and deterministic clocks; no provider calls or files.
@@ -28,8 +28,17 @@ async function setup(page) {
     if (state.fail) return route.fulfill({ status: 503, contentType: 'application/json', body: JSON.stringify({ status: 'unavailable', message: 'Controlled provider outage' }) })
     return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(payload(point, state.timestampMissing ? null : timestamp)) })
   })
-  await page.goto('/weather')
+  // Home shows weather for a chosen place (the Weather page was merged into Home).
+  await page.goto('/shelters')
+  await choosePlaceForHome(page, 12.9767936, 77.590082)
   return state
+}
+const BENGALURU = '/api/weather?latitude=12.9767936&longitude=77.590082'
+const days = page => page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')
+async function details(page) {
+  await page.getByRole('button', { name: 'Details' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Weather details & sources' })
+  await expect(dialog).toBeVisible(); return dialog
 }
 const freshness = page => page.getByRole('status', { name: 'Weather data freshness' })
 async function activate(page, hidden) {
@@ -43,7 +52,7 @@ async function activate(page, hidden) {
 test('fresh before six hours, automatically refreshes when due, manual refresh works and seven dates stay ordered', async ({ page }) => {
   const state = await setup(page)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  expect(state.requests).toEqual(['/api/weather'])
+  expect(state.requests).toEqual([BENGALURU])
   await page.clock.fastForward(SIX_HOURS - 1)
   await activate(page, false)
   expect(state.requests).toHaveLength(1)
@@ -52,7 +61,7 @@ test('fresh before six hours, automatically refreshes when due, manual refresh w
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'refreshing')
   await activate(page, false); await activate(page, false)
   expect(state.requests).toHaveLength(2)
-  await expect(page.getByText('27 °C', { exact: true })).toBeVisible()
+  await expect(days(page)).toHaveCount(7)   // the forecast stays visible while it refreshes
   await expect(freshness(page)).toContainText('Showing previously retrieved information')
   await expect(freshness(page)).toContainText('Displayed information is stale')
   release(); state.hold = null
@@ -60,13 +69,13 @@ test('fresh before six hours, automatically refreshes when due, manual refresh w
   await page.getByRole('button', { name: 'Refresh weather' }).click()
   await expect.poll(() => state.requests.length).toBe(3)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await openTab(page, '7 days')
-  const cards = page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')
+  const cards = days(page)
   await expect(cards).toHaveCount(7)
   expect(await cards.locator('time').evaluateAll(nodes => nodes.map(n => n.dateTime))).toEqual(Array.from({ length: 7 }, (_, i) => `2026-10-${String(8 + i).padStart(2, '0')}`))
-  await openTab(page, 'Sources'); await expect(page.getByText('Latitude 13.35°, longitude 74.75°')).toBeVisible()
-  await expect(page.getByText('Unavailable — provider does not supply it here')).toBeVisible()
-  await openTab(page,'Now');await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
+  const sources = await details(page)
+  await expect(sources).toContainText('13.35°, 74.75°')
+  await expect(sources).toContainText('Unavailable — provider does not supply it here')
+  await expect(sources).toContainText('not a seven-day flood prediction')
 })
 
 test('hidden tab reactivation checks stale age, errors retain explicitly stale weather and retries stop after three attempts', async ({ page }) => {
@@ -79,7 +88,9 @@ test('hidden tab reactivation checks stale age, errors retain explicitly stale w
   await activate(page, false)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'stale')
   await expect(page.getByRole('alert')).toContainText('Controlled provider outage')
-  await expect(page.getByText('27 °C', { exact: true })).toBeVisible()
+  // Home never shows stale current conditions as current; the stale forecast stays visible, labelled stale.
+  await expect(page.getByRole('heading', { name: 'Current weather unavailable' })).toBeVisible()
+  await expect(days(page)).toHaveCount(7)
   await activate(page, false); await activate(page, false)
   expect(state.requests).toHaveLength(2)
   await page.clock.fastForward(30 * 60 * 1000)
@@ -101,9 +112,10 @@ test('offline expiry becomes stale, reconnect refreshes selected Udupi and mobil
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
   await page.setViewportSize({ width: 390, height: 844 })
 
-  await selectPoint(page,13.34,74.74)
+  await choosePlaceForHome(page, 13.34, 74.74)
+  await openTab(page, 'Weather')   // phones: the forecast strip is Home's Weather tab
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: GPS_POINT_NAME })).toBeVisible()
   await expect.poll(() => state.requests.length).toBe(2)
   await context.setOffline(true)
   await page.clock.fastForward(SIX_HOURS)
@@ -127,7 +139,7 @@ test('missing retrieval time is explicitly unverified, does not fabricate freshn
   await expect(freshness(page)).toContainText('Unavailable — freshness cannot be verified')
   await activate(page, false); await activate(page, false)
   expect(state.requests).toHaveLength(2)
-  await openTab(page, '7 days'); await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
+  await expect(days(page)).toHaveCount(7)
 })
 
 test('switching location during an automatic refresh never renders the old location result', async ({ page }) => {
@@ -139,16 +151,17 @@ test('switching location during an automatic refresh never renders the old locat
   await expect.poll(() => state.requests.length).toBe(2)
   state.hold = null
 
-  await selectPoint(page,13.34,74.74)
+  await choosePlaceForHome(page, 13.34, 74.74)
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  // The panel re-renders for the new point; retry the tab until its Sources text is shown.
-  await expect(async () => { await openTab(page, 'Sources'); await expect(page.getByText(/Requested point: 13.34° latitude, 74.74° longitude/)).toBeVisible({ timeout: 1000 }) }).toPass({ timeout: 15000 })
+  const sources = await details(page)
+  await expect(sources).toContainText('Requested point: 13.34° latitude, 74.74° longitude')
+  await sources.getByRole('button', { name: 'Close' }).click()
   release()
   await page.evaluate(() => new Promise(resolve => queueMicrotask(resolve)))
-  await expect(page.getByRole('heading', { name: 'GPS-selected point', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: GPS_POINT_NAME })).toBeVisible()
   await page.getByRole('button', { name: 'Refresh weather' }).click()
   await expect.poll(() => state.requests.length).toBe(4)
   expect(state.requests.slice(-2)).toEqual(['/api/weather?latitude=13.34&longitude=74.74', '/api/weather?latitude=13.34&longitude=74.74'])
   await expect(freshness(page)).toHaveAttribute('data-freshness', 'fresh')
-  await openTab(page, '7 days'); await expect(page.getByRole('list', { name: 'Daily weather forecasts' }).getByRole('article')).toHaveCount(7)
+  await expect(days(page)).toHaveCount(7)
 })

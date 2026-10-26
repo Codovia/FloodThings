@@ -5,12 +5,14 @@ import userEvent from '@testing-library/user-event'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 import App from './App.jsx'
 import expandedDirectory from '../../data/reference/karnataka_location_directory_v2/directory.json'
-// One-screen layout: weather details are tabs ("7 days", "Sources").
+// Home shows the weather (the Weather page was merged into it): a strip on laptops (the test default), the Weather tab on phones.
 const openTab = name => { const tab = screen.queryByRole('tab', { name }); if (tab && tab.getAttribute('aria-selected') !== 'true') fireEvent.click(tab) }
-const forecastList = () => { openTab('7 days'); return screen.getByRole('list', { name: 'Daily weather forecasts' }) }
+const forecastList = () => { openTab('Weather'); return screen.getByRole('list', { name: 'Daily weather forecasts' }) }
+const details = () => { openTab('Weather'); if (!screen.queryByRole('dialog', { name: 'Weather details & sources' })) fireEvent.click(screen.getByRole('button', { name: 'Details' })); return screen.getByRole('dialog', { name: 'Weather details & sources' }) }
 
 const mapState = vi.hoisted(() => ({ map: vi.fn(), tileLayer: vi.fn(), circleMarker: vi.fn() }))
 vi.mock('leaflet', () => ({ default: mapState }))
+vi.mock('./HomeFloodMap.jsx', () => ({ default: () => <div>Home map fixture</div> }))
 const districts = [{ id: 'nic:udupi.nic.in', name: 'Udupi', navigation_bounds: [[13,74],[14,75]] }, { id: 'nic:other.nic.in', name: 'Other district', navigation_bounds: null }]
 const places = [1,2].map((id, i) => ({ id: `osm:node:${id}`, name: 'Duplicate fixture', district_id: districts[0].id, selectable: true, coordinate_status: 'verified_osm_place_point',
   coordinates: { latitude: [13.2,13.4][i], longitude: [74.5,74.7][i] }, coordinate_source: { license: 'ODbL 1.0', url: `https://www.openstreetmap.org/node/${id}` }, association_source_url: 'https://udupi.nic.in/en/municipal-administration/' }))
@@ -18,12 +20,12 @@ const missing = { id: 'missing', name: 'Name only', district_id: districts[0].id
 const response = (items) => ({ ok: true, json: async () => ({ status: 'available', items, total: items.length }) })
 const weather = point => ({ status: 'available', location: point, retrieved_at: new Date().toISOString(), current: { temperature_c: 27, valid_at: new Date().toISOString(), interval_seconds: 900 },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(i+8).padStart(2,'0')}`, temperature_max_c: 30, temperature_min_c: 20, precipitation_mm: 1 })), grid_location: { latitude: 13.21, longitude: 74.51 } })
-// On the Weather/Shelters pages the place search sits inside the "Change location" popup.
+// On Shelters the place search sits inside the "Change location" popup; on Home it is a button.
 const open = () => {const change=screen.queryByRole('button',{name:'Change location'});if(change&&!screen.queryByRole('dialog',{name:'Change location'}))fireEvent.click(change);fireEvent.click(screen.getByRole('button', { name: 'Search districts and localities' }))}
 const district = async (id = districts[0].id) => { await waitFor(() => expect(screen.getByLabelText('Karnataka district').disabled).toBe(false)); fireEvent.change(screen.getByLabelText('Karnataka district'), { target: { value: id } }) }
 
 beforeEach(() => {
-  window.history.replaceState(null, '', '/weather')
+  window.history.replaceState(null, '', '/')
   vi.clearAllMocks()
   mapState.map.mockReturnValue({ setView: vi.fn().mockReturnThis(), fitBounds: vi.fn(), remove: vi.fn(), removeLayer: vi.fn(), on: vi.fn() })
   mapState.tileLayer.mockReturnValue({ addTo: vi.fn().mockReturnThis(), on: vi.fn() })
@@ -107,32 +109,30 @@ it('late directory responses cannot replace the newer district locality list', a
   await act(async () => finish(response(places)))
   expect(screen.queryByRole('button', { name: /Duplicate fixture/ })).toBeNull()
 })
-it('locality selection recenters map and changes weather; district navigation makes no weather request', async () => {
-  render(<App />); await screen.findByText('27 °C'); open(); await district()
+it('choosing a locality on Home loads its weather; choosing only a district makes no weather request', async () => {
+  render(<App />); open(); await district()
   await screen.findAllByRole('button', { name: /Duplicate fixture/ })
-  expect(fetch.mock.calls.filter(([url]) => url.startsWith('/api/weather'))).toHaveLength(1)
-  expect(mapState.map.mock.results[0].value.fitBounds).toHaveBeenCalledWith(districts[0].navigation_bounds, { animate: false })
+  expect(fetch.mock.calls.filter(([url]) => url.startsWith('/api/weather'))).toHaveLength(0)
   fireEvent.click(screen.getAllByRole('button', { name: /Duplicate fixture/ })[0])
   await waitFor(() => expect(fetch.mock.calls.some(([url]) => url === '/api/weather?latitude=13.2&longitude=74.5')).toBe(true))
-  await screen.findByText('Duplicate fixture, Udupi')
-  expect(mapState.map.mock.results[0].value.setView).toHaveBeenLastCalledWith([13.2,74.5],12, { animate: false })
-  expect(forecastList().children).toHaveLength(7)
+  await screen.findByRole('heading', { name: 'Duplicate fixture, Udupi' })
+  await waitFor(() => expect(forecastList().children).toHaveLength(7))
   expect(screen.getByRole('status', { name: 'Weather data freshness' }).textContent).toContain('Fresh')
-  expect(screen.getByText(/Point weather, not locality-wide/)).toBeTruthy()
+  expect(details().textContent).toMatch(/Point weather, not locality-wide/)
 })
 it('switching localities during weather request prevents the older point overwriting the new one', async () => {
   let finishOld
   const normal = fetch.getMockImplementation()
   fetch.mockImplementation(url => url === '/api/weather?latitude=13.2&longitude=74.5' ? new Promise(resolve => { finishOld = resolve }) : normal(url))
-  render(<App />); await screen.findByText('27 °C'); open(); await district()
-  // Choosing a place closes the Change location popup, so the second choice reopens it (still before the first weather reply).
+  render(<App />); open(); await district()
+  // Choosing a place closes the search, so the second choice reopens it (still before the first weather reply).
   fireEvent.click((await screen.findAllByRole('button', { name: /Duplicate fixture/ }))[0]); open(); await district()
   fireEvent.click((await screen.findAllByRole('button', { name: /Duplicate fixture/ }))[1])
-  await waitFor(() => expect((openTab('Sources'),screen.getByText(/Requested point: 13.4/))).toBeTruthy())
   await screen.findByText('27 °C')
+  await waitFor(() => expect(details().textContent).toMatch(/Requested point: 13.4/))
   await act(async () => finishOld({ ok: true, json: async () => ({ ...weather({latitude:13.2,longitude:74.5}), current: {temperature_c:99} }) }))
   expect(screen.queryByText('99 °C')).toBeNull()
-  expect((openTab('Sources'),screen.getByText(/Requested point: 13.4/))).toBeTruthy()
+  expect(details().textContent).toMatch(/Requested point: 13.4/)
 })
 it('restricted coordinate provenance cannot trigger weather even if a malformed result claims selectable', async () => {
   const choose = vi.fn(); const malformed = { ...places[0], coordinate_source: { license: 'restricted SOI' } }
@@ -166,15 +166,14 @@ it('expanded source directory displays actual coverage, enables Kundapur and exp
   expect(document.getElementById(unavailable.getAttribute('aria-describedby')).textContent).toContain('not reviewed')
 })
 
-it('Mangaluru selection uses its retained point and association, preserving seven days and map recentering', async () => {
-  expandedResponses(); render(<App />); await screen.findByText('27 °C'); open(); await district('nic:dk.nic.in')
+it('Mangaluru selection uses its retained point and district association, preserving seven days', async () => {
+  expandedResponses(); render(<App />); open(); await district('nic:dk.nic.in')
   fireEvent.click(await screen.findByRole('button',{name:/^Mangaluru — Dakshina Kannada/}))
   await screen.findByRole('heading',{name:'Mangaluru, Dakshina Kannada'})
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=12.8698101&longitude=74.8430082')).toBe(true))
-  expect(mapState.map.mock.results[0].value.setView).toHaveBeenLastCalledWith([12.8698101,74.8430082],12,{animate:false})
-  expect(forecastList().children).toHaveLength(7)
+  await waitFor(()=>expect(forecastList().children).toHaveLength(7))
   expect(screen.getByRole('status',{name:'Weather data freshness'}).textContent).toContain('Fresh')
-  openTab('Sources');expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
+  details();expect(screen.getByRole('link',{name:'Dakshina Kannada district association'}).getAttribute('href')).toBe('https://dk.nic.in/en/municipal-administration/')
 })
 
 it('database-specific outage preserves independent GPS weather and seven-day forecasts', async () => {
@@ -182,13 +181,13 @@ it('database-specific outage preserves independent GPS weather and seven-day for
   fetch.mockImplementation(url => url.startsWith('/api/locations/')
     ? Promise.resolve({ok:false,json:async()=>({detail:'Location database is unavailable or invalid; no file fallback was used'})})
     : normal(url))
-  render(<App />); await screen.findByText('27 °C'); open()
+  render(<App />); open()
   expect((await screen.findByRole('alert',{name:'Location directory error'})).textContent).toContain('Location database is unavailable')
-  vi.stubGlobal('navigator',{geolocation:{getCurrentPosition:success=>success({coords:{latitude:14,longitude:75,accuracy:40}})}})
-  fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}))
-  await screen.findByRole('heading',{name:'GPS-selected point'})
+  vi.stubGlobal('isSecureContext', true)
+  vi.stubGlobal('navigator',{geolocation:{getCurrentPosition:success=>success({coords:{latitude:14,longitude:75,accuracy:40},timestamp:Date.now()})}})
+  fireEvent.click(screen.getByRole('button',{name:'Use my location'}))
   await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url==='/api/weather?latitude=14&longitude=75')).toBe(true))
-  expect(forecastList().children).toHaveLength(7)
+  await waitFor(()=>expect(forecastList().children).toHaveLength(7))
 })
 
 it('external district filter is reflected without inventing point weather',async()=>{

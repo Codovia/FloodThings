@@ -246,3 +246,10 @@ it('a provider that stops advancing the current time falls back to the six-hour 
  await advance(CURRENT_REFRESH_MS);expect(fetch).toHaveBeenCalledTimes(2)
  await advance(FRESHNESS_MS-CURRENT_MIN_GAP_MS);expect(fetch).toHaveBeenCalledTimes(2)
 })
+
+it('weather for a different point than requested is rejected, never shown for the chosen place', async () => {
+  fetch.mockResolvedValueOnce(reply(body({ latitude: 14.5, longitude: 75.2 })))
+  const { result } = renderHook(() => useWeatherSession(UDUPI)); await flush()
+  expect(result.current.data).toBeNull()
+  expect(result.current.error).toContain('does not match the selected location')
+})

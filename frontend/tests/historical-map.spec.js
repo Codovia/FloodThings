@@ -20,8 +20,8 @@ test('both event geometries match exported coordinates and Leaflet draws every r
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/flood-map')
-  await page.goto('/weather')
-  await expect(page.getByText(/Weather unavailable/)).toBeVisible()
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Karnataka statewide view' })).toBeVisible()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
   await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
   await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')

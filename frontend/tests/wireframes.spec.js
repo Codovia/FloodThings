@@ -14,12 +14,11 @@ test.beforeEach(async({page})=>{
 test('sketches 1-3 have information left and a dominant map right at both desktop sizes',async({page})=>{
  for(const size of [{width:1366,height:768},{width:1920,height:1080}]){
   await page.setViewportSize(size)
-  for(const route of ['/','/weather','/shelters']){
-   // Home uses its own status/map grid; Weather and Shelters use the shared workspace.
+  for(const route of ['/','/shelters']){
+   // Home uses its own status/map grid (and now holds the weather); Shelters uses the shared workspace.
    await page.goto(route);const information=page.locator(route==='/'?'.home-essential-status':'.workspace-information'),map=page.locator(route==='/'?'.home-map-stage':'.workspace-map')
    await expect(map).toBeVisible();const left=await information.boundingBox(),right=await map.boundingBox()
-   expect(right.x).toBeGreaterThan(left.x+left.width);// Weather gives the 7-day forecast the wider column; its map still takes at least 40% of the width.
-   if(route==='/weather')expect(right.width/(left.width+right.width)).toBeGreaterThan(.4);else expect(right.width).toBeGreaterThan(left.width)
+   expect(right.x).toBeGreaterThan(left.x+left.width);expect(right.width).toBeGreaterThan(left.width)
    expect(right.height).toBeGreaterThan(350)
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true)
    await page.waitForTimeout(1600);expect(await expectOneScreen(page),`${route} ${size.width}`).toEqual({page:0,width:0,scrolls:0,outside:0})
@@ -28,22 +27,22 @@ test('sketches 1-3 have information left and a dominant map right at both deskto
 })
 test('district selection survives all public routes; a historical cell never changes weather coordinates',async({page})=>{
  let weatherRequests=0;page.on('request',r=>{if(new URL(r.url()).pathname==='/api/weather')weatherRequests++})
- await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
- await page.getByRole('button',{name:'Change location'}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
+ await page.context().clearPermissions();await page.goto('/');await page.getByRole('button',{name:'Search districts and localities'}).click()
  await page.getByLabel('Karnataka district',{exact:true}).selectOption('nic:udupi.nic.in')
- await page.getByRole('button',{name:'Close',exact:true}).click()
+ await page.getByRole('button',{name:'Close place search'}).click()
  const nav=page.getByRole('navigation',{name:'Main navigation'})
  await nav.getByRole('link',{name:'Flood Map',exact:true}).click();await expect(page.getByLabel('Go to district')).toHaveValue('nic:udupi.nic.in')
  await page.getByRole('button',{name:'Zoom to past floods',exact:true}).click();await page.locator('.intelligence-map path[fill="#dc6047"]').first().click({force:true});await expect(page.getByRole('dialog',{name:'Flood evidence details'})).toBeVisible()
- expect(weatherRequests).toBe(1)
+ expect(weatherRequests).toBe(0)   // a district alone has no weather point
  await page.getByRole('button',{name:'Close',exact:true}).click()
  await nav.getByRole('link',{name:'Shelters',exact:true}).click()
  await page.getByRole('button',{name:'Change location'}).click();await page.getByRole('button',{name:'Search districts and localities'}).click()
  await expect(page.getByLabel('Karnataka district',{exact:true})).toHaveValue('nic:udupi.nic.in')
  await page.getByRole('button',{name:'Close',exact:true}).click()
  await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
- await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
- await expect(page.getByRole('heading',{name:'Bengaluru, Karnataka',exact:true})).toBeVisible();expect(weatherRequests).toBe(1)
+ // An old /weather link opens Home; the district filter is kept and no weather point is invented.
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page).toHaveURL(/\/$/)
+ await expect(page.getByRole('heading',{name:'Karnataka statewide view',exact:true})).toBeVisible();expect(weatherRequests).toBe(0)
  await expect(page.getByRole('button',{name:'Run experimental rainfall model'})).toHaveCount(0)
 })
 test('mobile splits Home into Warnings/Risk/Map tabs, and exposes honest warning and hazard states',async({page})=>{
