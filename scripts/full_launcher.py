@@ -10,6 +10,7 @@ import re
 import secrets
 import shutil
 import signal
+import ssl
 import stat
 import subprocess
 import sys
@@ -18,7 +19,7 @@ import time
 
 from launcher_config import APP_LAUNCHER, private_file
 from launcher_processes import (identity, same_process, signal_process, ensure_ports_available, LaunchError, reap,
-                                lan_address, LAN_LIMITS, LAN_MISSING)
+                                lan_address, LAN_CERTIFICATE, LAN_MISSING)
 from telegram_webhook_setup import (SetupError, atomic_private_json, load_configuration, register,
                                     tunnel_url, resolve_public, public_status, public_environment, TelegramAPI)
 from telegram_webhook_setup import deadline
@@ -162,9 +163,12 @@ def listener_owned(port, state):
     return False
 
 
-def local_status(port, path, method='GET'):
-    connection = http.client.HTTPConnection('127.0.0.1', port, timeout=2)
+def local_status(port, path, method='GET', ca=None):
+    connection = None
     try:
+        # --lan serves the website over HTTPS with the local certificate (its names include 127.0.0.1).
+        connection = (http.client.HTTPSConnection('127.0.0.1', port, timeout=2, context=ssl.create_default_context(cafile=ca))
+                      if ca else http.client.HTTPConnection('127.0.0.1', port, timeout=2))
         with deadline(2):
             connection.request(method, path, body=b'{}' if method == 'POST' else None,
                            headers={'Content-Type': 'application/json'})
@@ -174,7 +178,8 @@ def local_status(port, path, method='GET'):
     except (OSError, http.client.HTTPException):
         return None, b''
     finally:
-        connection.close()
+        if connection:
+            connection.close()
 
 
 class TunnelOutput:
@@ -268,6 +273,9 @@ def locked_run(root, folder, environment, telegram, cloudflared):
     receipt = folder / 'processes.json'
     children, output = [], None
     result = 1
+    lan = lan_address() if environment.get('FLOODPULSE_LAN') == '1' else None
+    ca = str(root / 'data/tmp/launcher/tls/ca.crt') if lan else None
+    site = f'https://{lan}:14180' if lan else 'http://127.0.0.1:14180'
     def stopping(signum, frame):
         raise Stopping(signum)
     old_handlers = {sig: signal.signal(sig, stopping) for sig in (signal.SIGINT, signal.SIGTERM)}
@@ -290,7 +298,7 @@ def locked_run(root, folder, environment, telegram, cloudflared):
         while time.monotonic() < deadline:
             pulse()
             health, _ = local_status(18050, '/api/health')
-            front, _ = local_status(14180, '/')
+            front, _ = local_status(14180, '/', ca=ca)
             mode_status, body = local_status(18050, '/api/environment')
             try:
                 live = mode_status == 200 and json.loads(body).get('mode') == 'live'
@@ -354,10 +362,10 @@ def locked_run(root, folder, environment, telegram, cloudflared):
             pulse()
             register(telegram, TelegramAPI(telegram), output.origin, folder / 'webhook.json', root)
             pulse()
-        print('\nApplication: http://127.0.0.1:14180\nAdmin:       http://127.0.0.1:14180/admin', flush=True)
-        lan = lan_address() if environment.get('FLOODPULSE_LAN') == '1' else None
+        print(f'\nApplication: {site}' + ('  (this laptop and every device on the same Wi-Fi)' if lan else '')
+              + f'\nAdmin:       {site}/admin', flush=True)
         if lan:
-            print(f'Same Wi-Fi:  http://{lan}:14180 ({LAN_LIMITS})', flush=True)
+            print(LAN_CERTIFICATE.format(origin=site), flush=True)
         print('Backend/frontend: verified; database managed only by the app launcher.', flush=True)
         if telegram:
             print('Public webhook hostname: ' + output.origin.split('/')[2] + '\nBot: @' + telegram.username

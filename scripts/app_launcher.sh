@@ -40,6 +40,14 @@ flock -n 9 || fail 'A FloodPulse launcher is already running for this checkout.'
 if [[ "${1:-}" != --check ]]; then
   "$VENV/bin/python" -B "$ROOT/scripts/launcher_processes.py" recover "$ROOT"
 fi
+# --lan: HTTPS on the laptop's Wi-Fi address with its local certificate (scripts/lan_tls.py). The origin
+# and Secure-cookie rules are unchanged; they simply apply to that https:// address instead of loopback.
+unset FLOODPULSE_LAN_ADDRESS FLOODPULSE_TLS_DIR
+if [[ "${FLOODPULSE_LAN:-}" == 1 && "${1:-}" != --check ]]; then
+  FLOODPULSE_LAN_ADDRESS=$("$VENV/bin/python" -B "$ROOT/scripts/lan_tls.py" "$ROOT") || exit 1
+  export FLOODPULSE_LAN_ADDRESS FLOODPULSE_TLS_DIR="$RUNTIME/tls" SHELTER_COOKIE_SECURE=true
+  export SHELTER_PUBLIC_ORIGIN="https://$FLOODPULSE_LAN_ADDRESS:$FLOODPULSE_FRONTEND_PORT"
+fi
 printf '[1/5] Checking Python, Node and private configuration...\n'
 "$VENV/bin/python" - preflight <<'PY'
 import importlib, os, sys
@@ -69,7 +77,11 @@ try:
     assert os.environ['LOCATION_DIRECTORY_BACKEND'] == 'postgres'
     assert os.environ['SHELTER_DIRECTORY_MODE'] in ['live', 'demonstration']
     config = SecurityConfig()
-    assert not config.secure and config.origin == f'http://127.0.0.1:{ports[1]}'
+    lan = os.environ.get('FLOODPULSE_LAN_ADDRESS')
+    if lan:
+        assert config.secure and config.origin == f'https://{lan}:{ports[1]}'
+    else:
+        assert not config.secure and config.origin == f'http://127.0.0.1:{ports[1]}'
 except Exception:
     sys.exit('Launcher configuration invalid: check distinct numeric ports, private database targets and matching loopback origin. No configuration values are printed.')
 from launcher_processes import ensure_ports_available, LaunchError

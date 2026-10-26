@@ -3,7 +3,7 @@
 #
 #   ./floodpulse.sh              start the app (if it is already running, it is restarted so new code loads)
 #   ./floodpulse.sh --telegram   also connect the Telegram bot to this laptop (takes it away from the server)
-#   ./floodpulse.sh --lan        also let phones and laptops on the same Wi-Fi open the website (viewing only)
+#   ./floodpulse.sh --lan        also let phones and laptops on the same Wi-Fi use it fully (HTTPS; see README)
 #   ./floodpulse.sh --stop       stop the running app
 #   ./floodpulse.sh --check      check that everything is ready; starts nothing
 #   ./floodpulse.sh --help
@@ -70,5 +70,5 @@ fi
 # 5. Start (or only check): the supervisor runs the app launcher's checks and services, plus the tunnel with --telegram.
 args=("${telegram[@]}")
 [[ "$mode" != check ]] || args+=(--check)
-say "$([[ "$mode" == check ]] && echo 'Checking readiness (nothing will be started)…' || echo "Starting. Open http://127.0.0.1:14180${FLOODPULSE_LAN:+ (or the Same Wi-Fi address it prints)} when it says it is ready; Ctrl+C stops it.")"
+say "$([[ "$mode" == check ]] && echo 'Checking readiness (nothing will be started)…' || echo "Starting. Open $([[ -n ${FLOODPULSE_LAN:-} ]] && echo 'the https:// address it prints' || echo http://127.0.0.1:14180) when it says it is ready; Ctrl+C stops it.")"
 exec "$PY" -B "$ROOT/scripts/full_launcher.py" "${args[@]}"

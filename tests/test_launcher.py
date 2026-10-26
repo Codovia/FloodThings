@@ -5,6 +5,7 @@ from pathlib import Path
 import secrets
 import signal
 import socket
+import stat
 import subprocess
 import sys
 import time
@@ -21,9 +22,9 @@ FAKE = r'''
 import os,sys,time,subprocess
 from pathlib import Path
 root=Path(os.environ['FAKE_ROOT']);kind=Path(sys.argv[0]).name
-if kind=='python' and any(a.endswith('/scripts/'+name) for a in sys.argv for name in ['launcher_config.py','launcher_processes.py']):
+if kind=='python' and any(a.endswith('/scripts/'+name) for a in sys.argv for name in ['launcher_config.py','launcher_processes.py','lan_tls.py']):
  os.execv(sys.executable,[sys.executable,*sys.argv[2:]])
-with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind in ('docker','npm') else '')+'\n')
+with (root/'events').open('a') as f:f.write(kind+' '+(' '.join(sys.argv[1:]) if kind in ('docker','npm','curl') else '')+'\n')
 if kind=='python' and 'preflight' in sys.argv:
  sys.stdin.read();assert os.environ['VIRTUAL_ENV']==str(root/'backend/.venv')
  assert os.environ.get('DATABASE_URL') and os.environ.get('SHELTER_DATABASE_URL')
@@ -90,6 +91,7 @@ def project(tmp_path):
     envdir = tmp_path / 'backend/.venv/bin'; envdir.mkdir(parents=True)
     (tmp_path / 'frontend').mkdir()
     (scripts / 'launcher_config.py').write_bytes((ROOT / 'scripts/launcher_config.py').read_bytes())
+    (scripts / 'lan_tls.py').write_bytes((ROOT / 'scripts/lan_tls.py').read_bytes())
     (scripts / 'launcher_processes.py').write_text((ROOT / 'scripts/launcher_processes.py').read_text().replace('STARTUP_TIMEOUT = 30','STARTUP_TIMEOUT = 2'))
     (envdir / 'activate').write_text(f'export VIRTUAL_ENV={tmp_path}/backend/.venv\n')
     tools = tmp_path / 'bin'; tools.mkdir()
@@ -321,21 +323,29 @@ def test_npm_parent_exit_still_cleans_worker_listener(project):
 
 
 @pytest.mark.parametrize('lan', [False, True])
-def test_website_listens_on_the_network_only_with_lan(project, lan):
+def test_website_uses_https_on_the_network_only_with_lan(project, lan):
     root, env = project
     if lan:
         env['FLOODPULSE_LAN'] = '1'
     address = processes.lan_address()
     if lan and not address:
         result = run(project)
-        assert result.returncode != 0 and 'private Wi-Fi/LAN address' in result.stderr and 'npm' not in (root/'events').read_text()
+        assert result.returncode != 0 and 'private Wi-Fi/LAN address' in result.stderr
+        assert not (root/'events').exists() or 'npm' not in (root/'events').read_text()
         return
     proc = launch_until_ready(project)
     try:
         output = (root/'terminal.log').read_text()
         events = (root/'events').read_text()
+        port = env['FLOODPULSE_FRONTEND_PORT']
         assert ('--host 0.0.0.0' in events) == lan and ('--host 127.0.0.1' in events) != lan
-        assert ('Same Wi-Fi:  http://' + str(address) + ':' + env['FLOODPULSE_FRONTEND_PORT'] in output) == lan
+        assert (f'Application: https://{address}:{port}' if lan else f'Application: http://127.0.0.1:{port}') in output
+        assert ('/floodpulse-local-ca.crt' in output) == lan
+        tls = root/'data/tmp/launcher/tls'
+        assert (f'--cacert {tls}/ca.crt https://{address}:{port}' in events) == lan
+        if lan:
+            assert stat.S_IMODE(tls.stat().st_mode) == 0o700
+            assert [stat.S_IMODE((tls/name).stat().st_mode) for name in ('ca.key', 'lan.key')] == [0o600, 0o600]
         assert 'PRIVATE_SENTINEL_LAUNCHER_TEST_ONLY' not in output
     finally:
         proc.send_signal(signal.SIGINT);proc.wait(timeout=15)

@@ -24,9 +24,8 @@ TERM_TIMEOUT = 5
 KILL_TIMEOUT = 3
 MARKER = 'FLOODPULSE_LAUNCH_ID'
 SECRET_KEYS = {'DATABASE_URL', 'SHELTER_DATABASE_URL', 'LOCATION_DIRECTORY_ADMIN_URL', 'OPENROUTESERVICE_API_KEY', 'GOOGLE_MAPS_EMBED_API_KEY', 'MAPTILER_PUBLIC_KEY'}
-# --lan opens only the website port to the local network; the API stays on loopback behind Vite's /api proxy.
-LAN_LIMITS = ('viewing only: plain HTTP, so GPS, camera, report sending and admin sign-in work only on this laptop '
-              '(or on the HTTPS server)')
+# --lan opens only the website port (HTTPS) to the local network; the API stays on loopback behind Vite's /api proxy.
+LAN_CERTIFICATE = 'First time on each device: install the local certificate from {origin}/floodpulse-local-ca.crt (README, "Same Wi-Fi").'
 LAN_MISSING = ('--lan needs a private Wi-Fi/LAN address (10.x, 172.16-31.x or 192.168.x) and none was found; '
                'connect to the Wi-Fi first. Nothing was opened to the network.')
 
@@ -300,12 +299,12 @@ def run(root):
                                      stdout=stream, stderr=subprocess.STDOUT, start_new_session=True)
         children.append(child)
         return child
-    def ready(child, url, label):
+    def ready(child, url, label, ca=None):
         deadline = time.monotonic() + STARTUP_TIMEOUT
         while time.monotonic() < deadline:
             if child.poll() is not None:
                 raise LaunchError(f'{label} exited; inspect its private launcher log.')
-            probe = subprocess.run(['curl', '--silent', '--fail', '--max-time', '2', url],
+            probe = subprocess.run(['curl', '--silent', '--fail', '--max-time', '2', *(['--cacert', ca] if ca else []), url],
                                    env=service_environment(True), stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL, timeout=3)
             if probe.returncode == 0:
@@ -313,8 +312,8 @@ def run(root):
             time.sleep(0.1)
         raise LaunchError(f'{label} readiness timed out; inspect its private launcher log.')
     try:
-        lan = lan_address() if os.environ.get('FLOODPULSE_LAN') == '1' else None
-        if os.environ.get('FLOODPULSE_LAN') == '1' and not lan:
+        lan = os.environ.get('FLOODPULSE_LAN_ADDRESS') if os.environ.get('FLOODPULSE_LAN') == '1' else None
+        if os.environ.get('FLOODPULSE_LAN') == '1' and not (lan and os.environ.get('FLOODPULSE_TLS_DIR')):
             raise LaunchError(LAN_MISSING)
         save_receipt(root, state)
         print('[4/5] Starting FastAPI on loopback...', flush=True)
@@ -328,10 +327,11 @@ def run(root):
         frontend = start('frontend', ['npm', 'run', 'dev', '--', '--host', '0.0.0.0' if lan else '127.0.0.1',
                          '--port', str(state['ports']['frontend']), '--strictPort'], root / 'frontend', True)
         origin = os.environ['SHELTER_PUBLIC_ORIGIN']
-        ready(frontend, origin, 'React/Vite')
-        print(f'\nApplication: {origin}\nAdmin:       {origin}/admin\nBackend:     {base}', flush=True)
+        ready(frontend, origin, 'React/Vite', str(Path(os.environ['FLOODPULSE_TLS_DIR']) / 'ca.crt') if lan else None)
+        print(f'\nApplication: {origin}' + ('  (this laptop and every device on the same Wi-Fi)' if lan else '')
+              + f'\nAdmin:       {origin}/admin\nBackend:     {base}', flush=True)
         if lan:
-            print(f'Same Wi-Fi:  http://{lan}:{state["ports"]["frontend"]} ({LAN_LIMITS})', flush=True)
+            print(LAN_CERTIFICATE.format(origin=origin), flush=True)
         print('\nPress Ctrl+C to stop FloodPulse. No refresh while the browser is closed.', flush=True)
         while all(child.poll() is None for child in children):
             time.sleep(0.1)
