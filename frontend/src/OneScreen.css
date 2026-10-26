@@ -24,9 +24,6 @@ main.app-content>*{min-height:0}
 .pager{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-shrink:0;margin-top:6px;font-size:12px}
 .pager button{min-height:36px;margin:0;padding:6px 12px;font-size:12px}
 
-/* Eight menu items fit one header line from 1280 px; on narrower laptops the labels stay and the icons go. */
-@media (min-width:1100px) and (max-width:1279px){ .primary-nav a svg{display:none} }
-
 @media (max-width:1099px){
  .header-inner{flex-wrap:nowrap;padding:6px 12px}
  .app-brand small{display:none}

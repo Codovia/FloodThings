@@ -154,3 +154,16 @@
  .page-home .map-overlay{position:absolute;box-shadow:0 2px 10px #17313c22}
  .page-home .home-map-frame{flex-direction:row}
 }
+
+/* Laptops: the place note and "Show address" share one line to keep Home on one screen. */
+@media (min-width:1100px){
+ .page-home .home-place>p[role=status]{display:inline}
+ .page-home .home-place .address-line{display:inline;margin:0 0 0 6px}
+}
+/* Short laptop screens: temperature and conditions share a line, and gaps tighten, to make room for the weather strip. */
+@media (min-width:1100px) and (max-height:760px){
+ .page-home .home-emergency-dashboard{gap:6px}
+ .page-home .home-location-bar{padding:6px 14px}
+ .page-home .home-temp{display:inline;font-size:1.125rem;margin-right:8px}
+ .page-home .home-weather-line>p:first-of-type{display:inline}
+}

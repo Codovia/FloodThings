@@ -2629,3 +2629,48 @@ Request: "weather page not in the application". The page existed at `/weather` b
 - Checked in Chrome: one header line with nothing cut off at 1100 (right edge 1080), 1280 (1260) and 1366 px (1346); phone menu lists all eight; Weather marked as the current page; no sideways scrolling.
 
 Tests: frontend unit 299/299 (navigation tests updated for eight items and the visible Weather entry); navigation, end-to-end and weather browser tests 7 passed, 1 skipped (database); build passes.
+
+## 2026-10-25 — Place names everywhere, and village names where only the taluk showed
+
+Request (with screenshot): Home showed "3.7 km SW" instead of a place; some taps or "Use my location" showed only the taluk; the place name should be used on all pages.
+
+Causes and fixes:
+- "3.7 km SW": a risk spot chosen on Home's map ("Full assessment here") had no `kind`, so no lookup ran. It is now a map point (`kind: 'map'`) → e.g. "Korankara Padi, Udupi 576101".
+- Taluk only: sampling 8 rural points showed Nominatim's detailed answer (zoom 18) is often an unnamed road with only the county (13.1, 75.9 → "Beluru taluk"), while the village-level answer (zoom 14) names the place ("Madhaghatta"). When the detailed answer has no locality or no PIN, the server now makes one village-level lookup and fills only those gaps (the detailed PIN wins when both exist, e.g. 585369 vs 585216); a failed second lookup changes nothing. → "Madhaghatta, Beluru taluk 573115". Two of eight sampled points have no PIN in OpenStreetMap at all; then none is shown (never invented).
+- All pages: App looks up the selected point once and shows its place name in the shared location bar (Weather, Shelters) and the Weather heading; Home, Shelters and Flood Map already used it. Lookups are shared per point in the browser (one request however many places show it).
+- Report page unchanged on purpose: its rule (tested) is that nothing reaches FloodPulse before review and consent, so a spot picked on the map stays unnamed until submission; your own GPS location there is already named with a PIN by BigDataCloud on the device.
+- Browser tests: the isolated test backend had been calling the real Nominatim with test points since the automatic lookup (a few requests per run); `playwright.config.js` now sets `FLOODPULSE_ADDRESS_LOOKUP=off` for it.
+
+Checks (Chrome, live app, stand-in GPS at a public landmark): risk spot → "Korankara Padi, Udupi 576101" on Home, then the same name on Weather (bar and heading), Shelters (bar and "Distances from"), Flood Map; phone Weather page fits one screen.
+
+Tests: backend 556/556 (4 new: village fill-in, PIN preference, failed second lookup, no second lookup when complete); frontend unit 300/300 (shared-lookup test); build; Playwright 81 passed, 8 skipped, 1 known admin layout failure.
+
+## 2026-10-26 — Home and Weather merged: seven-day strip on Home
+
+Request: merge the Home and Weather pages with a better UI. Layout chosen by the user from two options: a seven-day weather strip under Home's location bar (not tabs).
+
+- `WeatherStrip.jsx` (+ CSS, tests): "Next 7 days" with freshness (Fresh / Stale — previously retrieved / Refreshing / No weather data, the old retrieval/offline/retry/paused wording kept), Refresh, a Rain chart popup and a Details popup (requested point, locality provenance links "Mapped locality point · OpenStreetMap" and "<district> district association", provider grid point, retrieval time, "not a seven-day flood prediction"). Day cards: weekday ("Today" only for the actual IST date), icon by WMO code, max/min °C, rain mm with a bar relative to the wettest day; missing values stay "Unavailable"; missing days are never filled ("Incomplete forecast coverage: n of 7 days…"); empty forecast says so. Laptops: strip under the location bar (two-line cards on screens ≤760 px tall). Phones: Home's "Weather" tab (Warnings · Weather · Risk · Map), four days per page.
+- Removed: the separate Weather page (`WeatherPanel.jsx`, `WeatherFreshness.css`, its route content and context map) and the menu item (seven items again; the 1100–1279 px icon-hiding rule went with it). Old `/weather` links open Home (query and hash kept). Home's "7-day forecast" link went (the strip replaces it). Weather errors are announced once, in the location bar.
+- Behaviour kept on purpose (reconciled): Home still hides current conditions unless fresh and ≤90 minutes old; the old page showed stale current values. The old page also showed Bengaluru weather when nothing was chosen; Home shows weather only for a chosen place.
+- To fit one screen: the place note is shorter ("Your location (±12 m) · name and PIN from OpenStreetMap, approximate.") and shares a line with "Show address" on laptops; on short laptop screens temperature and conditions share a line.
+
+One-screen check (Chrome and Playwright): fits at 1508×761, 1480×736 (the user's window), 1366×768, 1600×900, 1920×1080, 1280×720 and phones 390×844/700, 320×720. Does not fit (the existing scroll fallback takes over): 1366×657 (a 1366×768 laptop with browser toolbars) and 1100×700 — Home needs about 725 px of height with the strip. Not fixed yet: the remaining room would have to come from the warning cards.
+
+Tests: unit 299/299 (new: WeatherStrip ×5, selector component tests for map click, wrapped longitude and reset; hook test for a weather reply for a different point; App, directory and navigation tests moved to Home; ten old Weather-page App tests removed where the hook/strip tests cover them); backend 556/556; build; Playwright 81 passed, 8 skipped, 1 known admin layout failure — 26 browser tests moved from /weather to Home (`choosePlaceForHome` helper; Shelters may name the same GPS point "Your GPS location"). Intermittent under full-suite load, then passing on repeat: flood-intelligence (depends on IMD outlines fetched live by the test backend) and fullscreen; the Home map-tap test now accepts either map popup.
+
+## 2026-10-26 — `--lan` removed
+
+Request: remove `--lan` ("it is giving problem"; plain `./floodpulse.sh` works) and do not use it when checking the site. Reverted 6e223be and a51cae9: `floodpulse.sh`, the launchers, `vite.config.js` (back to the plain `/api` proxy, no HTTPS, no forwarded addresses), README and tests are as before; `scripts/lan_tls.py` and `tests/test_lan_tls.py` deleted, and the locally generated certificate folder `data/tmp/launcher/tls/` (untracked) removed. Any device where its certificate was installed should remove "FloodPulse local test CA" from its trusted certificates.
+
+
+## 2026-10-26 — Weather "No weather data available" (Open-Meteo HTTP 429): cause and fix
+
+Report (screenshot, local app): Home's strip said "No weather data available · Automatic retry no earlier than 9:32 pm"; the bar said "Open-Meteo request returned HTTP 429".
+
+Cause (checked): Open-Meteo answered this laptop's IP with `{"reason":"Hourly API request limit exceeded..."}` (free tier: 600/min, 5,000/hour, 10,000/day per IP, open-meteo.com/en/terms). The flood API still answered. The live server on AWS is a different IP and was unaffected (its /api/weather returned Udupi weather, 25.9 °C, 7 days). The allowance was spent by this evening's work on this laptop: every Playwright run starts a fresh test backend, and after the Home/Weather merge 26 more browser tests choose a place on Home, so each made the test backend fetch live risk (rain, river flow, elevation) from Open-Meteo; several full runs plus repeats, and app restarts that refetch the statewide grid (kept in memory only), exceeded 5,000 calls in an hour. Nothing was broken in the app; it showed the outage honestly and keeps retrying.
+
+Fix:
+- `frontend/tests/liveData.js` `withoutLiveRisk(page)`: browser tests that are not about risk answer `/api/risk`, `/api/risk/area`, `/api/risk/grid`, `/api/river-forecast` and `/api/ai/*` in the browser ("TEST: live risk is not requested"), registered after each spec's catch-all route (15 specs). `risk-features.spec.js` stays the one deliberate live check. Verified with a temporary test: all four risk/river requests got the stand-in, none reached the test backend; the whole suite except the live test passed while Open-Meteo was still refusing this IP (80 passed, 8 skipped, 1 known admin layout failure).
+- `backend/app/weather.py`: a 429 now reads "Open-Meteo's free usage limit for this network was reached (HTTP 429); weather returns automatically once it resets." instead of only the status code.
+
+Still possible: restarting the local app repeatedly refetches the statewide risk grid (256 cells), because that cache is in memory only.

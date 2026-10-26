@@ -1,7 +1,7 @@
 import React from 'react'
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
-import AddressLine, { usePlaceLookup } from './AddressLine.jsx'
+import AddressLine, { forgetPlaces, usePlaceLookup } from './AddressLine.jsx'
 
 // TEST FIXTURES ONLY — invented points and addresses; fetch is mocked.
 const GPS = { name: 'GPS-selected point', kind: 'gps', latitude: 13.340912, longitude: 74.742134, accuracy_m: 8 }
@@ -11,7 +11,7 @@ function Place({ point }) {
   const lookup = usePlaceLookup(point)
   return <><h2>{lookup.place || point?.name || 'No place'}</h2><AddressLine lookup={lookup} /></>
 }
-afterEach(() => { cleanup(); vi.unstubAllGlobals() })
+afterEach(() => { cleanup(); vi.unstubAllGlobals(); forgetPlaces() })
 
 it('names a located point with its PIN code automatically, sending just the point and its accuracy', async () => {
   const fetch = reply(OK); vi.stubGlobal('fetch', fetch)
@@ -66,4 +66,11 @@ it('a new location drops the old name and ignores a late answer for the old poin
   expect(screen.getByRole('heading', { name: 'Second point' })).toBeTruthy()
   answers[1]({ ok: true, json: async () => ({ ...OK, place: 'TEST Second, Udupi 576102' }) })
   expect(await screen.findByRole('heading', { name: 'TEST Second, Udupi 576102' })).toBeTruthy()
+})
+
+it('several places showing the same point share one request', async () => {
+  const fetch = reply(OK); vi.stubGlobal('fetch', fetch)
+  render(<><Place point={GPS} /><Place point={{ ...GPS }} /></>)
+  expect(await screen.findAllByRole('heading', { name: 'TEST Ward, Udupi 576101' })).toHaveLength(2)
+  expect(fetch).toHaveBeenCalledTimes(1)
 })

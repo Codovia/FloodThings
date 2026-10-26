@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import {test,expect} from '@playwright/test'
 import {mkdir} from 'node:fs/promises'
 import {tmpdir} from 'node:os'
@@ -121,3 +122,6 @@ test('administrator sections and exact preview stay explicit without a send',asy
  expect(sends).toBe(0)
  await page.screenshot({path:output+'after-notification-preview-fixture.png'})
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

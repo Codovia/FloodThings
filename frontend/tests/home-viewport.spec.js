@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { test, expect } from '@playwright/test'
 import { expectOneScreen, openTab } from './oneScreen.js'
 // These layout fixtures are isolated HTTP responses, never observations or DB writes.
@@ -54,3 +55,6 @@ test('very short windows and enlarged text fall back to scrolling instead of hid
  await expect.poll(()=>page.evaluate(()=>document.documentElement.dataset.fit||null)).toBe('scroll')
  await page.locator('.risk-area').scrollIntoViewIfNeeded();await expect(page.locator('.risk-area')).toBeInViewport();expect(await page.evaluate(()=>document.documentElement.scrollWidth)).toBe(1366)
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

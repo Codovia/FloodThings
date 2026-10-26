@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
 import {test,expect} from '@playwright/test'
 import {readFileSync} from 'node:fs'
@@ -27,7 +28,7 @@ async function setup(page,missing=false){
   }
   if(u.pathname==='/api/shelters')return route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({status:'available',mode:'live',shelters:[],retrieved_at:reference})})
   return route.continue()
- });return calls
+ });await withoutLiveRisk(page);return calls
 }
 for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:1920,height:1080},{width:390,height:844}])test(`current weather and hourly rainfall preserve ${viewport.width}x${viewport.height} workspace`,async({page})=>{
  const calls=await setup(page);await page.setViewportSize(viewport);await page.goto('/')
@@ -45,11 +46,12 @@ for(const viewport of [{width:1366,height:768},{width:1600,height:900},{width:19
   await expect(page.locator('.imd-card')).toBeVisible()
  }else expect(size.height).toBe(viewport.height)
  await page.waitForTimeout(1600);expect(await expectOneScreen(page)).toEqual({page:0,width:0,scrolls:0,outside:0})
- if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
- await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))})
- await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(viewport.width>=1100?7:4)
- if(viewport.width<1100)await page.getByRole('button',{name:'Open navigation menu'}).click()
- await page.getByRole('navigation',{name:'Main navigation'}).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)
+ // The seven-day forecast is on Home (the Weather page was merged into it): a strip on laptops, the Weather tab on phones.
+ if(viewport.width<1100)await openTab(page,'Weather')
+ await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(viewport.width>=1100?7:4)
+ // An old /weather link opens Home with the same reading, without another request.
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page).toHaveURL(/\/$/)
+ await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();expect(calls).toHaveLength(1)
 })
 test('one null hour makes the whole total unavailable while keeping valid current weather',async({page})=>{
  await setup(page,true);await page.goto('/');await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h');await expect(page.getByRole('heading',{name:'35.5 °C',exact:true})).toBeVisible();await page.getByRole('button',{name:'Data sources & privacy'}).click();await expect(page.getByText(/Exactly 24 ordered, consecutive one-hour intervals/)).toBeVisible()

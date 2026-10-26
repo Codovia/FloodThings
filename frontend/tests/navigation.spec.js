@@ -1,5 +1,6 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, expectOneScreen } from './oneScreen.js'
-import {selectPoint} from './pointSelection.js'
+import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import {test,expect} from '@playwright/test'
 import {emptyShelterDirectory} from './shelterFixture.js'
 const stamp='2026-10-10T06:00:00Z'
@@ -14,14 +15,15 @@ async function setup(page){
   }
   return route.continue()
  })
- await emptyShelterDirectory(page)
+ await emptyShelterDirectory(page);await withoutLiveRisk(page)
  return ()=>requests
 }
 const nav=page=>page.getByRole('navigation',{name:'Main navigation'})
 
 test('five routes, direct URLs, back/forward, persistent location and one freshness lifecycle',async({page})=>{
- const requests=await setup(page);await page.goto('/weather');await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
- await selectPoint(page,13.34,74.74);await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
+ const requests=await setup(page);await page.goto('/shelters')
+ // Home shows the weather of the chosen place (the Weather page was merged into Home).
+ await choosePlaceForHome(page,13.34,74.74);await expect(page.getByRole('heading',{name:GPS_POINT_NAME})).toBeVisible();await expect(page.getByText('27 °C',{exact:true})).toBeVisible();await expect.poll(requests).toBe(1)
  // The page clock is frozen while the browser stamps GPS fixes with real time, so the fix looks stale and Shelters
  // would refresh it automatically. Location access is withdrawn so this test checks only that the point persists.
  await page.context().clearPermissions()
@@ -29,13 +31,16 @@ test('five routes, direct URLs, back/forward, persistent location and one freshn
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText('No currently verified open shelters are available in this directory.')).toBeVisible()
  await page.goBack();await expect(page).toHaveURL(/\/flood-map$/);await expect(page.locator('.historical-map path[fill="#dc6047"]')).toHaveCount(56)
  await page.goForward();await expect(page).toHaveURL(/\/shelters$/)
- await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();await expect.poll(requests).toBe(2)
- await page.clock.fastForward(6*3600000);await expect.poll(requests).toBe(3)
- await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(3)
+ await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('region',{name:'Karnataka emergency map'})).toBeVisible();await expect(page.getByRole('heading',{name:GPS_POINT_NAME})).toBeVisible();await expect.poll(requests).toBe(1)
+ await page.clock.fastForward(6*3600000);await expect.poll(requests).toBe(2)
+ // An old /weather link opens Home with the same place and forecast, without another request.
+ await nav(page).getByRole('link',{name:'Flood Map',exact:true}).click()
+ await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page).toHaveURL(/\/$/);await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7);expect(requests()).toBe(2)
  await nav(page).getByRole('link',{name:'Admin',exact:true}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible();await expect(nav(page).getByRole('link',{name:'Admin',exact:true})).toHaveAttribute('aria-current','page')
- for(const [url,title] of [['/','FloodPulse'],['/weather','Weather details'],['/flood-map','Flood Map'],['/shelters','Emergency Shelters'],['/admin','Administration']]){
+ for(const [url,title] of [['/','FloodPulse'],['/weather','FloodPulse'],['/flood-map','Flood Map'],['/shelters','Emergency Shelters'],['/admin','Administration']]){
   await page.goto(url);await expect(page.getByRole('heading',{name:title,exact:true,level:1})).toBeVisible()
  }
+ await page.goto('/weather');await expect(page).toHaveURL(/127\.0\.0\.1:\d+\/$/)
 })
 
 test('mobile menu, keyboard, layer toggles and maps remain usable after routing',async({page})=>{
@@ -51,7 +56,7 @@ test('mobile menu, keyboard, layer toggles and maps remain usable after routing'
 
 test('missing data, unknown routes and shelter errors do not invent readings or destinations',async({page})=>{
  await setup(page);await page.route('**/api/weather*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({message:'Controlled weather outage'})}));await page.route('**/api/shelters*',r=>r.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled directory outage'})}))
- await page.goto('/weather');await expect(page.getByText(/Controlled weather outage/)).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
+ await page.goto('/shelters');await choosePlaceForHome(page,13.34,74.74);await expect(page.getByText(/Controlled weather outage/)).toBeVisible();await expect(page.getByRole('list',{name:'Daily weather forecasts'})).toHaveCount(0)
  await nav(page).getByRole('link',{name:'Shelters',exact:true}).click();await expect(page.getByText(/Controlled directory outage/)).toBeVisible();await expect(page.getByRole('link',{name:'Open external entrance directions'})).toHaveCount(0)
  await page.goto('/missing');await expect(page.getByRole('heading',{name:'This page is unavailable'})).toBeVisible();await page.getByRole('link',{name:'Return Home'}).click();await expect(page).toHaveURL(/\/$/)
 })

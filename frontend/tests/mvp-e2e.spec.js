@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import {test,expect} from '@playwright/test'
 import {mkdir,writeFile,readFile} from 'node:fs/promises'
 const evidence='/tmp/floodpulse-mvp-readiness'
@@ -103,3 +104,6 @@ test('real application: private incident -> moderation -> map shelter -> directi
  await writeFile(evidence+'/browser-results.json',JSON.stringify({dimensions,errors,privateReport:id,manualPositionSource:'USER_SELECTED_MAP',admin:'legitimately provisioned isolated fixture',databaseRoles:'restricted reader/application',externalDirections:url.href,roadRouteGenerated:false,telegramLiveDelivery:false,weatherHTTP:weather.status(),fixtures:['owned 2x2 PNG','explicit manual incident point','demonstration shelter authorization/capacity'],providerMocks:false},null,2))
  expect(errors).toEqual([]);await context.close()
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab, findLocality, expectOneScreen } from './oneScreen.js'
 import {selectPoint} from './pointSelection.js'
 import {expect,test} from '@playwright/test'
@@ -100,3 +101,6 @@ test('isolated authenticated admin form uses the real district contract and requ
  for(const size of [{width:1366,height:768},{width:1920,height:1080},{width:390,height:844}]){await page.setViewportSize(size);await page.getByRole('heading',{name:'Inspect facility & select entrance'}).scrollIntoViewIfNeeded();if(size.width>=1366){await page.getByRole('region',{name:'Administrator entrance selection map'}).scrollIntoViewIfNeeded();const map=await page.getByRole('region',{name:'Administrator entrance selection map'}).boundingBox();expect(map.height).toBeGreaterThanOrEqual(190);expect(map.y+map.height).toBeLessThanOrEqual(size.height-45);}expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);await page.screenshot({path:test.info().outputPath(`admin-isolated-${size.width}.png`),fullPage:true})}
  await page.getByRole('button',{name:'Sign out'}).click();await expect(page.getByRole('button',{name:'Sign in'})).toBeVisible()
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

@@ -1,13 +1,19 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
 export const PAGES = [
-  {path:'/',name:'Home',icon:'home'}, {path:'/weather',name:'Weather',icon:'weather'},
+  {path:'/',name:'Home',icon:'home'},
   {path:'/flood-map',name:'Flood Map',icon:'map'}, {path:'/shelters',name:'Shelters',icon:'shelter'},
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
   {path:'/how-it-works',name:'How it works',icon:'info'},
   {path:'/admin',name:'Admin',icon:'admin'},
 ]
-const currentPath=()=>window.location.pathname.replace(/\/+$/, '') || '/'
+// The Weather page was merged into Home; old /weather links open Home.
+const currentPath=()=>{
+ const path=window.location.pathname.replace(/\/+$/, '') || '/'
+ if(path!=='/weather')return path
+ window.history.replaceState(null,'','/'+window.location.search+window.location.hash)
+ return '/'
+}
 export function usePage(){
  const [path,setPath]=useState(currentPath)
  const heading=useRef(null)

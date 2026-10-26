@@ -1,5 +1,6 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
-import {selectPoint} from './pointSelection.js'
+import { choosePlaceForHome, GPS_POINT_NAME } from './pointSelection.js'
 import { expect, test } from '@playwright/test'
 
 // Directory endpoints and map geography are genuine retained public records.
@@ -8,9 +9,8 @@ const body = (point, retrieved) => ({ status: 'available', location: point, retr
   current: { temperature_c: 27, humidity_percent: 70, precipitation_mm: 0, interval_seconds: 900, valid_at: retrieved, stale: false },
   forecast: Array.from({ length: 7 }, (_, i) => ({ date: `2026-10-${String(8+i).padStart(2,'0')}`, temperature_min_c: 20, temperature_max_c: 30, precipitation_mm: i, weather_code: 61 })),
   grid_location: { latitude: 13.25, longitude: 74.95 }, prediction_status: 'not_available' })
-// One-screen layout: the search sits in the "Change location" popup (closed after each choice) and lists four results per page.
+// Home (which now shows the weather) has the place search as a button; it closes after each choice and lists four results per page.
 const open = async page => {
-  if (!await page.getByRole('dialog', { name: 'Change location' }).count()) await page.getByRole('button', { name: 'Change location' }).click()
   if (!await page.getByRole('button', { name: 'Close place search' }).count()) await page.getByRole('button', { name: 'Search districts and localities' }).click()
   await expect(page.getByLabel('Karnataka district')).toBeEnabled()
 }
@@ -23,6 +23,13 @@ async function locality(page, name) {
   return target
 }
 const choose = async (page, name) => { await open(page); await (await locality(page, name)).click() }
+const homeMap = page => page.getByRole('region', { name: 'Karnataka emergency map' })
+const selectedMarker = page => homeMap(page).locator('path[fill="#087e7c"]')   // Home map's selected-place marker
+async function weatherDetails(page, text) {
+  await page.getByRole('button', { name: 'Details' }).click()
+  const dialog = page.getByRole('dialog', { name: 'Weather details & sources' })
+  await expect(dialog).toContainText(text); await dialog.getByRole('button', { name: 'Close' }).click()
+}
 
 test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: new Date('2026-10-08T06:00:00Z') })
@@ -49,66 +56,58 @@ test('real district/locality directory selects exact OSM points, recenters Leafl
   })
   const errors = []; page.on('pageerror',e=>errors.push(e.message)); let calls=0
   page.on('request',r=>{ if(new URL(r.url()).pathname==='/api/weather') calls++ })
-  await page.goto('/weather'); await expect(page.getByText('27 °C',{exact:true})).toBeVisible(); await open(page)
+  await page.goto('/'); await open(page)
   await expect(page.getByLabel('Karnataka district').locator('option')).toHaveCount(32)
   await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   await expect(page.getByRole('status',{name:'District locality results'})).toContainText('5 locality records')
   await expect(page.getByRole('list',{name:'District localities'}).getByRole('button')).toHaveCount(4)
-  expect(calls).toBe(1)
+  expect(calls).toBe(0)   // no weather before a place is chosen
   await expect(await locality(page,'Kaup')).toBeDisabled()
   await expect(await locality(page,'Kundapur')).toBeEnabled()
   const request = page.waitForRequest(r=>r.url().includes('latitude=13.2145414&longitude=74.9951861'))
   await choose(page,'Karkala'); await request
   await expect(page.getByRole('heading',{name:'Karkala, Udupi',exact:true})).toBeVisible()
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 13.2145414/)).toBeVisible()
-  const map = page.getByRole('region',{name:'Weather location selection map'})
-  // Actual Leaflet marker is visible in the recentered viewport, not offscreen.
-  await map.scrollIntoViewIfNeeded()
-  await expect(map.locator('path.leaflet-interactive')).toBeInViewport()
-  const centred = await map.evaluate(el => { const a=el.getBoundingClientRect(), b=el.querySelector('path.leaflet-interactive').getBoundingClientRect(); return Math.abs((a.left+a.right-b.left-b.right)/2)<3 && Math.abs((a.top+a.bottom-b.top-b.bottom)/2)<3 })
-  expect(centred).toBe(true)
-  await openTab(page,'Sources');await expect(page.getByText('Latitude 13.25°, longitude 74.95°')).toBeVisible()
-  await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
+  await weatherDetails(page,'Requested point: 13.2145414')
+  // Home's map moves to the chosen place (it frames the area around it, with nearby risk spots): the marker is in view.
+  await expect(selectedMarker(page)).toBeInViewport()
+  await weatherDetails(page,'13.25°, 74.95°')
+  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
   const before=calls; await page.clock.fastForward(6*60*60*1000-1); expect(calls).toBe(before)
   await page.clock.fastForward(1); await expect.poll(()=>calls).toBe(before+1)
   await choose(page,'Udupi')
   await expect(page.getByRole('heading',{name:'Udupi, Udupi',exact:true})).toBeVisible()
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 13.3419169/)).toBeVisible()
-  await openTab(page,'Now');await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
+  await weatherDetails(page,'Requested point: 13.3419169')
   expect(errors).toEqual([])
 })
 
 test('v2 settlement expansion preserves stable Kundapur identity and cross-district weather freshness', async ({ page }) => {
   const requests=[]; page.on('request',r=>{if(new URL(r.url()).pathname==='/api/weather') requests.push(r.url())})
-  await page.goto('/weather'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
+  await page.goto('/'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   await expect(page.getByText(/5 localities/)).toBeVisible()
   await choose(page,'Kundapur')
   await expect(page.getByRole('heading',{name:'Kundapur, Udupi',exact:true})).toBeVisible()
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 13.6250993/)).toBeVisible()
+  await weatherDetails(page,'Requested point: 13.6250993')
   await choose(page,'Saligrama')
   await expect(page.getByRole('heading',{name:'Saligrama, Udupi',exact:true})).toBeVisible()
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 13.4977795/)).toBeVisible()
+  await weatherDetails(page,'Requested point: 13.4977795')
   await page.clock.fastForward(60*60*1000)
   await open(page); await page.getByLabel('Karnataka district').selectOption('nic:dk.nic.in')
   await expect(page.getByRole('heading',{name:'Saligrama, Udupi',exact:true})).toBeVisible()
   await choose(page,'Mangaluru')
   await expect(page.getByRole('heading',{name:'Mangaluru, Dakshina Kannada',exact:true})).toBeVisible()
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 12.8698101/)).toBeVisible()
-  const map=page.getByRole('region',{name:'Weather location selection map'})
-  await map.scrollIntoViewIfNeeded(); await expect(map.locator('path.leaflet-interactive')).toBeInViewport()
-  await expect.poll(()=>map.evaluate(el=>{const a=el.getBoundingClientRect(),b=el.querySelector('path.leaflet-interactive').getBoundingClientRect();return Math.abs((a.left+a.right-b.left-b.right)/2)<3&&Math.abs((a.top+a.bottom-b.top-b.bottom)/2)<3}),{timeout:5000}).toBe(true)
-  await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
+  await weatherDetails(page,'Requested point: 12.8698101')
+  await expect(selectedMarker(page)).toBeInViewport()
+  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
   // Current conditions are re-fetched 60 minutes after their valid time, for the selected point only.
   const before=requests.length; await page.clock.fastForward(60*60*1000-1); expect(requests.length).toBe(before)
   await page.clock.fastForward(1); await expect.poll(()=>requests.length).toBe(before+1)
   expect(requests.at(-1)).toContain('latitude=12.8698101&longitude=74.8430082')
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
-  await openTab(page,'Now');await expect(page.getByText(/flood and drainage risk is on Home/)).toBeVisible()
 })
 
 test('mobile alias search selects real Mangaluru and disabled Kaup explains unavailable point', async ({ page }) => {
-  await page.setViewportSize({width:390,height:844}); await page.goto('/weather'); await open(page)
+  await page.setViewportSize({width:390,height:844}); await page.goto('/'); await open(page)
   await page.getByLabel('Search districts or localities').fill('Mangalore'); await page.clock.fastForward(250)
   const result=page.getByRole('list',{name:'Place search results'}).getByRole('button',{name:/^Mangaluru — Dakshina Kannada/})
   await expect(result).toBeVisible(); await result.focus(); await page.keyboard.press('Enter')
@@ -123,7 +122,7 @@ test('mobile alias search selects real Mangaluru and disabled Kaup explains unav
 })
 
 test('keyboard global search, district filtering, empty states and mobile focus remain usable', async ({ page }) => {
-  await page.setViewportSize({width:390,height:844}); await page.goto('/weather'); await page.getByRole('button',{name:'Change location'}).click()
+  await page.setViewportSize({width:390,height:844}); await page.goto('/')
   const button = page.getByRole('button',{name:'Search districts and localities'})
   await button.focus(); await page.keyboard.press('Enter')
   await expect(page.getByLabel('Karnataka district')).toBeEnabled()
@@ -143,7 +142,7 @@ test('keyboard global search, district filtering, empty states and mobile focus 
 
 test('directory unavailable and locality provider failure preserve manual recovery without fabricated weather', async ({ page }) => {
   await page.route('**/api/locations/districts',route=>route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Controlled directory outage'})}))
-  await page.goto('/weather'); await page.getByRole('button',{name:'Change location'}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.goto('/'); await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Controlled directory outage')
   await page.unroute('**/api/locations/districts'); await page.getByRole('button',{name:'Retry location search'}).click()
   await expect(page.getByLabel('Karnataka district')).toBeEnabled(); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
@@ -151,30 +150,33 @@ test('directory unavailable and locality provider failure preserve manual recove
   await choose(page,'Karkala'); await expect(page.getByText(/Controlled provider failure/)).toBeVisible()
   await expect(page.getByRole('heading',{name:'Karkala, Udupi'})).toBeVisible(); await expect(page.getByText('27 °C',{exact:true})).toHaveCount(0)
 
-  await selectPoint(page,14,75); await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
+  await choosePlaceForHome(page,14,75); await expect(page.getByRole('heading',{name:GPS_POINT_NAME})).toBeVisible()
 })
 
 test('late locality weather cannot overwrite newer locality during point switching', async ({ page }) => {
   let release
   await page.route('**/api/weather?latitude=13.2145414&longitude=74.9951861',async route=>{ await new Promise(resolve=>{release=resolve}); try { await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({...body({latitude:13.2145414,longitude:74.9951861},'2026-10-08T06:00:00Z'),current:{temperature_c:99}})}) } catch {} })
-  await page.goto('/weather'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
+  await page.goto('/'); await open(page); await page.getByLabel('Karnataka district').selectOption('nic:udupi.nic.in')
   const old=page.waitForRequest(r=>r.url().includes('latitude=13.2145414'))
   await choose(page,'Karkala'); await old; await choose(page,'Udupi')
   await expect(page.getByRole('heading',{name:'Udupi, Udupi'})).toBeVisible(); await expect(page.getByText('27 °C',{exact:true})).toBeVisible()
   release(); await expect(page.getByText('99 °C',{exact:true})).toHaveCount(0)
-  await openTab(page,'Sources');await expect(page.getByText(/Requested point: 13.3419169/)).toBeVisible()
+  await weatherDetails(page,'Requested point: 13.3419169')
 })
 
 test('database directory outage leaves manual point weather and seven-day freshness independent', async ({ page }) => {
   await page.route('**/api/locations/**', route => route.fulfill({status:503,contentType:'application/json',body:JSON.stringify({detail:'Location database is unavailable or invalid; no file fallback was used'})}))
-  await page.goto('/weather'); await page.getByRole('button',{name:'Change location'}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.goto('/'); await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toContainText('Location database is unavailable')
 
   const request=page.waitForRequest(r=>r.url().includes('latitude=14&longitude=75'))
-  await selectPoint(page,14,75); await request
-  await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible()
-  await openTab(page,'7 days');await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
+  await choosePlaceForHome(page,14,75); await request
+  await expect(page.getByRole('heading',{name:GPS_POINT_NAME})).toBeVisible()
+  await expect(page.getByRole('list',{name:'Daily weather forecasts'}).getByRole('article')).toHaveCount(7)
   await expect(page.getByRole('status',{name:'Weather data freshness'})).toHaveAttribute('data-freshness','fresh')
-  await page.getByRole('button',{name:'Change location'}).click(); await page.getByRole('button',{name:'Search districts and localities'}).click()
+  await page.getByRole('button',{name:'Search districts and localities'}).click()
   await expect(page.getByRole('alert',{name:'Location directory error'})).toBeVisible()
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

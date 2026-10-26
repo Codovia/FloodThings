@@ -100,7 +100,7 @@ export default function HomeFloodMap({ fitViewport, point, navigate, onReportHer
       frame.push([cell.latitude, cell.longitude])
       const reasons = result.reasons.length ? `Why: ${result.reasons.join(', ').toLowerCase()}.` : 'No factor adds points.'
       const content = choosePopup([['strong', `${KIND_NAME[kind]} risk: ${LEVEL_NAMES[level]}${result.score === null ? '' : ` (score ${result.score} of ${result.max_score})`}`], ['p', spotLabel(cell)], ['p', spotInputs(cell, kind)], ['p', reasons], ['small', 'Experimental index for the next 24 hours · not an official warning.']],
-        'Full assessment here', () => { map.current?.closePopup(); actions.current.onChoose({ name: spotLabel(cell).replace('Your location', 'Grid spot'), latitude: cell.latitude, longitude: cell.longitude }) })
+        'Full assessment here', () => { map.current?.closePopup(); actions.current.onChoose({ name: spotLabel(cell).replace('Your location', 'Grid spot'), kind: 'map', latitude: cell.latitude, longitude: cell.longitude }) })
       const zone = ZONE[level]
         ? L.circle([cell.latitude, cell.longitude], { renderer: renderer.current, radius, stroke: false, fillColor: LEVEL_COLORS[level], fillOpacity: showRisk ? ZONE[level] : 0, bubblingMouseEvents: false, interactive: showRisk })
         : L.circle([cell.latitude, cell.longitude], { renderer: renderer.current, radius: radius * 0.9, stroke: false, fillColor: '#ffffff', fillOpacity: 0.001, bubblingMouseEvents: false, interactive: showRisk })

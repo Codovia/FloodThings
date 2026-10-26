@@ -1,3 +1,4 @@
+import { withoutLiveRisk } from './liveData.js'
 import { openTab } from './oneScreen.js'
 import { expect, test } from '@playwright/test'
 import { readFileSync } from 'node:fs'
@@ -20,8 +21,8 @@ test('both event geometries match exported coordinates and Leaflet draws every r
   const errors = []
   page.on('pageerror', error => errors.push(error.message))
   await page.goto('/flood-map')
-  await page.goto('/weather')
-  await expect(page.getByText(/Weather unavailable/)).toBeVisible()
+  await page.goto('/')
+  await expect(page.getByRole('heading', { name: 'Karnataka statewide view' })).toBeVisible()
   await page.getByRole('navigation', { name: 'Main navigation' }).getByRole('link', { name: 'Flood Map' }).click()
   await expect(page.getByRole('heading', { name: 'Karnataka Flood Intelligence' })).toBeVisible()
   await page.getByLabel('Go to district', { exact: true }).selectOption('nic:udupi.nic.in')
@@ -57,3 +58,6 @@ test('district view, mobile layout and historical warning remain usable', async 
   await openTab(page, 'Past floods'); await expect(page.getByText(/not current flooding/)).toBeVisible()
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
+
+// Not a risk test: answer live-risk requests in the browser (see liveData.js). Registered last, so it runs first.
+test.beforeEach(async ({ page }) => { await withoutLiveRisk(page) })

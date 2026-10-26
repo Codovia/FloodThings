@@ -1,0 +1,46 @@
+/* Home's seven-day weather strip: a short head column and one row of day cards under the location bar. */
+.weather-strip{display:grid;grid-template-columns:minmax(150px,190px) minmax(0,1fr);align-items:center;gap:8px 12px;padding:8px 12px;border:1px solid #d7dfdd;background:#fff;border-radius:12px;min-width:0}
+.weather-strip .strip-head{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+.weather-strip h2{margin:0;font-size:15px;color:#17313c}
+.weather-strip .strip-freshness{margin:0;font-size:11.5px;line-height:1.35;color:#50647b;min-width:0}
+.weather-strip .strip-freshness strong{color:#1b625d}
+.weather-strip .strip-freshness[data-freshness=stale] strong,.weather-strip .strip-freshness[data-freshness=unavailable] strong{color:#9a4b00}
+.weather-strip .strip-actions{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:center;font-size:12px}
+.weather-strip .strip-actions .link-button{font-size:12px}
+.weather-strip .strip-note{margin:0 0 4px;font-size:12px;color:#50647b}
+.weather-strip .strip-days{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.weather-strip .strip-days article{display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"day day day" "icon temp rain" "bar bar bar";align-items:center;gap:1px 6px;padding:5px 8px 6px;border-radius:9px;background:#f3f7f6;border:1px solid #e3ebe9;height:100%}
+.weather-strip .strip-days h3{grid-area:day;margin:0;font-size:12px;font-weight:700;color:#17313c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.weather-strip .strip-days h3 small{font-weight:400;color:#50647b}
+.weather-strip .strip-icon{grid-area:icon;width:22px;height:22px;color:#2b6e8f}
+.weather-strip .strip-temp{grid-area:temp;margin:0;font-size:12px;white-space:nowrap}
+.weather-strip .strip-temp strong{font-size:16px;color:#17313c}
+.weather-strip .strip-temp span{color:#50647b}
+.weather-strip .strip-rain{grid-area:rain;margin:0;font-size:12px;color:#0b5d8c;font-weight:600;white-space:nowrap}
+.weather-strip .strip-rain-bar{grid-area:bar;display:block;height:3px;border-radius:2px;background:#dbe7ee;overflow:hidden;margin-top:2px}
+.weather-strip .strip-rain-bar>span{display:block;height:100%;background:#2b7fb8}
+.weather-strip .pager{margin-top:6px}
+.weather-strip .strip-sources{display:grid;gap:4px;margin:8px 0}
+.weather-strip .strip-sources div{display:flex;gap:8px;flex-wrap:wrap}
+.weather-strip .strip-sources dt{font-weight:700}
+.weather-strip .strip-sources dd{margin:0}
+/* Laptops 1100-1279 px: the seven cards drop the date to stay on one line. */
+@media (min-width:1100px) and (max-width:1279px){ .weather-strip .strip-days h3 small{display:none} }
+/* Phones (the Weather tab): head above, four day cards per page. */
+@media (max-width:1099px){
+ .weather-strip{grid-template-columns:minmax(0,1fr);padding:8px 10px}
+ .weather-strip .strip-head{flex-direction:row;flex-wrap:wrap;align-items:baseline;gap:2px 10px}
+ .weather-strip .strip-days{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+ .weather-strip .strip-days article{grid-template-columns:1fr;grid-template-areas:"day" "icon" "temp" "rain" "bar";justify-items:center;text-align:center;padding:6px 4px;gap:2px}
+ .weather-strip .strip-days h3 small{display:block}
+ .weather-strip .strip-rain-bar{width:100%}
+}
+/* Short laptop screens (e.g. 1280 × 720): two-line day cards without the bar, so Home still fits one screen. */
+@media (min-width:1100px) and (max-height:760px){
+ .weather-strip{padding:5px 10px;gap:4px 10px}
+ .weather-strip h2{font-size:14px}
+ .weather-strip .strip-days article{grid-template-columns:1fr auto;grid-template-areas:"day icon" "temp rain";padding:3px 8px;gap:0 6px}
+ .weather-strip .strip-days h3 small,.weather-strip .strip-rain-bar{display:none}
+ .weather-strip .strip-icon{width:18px;height:18px}
+ .weather-strip .strip-temp strong{font-size:14px}
+}

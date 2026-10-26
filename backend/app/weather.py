@@ -223,7 +223,9 @@ async def fetch_weather(client, params):
     except httpx.HTTPStatusError as exc:
         status = exc.response.status_code
         kind = "rate_limited" if status == 429 else "provider_unavailable" if status >= 500 else "provider_http_error"
-        raise WeatherUnavailable(f"Open-Meteo request returned HTTP {status}.", kind=kind, upstream_status=status,
+        message = ("Open-Meteo's free usage limit for this network was reached (HTTP 429); weather returns automatically once it resets."
+                   if status == 429 else f"Open-Meteo request returned HTTP {status}.")
+        raise WeatherUnavailable(message, kind=kind, upstream_status=status,
                                  retry_after_seconds=retry_after(exc.response.headers.get("retry-after"), datetime.now(timezone.utc))) from exc
     except (httpx.TimeoutException, TimeoutError) as exc:
         raise WeatherUnavailable("Weather provider could not be reached: request timed out.", kind="timeout") from exc
