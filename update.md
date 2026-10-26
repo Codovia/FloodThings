@@ -2645,36 +2645,6 @@ Checks (Chrome, live app, stand-in GPS at a public landmark): risk spot → "Kor
 
 Tests: backend 556/556 (4 new: village fill-in, PIN preference, failed second lookup, no second lookup when complete); frontend unit 300/300 (shared-lookup test); build; Playwright 81 passed, 8 skipped, 1 known admin layout failure.
 
-## 2026-10-26 — Open the website on other devices on the same Wi-Fi (`--lan`)
-
-Request: `./floodpulse.sh` gives only a localhost link; make the app visible on all devices on the same Wi-Fi.
-
-Acceptance test: without `--lan` nothing changes (Vite on 127.0.0.1); with `--lan` Vite listens on all interfaces and the launcher prints `Same Wi-Fi: http://<private address>:14180`; the backend stays on loopback; with no private address, nothing is opened.
-
-- `floodpulse.sh --lan` sets `FLOODPULSE_LAN=1` (cleared first, so only the option enables it). `launcher_processes.py` then starts Vite with `--host 0.0.0.0` and prints the address; `full_launcher.py` (which hides the app launcher's output) prints it too and refuses `--lan` early when no private address exists. `lan_address()` asks the routing table via an unsent UDP connect and accepts only private, non-loopback, non-link-local IPv4.
-- Security controls unchanged on purpose: `SHELTER_PUBLIC_ORIGIN` stays the loopback origin and insecure cookies stay loopback-only, so on other devices reports, report withdrawal and admin sign-in are refused (403 `Same-origin request required`); GPS/camera need HTTPS. Labelled "viewing only" in the output and README; the HTTPS server is the route for the full app on phones.
-
-Checked here: a separate Vite on spare port 14199 started with the launcher's new arguments, the running app left untouched — `ss` shows `0.0.0.0:14199`; via `http://10.73.242.93:14199` the page returns 200 and `/api/health` through the proxy returns 200; a report POST with that origin returns 403 `Same-origin request required`; the backend on `10.73.242.93:18050` refuses connections. Not checked: a real phone (the firewall is `ufw`, active; its rules need sudo and loopback tests do not pass through it), and a full `./floodpulse.sh --lan` run, which would have restarted the running app.
-
-Tests: launcher suites 101/101 (new: npm host argument and printed address with and without `--lan`, or refusal when no private address; `lan_address` for private, public, loopback, link-local and no-route cases).
-
-## 2026-10-26 — `--lan` fully usable from other devices: HTTPS on the Wi-Fi address
-
-Request: make GPS, camera, report sending and admin sign-in work from devices on the same Wi-Fi (the first `--lan` was view-only over plain HTTP).
-
-Acceptance test: with `--lan` the site is served over HTTPS at the Wi-Fi address with a locally issued certificate; the existing origin check accepts that address and still refuses others; admin cookies are Secure; the backend stays on loopback; without `--lan` nothing changes.
-
-- No security control was relaxed. `SecurityConfig` already accepts an `https://` origin with Secure (`__Host-`) cookies; in LAN mode `app_launcher.sh` sets `SHELTER_PUBLIC_ORIGIN=https://<Wi-Fi address>:14180` and `SHELTER_COOKIE_SECURE=true`, and the preflight now requires exactly that pair in LAN mode (loopback pair otherwise).
-- `scripts/lan_tls.py`: one private CA per laptop (EC P-256, 10 years, name constraints: private IPv4 ranges and loopback only, no DNS names) and a server certificate per Wi-Fi address (SAN = address + 127.0.0.1, serverAuth, 397 days, within Apple's 825-day limit), reissued only when the address changes or it is within 30 days of expiry. Keys 0600 in a 0700 folder under `data/tmp` (ignored by Git).
-- `vite.config.js`: HTTPS when `FLOODPULSE_TLS_DIR` is set; `/floodpulse-local-ca.crt` serves the CA's public certificate; the `/api` proxy now sends `X-Forwarded-For` (`xfwd`). Uvicorn trusts forwarding only from 127.0.0.1 and takes the right-most untrusted entry, and Vite appends rather than replaces, so a device cannot spoof its address; rate limits and login lockouts become per device instead of shared by everything behind the proxy.
-- Launchers: readiness probes verify the site over HTTPS with the local CA; the printed Application/Admin links are the https Wi-Fi address plus the certificate link.
-- Research: Apple TLS requirements (support.apple.com/en-us/103769: SHA-2, SAN, serverAuth EKU, ≤825 days); manually installed iOS profiles need full trust enabled in Certificate Trust Settings; Chrome considers locally added roots for TCP TLS (Chrome Root Store FAQ). No official source found stating Android Chrome's handling of user-installed CAs or whether phones allow GPS after clicking past a warning — README recommends installing the CA.
-
-Checked here (live app, `./floodpulse.sh --lan`): `https://10.73.242.93:14180` verifies with the local CA (`ssl_verify_result=0`) and fails without it; the CA download returns the identical file as `application/x-x509-ca-cert`; `/api/health` via the proxy 200; withdrawal of an unknown report with the Wi-Fi origin passes the origin check (404, read-only), while origins `http://127.0.0.1:14180` and `https://evil.example` get 403; backend on the Wi-Fi address refuses connections; plain HTTP on 14180 is not served. Playwright Chromium against the live site: with the certificate trusted (SPKI pin) and with the warning clicked past, `isSecureContext` true, GPS returns the emulated position, `getUserMedia` available. Normal `./floodpulse.sh` still serves `http://127.0.0.1:14180`. Not checked: real phones (no device here; `ufw` is active and its rules need sudo) and an admin sign-in over the Wi-Fi address (needs the private admin password). Existing quirk, unchanged: `./floodpulse.sh --stop` makes the supervisor print "An owned service or Cloudflare tunnel failed" on a normal run too.
-
-Tests: launcher suites + new `test_lan_tls.py` 106/106 (certificate requirements, private keys, reuse/reissue, CA refuses `www.google.com` and `8.8.8.8`, nothing created without a private address; launcher prints the https address and probes with `--cacert`); the no-network branch also passed in an isolated network namespace; frontend unit 299/299; build passes.
-
-
 ## 2026-10-26 — Home and Weather merged: seven-day strip on Home
 
 Request: merge the Home and Weather pages with a better UI. Layout chosen by the user from two options: a seven-day weather strip under Home's location bar (not tabs).
@@ -2687,3 +2657,8 @@ Request: merge the Home and Weather pages with a better UI. Layout chosen by the
 One-screen check (Chrome and Playwright): fits at 1508×761, 1480×736 (the user's window), 1366×768, 1600×900, 1920×1080, 1280×720 and phones 390×844/700, 320×720. Does not fit (the existing scroll fallback takes over): 1366×657 (a 1366×768 laptop with browser toolbars) and 1100×700 — Home needs about 725 px of height with the strip. Not fixed yet: the remaining room would have to come from the warning cards.
 
 Tests: unit 299/299 (new: WeatherStrip ×5, selector component tests for map click, wrapped longitude and reset; hook test for a weather reply for a different point; App, directory and navigation tests moved to Home; ten old Weather-page App tests removed where the hook/strip tests cover them); backend 556/556; build; Playwright 81 passed, 8 skipped, 1 known admin layout failure — 26 browser tests moved from /weather to Home (`choosePlaceForHome` helper; Shelters may name the same GPS point "Your GPS location"). Intermittent under full-suite load, then passing on repeat: flood-intelligence (depends on IMD outlines fetched live by the test backend) and fullscreen; the Home map-tap test now accepts either map popup.
+
+## 2026-10-26 — `--lan` removed
+
+Request: remove `--lan` ("it is giving problem"; plain `./floodpulse.sh` works) and do not use it when checking the site. Reverted 6e223be and a51cae9: `floodpulse.sh`, the launchers, `vite.config.js` (back to the plain `/api` proxy, no HTTPS, no forwarded addresses), README and tests are as before; `scripts/lan_tls.py` and `tests/test_lan_tls.py` deleted, and the locally generated certificate folder `data/tmp/launcher/tls/` (untracked) removed. Any device where its certificate was installed should remove "FloodPulse local test CA" from its trusted certificates.
+

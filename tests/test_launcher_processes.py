@@ -171,16 +171,3 @@ def test_stop_never_signals_a_recycled_pid_or_a_previous_boot(tmp_path, stoppabl
 
 def test_stop_without_a_receipt_does_nothing(tmp_path):
     assert processes.stop_running(tmp_path) is False
-
-
-@pytest.mark.parametrize('address, expected', [('10.73.242.93', '10.73.242.93'), ('192.168.1.5', '192.168.1.5'),
-                                               ('8.8.8.8', None), ('127.0.0.1', None), ('169.254.3.4', None), (OSError, None)])
-def test_lan_address_is_only_a_private_network_address(address, expected, monkeypatch):
-    class Probe:
-        def __enter__(self):return self
-        def __exit__(self, *exc):return False
-        def connect(self, target):
-            if address is OSError:raise OSError(errno.ENETUNREACH, 'unreachable')
-        def getsockname(self):return (address, 40000)
-    monkeypatch.setattr(processes.socket, 'socket', lambda *args:Probe())
-    assert processes.lan_address() == expected

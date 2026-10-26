@@ -3,7 +3,6 @@
 #
 #   ./floodpulse.sh              start the app (if it is already running, it is restarted so new code loads)
 #   ./floodpulse.sh --telegram   also connect the Telegram bot to this laptop (takes it away from the server)
-#   ./floodpulse.sh --lan        also let phones and laptops on the same Wi-Fi use it fully (HTTPS; see README)
 #   ./floodpulse.sh --stop       stop the running app
 #   ./floodpulse.sh --check      check that everything is ready; starts nothing
 #   ./floodpulse.sh --help
@@ -18,14 +17,12 @@ cd "$ROOT"
 
 say() { printf 'FloodPulse: %s\n' "$*"; }
 fail() { printf 'FloodPulse: %s\n' "$*" >&2; exit 1; }
-usage() { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; }
+usage() { sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'; }
 
 mode=start telegram=() yes=
-unset FLOODPULSE_LAN  # Only the --lan option opens the website to the network.
 for arg in "$@"; do
   case "$arg" in
     --telegram) telegram=(--telegram) ;;
-    --lan) export FLOODPULSE_LAN=1 ;;
     --stop) mode=stop ;;
     --check) mode=check ;;
     --yes) yes=1 ;;
@@ -70,5 +67,5 @@ fi
 # 5. Start (or only check): the supervisor runs the app launcher's checks and services, plus the tunnel with --telegram.
 args=("${telegram[@]}")
 [[ "$mode" != check ]] || args+=(--check)
-say "$([[ "$mode" == check ]] && echo 'Checking readiness (nothing will be started)…' || echo "Starting. Open $([[ -n ${FLOODPULSE_LAN:-} ]] && echo 'the https:// address it prints' || echo http://127.0.0.1:14180) when it says it is ready; Ctrl+C stops it.")"
+say "$([[ "$mode" == check ]] && echo 'Checking readiness (nothing will be started)…' || echo 'Starting. Open http://127.0.0.1:14180 when it says it is ready; Ctrl+C stops it.')"
 exec "$PY" -B "$ROOT/scripts/full_launcher.py" "${args[@]}"
