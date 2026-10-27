@@ -6,6 +6,7 @@ import 'leaflet/dist/leaflet.css'
 import './WeatherLocationSelector.css'
 import LocationDirectorySelector from './LocationDirectorySelector.jsx'
 import Popup from './Popup.jsx'
+import { preciseLocation, locationQuality, QUICK_ACCURACY_M } from './preciseLocation.js'
 
 export const DEFAULT_POINT = { name: 'Bengaluru, Karnataka', latitude: 12.9767936, longitude: 77.5900820 }
 
@@ -68,13 +69,14 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   const [navigationBounds, setNavigationBounds] = useState(null)
   const [error, setError] = useState(null)
   const [locating, setLocating] = useState(false)
-  const selection = useRef(0)
+  const [progress, setProgress] = useState(null)
+  const selection = useRef(0), watch = useRef(null)
 
   useEffect(() => { if (mapInitiallyOpen) setShowMap(true) }, [mapInitiallyOpen])
-  useEffect(() => () => { selection.current++ }, [])
+  useEffect(() => () => { selection.current++; watch.current?.abort() }, [])
 
   function choose(next) {
-    selection.current++; setLocating(false); setError(null)
+    selection.current++; watch.current?.abort(); setLocating(false); setError(null)
     setNavigationBounds(null)
     onSelect(next)
   }
@@ -83,22 +85,25 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
   function locate(done = () => {}) {
     if (!navigator.geolocation) { setError('GPS is unavailable in this browser. Select a verified place or the map.'); return }
     const request = ++selection.current
-    setError(null); setLocating(true)
-    navigator.geolocation.getCurrentPosition(position => {
+    watch.current?.abort(); watch.current = new AbortController()
+    setError(null); setLocating(true); setProgress(null)
+    // High accuracy, refined for a few seconds (see preciseLocation.js); progress shows on the button.
+    preciseLocation({ good: QUICK_ACCURACY_M, signal: watch.current.signal, onProgress: p => { if (selection.current === request) setProgress(Math.round(p.coords.accuracy)) } }).then(position => {
       if (selection.current !== request) return
       const { latitude: lat, longitude: lon, accuracy } = position.coords
       if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -90 || lat > 90 || lon < -180 || lon > 180) {
         setLocating(false); setError('GPS returned invalid coordinates. Use verified place search or the map.'); return
       }
-      choose({ name: 'GPS-selected point', kind: 'gps', latitude: lat, longitude: lon,
+      choose({ name: 'GPS-selected point', kind: 'gps', latitude: lat, longitude: lon, gps_timestamp: position.timestamp,
         accuracy_m: Number.isFinite(accuracy) && accuracy >= 0 ? accuracy : null }); done()
     }, failure => {
       if (selection.current !== request) return
       setLocating(false)
-      setError(failure.code === 1 ? 'Location permission denied. Use verified place search or the map.' : 'GPS could not determine your location. Use verified place search or the map.')
-    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 })
+      setError(failure?.code === 1 ? 'Location permission denied. Use verified place search or the map.' : 'GPS could not determine your location. Use verified place search or the map.')
+    })
   }
 
+  const quality = point.kind === 'gps' ? locationQuality(point.accuracy_m) : null
   const controls = (done = () => {}) => <>
     <LocationDirectorySelector active={active} selectedDistrictId={selectedDistrictId} onChoose={next => { setShowMap(true); choose(next); done() }} onDistrict={district => {
       selection.current++; setLocating(false); setError(null)
@@ -108,12 +113,13 @@ export default function WeatherLocationSelector({ point = DEFAULT_POINT, onSelec
     }} />
     <div className="weather-map-actions">
       {!compact&&!externalMap&&<button type="button" aria-expanded={showMap} onClick={() => setShowMap(value => !value)}>{showMap ? 'Hide weather map' : 'Open weather map'}</button>}
-      <button type="button" onClick={() => locate(done)} disabled={locating}>{locating ? 'Locating…' : 'Use my GPS location'}</button>
+      <button type="button" onClick={() => locate(done)} disabled={locating}>{!locating ? 'Use my GPS location' : progress !== null ? `±${progress} m, improving…` : 'Locating…'}</button>
       <button type="button" onClick={() => { choose(DEFAULT_POINT); done() }}>Reset to Bengaluru</button>
     </div>
     <p className="muted">GPS is requested only when you choose it. Coordinates are sent through FloodPulse to Open-Meteo for this weather request.</p>
     {error && <p className="notice error" role="alert">{error}</p>}
-    {point.accuracy_m != null && <p className="muted">Device-reported location accuracy: approximately {Math.round(point.accuracy_m)} metres.</p>}
+    {quality && <p className={`location-quality ${quality.level}`}><strong>{quality.label}</strong> GPS {quality.shown} (device-reported)</p>}
+    {quality?.advice && <p className="location-advice">{quality.advice}</p>}
     </>
   const mapVisible = overview || showMap
   // One-screen rule: the compact box is one line; changing the place happens in a popup.

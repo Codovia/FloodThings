@@ -1,7 +1,7 @@
 import React from 'react'
 import {afterEach,beforeEach,expect,it,vi} from 'vitest'
 import {act,cleanup,fireEvent,render,screen} from '@testing-library/react'
-import {AppHeader,PageLink,usePage} from './AppNavigation.jsx'
+import {AppHeader,BottomNav,PageLink,usePage} from './AppNavigation.jsx'
 function Harness(){const {path,navigate,heading}=usePage();return <><AppHeader path={path} navigate={navigate}/><h1 ref={heading} tabIndex={-1}>{path}</h1><PageLink to="/missing" navigate={navigate}>Unknown route</PageLink></>}
 beforeEach(()=>{window.history.replaceState(null,'','/');vi.spyOn(window,'scrollTo').mockImplementation(()=>{})})
 afterEach(()=>{cleanup();vi.restoreAllMocks()})
@@ -11,3 +11,11 @@ it('mobile menu closes on navigation and Escape returns focus',()=>{render(<Harn
 it('modified clicks retain native new-tab behavior',()=>{const navigate=vi.fn();render(<PageLink to="/weather" navigate={navigate}>Weather</PageLink>);fireEvent.click(screen.getByRole('link'),{ctrlKey:true});expect(navigate).not.toHaveBeenCalled();fireEvent.click(screen.getByRole('link'));expect(navigate).toHaveBeenCalledWith('/weather')})
 it('old /weather links open Home, where the weather now is',()=>{window.history.replaceState(null,'','/weather?from=old#x');render(<Harness/>);expect(window.location.pathname+window.location.search+window.location.hash).toBe('/?from=old#x');expect(document.title).toBe('Home · FloodPulse');expect(screen.getByRole('link',{name:'Home',exact:true}).getAttribute('aria-current')).toBe('page')})
 it('unknown paths have no fabricated active page',()=>{window.history.replaceState(null,'','/missing');render(<Harness/>);expect(document.title).toBe('Page unavailable · FloodPulse');expect(screen.getByRole('navigation').querySelector('[aria-current]')).toBeNull()})
+it('phone bottom bar keeps the four main tasks one tap away and marks the current page',()=>{
+ function Phone(){const {path,navigate}=usePage();return <BottomNav path={path} navigate={navigate}/>}
+ render(<Phone/>);const bar=screen.getByRole('navigation',{name:'Quick navigation'})
+ expect([...bar.querySelectorAll('a')].map(a=>[a.textContent,a.getAttribute('href')])).toEqual([['Home','/'],['Map','/flood-map'],['Report','/report'],['Shelters','/shelters']])
+ expect(bar.querySelector('[aria-current=page]').textContent).toBe('Home')
+ fireEvent.click(screen.getByRole('link',{name:'Report'}));expect(window.location.pathname).toBe('/report');expect(bar.querySelector('[aria-current=page]').textContent).toBe('Report')
+})
+

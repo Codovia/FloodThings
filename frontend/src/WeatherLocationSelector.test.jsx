@@ -54,36 +54,47 @@ it('reset chooses the Bengaluru reference point again, also when it is already s
   expect(selected).toHaveBeenCalledTimes(2); expect(selected).toHaveBeenLastCalledWith(DEFAULT_POINT)
 })
 
-it('GPS is requested only after a click and has permission-denied/map fallback', () => {
+it('GPS is requested only after a click and has permission-denied/map fallback', async () => {
   const gps = vi.fn((success, failure) => failure({ code: 1 }))
   vi.stubGlobal('navigator', { geolocation: { getCurrentPosition: gps } })
   const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
   expect(gps).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
-  expect(screen.getByRole('alert').textContent).toContain('Location permission denied')
+  expect(gps.mock.calls[0][2]).toMatchObject({ enableHighAccuracy: true, maximumAge: 0 })
+  expect((await screen.findByRole('alert')).textContent).toContain('Location permission denied')
   expect(selected).not.toHaveBeenCalled()
   coordinates(); expect(selected).toHaveBeenCalledWith({ name: 'Selected map point', kind: 'map', latitude: 13.34, longitude: 74.74 })
 })
 
-it('GPS preserves device uncertainty and ignores callbacks after a newer map selection', () => {
-  let success
-  vi.stubGlobal('navigator', { geolocation: { getCurrentPosition: vi.fn(fn => { success = fn }) } })
+it('GPS refines to the best fix, shows progress, keeps device uncertainty and ignores callbacks after a newer map selection', async () => {
+  let fix; const clear = vi.fn()
+  vi.stubGlobal('navigator', { geolocation: { watchPosition: vi.fn(fn => { fix = fn; return 7 }), clearWatch: clear } })
   const selected = vi.fn(); render(<WeatherLocationSelector onSelect={selected} />)
+  const at = (latitude, longitude, accuracy) => ({ coords: { latitude, longitude, accuracy }, timestamp: 1700000000000 })
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
-  act(() => success({ coords: { latitude: 13.34, longitude: 74.74, accuracy: 50 } }))
-  expect(selected).toHaveBeenLastCalledWith({ name: 'GPS-selected point', kind: 'gps', latitude: 13.34, longitude: 74.74, accuracy_m: 50 })
+  act(() => fix(at(13.3, 74.7, 640)))
+  expect(screen.getByRole('button', { name: '±640 m, improving…' })).toBeTruthy(); expect(selected).not.toHaveBeenCalled()
+  await act(async () => fix(at(13.34, 74.74, 12)))
+  expect(clear).toHaveBeenCalledWith(7)
+  expect(selected).toHaveBeenLastCalledWith({ name: 'GPS-selected point', kind: 'gps', latitude: 13.34, longitude: 74.74, accuracy_m: 12, gps_timestamp: 1700000000000 })
   fireEvent.click(screen.getByRole('button', { name: 'Use my GPS location' }))
   coordinates('14', '75')
-  act(() => success({ coords: { latitude: 13, longitude: 74, accuracy: 50 } }))
+  await act(async () => fix(at(13, 74, 12)))
   expect(selected).toHaveBeenLastCalledWith({ name: 'Selected map point', kind: 'map', latitude: 14, longitude: 75 })
 })
 
-it('public coordinate fields are absent and invalid GPS is rejected while zero is valid',()=>{
+it('public coordinate fields are absent and invalid GPS is rejected while zero is valid', async () => {
  let success;vi.stubGlobal('navigator',{geolocation:{getCurrentPosition:vi.fn(fn=>{success=fn})}})
  const selected=vi.fn();render(<WeatherLocationSelector onSelect={selected}/>);
  expect(screen.queryByLabelText('Weather latitude')).toBeNull();expect(screen.queryByLabelText('Weather longitude')).toBeNull()
- fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:91,longitude:75}}));expect(screen.getByRole('alert')).toBeTruthy();expect(selected).not.toHaveBeenCalled()
- fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));act(()=>success({coords:{latitude:0,longitude:0,accuracy:50}}));expect(selected).toHaveBeenCalledWith({name:'GPS-selected point',kind:'gps',latitude:0,longitude:0,accuracy_m:50})
+ fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));await act(async()=>success({coords:{latitude:91,longitude:75,accuracy:5},timestamp:1}));expect(await screen.findByRole('alert')).toBeTruthy();expect(selected).not.toHaveBeenCalled()
+ fireEvent.click(screen.getByRole('button',{name:'Use my GPS location'}));await act(async()=>success({coords:{latitude:0,longitude:0,accuracy:50},timestamp:1}));expect(selected).toHaveBeenCalledWith({name:'GPS-selected point',kind:'gps',latitude:0,longitude:0,accuracy_m:50,gps_timestamp:1})
+})
+
+it('a coarse fix is labelled approximate with the phone settings that give a precise one', () => {
+ render(<WeatherLocationSelector point={{ name: 'GPS-selected point', kind: 'gps', latitude: 13, longitude: 75, accuracy_m: 4200 }} onSelect={vi.fn()} />)
+ expect(screen.getByText(/±4.2 km/).closest('p').textContent).toContain('Approximate')
+ expect(screen.getByText(/Safari Websites → turn on Precise Location/)).toBeTruthy()
 })
 
 it('compact name controls start collapsed and point selection uses the map',()=>{

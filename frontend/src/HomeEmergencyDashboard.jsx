@@ -6,6 +6,7 @@ import { PageLink } from './AppNavigation.jsx'
 import { clock, assessNext24Rainfall, usableCurrent } from './homeEvidence.js'
 import { condition } from './DailyForecast.jsx'
 import { classifyCoverage } from './homeGeography.js'
+import { locationQuality } from './preciseLocation.js'
 import ScreenTabs, { useWide } from './ScreenTabs.jsx'
 import WeatherStrip from './WeatherStrip.jsx'
 import Popup from './Popup.jsx'
@@ -25,19 +26,20 @@ export default function HomeEmergencyDashboard({ point, district, districtId, se
   const rainfall = rainAssessment?.status === 'available' ? rainAssessment : null
   const gpsCoverage = point?.kind === 'gps' ? classifyCoverage(point) : null
   const placeLookup = usePlaceLookup(point)
+  const quality = point?.kind === 'gps' ? locationQuality(point.accuracy_m) : null
   const gpsNotice = gpsCoverage === 'outside' ? 'Your location is outside Karnataka.' : ['uncertain', 'unknown'].includes(gpsCoverage) ? 'State-boundary coverage and district association are unconfirmed for this GPS point.' : null
   const weatherStatus = !point ? null : session.loading ? 'Loading weather…' : !current ? 'Current weather unavailable' : Number.isFinite(current.temperature_c) ? `${current.temperature_c} °C` : 'Temperature unavailable'
   const extras = current ? [condition(current.weather_code), [Number.isFinite(current.humidity_percent) && `Humidity: ${current.humidity_percent}%.`, Number.isFinite(current.wind_speed) && current.wind_speed_unit && `Wind: ${current.wind_speed} ${current.wind_speed_unit}.`].filter(Boolean).join(' ')].filter(Boolean).join(' · ') : ''
-  return <div className="home-emergency-dashboard home-viewport-fit">
+  return <div className={'home-emergency-dashboard home-viewport-fit' + (tab === 'map' ? ' tab-map' : '')}>
     <section className="home-location-bar" aria-label="Home location selection">
-      <div className="home-place"><p className="eyebrow">YOUR LOCATION</p><h2>{placeLookup.place || point?.name || (location.status === 'coarse' ? 'Approximate location — select your town' : 'Karnataka statewide view')}</h2><p role="status">{placeLookup.place ? (point.kind === 'gps' ? `Your location (±${Math.round(point.accuracy_m)} m) · name and PIN from OpenStreetMap, approximate.` : 'Place you picked on the map · name and PIN from OpenStreetMap, approximate.') : point && location.status === 'idle' ? 'Place you selected. Location access is optional.' : location.message}</p>{gpsNotice && !location.message.includes(gpsNotice) && <p role="status">{gpsNotice}</p>}<AddressLine lookup={placeLookup} /></div>
+      <div className="home-place"><p className="eyebrow">YOUR LOCATION</p><h2>{placeLookup.place || point?.name || (location.status === 'coarse' ? 'Approximate location — select your town' : 'Karnataka statewide view')}</h2><p role="status">{placeLookup.place ? (point.kind === 'gps' ? 'Your location · name and PIN from OpenStreetMap, approximate.' : 'Place you picked on the map · name and PIN from OpenStreetMap, approximate.') : point && location.status === 'idle' ? 'Place you selected. Location access is optional.' : location.message}</p>{quality && <p className={`location-quality ${quality.level}`}><strong>{quality.label}</strong> GPS {quality.shown}</p>}{quality?.advice && <p className="location-advice">{quality.advice}</p>}{gpsNotice && !location.message.includes(gpsNotice) && <p role="status">{gpsNotice}</p>}<AddressLine lookup={placeLookup} /></div>
       {point && <div className="home-weather-line" aria-label="Current weather and rain">
         <h2 className="home-temp">{weatherStatus}</h2>
         <p>{extras}{current && <small> · valid {clock(current.valid_at)}</small>}</p>
         <p className="home-rain"><strong>{rainfall ? `${Number(rainfall.mm.toFixed(1))} mm` : 'Unavailable'}</strong> rain forecast in the next 24 h{rainfall && <small className="rain-window"> ({hour(rainfall.start)} – {hour(rainfall.end)})</small>}</p>
         {session.error && <p role="alert">{session.error}</p>}
       </div>}
-      <div className="home-location-actions"><button onClick={location.request} disabled={location.status === 'requesting'}>Use my location</button><LocationDirectorySelector onChoose={choosePoint} onDistrict={chooseDistrict} selectedDistrictId={districtId} collapseOnChoose /></div>
+      <div className="home-location-actions"><button className="locate-button" onClick={location.request} disabled={location.status === 'requesting'} aria-busy={location.status === 'requesting'}>{location.status !== 'requesting' ? 'Use my location' : Number.isFinite(location.progress) ? `±${location.progress} m, improving…` : 'Locating…'}</button><LocationDirectorySelector onChoose={choosePoint} onDistrict={chooseDistrict} selectedDistrictId={districtId} collapseOnChoose /></div>
     </section>
     {/* Laptops: the seven-day strip sits under the location bar. Phones: it is the Weather tab (one-screen rule). */}
     {point && wide && <WeatherStrip point={point} session={session} />}

@@ -789,3 +789,11 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 @media(max-width:500px){.admin-inspection-options {grid-template-columns:minmax(0,1fr)}}
 
 .demo-environment-badge{display:inline-block;margin-left:8px;font-size:.625rem;line-height:1.2;vertical-align:middle;padding:3px 5px;border:1px solid #93622b;border-radius:4px;color:#75430a;background:#fff4d8;white-space:nowrap}
+
+/* Location accuracy badge (Home, location picker): how exact a GPS fix is, with advice when it is coarse. */
+.location-quality{display:inline-flex;align-items:center;gap:6px;margin:4px 0;padding:2px 8px;border-radius:999px;font-size:.75rem;font-weight:600}
+.location-quality.precise{background:#e5f3e8;color:#1d5a2b}
+.location-quality.rough{background:#fff3dc;color:#6b4300}
+.location-quality.approximate{background:#fde8e6;color:#8a1c13}
+.location-advice{color:#5a3b00;background:#fff8ea;border-left:3px solid #c98a00;padding:4px 8px;border-radius:4px;font-size:.8rem}
+

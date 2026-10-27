@@ -37,6 +37,9 @@ export default function useAdminRequests(onUnauthorized) {
           if (response.status === 401) { cancel(controller); unauthorized.current() }
           const error = Error(typeof data.detail === 'string' ? data.detail : 'Invalid shelter request; check fields and verification confirmations')
           error.status = response.status
+          // Sign-in failures: tries left in this 15-minute window, and seconds until a paused sign-in reopens.
+          error.attemptsRemaining = response.headers?.get?.('X-Login-Attempts-Remaining') ?? null
+          error.retryAfter = response.headers?.get?.('Retry-After') ?? null
           throw error
         }
         return data

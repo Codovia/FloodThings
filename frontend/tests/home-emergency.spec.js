@@ -9,7 +9,10 @@ async function setup(page, mode='pending') {
   if(mode==='native')return
   if(mode==='unsupported'){Object.defineProperty(navigator,'geolocation',{value:undefined});return}
   if(mode==='insecure')Object.defineProperty(window,'isSecureContext',{value:false})
-  Object.defineProperty(navigator,'geolocation',{value:{getCurrentPosition:(yes,no,options)=>{window.__gpsCalls++;window.__gpsSuccess=yes;window.__gpsFailure=no;window.__gpsOptions=options;if(mode==='denied')no({code:1});if(mode==='unavailable')no({code:2})},watchPosition:()=>window.__watchCalls++}})
+  window.__clearCalls=0
+  // Home refines its fix with one bounded watch (preciseLocation.js); other pages make a single request.
+  const answer=counter=>(yes,no,options)=>{window[counter]++;window.__gpsSuccess=yes;window.__gpsFailure=no;window.__gpsOptions=options;if(mode==='denied')no({code:1});if(mode==='unavailable')no({code:2});return 1}
+  Object.defineProperty(navigator,'geolocation',{value:{getCurrentPosition:answer('__gpsCalls'),watchPosition:answer('__watchCalls'),clearWatch:()=>window.__clearCalls++}})
  },mode)
  await page.route('**/*',async route=>{
   const u=new URL(route.request().url());if(!['127.0.0.1','localhost'].includes(u.hostname))return route.abort()
@@ -30,7 +33,7 @@ test('automatic GPS uses exact coordinates, browser accuracy and one weather ses
  await expect(page.getByText(/Your device location \(±40 m\)/)).toBeVisible();await expect(page.getByRole('heading',{name:'Flood & drainage risk · next 24 h'})).toBeVisible();await expect(page.getByLabel('Current weather and rain')).toContainText('Unavailable rain forecast in the next 24 h')
  expect(await page.evaluate(()=>window.__gpsOptions)).toEqual({enableHighAccuracy:true,timeout:10000,maximumAge:0})
  await page.evaluate(()=>{history.pushState(null,'','/weather');dispatchEvent(new PopStateEvent('popstate'))});await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(requests).toHaveLength(1)
- await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>window.__watchCalls)).toBe(0);expect(requests).toHaveLength(1)
+ await nav(page).getByRole('link',{name:'Home',exact:true}).click();await expect(page.getByRole('heading',{name:'GPS-selected point'})).toBeVisible();expect(await page.evaluate(()=>window.__watchCalls)).toBe(1);expect(await page.evaluate(()=>window.__clearCalls)).toBe(1);expect(await page.evaluate(()=>window.__gpsCalls)).toBe(0);expect(requests).toHaveLength(1)
  expect(new URL(page.url()).search).toBe('');expect(await page.evaluate(()=>Object.keys(sessionStorage).concat(Object.keys(localStorage)).filter(k=>/gps|latitude|longitude/i.test(k)))).toEqual([])
 })
 for(const [mode,text] of [['denied','Location permission was denied'],['unavailable','Location could not be determined'],['unsupported','Location access is unavailable in this browser'],['insecure','Location requires a secure connection']])test(`${mode} retains statewide map and name search without default weather`,async({page})=>{
@@ -83,7 +86,7 @@ test('Home has a dominant map on laptops and Warnings/Risk/Map tabs on phones, n
 })
 
 test('reload makes one fresh bounded GPS attempt and stores no location coordinates',async({page})=>{
- await setup(page,'denied');await page.goto('/');await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);await page.reload();await expect(page.getByRole('heading',{name:'Karnataka statewide view'})).toBeVisible();await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__gpsCalls)).toBe(1);expect(await page.evaluate(()=>Object.entries(sessionStorage))).toEqual([['floodpulse-home-location-attempted','1']])
+ await setup(page,'denied');await page.goto('/');await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__watchCalls)).toBe(1);await page.reload();await expect(page.getByRole('heading',{name:'Karnataka statewide view'})).toBeVisible();await expect(page.getByText(/Location permission was denied/)).toBeVisible();expect(await page.evaluate(()=>window.__watchCalls)).toBe(1);expect(await page.evaluate(()=>Object.entries(sessionStorage))).toEqual([['floodpulse-home-location-attempted','1']])
 })
 
 test('native browser geolocation permission grant automatically selects the controlled GPS fix',async({page})=>{

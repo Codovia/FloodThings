@@ -9,7 +9,7 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 from app.main import app
 from app.shelter_security import HASHER,SecurityConfig,csrf_token,digest,password_matches
-from app.shelters import ShelterInput,Verification,serialize,directions,get_store,VERIFICATION_HOURS,mode
+from app.shelters import ShelterInput,Verification,serialize,directions,get_store,VERIFICATION_HOURS,mode,invalid_credentials,login_rate_limited
 from app.shelter_schema import SHELTER_TABLES,shelters
 
 
@@ -113,3 +113,33 @@ def test_schema_separates_audit_and_directory_tables():
 def test_invalid_mode_fails_closed(monkeypatch):
     monkeypatch.setenv('SHELTER_DIRECTORY_MODE','unknown')
     with pytest.raises(HTTPException):mode()
+
+
+class _RefusingStore:
+    """TEST STAND-IN ONLY: answers a login the way ShelterStore.login does after counting the attempt."""
+    def __init__(self, error):
+        self.error = error
+
+    def login(self, username, password, peer):
+        raise self.error
+
+
+@pytest.mark.parametrize('error, status, header, value', [
+    (lambda: invalid_credentials(3), 401, 'x-login-attempts-remaining', '3'),
+    (lambda: invalid_credentials(-2), 401, 'x-login-attempts-remaining', '0'),
+    (lambda: login_rate_limited(412.2), 429, 'retry-after', '413'),
+    (lambda: login_rate_limited(0), 429, 'retry-after', '1'),
+])
+def test_failed_login_says_tries_left_or_when_to_retry_without_naming_the_wrong_field(monkeypatch, error, status, header, value):
+    monkeypatch.setenv('SHELTER_PUBLIC_ORIGIN', 'http://127.0.0.1:14173'); monkeypatch.setenv('SHELTER_COOKIE_SECURE', 'false')
+    secret = secrets.token_urlsafe(30)
+    app.dependency_overrides[get_store] = lambda: _RefusingStore(error())
+    try:
+        with TestClient(app) as client:
+            r = client.post('/api/admin/login', json={'username': 'test.admin', 'password': secret},
+                            headers={'Origin': 'http://127.0.0.1:14173', 'X-FloodPulse-Login': '1'})
+    finally:
+        app.dependency_overrides.pop(get_store, None)
+    assert r.status_code == status and r.headers[header] == value and secret not in r.text and 'test.admin' not in r.text
+    if status == 401:
+        assert r.json()['detail'] == 'Invalid administrator credentials'   # the same for unknown user, wrong password, inactive

@@ -2674,3 +2674,46 @@ Fix:
 - `backend/app/weather.py`: a 429 now reads "Open-Meteo's free usage limit for this network was reached (HTTP 429); weather returns automatically once it resets." instead of only the status code.
 
 Still possible: restarting the local app repeatedly refetches the statewide risk grid (256 cells), because that cache is in memory only.
+
+## 2026-10-26 — Administrator sign-in: Show password and specific, credential-free errors
+
+Request: a show-password control on the admin login, and specific errors telling the admin what went wrong, without disclosing the username or password.
+
+Reconciled control: the server keeps one answer ("Invalid administrator credentials", same timing via the dummy hash) for an unknown username, a wrong password and a deactivated account, so the page cannot be used to discover which usernames exist; the page therefore says "Username or password is incorrect" and never which. Everything else is now specific.
+
+- `frontend/src/AdminLogin.jsx` (new): Show/Hide button (`aria-pressed`, hidden and cleared again after every attempt); checks before sending — blank username or password, spaces, capital letters ("Usernames use lowercase letters only. Check that Caps Lock is off."), first character, allowed characters, length (the server's own rule `^[a-z][a-z0-9._-]*$`, 3–64); a "Caps Lock is on." notice; server answers mapped to plain messages: 401 with tries left ("3 tries left before sign-in pauses for up to 15 minutes", "That was the last try…"), 429 with the time sign-in reopens ("…paused for this username or network until about 8:40 pm IST"), 422 format, 403 security check, 503 database unavailable, other 5xx, no connection, timeout. Messages never repeat the typed username or password.
+- `backend/app/shelters.py`: 401 carries `X-Login-Attempts-Remaining` (the smaller of the per-username and per-address allowances left in the 15-minute window; both are counted for any username, real or not, so the number reveals nothing about which exist); 429 carries the real seconds until the window ends in `Retry-After` (was a fixed 900).
+- `frontend/src/useAdminRequests.js`: passes those two headers on with the error. Before, a username with capitals produced "Invalid shelter request; check fields and verification confirmations".
+
+Checks: unit 317/317 (new AdminLogin tests: show/hide, cleared after attempt, pre-send checks, Caps Lock, every server answer → message, reopening time); backend 560/560 (new: headers on 401/429 through the real endpoint, no credentials echoed, same 401 text); isolated browser check (test server without a database): Show/Hide, capital-letter message, then "Sign-in is unavailable right now: the administrator database cannot be reached" with the password cleared and hidden — screenshots taken. Not tried against the operational database (no sign-in attempts there). Playwright (all but the live risk test): 79 passed, 8 skipped, known admin layout failure, plus one intermittent failure in the place-choosing test helper: Shelters' own location lookup raced the location control on a second visit; the helper now sets the position before opening Shelters and reads the bar text (phones hide the coordinates) — affected specs then passed 72/72 across repeats.
+
+## 2026-10-27 — Mobile slice 1: accurate location on phones
+
+Request: a better mobile UI for demonstrating accurate location; research what works first.
+
+Research (sources cross-checked): Chrome for Android's location prompt now offers "Precise" or "Approximate (Neighborhood)" per site (9to5Google, May 2026); iPhones with "Precise Location" off for Safari Websites give areas of a few km (Frontend Masters reports ~3–9 km); WCAG 2.2 AA target size 24×24 CSS px (W3C); Android guidance: navigation bar with 3–5 destinations on compact screens; NN/g: hidden (hamburger) navigation is less discoverable than visible navigation; map apps show the fix with its accuracy and refine it.
+
+Audit (phone 390×844, emulated GPS): Home's "Use my location" looked disabled (grey) while waiting; Home and the location picker took the browser's first answer, and the picker even asked for low accuracy (`enableHighAccuracy: false`), so phones would report a Wi-Fi/mobile-network estimate; accuracy was only grey text; the picker's GPS point had no timestamp (Shelters needs it for directions). Also seen, for later slices: navigation hidden behind "Menu", the Map tab's controls and legend cover most of a small map, Shelters repeats the location.
+
+Changes:
+- Home and the picker use `preciseLocation` (one bounded watch, coordinates in memory only): stop at ±50 m (`QUICK_ACCURACY_M`; Shelters keeps ±20 m for directions), otherwise keep the best fix for up to 20 s after the first one. The button shows live progress ("±240 m, improving…") in full colour instead of a greyed-out button; cancelling, leaving Home or the network fallback stops the watch.
+- Accuracy badge on every GPS fix: Precise (≤100 m), Rough (≤1 km, "move outdoors or near a window"), Approximate (>1 km, with the Android Chrome and iPhone settings for precise location). The 1 km threshold is a heuristic.
+- Picker GPS points now carry `gps_timestamp`; a browser offering only `watchPosition` is no longer "unsupported".
+
+Checked (Chrome, phone size, simulated fixes): ±850 → ±240 → ±12 m showed progress then "Precise GPS ±12 m" with the place named (16 s); a single ±4.2 km fix showed "Approximate GPS ±4.2 km" and the settings advice; laptop 1366×768 still one screen, no sideways scroll. Not checked on a real phone.
+
+Tests: unit 320/320 (Home hook tests rewritten for the watch: refinement, progress, best fix, window replaces the 10 s timeout, impossible fixes ignored; picker: progress, best fix, timestamp, approximate advice); build passes. Browser: home-emergency 14/14 (stub now answers `watchPosition`; asserts exactly one watch, stopped), ui-repair, location-weather, location-directory pass. The full browser suite was not re-run after the last change; its earlier run's only other failure was the known admin layout test (shelters.spec.js:56). Seen, not caused here: after midnight IST the weather card showed "Forecast dates must be unique, ordered and within the requested local week".
+
+## 2026-10-27 — Mobile slice 2: bottom navigation bar and a usable map on phones
+
+Request: same as slice 1 (better mobile UI for the demonstration). Applies the research there: visible navigation beats a hidden menu (NN/g), 3–5 destinations in a phone navigation bar (Android), touch targets well above WCAG's 24×24 px, and map controls that do not cover the map.
+
+- `AppNavigation.jsx` `BottomNav` (phones ≤700 px): Home · Map · Report · Shelters at the bottom, current page marked (`aria-current`), 50 px tall targets. It is part of the page column, so the one-screen layout gets shorter rather than covered; when a page falls back to scrolling (`useFitGuard`) the bar sticks to the bottom. "Menu" keeps every page (Telegram alerts, How it works, Admin).
+- Home Map tab on phones: one-row toolbar ("Karnataka Map" title kept for screen readers; the tab says Map), layers and legend behind a "Layers" button (closed by default; laptops always show them), and the Report/Nearest-shelter row steps aside while the Map tab is open (other tabs keep it; the bar remains).
+- `App.test.jsx`: two link look-ups scoped to "Main navigation" (the bar also has Home/Shelters links).
+
+Measured (live app, Playwright phone sizes): Home Map tab map 228 → 302 px at 390×844 with a GPS place (384 px without a place), 210 px at 320×720 without a place; nothing scrolls; layers panel opens below its button without overlap. Home, Map and Report fit one screen with the bar. Shelters at 390×844 was already at the limit: with the bar it uses the scroll fallback (59 px), the bar staying visible — compacting Shelters is a next step.
+
+Tests: unit 321/321 (new: bottom bar links, order and current page); build passes; browser suite 80 passed, 8 skipped, 2 failed — shelters.spec.js:56 (known admin layout) and flood-intelligence.spec.js:7, which passes when run alone (known to be intermittent under full-suite load). Not checked on a real phone.
+
+Next mobile slices: compact Shelters (the place is shown twice), and the Report steps on small screens.

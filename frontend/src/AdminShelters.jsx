@@ -1,4 +1,5 @@
 import React,{useEffect,useMemo,useRef,useState} from 'react'
+import AdminLogin, { loginErrorMessage } from './AdminLogin.jsx'
 import AdminEntranceMap from './AdminEntranceMap.jsx'
 import AdminNotifications from './AdminNotifications.jsx'
 import AdminReports from './AdminReports.jsx'
@@ -28,9 +29,8 @@ export default function AdminShelters({embedded=false,onHome=null}){
   const [workspaceDistrict,setWorkspaceDistrict]=useState(''),[view,setView]=useState('all')
   const formRef=useRef(null),formHeading=useRef(null)
   const [lookup,setLookup]=useState(null),lookupSequence=useRef(0),latestForm=useRef(null)
-  const [username,setUsername]=useState(''),[password,setPassword]=useState('')
   const busyRef=useRef(false),loadSequence=useRef(0),operationSequence=useRef(0)
-  function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setWorkspaceDistrict('');setUsername('');setPassword('');setNotice(null);setAdminTab('shelters')}
+  function clearPrivate(){loadSequence.current++;setSession(null);setRows([]);setTotal(0);setDistricts([]);setForm(blank());setEditing(null);setHistory(null);setOffset(0);setWorkspaceDistrict('');setNotice(null);setAdminTab('shelters')}
   const requests=useAdminRequests(clearPrivate)
   async function request(path,options={},auth=session){
     return requests.request(path,{credentials:'same-origin',...options,headers:{...(options.body?{'Content-Type':'application/json'}:{}),...(auth?.csrf_token?{'X-CSRF-Token':auth.csrf_token}:{}),...options.headers}})
@@ -73,7 +73,8 @@ export default function AdminShelters({embedded=false,onHome=null}){
   function edit(row){setLookup(null);lookupSequence.current++;setEditing(row.id);setHistory(null);setNotice(null);setForm({...blank(),...Object.fromEntries(Object.keys(blank()).filter(k=>k!=='verification').map(k=>[k,row[k]??blank()[k]])),latitude:row.latitude??'',longitude:row.longitude??'',capacity:String(row.capacity),occupancy:String(row.occupancy),verification:{authorization:false,entrance:false,usability:false,capacity:false,evidence:''}})}
   async function operation(fn){if(busyRef.current)return;const sequence=++operationSequence.current;busyRef.current=true;setBusy(true);setError(null);try{await fn()}catch(e){if(requests.mounted()&&sequence===operationSequence.current&&e.name!=='AbortError')setError(e.message)}finally{if(sequence===operationSequence.current){busyRef.current=false;if(requests.mounted())setBusy(false)}}}
   function signOut(){const auth=session;requests.cancel();busyRef.current=false;clearPrivate();void operation(async()=>{await request('/api/admin/logout',{method:'POST'},auth);requests.cancel();setNotice('Signed out')})}
-  async function login(e){e.preventDefault();await operation(async()=>{try{const data=await request('/api/admin/login',{method:'POST',headers:{'X-FloodPulse-Login':'1'},body:JSON.stringify({username,password})},null);setSession(data);setNotice('Signed in')}finally{setPassword('')}})}
+  // The sign-in form clears the password after every attempt; failures get a specific, credential-free message.
+  async function login(username,password){await operation(async()=>{let data;try{data=await request('/api/admin/login',{method:'POST',headers:{'X-FloodPulse-Login':'1'},body:JSON.stringify({username,password})},null)}catch(e){throw e.name==='AbortError'?e:Error(loginErrorMessage(e))}setSession(data);setNotice('Signed in')})}
   async function save(e){e.preventDefault();await operation(async()=>{
     const body={...form,latitude:form.latitude===''?null:Number(form.latitude),longitude:form.longitude===''?null:Number(form.longitude),capacity:Number(form.capacity),occupancy:Number(form.occupancy)}
     const row=await request('/api/admin/shelters'+(editing?'/'+editing:''),{method:editing?'PUT':'POST',body:JSON.stringify(body)})
@@ -89,7 +90,7 @@ export default function AdminShelters({embedded=false,onHome=null}){
   return <Container className="admin-shell"><div className="admin-identity-bar"><div className="admin-identity-title"><h2>Administrator workspace</h2><a href="/" onClick={onHome?e=>{e.preventDefault();onHome()}:undefined}>Return to citizen dashboard</a></div>{session&&<div><span>Signed in as {session.user.username}</span> <button onClick={signOut}>Sign out</button></div>}</div><p className="admin-access-note">Provisioned project staff only. Prototype; no affiliation with a disaster-management authority. No public registration. {session&&'Session expires after 30 idle minutes or eight hours.'}</p>
     {checking&&<p role="status">Checking administrator session…</p>}
     {error&&<p role="alert" className="notice error">{error}</p>}{notice&&<p role="status">{notice}</p>}
-    {!checking&&!session&&<form className="panel shelter-form" onSubmit={login}><h2>Administrator login</h2><label>Username<input autoComplete="username" required maxLength={64} value={username} onChange={e=>setUsername(e.target.value)} /></label><label>Password<input type="password" autoComplete="current-password" required maxLength={128} value={password} onChange={e=>setPassword(e.target.value)} /></label><button disabled={busy}>Sign in</button></form>}
+    {!checking&&!session&&<AdminLogin busy={busy} onSignIn={login}/>}
     {session&&<>
       {session.mode==='demonstration'&&<p role="alert" className="notice error"><strong>DEMONSTRATION ONLY — isolated database. These are not operational shelter assignments.</strong></p>}
       <nav aria-label="Administrator workspace" className="admin-tabs"><button type="button" aria-pressed={adminTab==='shelters'} onClick={()=>setAdminTab('shelters')}>Shelter workspace</button>{counts.attention>0&&<button type="button" className="admin-tab-badge" onClick={()=>{setAdminTab('shelters');setView('attention')}}>{counts.attention} {counts.attention===1?'shelter needs':'shelters need'} attention</button>}<button type="button" aria-pressed={adminTab==='notifications'} onClick={()=>setAdminTab('notifications')}>Telegram notifications</button><button type="button" aria-pressed={adminTab==='reports'} onClick={()=>setAdminTab('reports')}>Citizen reports</button></nav>

@@ -1,4 +1,5 @@
 """Manual shelter assignment, never inferred from weather/model predictions."""
+import math
 import os
 import uuid
 from datetime import timedelta
@@ -92,7 +93,7 @@ class ShelterStore:
 
     def login(self,username,password,peer):
         timestamp=now();start=timestamp.replace(minute=timestamp.minute//15*15,second=0,microsecond=0)
-        blocked=False
+        blocked=False;remaining=None
         # Atomic cross-worker rate buckets; ignore untrusted forwarded headers.
         with self.engine.begin() as c:
             c.execute(text('SELECT pg_advisory_xact_lock(814208)'))
@@ -103,11 +104,12 @@ class ShelterStore:
                 if count>=maximum:blocked=True;break
                 if row:c.execute(update(limits).where(limits.c.key==key).values(window_start=start,attempts=count+1))
                 else:c.execute(limits.insert().values(key=key,window_start=start,attempts=1))
+                remaining=maximum-count-1 if remaining is None else min(remaining,maximum-count-1)
             user=c.execute(select(admins).where(admins.c.username==username)).mappings().one_or_none() if not blocked else None
-        if blocked:raise HTTPException(429,'Login temporarily rate limited; retry after the 15-minute window',headers={'Retry-After':'900'})
+        if blocked:raise login_rate_limited((start+LOGIN_WINDOW-timestamp).total_seconds())
         valid=password_matches(user['password_hash'] if user else dummy_hash(),password)
         if not valid or not user or not user['active']:
-            raise HTTPException(401,'Invalid administrator credentials')
+            raise invalid_credentials(remaining)
         token=__import__('secrets').token_urlsafe(32)
         with self.engine.begin() as c:
             c.execute(delete(limits).where(limits.c.key==digest('account:'+username)))
@@ -175,6 +177,20 @@ class ShelterStore:
             if not exists:raise HTTPException(404,'Shelter not found')
             rows=c.execute(select(audit).where(audit.c.shelter_id==identity).order_by(audit.c.at,audit.c.id).limit(100)).mappings().all()
             return {'events':[dict(r) for r in rows],'limit':100}
+
+
+LOGIN_WINDOW=timedelta(minutes=15)
+
+
+def login_rate_limited(retry_seconds):
+    """429 with the seconds until the 15-minute window ends, so the sign-in page can say when to retry."""
+    return HTTPException(429,'Login temporarily rate limited; retry after the 15-minute window',headers={'Retry-After':str(max(1,math.ceil(retry_seconds)))})
+
+
+def invalid_credentials(remaining):
+    """One answer for an unknown username, a wrong password or a deactivated account, so nobody can find out which
+    usernames exist. The tries left are counted the same way for every username, so they reveal nothing either."""
+    return HTTPException(401,'Invalid administrator credentials',headers=None if remaining is None else {'X-Login-Attempts-Remaining':str(max(0,remaining))})
 
 
 def audit_snapshot(row):
