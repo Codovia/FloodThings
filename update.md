@@ -2777,3 +2777,18 @@ Checked: disposable PostGIS container (127.0.0.1:55499, random password, removed
 Tests: backend 594/594 (new: commands, names and former names, start-link validity for all 31 districts, draft target rule); frontend unit 326/326 (district chooser, admin district target); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
 
 Not done here: the laptop database is still at 0006 — the maintenance password file is not in this checkout, so `./scripts/upgrade-database.sh` must be run by the user (`--maintenance-prompt`); until then `./floodpulse.sh` stops at its database check. A real Telegram subscription and alert were not exercised.
+
+## 2026-10-27 — Help people name their district correctly (website and bot)
+
+Request: make it easy to connect a person to the right district, because people may type the district name wrongly; help them build the correct Telegram command.
+
+Research: Telegram ReplyKeyboardMarkup (`keyboard`, `one_time_keyboard`, `resize_keyboard`, `input_field_placeholder` 1–64 characters), KeyboardButton text "sent as a message when the button is pressed", ReplyKeyboardRemove `remove_keyboard` (core.telegram.org/bots/api/types). The place directory covers only 6 towns (2 districts), so town-to-district lookup was not added.
+
+Bot:
+- `/start` or `/start floodpulse` replies with a button for each of the 31 districts (3 per row, names only so they fit a phone); tapping one sends the name, and a plain message that exactly matches a district or former name now subscribes. The confirmation removes the buttons.
+- Misspellings: "did you mean …?" with buttons for the closest districts (SequenceMatcher on names and former names; only names within 0.1 of the best score, so "mangalor" offers only Dakshina Kannada). Nothing is subscribed until a button is tapped. Plain messages are answered only when clearly close (≥0.75); other chat stays ignored.
+- Former names are now `FORMER_NAMES` (district → names) and are sent to the website as `also`.
+
+Website (Alerts page): "Find your district" search (names, former names, small spelling mistakes via edit distance; up to 4 matches, misspellings shown as "Did you mean …?"), the dropdown kept as "Or choose from the list", and for the chosen district a one-tap "Get <district> alerts in Telegram" link plus the exact command with a Copy button (clipboard, or the text is selected where copying is blocked). On phones the three-step list is hidden and the generic bot line disappears once a district is chosen, so the page fits one screen at 390×844 and 412×915 (360×740 uses the scroll fallback).
+
+Tests: backend 609/609 (new: misspelling suggestions, plain-message threshold, buttons cover every district and each button subscribes); disposable-PostGIS suite 74/74 (new: Start shows 31 buttons, tapping "Udupi" subscribes and removes the buttons, "udpi" and "/start floodpulse dakshin kanada" get one suggestion button and change nothing, "thank you" is ignored; test DB removed afterwards); frontend unit 328/328 (search rules; typo → exact command → copy); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout). One earlier full browser run also had home-weather, risk-features and one other test fail; the next two runs passed them (intermittent under load). No real Telegram message was sent.

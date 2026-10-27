@@ -5,7 +5,7 @@ import uuid
 import pytest
 from pydantic import ValidationError
 
-from app.district_alerts import ALIASES, help_text, match, parse, start_payload
+from app.district_alerts import ALIASES, FORMER_NAMES, help_reply, help_text, keyboard, match, parse, start_payload, suggest
 from app.notifications import DraftInput, render_message
 
 # The 31 districts as named by the active place directory (karnataka_location_directory_v2).
@@ -24,7 +24,8 @@ DISTRICTS = [{'id': f'nic:{k}.nic.in', 'name': v, 'start': start_payload(v)} for
     ('/start FloodPulse-Kodagu', ('subscribe', 'Kodagu')), ('/start floodpulse', ('bare', '')), ('/start', ('help', '')),
     ('/start somethingelse', ('help', '')), ('/help', ('help', '')), ('/mydistricts', ('status', '')),
     ('/stop', ('stop', '')), ('/stop udupi', ('unsubscribe', 'udupi')), ('/stop floodpulse_udupi', ('unsubscribe', 'udupi')),
-    ('hello', None), ('', None), (None, None), ('/start floodpulse ' + 'x' * 300, None)])
+    ('Udupi', ('name', 'Udupi')), (' dakshina kannada ', ('name', 'dakshina kannada')), ('a', None), ('see http://x.test', None),
+    ('', None), (None, None), ('/start floodpulse ' + 'x' * 300, None)])
 def test_commands(command, expected):
     assert parse(command) == expected
 
@@ -58,3 +59,25 @@ def test_a_draft_names_exactly_one_target_and_district_notices_say_how_to_stop()
     out = render_message(draft, None, {'id': 'nic:udupi.nic.in', 'name': 'Udupi'})
     assert 'District: Udupi\n' in out and out.endswith('Stop: /stop udupi · Stop all: /stop') and draft.message in out
     assert render_message(DraftInput(**base, destination_id='private-test'), None).endswith(draft.message)
+
+
+@pytest.mark.parametrize('typed, expected', [('udpi', ['Udupi']), ('dakshin kanada', ['Dakshina Kannada']), ('mangalor', ['Dakshina Kannada']),
+    ('belgam', ['Belagavi']), ('shivamoga', ['Shivamogga']), ('chikmagalore', ['Chikkamagaluru']), ('davangare', ['Davanagere']),
+    ('kannada', ['Uttara Kannada', 'Dakshina Kannada']), ('goa', []), ('hello', [])])
+def test_misspelt_names_get_the_closest_districts_only(typed, expected):
+    assert [d['name'] for d in suggest(typed, DISTRICTS)] == expected
+
+
+def test_plain_messages_are_answered_only_when_clearly_close_to_a_district():
+    assert [d['name'] for d in suggest('udpi', DISTRICTS, cutoff=0.75)] == ['Udupi']
+    assert suggest('kannada', DISTRICTS, cutoff=0.75) == [] and suggest('thank you', DISTRICTS, cutoff=0.75) == []
+
+
+def test_district_buttons_cover_every_district_with_short_labels():
+    reply = help_reply(DISTRICTS); board = reply['reply_markup']
+    names = [b['text'] for row in board['keyboard'] for b in row]
+    assert names == [d['name'] for d in DISTRICTS] and all(len(row) <= 3 for row in board['keyboard'])
+    assert board['one_time_keyboard'] and 1 <= len(board['input_field_placeholder']) <= 64 and 'Tap your district' in reply['text']
+    assert all(match(n, DISTRICTS)['name'] == n for n in names)  # tapping a button sends a name that subscribes
+    assert set(FORMER_NAMES) <= {d['id'] for d in DISTRICTS} and keyboard(DISTRICTS[:1], 'x' * 80)['input_field_placeholder'] == 'x' * 64
+

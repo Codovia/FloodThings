@@ -75,14 +75,19 @@ district's subscribers.
 | Person sends | Effect |
 |---|---|
 | `/start floodpulse udupi`, or opens `https://t.me/<bot>?start=floodpulse_udupi` (links per district on the Alerts page) | Subscribes to Udupi; the bot confirms once |
-| `/start floodpulse` or `/start` | The bot replies with the commands and the 31 district names |
+| `/start floodpulse` or `/start` | The bot replies with the commands and a button for each of the 31 districts |
+| Taps a district button, or sends just a district name (`Udupi`, `Mangalore`) | Subscribes to that district |
+| A misspelt name (`udpi`, `/start floodpulse dakshin kanada`) | "Did you mean Udupi?" with a button; nothing is subscribed until it is tapped |
 | `/mydistricts` | Lists the person's districts |
 | `/stop udupi` | Stops Udupi only (with no districts left, the chat ID is deleted) |
 | `/stop` | Stops everything and deletes the chat ID |
 
 - Names are matched to the active place directory's 31 districts, plus common former names (Mangalore,
   Belgaum, Coorg, Bangalore, Gulbarga, Shimoga, …; list in `backend/app/district_alerts.py`). Unknown names get
-  the district list; nothing is guessed.
+  the district list; nothing is guessed. Misspellings get the closest names only (similarity ≥0.6 for commands; plain
+  messages are answered only at ≥0.75, so ordinary chat such as "thank you" gets no reply).
+- Alerts page: "Find your district" accepts names, former names and small spelling mistakes, then shows the
+  one-tap Telegram link and the exact command with a Copy button.
 - Consent: the person's own command. FloodPulse stores the Telegram chat ID only to deliver alerts
   (`telegram_district_subscribers`); `/stop`, or Telegram reporting that the person blocked the bot (403),
   deletes it. The append-only audit log (`telegram_district_audit`) keeps only the keyed subscriber hash.

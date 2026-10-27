@@ -92,7 +92,7 @@ def test_public_subscriptions_in_live_mode_and_none_from_unknown_chats_in_a_demo
     assert 'FloodPulse district flood alerts' not in json.dumps(say(alerts, '/start', 21, chat=777))
     monkeypatch.setenv('SHELTER_DIRECTORY_MODE', 'live')
     assert 'Kodagu' in say(alerts, '/start floodpulse kodagu', 22, chat=777)['text']
-    assert 'Subscribe: /start floodpulse <district>' in say(alerts, '/start floodpulse', 23, chat=778)['text']
+    assert 'Tap your district below to subscribe' in say(alerts, '/start floodpulse', 23, chat=778)['text']
     with alerts[0][1].connect() as c:
         row = c.execute(select(subscribers)).mappings().one()
         assert row['chat_id'] == '777' and row['demonstration'] is False
@@ -138,3 +138,20 @@ def test_blocked_and_uncertain_deliveries_and_leaving_before_approval(alerts):
     with api[1].connect() as c:
         assert c.execute(select(notifications.c.status).where(notifications.c.id == row['id'])).scalar_one() == 'draft'
         assert c.execute(select(district_notices.c.recipients).where(district_notices.c.notification_id == row['id'])).scalar_one() is None
+
+
+def test_buttons_plain_names_and_misspellings_help_people_reach_the_right_district(alerts):
+    db = alerts[0][1]
+    start = say(alerts, '/start', 50)
+    rows = start['reply_markup']['keyboard']
+    assert 'Tap your district' in start['text'] and rows[0] == [{'text': 'Bagalkote'}, {'text': 'Ballari'}, {'text': 'Belagavi'}]
+    assert sum(len(r) for r in rows) == 31 and start['reply_markup']['one_time_keyboard'] is True
+    tapped = say(alerts, 'Udupi', 51)  # a tapped button sends the district's name
+    assert 'flood alerts for Udupi district' in tapped['text'] and tapped['reply_markup'] == {'remove_keyboard': True}
+    typo = say(alerts, 'udpi', 52)
+    assert typo['text'].startswith('FloodPulse: did you mean Udupi?') and typo['reply_markup']['keyboard'] == [[{'text': 'Udupi'}]]
+    typed = say(alerts, '/start floodpulse dakshin kanada', 53)
+    assert 'Did you mean Dakshina Kannada?' in typed['text'] and typed['reply_markup']['keyboard'] == [[{'text': 'Dakshina Kannada'}]]
+    assert say(alerts, 'thank you', 54) == {'ok': True, 'processed': False}
+    with db.connect() as c:
+        assert c.execute(select(district_subscriptions.c.district_id)).scalars().all() == [UDUPI]

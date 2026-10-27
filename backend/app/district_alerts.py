@@ -7,6 +7,7 @@ after an administrator previews and approves them (notifications.py). /stop dele
 import re
 import time
 import uuid
+from difflib import SequenceMatcher
 
 from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.dialects.postgresql import insert
@@ -17,21 +18,19 @@ from .location_database import active as directory_active, districts as director
 CONSENT_VERSION = 'telegram-district-alerts-v1-2026-10-27'
 PREFIX = 'floodpulse'
 DISCLAIMER = 'FloodPulse is a student project prototype, not an official warning service. Follow IMD, KSNDMC and district administration advice.'
-# Former and common English names (project-chosen), keyed without spaces, mapped to the directory's district IDs.
-ALIASES = {
-    'bengaluru': 'nic:bengaluruurban.nic.in', 'bangalore': 'nic:bengaluruurban.nic.in', 'bangaloreurban': 'nic:bengaluruurban.nic.in',
-    'bangalorerural': 'nic:bangalorerural.nic.in', 'ramanagara': 'nic:ramanagara.nic.in', 'ramanagaram': 'nic:ramanagara.nic.in',
-    'mangalore': 'nic:dk.nic.in', 'mangaluru': 'nic:dk.nic.in', 'southcanara': 'nic:dk.nic.in', 'dk': 'nic:dk.nic.in',
-    'karwar': 'nic:uttarakannada.nic.in', 'northcanara': 'nic:uttarakannada.nic.in', 'uk': 'nic:uttarakannada.nic.in',
-    'mysore': 'nic:mysore.nic.in', 'tumkur': 'nic:tumkur.nic.in', 'shimoga': 'nic:shimoga.nic.in',
-    'chikmagalur': 'nic:chikkamagaluru.nic.in', 'chikkamagalur': 'nic:chikkamagaluru.nic.in',
-    'coorg': 'nic:kodagu.nic.in', 'madikeri': 'nic:kodagu.nic.in', 'belgaum': 'nic:belagavi.nic.in', 'bellary': 'nic:ballari.nic.in',
-    'gulbarga': 'nic:kalaburagi.nic.in', 'kalburgi': 'nic:kalaburagi.nic.in', 'bijapur': 'nic:vijayapura.nic.in',
-    'bagalkot': 'nic:bagalkot.nic.in', 'davangere': 'nic:davanagere.nic.in', 'chamrajnagar': 'nic:chamrajnagar.nic.in',
-    'chamarajnagar': 'nic:chamrajnagar.nic.in', 'chikballapur': 'nic:chikkaballapur.nic.in', 'chikkaballapur': 'nic:chikkaballapur.nic.in',
-    'hospet': 'nic:vijayanagara.nic.in', 'hosapete': 'nic:vijayanagara.nic.in', 'hubli': 'nic:dharwad.nic.in',
-    'hubballi': 'nic:dharwad.nic.in', 'dharwar': 'nic:dharwad.nic.in', 'yadagiri': 'nic:yadgir.nic.in',
+# Former names, common English spellings and main towns (project-chosen), shown to people as "also matches".
+FORMER_NAMES = {
+    'nic:bengaluruurban.nic.in': ['Bengaluru', 'Bangalore', 'Bangalore Urban'], 'nic:bangalorerural.nic.in': ['Bangalore Rural'],
+    'nic:ramanagara.nic.in': ['Ramanagara', 'Ramanagaram'], 'nic:dk.nic.in': ['Mangaluru', 'Mangalore', 'South Canara', 'DK'],
+    'nic:uttarakannada.nic.in': ['Karwar', 'North Canara', 'UK'], 'nic:mysore.nic.in': ['Mysore'], 'nic:tumkur.nic.in': ['Tumkur'],
+    'nic:shimoga.nic.in': ['Shimoga'], 'nic:chikkamagaluru.nic.in': ['Chikmagalur', 'Chikkamagalur'], 'nic:kodagu.nic.in': ['Coorg', 'Madikeri'],
+    'nic:belagavi.nic.in': ['Belgaum'], 'nic:ballari.nic.in': ['Bellary'], 'nic:kalaburagi.nic.in': ['Gulbarga', 'Kalburgi'],
+    'nic:vijayapura.nic.in': ['Bijapur'], 'nic:bagalkot.nic.in': ['Bagalkot'], 'nic:davanagere.nic.in': ['Davangere'],
+    'nic:chamrajnagar.nic.in': ['Chamrajnagar', 'Chamarajnagar'], 'nic:chikkaballapur.nic.in': ['Chikballapur', 'Chikkaballapur'],
+    'nic:vijayanagara.nic.in': ['Hospet', 'Hosapete'], 'nic:dharwad.nic.in': ['Hubballi', 'Hubli', 'Dharwar'], 'nic:yadgir.nic.in': ['Yadagiri'],
 }
+ALIASES = {re.sub(r'[^a-z0-9]', '', n.lower()): district_id for district_id, names in FORMER_NAMES.items() for n in names}
+REMOVE_KEYBOARD = {'remove_keyboard': True}
 _cache = {}
 
 
@@ -45,9 +44,13 @@ def start_payload(name):
 
 
 def parse(command):
-    """(action, district text) for district commands; None for anything else (ignored, as before)."""
+    """(action, district text) for district commands and short plain messages that may name a district
+    (a tapped district button sends just its name); None for anything else (ignored, as before)."""
     if not isinstance(command, str) or len(command) > 200:
         return None
+    if not command.startswith('/'):
+        text = command.strip()
+        return ('name', text) if 2 <= len(text) <= 40 and re.fullmatch(r"[\w .'-]+", text) else None
     head, _, rest = command.strip().partition(' ')
     head, rest = head.lower(), rest.strip()
     if head in ('/help', '/start') and not rest:
@@ -65,16 +68,41 @@ def parse(command):
     return None
 
 
+def key(value):
+    value = re.sub(r'^floodpulse ', '', normalize(value))
+    return re.sub(r' district$', '', value).replace(' ', '')
+
+
 def match(value, items):
-    key = normalize(value)
-    key = re.sub(r'^floodpulse ', '', key)
-    key = re.sub(r' district$', '', key)
-    compact = key.replace(' ', '')
+    compact = key(value)
     for district in items:
         if normalize(district['name']).replace(' ', '') == compact:
             return district
     target = ALIASES.get(compact)
     return next((d for d in items if d['id'] == target), None)
+
+
+def suggest(value, items, n=3, cutoff=0.6):
+    """Closest district names or former names for a misspelt name (no automatic subscription)."""
+    keys = {key(d['name']): d['id'] for d in items}
+    keys.update({k: v for k, v in ALIASES.items() if any(d['id'] == v for d in items)})
+    wanted = key(value)
+    scored = sorted(((SequenceMatcher(None, wanted, k).ratio(), k) for k in keys), reverse=True)
+    best = scored[0][0] if scored else 0
+    found = []
+    for score, close in scored:
+        district = next(d for d in items if d['id'] == keys[close])
+        # Only names nearly as close as the best one (e.g. "mangalor" -> Mangalore, not also Bangalore).
+        if score >= cutoff and score >= best - 0.1 and district not in found:
+            found.append(district)
+    return found[:n]
+
+
+def keyboard(items, placeholder, columns=3):
+    """District buttons: tapping one sends the district's name, which subscribes to it."""
+    names = [d['name'] for d in items]
+    return {'keyboard': [[{'text': n} for n in names[i:i + columns]] for i in range(0, len(names), columns)],
+            'one_time_keyboard': True, 'resize_keyboard': True, 'input_field_placeholder': placeholder[:64]}
 
 
 def active_districts(engine, ttl=600):
@@ -92,9 +120,13 @@ def active_districts(engine, ttl=600):
 
 
 def help_text(items):
-    return ('FloodPulse district flood alerts.\nSubscribe: /start floodpulse <district>, for example /start floodpulse udupi\n'
+    return ('FloodPulse district flood alerts.\nTap your district below to subscribe, or send /start floodpulse <district>, for example /start floodpulse udupi\n'
             'Your districts: /mydistricts\nStop one district: /stop <district>. Stop all and delete your chat ID: /stop\n'
             'Districts: ' + ', '.join(d['name'] for d in items) + '.\n' + DISCLAIMER)
+
+
+def help_reply(items):
+    return {'text': help_text(items), 'reply_markup': keyboard(items, 'Tap your district')}
 
 
 class DistrictSubscriptions:
@@ -110,18 +142,30 @@ class DistrictSubscriptions:
         return [d['name'] for d in self.districts() if d['id'] in ids]
 
     def handle(self, action, value, key, chat_id, update_id, command_at, received_at, demonstration):
-        """Apply one command and return the reply, or None when nothing should be sent (duplicate/older update)."""
+        """Apply one command; return the reply (text and optional buttons), or None when nothing should be sent."""
         items = self.districts()
         if action in ('help', 'bare'):
-            return help_text(items)
-        district = match(value, items) if action in ('subscribe', 'unsubscribe') else None
+            return help_reply(items)
+        district = match(value, items) if action in ('subscribe', 'unsubscribe', 'name') else None
+        if action == 'name':
+            if district is None:
+                # A plain message is answered only when it is close to a district name; anything else stays ignored.
+                close = suggest(value, items, cutoff=0.75)
+                return {'text': f'FloodPulse: did you mean {" or ".join(d["name"] for d in close)}? Tap it below to get its flood alerts.',
+                        'reply_markup': keyboard(close, 'Tap your district', columns=1)} if close else None
+            action = 'subscribe'
         if action in ('subscribe', 'unsubscribe') and district is None:
             shown = re.sub(r'[^\w .-]', '', value)[:40]
-            return f'FloodPulse: "{shown}" is not a Karnataka district. Example: /start floodpulse udupi\nDistricts: ' + ', '.join(d['name'] for d in items) + '.'
+            close = suggest(value, items)
+            if close:
+                return {'text': f'FloodPulse: "{shown}" is not a district name. Did you mean {" or ".join(d["name"] for d in close)}? Tap it below.',
+                        'reply_markup': keyboard(close, 'Tap your district', columns=1)}
+            return {'text': f'FloodPulse: "{shown}" is not a Karnataka district. Tap your district below.\nDistricts: ' + ', '.join(d['name'] for d in items) + '.',
+                    'reply_markup': keyboard(items, 'Tap your district')}
         if action == 'status':
             with self.engine.connect().execution_options(postgresql_readonly=True) as c:
                 names = self.names(c, key)
-            return ('FloodPulse: your districts: ' + ', '.join(names) + '.') if names else 'FloodPulse: you are not subscribed to any district. Send /start floodpulse <district>, for example /start floodpulse udupi.'
+            return {'text': ('FloodPulse: your districts: ' + ', '.join(names) + '.') if names else 'FloodPulse: you are not subscribed to any district. Send /start floodpulse <district>, for example /start floodpulse udupi.'}
         with self.engine.begin() as c:
             c.execute(text('SELECT pg_advisory_xact_lock(hashtextextended(:key,0))'), {'key': 'district-subscription:' + key})
             # The append-only audit log orders commands, so a retried or older Telegram update changes nothing.
@@ -144,9 +188,10 @@ class DistrictSubscriptions:
                               .values(chat_id=chat_id, demonstration=demonstration, consent_version=CONSENT_VERSION))
                 c.execute(insert(district_subscriptions).values(subscriber_key=key, district_id=district['id'], created_at=received_at)
                           .on_conflict_do_nothing())
-                return (f'FloodPulse: you will receive administrator-approved flood alerts for {district["name"]} district.\n'
-                        f'Your districts: {", ".join(self.names(c, key))}.\n'
-                        f'Stop {district["name"]} alerts: /stop {normalize(district["name"])}. Stop all and delete your chat ID: /stop\n' + DISCLAIMER)
+                return {'text': f'FloodPulse: you will receive administrator-approved flood alerts for {district["name"]} district.\n'
+                                f'Your districts: {", ".join(self.names(c, key))}.\n'
+                                f'Stop {district["name"]} alerts: /stop {normalize(district["name"])}. Stop all and delete your chat ID: /stop\n' + DISCLAIMER,
+                        'reply_markup': REMOVE_KEYBOARD}
             if action == 'unsubscribe':
                 if row is not None:
                     c.execute(delete(district_subscriptions).where(district_subscriptions.c.subscriber_key == key,
@@ -154,10 +199,11 @@ class DistrictSubscriptions:
                 remaining = self.names(c, key)
                 if row is not None and not remaining:
                     c.execute(delete(subscribers).where(subscribers.c.subscriber_key == key))
-                return (f'FloodPulse: you will no longer receive {district["name"]} alerts.'
-                        + (f' You still receive: {", ".join(remaining)}.' if remaining else ' You have no district alerts left; your chat ID is not stored by FloodPulse.'))
+                return {'text': f'FloodPulse: you will no longer receive {district["name"]} alerts.'
+                        + (f' You still receive: {", ".join(remaining)}.' if remaining else ' You have no district alerts left; your chat ID is not stored by FloodPulse.')}
             c.execute(delete(subscribers).where(subscribers.c.subscriber_key == key))  # 'stop': districts cascade
-            return 'FloodPulse: all district alerts stopped and your chat ID was deleted from FloodPulse. Send /start floodpulse <district> to subscribe again.'
+            return {'text': 'FloodPulse: all district alerts stopped and your chat ID was deleted from FloodPulse. Send /start floodpulse <district> to subscribe again.',
+                    'reply_markup': REMOVE_KEYBOARD}
 
 
 def recipients(connection, district_id, demonstration):
