@@ -2734,3 +2734,14 @@ Checked (live app, laptop 1366×768 and phone 390×844): every tab fits one scre
 Tests: backend 562/562 (new: artifact numbers repeated exactly, matrices add up to test days, served rule, rainfall holdout/baseline); unit 323/323 (new: page tabs and numbers, unavailable state shows no numbers); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
 
 Limits stated on the page: targets are GloFAS modelled flow (no measured Karnataka gauge data), test days are not independent events, live rain is rescaled from Open-Meteo to ERA5, the rainfall model covers only Kundapur and Mangaluru and is not a flood prediction.
+
+## 2026-10-27 — Model performance in the main menu
+
+Request: "I can't see the model performance page in the application." The page worked (local `/model-performance` 200; the live server's `/api/models/performance` already returns the model results) but was only linked from How it works → AI models.
+
+- "Model performance" (chart icon) is now in the main menu after How it works (eight items; phones: in Menu).
+- Header fit: 1366 px and wider unchanged; 1100–1365 px hide the small menu icons and the brand subtitle and tighten link padding; 1100–1199 px also 12 px link text. Fixed a pre-existing wrap at exactly 1100 px (an old `max-width:1100px` rule in styles.css forced the menu onto its own row).
+- Measured (Playwright, live app): one header line with all eight items at 1100, 1150, 1180, 1199, 1200, 1280, 1365, 1366, 1508 and 1920 px (right edge 20 px inside the window); below 1100 px the Menu button as before.
+- Seen, not caused by this change: with today's live data Home at 1366/1280/1180 × 768 overflows by 14/35/49 px and uses the scroll fallback; the overflow is identical with the new menu item hidden. The browser tests (fixed data) fit at these sizes.
+
+Tests: unit 323/323 (menu test now expects eight items in order); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
