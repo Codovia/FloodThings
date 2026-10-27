@@ -50,6 +50,7 @@ See [docs/FULL_SYSTEM_LAUNCHER.md](docs/FULL_SYSTEM_LAUNCHER.md) and [docs/TELEG
 ```bash
 ./scripts/setup-admin.sh                  # create an account (prompts privately)
 ./scripts/setup-admin.sh --verify-only    # test login
+./scripts/upgrade-database.sh             # after pulling new database tables (e.g. district alerts); --check is read-only
 # rotate a password (maintenance connection exported privately in your own shell):
 cd backend && .venv/bin/python -B -m app.provision_shelter_admin --username NAME --reset-password
 ```

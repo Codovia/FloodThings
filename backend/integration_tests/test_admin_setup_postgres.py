@@ -17,7 +17,7 @@ setup=importlib.util.module_from_spec(spec);spec.loader.exec_module(setup)
 
 def test_setup_checks_existing_head_and_preserves_existing_admin_and_sentinel(db):
     result=setup.check_database(db,db.url.database)
-    assert result['revision']=='0006_report_position_provenance'
+    assert result['revision']=='0007_telegram_district_alerts'
     password=secrets.token_urlsafe(32);identity=provision(db,'chosen-fixture-admin',password)
     with db.connect() as c:before=dict(c.execute(select(admins).where(admins.c.id==identity)).mappings().one())
     with pytest.raises(setup.SetupError,match='left unchanged'):

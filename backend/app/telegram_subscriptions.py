@@ -16,6 +16,7 @@ from .shelters import shelter_engine,mode
 from .shelter_security import now,digest
 from .telegram_delivery import TelegramConfig,ConfigurationUnavailable
 from .subscription_schema import subscriptions,subscription_audit
+from .district_alerts import DistrictSubscriptions,parse,active_districts,normalize,CONSENT_VERSION as DISTRICT_CONSENT
 
 router=APIRouter()
 CONSENT_VERSION='telegram-private-alerts-v1-2026-10-13'
@@ -45,8 +46,9 @@ def webhook_secret():
 
 
 class SubscriptionStore:
-    def __init__(self,engine=None):
+    def __init__(self,engine=None,districts=None):
         self.engine=engine or shelter_engine()
+        self.district_store=DistrictSubscriptions(self.engine,districts)
 
     def intake(self,body,config):
         if not isinstance(body,dict):
@@ -56,10 +58,15 @@ class SubscriptionStore:
         chat=message.get('chat',{});sender=message.get('from',{})
         if not isinstance(chat,dict) or not isinstance(sender,dict):return {'ok':True,'processed':False}
         command=message.get('text');identity=chat.get('id')
-        if not isinstance(sender,dict) or chat.get('type')!='private' or type(identity) is not int or not 0<identity<2**53 or type(sender.get('id')) is not int or sender.get('id')!=identity or sender.get('is_bot') is not False or 'forward_origin' in message or 'via_bot' in message or command not in ('/start floodpulse','/stop'):
+        district=parse(command)
+        if not isinstance(sender,dict) or chat.get('type')!='private' or type(identity) is not int or not 0<identity<2**53 or type(sender.get('id')) is not int or sender.get('id')!=identity or sender.get('is_bot') is not False or 'forward_origin' in message or 'via_bot' in message or (command not in ('/start floodpulse','/stop') and district is None):
             return {'ok':True,'processed':False}
         destination=next((d for d in config.destinations.values() if d.chat_id==str(identity)),None)
-        if not destination or (mode()=='demonstration' and not destination.test_only):
+        operator=bool(destination) and (mode()!='demonstration' or destination.test_only)
+        # District alerts are public in live mode; a demonstration accepts only configured private test chats.
+        public=mode()!='demonstration' or bool(destination and destination.test_only)
+        if command=='/start floodpulse' and operator:district=None  # The existing operator opt-in; no reply.
+        if not operator and not (public and district):
             return {'ok':True,'processed':False}
         update_id=body.get('update_id');sent=message.get('date')
         if type(update_id) is not int or not 0<=update_id<2**63 or type(sent) is not int or not 0<=sent<2**40:
@@ -69,7 +76,14 @@ class SubscriptionStore:
         timestamp=now()
         if not timestamp-timedelta(days=7)<=command_at<=timestamp+timedelta(minutes=1):
             return {'ok':True,'processed':False}
-        key=subscriber_key(config,str(identity));active=command=='/start floodpulse'
+        key=subscriber_key(config,str(identity));result={'ok':True,'processed':False}
+        if operator and command in ('/start floodpulse','/stop'):
+            result=self.operator(key,command=='/start floodpulse',command_at,timestamp,update_id)
+        reply=self.district_store.handle(*district,key,str(identity),update_id,command_at,timestamp,mode()=='demonstration') if public and district else None
+        # Telegram performs a method returned in the webhook answer, so the confirmation needs no extra request.
+        return {'method':'sendMessage','chat_id':identity,'text':reply} if reply else result
+
+    def operator(self,key,active,command_at,timestamp,update_id):
         with self.engine.begin() as c:
             c.execute(text('SELECT pg_advisory_xact_lock(hashtextextended(:key,0))'),{'key':'subscription:'+key})
             old=c.execute(select(subscriptions).where(subscriptions.c.subscriber_key==key)).mappings().one_or_none()
@@ -95,8 +109,11 @@ def options():
             raise ValueError()
     except (ValueError,ConfigurationUnavailable,HTTPException):
         return JSONResponse({'status':'unavailable','message':'Telegram subscriptions are not configured. Check official local warning channels.'},headers={'Cache-Control':'no-store'})
-    return JSONResponse({'status':'available','url':'https://t.me/'+username+'?start=floodpulse','consent_version':CONSENT_VERSION,
-        'message':'Send /start floodpulse to request private project alerts; /stop opts out. Delivery is not guaranteed. Administrator must authorize your destination before alerts are eligible.'},headers={'Cache-Control':'no-store'})
+    # District links let anyone subscribe to one district's administrator-approved alerts (district_alerts.py).
+    try:districts=[{'id':d['id'],'name':d['name'],'url':'https://t.me/'+username+'?start='+d['start'],'command':'/start floodpulse '+normalize(d['name'])} for d in active_districts(shelter_engine())]
+    except (SQLAlchemyError,HTTPException):districts=[]
+    return JSONResponse({'status':'available','url':'https://t.me/'+username+'?start=floodpulse','consent_version':CONSENT_VERSION,'district_consent_version':DISTRICT_CONSENT,'districts':districts,
+        'message':'Choose your district and open the link (or send /start floodpulse <district>) to receive administrator-approved alerts for that district. FloodPulse stores your Telegram chat ID only to deliver them; /stop ends all alerts and deletes it. Delivery is not guaranteed.'},headers={'Cache-Control':'no-store'})
 
 
 @router.post('/api/telegram/webhook')

@@ -29,3 +29,14 @@ it('always points to official warnings and verified emergency numbers, separate 
  render(<AlertSubscription navigate={vi.fn()}/>);await screen.findByText('Telegram subscriptions are not configured.')
  expect(screen.getByRole('link',{name:'NDMA SACHET'}).getAttribute('href')).toBe('https://sachet.ndma.gov.in/');expect(screen.getByRole('link',{name:'112'}).getAttribute('href')).toBe('tel:112');expect(screen.getByRole('link',{name:'080-1070'}).getAttribute('href')).toBe('tel:0801070')
 })
+it('a chosen district gives its own bot link and command; links to anything else are dropped',async()=>{
+ const base='https://t.me/TEST_ONLY_bot?start=floodpulse'
+ vi.stubGlobal('fetch',vi.fn(async()=>({ok:true,json:async()=>({status:'available',url:base,districts:[
+  {name:'Udupi',url:base+'_udupi',command:'/start floodpulse udupi'},{name:'Dakshina Kannada',url:base+'_dakshina_kannada',command:'/start floodpulse dakshina kannada'},
+  {name:'Fake',url:'https://unapproved.test/x',command:'/start floodpulse fake'},{name:'Other bot',url:'https://t.me/OTHER_bot?start=floodpulse_udupi',command:'/start floodpulse udupi'}]})})))
+ render(<AlertSubscription/>);const select=await screen.findByLabelText('Your district')
+ expect([...select.options].map(o=>o.textContent)).toEqual(['Choose your district','Udupi','Dakshina Kannada'])
+ fireEvent.change(select,{target:{value:'Dakshina Kannada'}})
+ expect(screen.getByRole('link',{name:'Get Dakshina Kannada alerts in Telegram'}).getAttribute('href')).toBe(base+'_dakshina_kannada')
+ expect(screen.getByText('/start floodpulse dakshina kannada')).toBeTruthy();expect(subscriberLinks().some(a=>/unapproved|OTHER_bot/.test(a.getAttribute('href')))).toBe(false)
+})

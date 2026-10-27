@@ -77,3 +77,15 @@ it('official IMD drafts only fill the composer; nothing is previewed or sent aut
  fireEvent.click(button);expect(screen.getByLabelText('Notification message').value).toBe('TEST ONLY — Official IMD ORANGE warning for Udupi district today.')
  expect(calls).toHaveLength(0)
 })
+
+it('district subscribers are a target: counts shown, empty districts disabled, an IMD suggestion preselects its district',async()=>{
+ config.districts=[{id:'nic:udupi.nic.in',name:'Udupi',subscribers:2},{id:'nic:hassan.nic.in',name:'Hassan',subscribers:0}]
+ try{
+  await mount();const target=screen.getByLabelText('Telegram destination')
+  expect(within(target).getByRole('option',{name:'Udupi — 2 subscribers'}).disabled).toBe(false)
+  expect(within(target).getByRole('option',{name:'Hassan — no subscribers yet'}).disabled).toBe(true)
+  fireEvent.click(await screen.findByRole('button',{name:'Use as draft'}));expect(target.value).toBe('district:nic:udupi.nic.in')
+  fireEvent.click(screen.getByRole('button',{name:'Review exact notification'}));await screen.findByRole('heading',{name:/Exact message preview/})
+  expect(calls[0].body.district_id).toBe('nic:udupi.nic.in');expect(calls[0].body.destination_id).toBeUndefined()
+ }finally{delete config.districts}
+})
