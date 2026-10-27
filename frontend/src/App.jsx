@@ -10,6 +10,7 @@ import AlertSubscription from './AlertSubscription.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
 import HowItWorks from './HowItWorks.jsx'
 import ModelPerformance from './ModelPerformance.jsx'
+import PrivacyTerms from './PrivacyTerms.jsx'
 import { usePlaceLookup } from './AddressLine.jsx'
 import { useWide } from './ScreenTabs.jsx'
 import useFitGuard from './useFitGuard.js'
@@ -23,6 +24,7 @@ const pageInfo={
  '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Tell us what you see. Your location is found automatically; photos are optional.'],
  '/how-it-works': ['PREDICTION · EVIDENCE','How FloodPulse predicts','How the flood and drainage risk is calculated, and why it is a rule-based index rather than a trained flood model.'],
  '/model-performance': ['PREDICTION · TEST RESULTS','Model performance','Recorded results of the two trained AI models on years they never saw, compared with simple rules.'],
+ '/privacy': ['YOUR DATA · TERMS','Privacy and terms','What FloodPulse does with your data, and the terms for using this prototype.'],
  '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Review citizen evidence, manage shelters and control project notifications.'],
 }
 
@@ -52,7 +54,7 @@ export default function App() {
  const place=usePlaceLookup(selectedPoint)
  const shownPoint=useMemo(()=>place.place&&selectedPoint?{...point,name:place.place}:point,[point,place.place,selectedPoint])
  const publicPage=path !== '/admin' && !!pageInfo[path]
- const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'&&path!=='/model-performance'
+ const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'&&path!=='/model-performance'&&path!=='/privacy'
  const sheltersPage=path==='/shelters'
  const info=pageInfo[path]
  function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
@@ -75,11 +77,12 @@ export default function App() {
    {path==='/alerts'&&<AlertSubscription navigate={navigate}/>}
    {path==='/how-it-works'&&<HowItWorks navigate={navigate}/>}
    {path==='/model-performance'&&<ModelPerformance navigate={navigate}/>}
+   {path==='/privacy'&&<PrivacyTerms navigate={navigate}/>}
    {path==='/report'&&<CitizenReport navigate={navigate} suggestedSpot={reportSpot} onSpotUsed={()=>setReportSpot(null)}/>}
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
    {!info&&<nav className="not-found" aria-label="Suggested pages"><PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink><PageLink to="/flood-map" navigate={navigate}>Flood Map</PageLink><PageLink to="/shelters" navigate={navigate}>Shelters</PageLink><PageLink to="/report" navigate={navigate}>Report an incident</PageLink></nav>}
   </main>
-  <footer className="app-footer"><p><strong>FloodPulse</strong> · <span className="footer-long">Weather, river and elevation data: </span><span className="footer-short">Data: </span><a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · <span className="footer-long">Risk levels are experimental, not an official warning. Follow IMD, KSNDMC and district advice.</span><span className="footer-short">Experimental, not an official warning.</span></p></footer>
+  <footer className="app-footer"><p><strong>FloodPulse</strong> · <span className="footer-long">Weather, river and elevation data: </span><span className="footer-short">Data: </span><a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · <span className="footer-long">Risk levels are experimental, not an official warning. Follow IMD, KSNDMC and district advice.</span><span className="footer-short">Experimental, not an official warning.</span> · <PageLink to="/privacy" navigate={navigate}><span className="footer-long">Privacy & terms</span><span className="footer-short">Privacy</span></PageLink></p></footer>
   <BottomNav path={path} navigate={navigate} />
  </>
 }

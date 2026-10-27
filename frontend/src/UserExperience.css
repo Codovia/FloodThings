@@ -44,8 +44,8 @@ a{text-underline-offset:3px}
 .moderation-detail textarea{display:block;width:100%;min-height:110px;margin-block:8px;font:inherit;padding:10px;border:1px solid #688c97;border-radius:6px}
 .notice.error,[role=alert]{overflow-wrap:anywhere}
 /* Task-heavy routes use natural page flow, avoiding tiny nested editor panes. */
-#root:has(:is(.page-report,.page-admin,.page-alerts,.page-how-it-works,.page-model-performance)){height:auto;min-height:100dvh;overflow:visible}
-main.app-content:is(.page-report,.page-admin,.page-alerts,.page-how-it-works,.page-model-performance){flex:1 0 auto;overflow:visible;padding-bottom:32px}
+#root:has(:is(.page-report,.page-admin,.page-alerts,.page-how-it-works,.page-model-performance,.page-privacy)){height:auto;min-height:100dvh;overflow:visible}
+main.app-content:is(.page-report,.page-admin,.page-alerts,.page-how-it-works,.page-model-performance,.page-privacy){flex:1 0 auto;overflow:visible;padding-bottom:32px}
 .page-admin .admin-shell{display:block;overflow:visible}
 .page-admin :is(.admin-management,.admin-notifications){height:auto;min-height:0;overflow:visible}
 .page-admin .admin-information{overflow:visible}

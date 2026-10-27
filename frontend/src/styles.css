@@ -810,3 +810,7 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 /* Phones: the three steps repeat what the district finder already says; hiding them keeps the page on one screen. */
 @media (max-width:700px){.page-alerts .alert-steps{display:none}.district-subscribe select{max-width:100%}}
 
+/* ErrorBoundary: shown instead of a blank page if the app crashes. */
+.crash-screen{display:block;max-width:720px;margin:24px auto;padding:0 16px}
+.crash-screen h1{font-size:1.4rem}
+

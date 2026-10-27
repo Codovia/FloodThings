@@ -22,6 +22,7 @@ from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_forecast import router as river_forecast_router, RiverForecast
 from .model_performance import router as model_performance_router
+from .client_errors import router as client_errors_router
 from .risk import router as risk_router, RiskService
 from .official import router as official_router, OfficialService, official_tls_context
 from .admin_place import router as admin_place_router, PlaceLookup
@@ -65,6 +66,7 @@ app.include_router(subscriptions_router)
 app.include_router(geocoding_router)
 app.include_router(river_forecast_router)
 app.include_router(model_performance_router)
+app.include_router(client_errors_router)
 app.include_router(risk_router)
 app.include_router(official_router)
 app.include_router(admin_place_router)
@@ -72,6 +74,16 @@ app.include_router(location_address_router)
 app.include_router(routing_router)
 
 
+class WithoutQueryString(logging.Filter):
+    """Uvicorn's access log records the full request line; query strings can hold citizen coordinates
+    (e.g. /api/weather?latitude=...), so only the path is kept. Args: client, method, path?query, version, status."""
+    def filter(self, record):
+        if isinstance(record.args, tuple) and len(record.args) == 5 and isinstance(record.args[2], str):
+            record.args = (*record.args[:2], record.args[2].split('?', 1)[0], *record.args[3:])
+        return True
+
+
+logging.getLogger("uvicorn.access").addFilter(WithoutQueryString())
 log = logging.getLogger("floodpulse")
 if not log.handlers:
     _handler = logging.StreamHandler()
