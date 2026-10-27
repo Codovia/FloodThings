@@ -9,6 +9,7 @@ import CitizenReport from './CitizenReport.jsx'
 import AlertSubscription from './AlertSubscription.jsx'
 import HomeEmergencyDashboard from './HomeEmergencyDashboard.jsx'
 import HowItWorks from './HowItWorks.jsx'
+import ModelPerformance from './ModelPerformance.jsx'
 import { usePlaceLookup } from './AddressLine.jsx'
 import { useWide } from './ScreenTabs.jsx'
 import useFitGuard from './useFitGuard.js'
@@ -21,6 +22,7 @@ const pageInfo={
  '/alerts': ['ADMIN-REVIEWED NOTICES','Citizen alerts','Telegram opt-in and opt-out for project notices.'],
  '/report': ['CITIZEN EVIDENCE · PRIVATE REVIEW','Report an incident','Tell us what you see. Your location is found automatically; photos are optional.'],
  '/how-it-works': ['PREDICTION · EVIDENCE','How FloodPulse predicts','How the flood and drainage risk is calculated, and why it is a rule-based index rather than a trained flood model.'],
+ '/model-performance': ['PREDICTION · TEST RESULTS','Model performance','Recorded results of the two trained AI models on years they never saw, compared with simple rules.'],
  '/admin': ['AUTHORIZED PROJECT STAFF','Administration','Review citizen evidence, manage shelters and control project notifications.'],
 }
 
@@ -50,7 +52,7 @@ export default function App() {
  const place=usePlaceLookup(selectedPoint)
  const shownPoint=useMemo(()=>place.place&&selectedPoint?{...point,name:place.place}:point,[point,place.place,selectedPoint])
  const publicPage=path !== '/admin' && !!pageInfo[path]
- const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'
+ const selectorPage=publicPage&&path!=='/flood-map'&&path!=='/report'&&path!=='/alerts'&&path!=='/how-it-works'&&path!=='/model-performance'
  const sheltersPage=path==='/shelters'
  const info=pageInfo[path]
  function chooseDistrict(next){manualRevision.current++;homeLocation.cancel();setDistrictId(next?.id||'');setDistrict(next||null);setEvidenceFeature(null)}
@@ -72,6 +74,7 @@ export default function App() {
    </div>}
    {path==='/alerts'&&<AlertSubscription navigate={navigate}/>}
    {path==='/how-it-works'&&<HowItWorks navigate={navigate}/>}
+   {path==='/model-performance'&&<ModelPerformance navigate={navigate}/>}
    {path==='/report'&&<CitizenReport navigate={navigate} suggestedSpot={reportSpot} onSpotUsed={()=>setReportSpot(null)}/>}
    {path==='/admin'&&<AdminShelters embedded onHome={()=>navigate('/')}/>}
    {!info&&<nav className="not-found" aria-label="Suggested pages"><PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink><PageLink to="/flood-map" navigate={navigate}>Flood Map</PageLink><PageLink to="/shelters" navigate={navigate}>Shelters</PageLink><PageLink to="/report" navigate={navigate}>Report an incident</PageLink></nav>}

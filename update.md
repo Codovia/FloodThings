@@ -2717,3 +2717,20 @@ Measured (live app, Playwright phone sizes): Home Map tab map 228 → 302 px at 
 Tests: unit 321/321 (new: bottom bar links, order and current page); build passes; browser suite 80 passed, 8 skipped, 2 failed — shelters.spec.js:56 (known admin layout) and flood-intelligence.spec.js:7, which passes when run alone (known to be intermittent under full-suite load). Not checked on a real phone.
 
 Next mobile slices: compact Shelters (the place is shown twice), and the Report steps on small screens.
+
+## 2026-10-27 — Model performance page (research view of the two trained models)
+
+Request: the guide asked for a working prediction model and a page showing model performance like a research paper; the user supplied a Gemini plan (Random Forest on 12,000 synthetic samples labelled by its own formula, invented per-district thresholds/porosities/discharges, "flood probability %") and asked to implement it if it is a good plan.
+
+Assessment (not implemented as written): the synthetic labels are produced by the same formula the model then learns, so its accuracy/ROC-AUC would measure agreement with that formula, not floods; this is the fabricated-training-label case AGENTS.md forbids, and the Phase 12G NO-GO (no verified Karnataka flood-outcome labels) still holds. Its thresholds had no sources, and "flood probability" contradicts the experimental, non-probability rule. The project already has what the plan aimed at, trained on real data: `river_flood_v1` (ERA5 rain over each upstream catchment, 1, 3, 5, 10 and 30-day antecedent rain, per-river catchments; train 1997–2015, test 2016–2021 against GloFAS reanalysis above the 2-year level) and `rainfall_logistic_v1` (IMD heavy rain ≥64.5 mm/24 h, train 2023–24, test 2025).
+
+Added:
+- `GET /api/models/performance` (`backend/app/model_performance.py`): reads both artifacts through their own validating loaders and returns the recorded held-out results; nothing recomputed or fetched. Only derived value: true negatives = test days − TP − FP − FN. "Served" uses the app's own rule (model F1 > rain-rule F1).
+- `/model-performance` page (linked from How it works; hidden from the header so the menu still fits one line): Summary (5 of 6 rivers beat the rain rule; 5 of 5 documented floods in the test years flagged 1–4 days ahead; rainfall model caught 88 of 96 heavy-rain days in 2025, precision 14%), F1 chart AI model vs rain rule per river (palette validated: colour-blind separation ΔE 24.7, contrast ≥3:1; hover details; same numbers in the Table tab), per-river confusion matrices, documented floods, rainfall model vs the "always no" baseline, method and the artifacts' own limitations.
+- Fixed on How it works too: an empty shared workspace block took ~150 px above the tabs; it is now hidden on both pages (its panels stay mounted).
+
+Checked (live app, laptop 1366×768 and phone 390×844): every tab fits one screen, no sideways scroll, no page errors; endpoint numbers equal the artifact files.
+
+Tests: backend 562/562 (new: artifact numbers repeated exactly, matrices add up to test days, served rule, rainfall holdout/baseline); unit 323/323 (new: page tabs and numbers, unavailable state shows no numbers); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
+
+Limits stated on the page: targets are GloFAS modelled flow (no measured Karnataka gauge data), test days are not independent events, live rain is rescaled from Open-Meteo to ERA5, the rainfall model covers only Kundapur and Mangaluru and is not a flood prediction.

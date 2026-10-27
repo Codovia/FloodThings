@@ -5,6 +5,7 @@ export const PAGES = [
   {path:'/flood-map',name:'Flood Map',icon:'map'}, {path:'/shelters',name:'Shelters',icon:'shelter'},
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
   {path:'/how-it-works',name:'How it works',icon:'info'},
+  {path:'/model-performance',name:'Model performance',icon:'info',hidden:true},  // linked from How it works and Home
   {path:'/admin',name:'Admin',icon:'admin'},
 ]
 // The Weather page was merged into Home; old /weather links open Home.

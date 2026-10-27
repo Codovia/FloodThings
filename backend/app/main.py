@@ -21,6 +21,7 @@ from .reports import router as reports_router
 from .telegram_subscriptions import router as subscriptions_router
 from .home_geocoding import router as geocoding_router, ReverseGeocoder
 from .river_forecast import router as river_forecast_router, RiverForecast
+from .model_performance import router as model_performance_router
 from .risk import router as risk_router, RiskService
 from .official import router as official_router, OfficialService, official_tls_context
 from .admin_place import router as admin_place_router, PlaceLookup
@@ -63,6 +64,7 @@ app.include_router(reports_router)
 app.include_router(subscriptions_router)
 app.include_router(geocoding_router)
 app.include_router(river_forecast_router)
+app.include_router(model_performance_router)
 app.include_router(risk_router)
 app.include_router(official_router)
 app.include_router(admin_place_router)
