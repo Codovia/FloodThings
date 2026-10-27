@@ -29,6 +29,7 @@ export default function HowItWorks({ navigate }) {
       <h2 id="how-pipeline">From live data to an early warning</h2>
       <ol className="how-pipeline">{PIPELINE.map(([title, text]) => <li key={title}><strong>{title}</strong><span>{text}</span></li>)}</ol>
       <p className="muted">Works for any point in Karnataka. Official warnings are shown exactly as issued; FloodPulse's own prediction is always labelled experimental and is never presented as a flood probability.</p>
+      <p><PageLink to="/model-performance" navigate={navigate}>Model performance: how the AI models did on years they never saw</PageLink></p>
     </section>
       </> },
       { id: 'index', label: 'Risk index', content: <>
@@ -51,6 +52,7 @@ export default function HowItWorks({ navigate }) {
       <p>The India Flood Inventory has no confirmed "no flood" days, and reporting grew about 24 times (0.39% of days in 1969–94, 9.31% in 2011–23), so the labels partly measure reporting. Those models did not beat a simple rainfall rule, so the risk index above stays rule-based.</p>
       <h3>Works: the AI river flood model</h3>
       <p>A model trained by FloodPulse predicts whether a river will rise above its 2-year flood level within 3 days, from rain over its upstream catchment (e.g. near Mahabaleshwar for the Krishna — in August 2019 Kudachi had 196 mm while the upstream catchment had 1,513 mm). Trained on 1997–2015, tested on 2016–2021: it beat a simple rain rule on 5 of 6 rivers and flagged all 5 documented floods in those years 1–4 days ahead. It learned from GloFAS river flow, because measured Karnataka gauge data are not available, so it cannot be more accurate than GloFAS. See Flood Map → Rivers.</p>
+      <p><PageLink to="/model-performance" navigate={navigate} className="button-link">See the model performance: charts, confusion matrices and real floods</PageLink></p>
     </section>
       </> },
       { id: 'next', label: 'Next steps', content: <>
