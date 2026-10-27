@@ -493,16 +493,9 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
 html[data-fit=scroll] .bottom-nav{position:sticky;bottom:0;z-index:1000}
 
 
-/* Eight menu items (with Model performance) fit one header line from 1366 px; on narrower laptops the small
-   menu icons and the brand subtitle step aside and the links tighten. */
-@media (min-width:1100px) and (max-width:1365px){
- .primary-nav a svg{display:none}
- .app-brand small{display:none}
- .primary-nav a{padding-left:7px;padding-right:7px}
-}
+/* Laptops 1100–1199 px: styles.css still wraps the header at max-width:1100px (inclusive), and the seven menu
+   items need the tighter spacing to stay on one line next to the brand. */
 @media (min-width:1100px) and (max-width:1199px){
- /* styles.css still wraps the header at max-width:1100px (inclusive); 1100 px is a laptop width here. */
  .app-header .header-inner{flex-wrap:nowrap}
  .app-header .primary-nav{width:auto;gap:0}
- .primary-nav a{font-size:12px;padding-left:5px;padding-right:5px}
 }

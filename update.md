@@ -2745,3 +2745,13 @@ Request: "I can't see the model performance page in the application." The page w
 - Seen, not caused by this change: with today's live data Home at 1366/1280/1180 × 768 overflows by 14/35/49 px and uses the scroll fallback; the overflow is identical with the new menu item hidden. The browser tests (fixed data) fit at these sizes.
 
 Tests: unit 323/323 (menu test now expects eight items in order); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
+
+## 2026-10-27 — How it works removed from the main menu (page kept)
+
+Request: remove How it works from the navbar without deleting it from the code base.
+
+- `AppNavigation.jsx`: How it works is `hidden: true` — not in the header or phone Menu, but `/how-it-works` still works with its title, and it stays linked from Home ("How it works" in the links row) and Model performance (Method & limits). No files removed.
+- Menu: Home · Flood Map · Shelters · Report an incident · Telegram alerts · Model performance · Admin.
+- With seven items the normal header fits again, so the compact laptop style added for eight items (hidden icons and subtitle, 12 px links) is removed; kept only the fix for the wrap at exactly 1100 px and gap 0 at 1100–1199 px. Measured: one line with icons at 1100, 1150, 1199, 1200, 1280, 1366 and 1920 px (at least 14 px between brand and menu); Menu button below 1100 px.
+
+Tests: unit 324/324 (menu test: seven items in order; new: How it works still loads with its title and is absent from the menu); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).

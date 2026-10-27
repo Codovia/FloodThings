@@ -4,7 +4,7 @@ export const PAGES = [
   {path:'/',name:'Home',icon:'home'},
   {path:'/flood-map',name:'Flood Map',icon:'map'}, {path:'/shelters',name:'Shelters',icon:'shelter'},
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
-  {path:'/how-it-works',name:'How it works',icon:'info'},
+  {path:'/how-it-works',name:'How it works',icon:'info',hidden:true},  // not in the menu; linked from Home and Model performance
   {path:'/model-performance',name:'Model performance',icon:'chart'},
   {path:'/admin',name:'Admin',icon:'admin'},
 ]
