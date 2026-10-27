@@ -6,6 +6,7 @@ export const PAGES = [
   {path:'/report',name:'Report an incident',icon:'report'}, {path:'/alerts',name:'Telegram alerts',icon:'alert'},
   {path:'/how-it-works',name:'How it works',icon:'info',hidden:true},  // not in the menu; linked from Home and Model performance
   {path:'/model-performance',name:'Model performance',icon:'chart'},
+  {path:'/privacy',name:'Privacy and terms',icon:'info',hidden:true},  // linked from the footer
   {path:'/admin',name:'Admin',icon:'admin'},
 ]
 // The Weather page was merged into Home; old /weather links open Home.
