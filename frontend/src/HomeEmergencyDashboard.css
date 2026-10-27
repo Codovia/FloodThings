@@ -167,3 +167,9 @@
  .page-home .home-temp{display:inline;font-size:1.125rem;margin-right:8px}
  .page-home .home-weather-line>p:first-of-type{display:inline}
 }
+.page-home .home-place .location-quality{margin:4px 0 2px}
+/* .home-place p sets a grey text colour; keep the badge and advice colours. */
+.page-home .home-place .location-quality.precise{color:#1d5a2b}.page-home .home-place .location-quality.rough{color:#6b4300}.page-home .home-place .location-quality.approximate{color:#8a1c13}.page-home .home-place .location-advice{color:#5a3b00}
+/* While locating the button shows live accuracy; keep it readable rather than greyed out. */
+.page-home .home-location-actions .locate-button[aria-busy=true]{opacity:1;cursor:progress;background:#1b625d;color:#fff}
+
