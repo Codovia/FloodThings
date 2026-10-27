@@ -2734,3 +2734,24 @@ Checked (live app, laptop 1366×768 and phone 390×844): every tab fits one scre
 Tests: backend 562/562 (new: artifact numbers repeated exactly, matrices add up to test days, served rule, rainfall holdout/baseline); unit 323/323 (new: page tabs and numbers, unavailable state shows no numbers); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
 
 Limits stated on the page: targets are GloFAS modelled flow (no measured Karnataka gauge data), test days are not independent events, live rain is rescaled from Open-Meteo to ERA5, the rainfall model covers only Kundapur and Mangaluru and is not a flood prediction.
+
+## 2026-10-27 — Model performance in the main menu
+
+Request: "I can't see the model performance page in the application." The page worked (local `/model-performance` 200; the live server's `/api/models/performance` already returns the model results) but was only linked from How it works → AI models.
+
+- "Model performance" (chart icon) is now in the main menu after How it works (eight items; phones: in Menu).
+- Header fit: 1366 px and wider unchanged; 1100–1365 px hide the small menu icons and the brand subtitle and tighten link padding; 1100–1199 px also 12 px link text. Fixed a pre-existing wrap at exactly 1100 px (an old `max-width:1100px` rule in styles.css forced the menu onto its own row).
+- Measured (Playwright, live app): one header line with all eight items at 1100, 1150, 1180, 1199, 1200, 1280, 1365, 1366, 1508 and 1920 px (right edge 20 px inside the window); below 1100 px the Menu button as before.
+- Seen, not caused by this change: with today's live data Home at 1366/1280/1180 × 768 overflows by 14/35/49 px and uses the scroll fallback; the overflow is identical with the new menu item hidden. The browser tests (fixed data) fit at these sizes.
+
+Tests: unit 323/323 (menu test now expects eight items in order); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
+
+## 2026-10-27 — How it works removed from the main menu (page kept)
+
+Request: remove How it works from the navbar without deleting it from the code base.
+
+- `AppNavigation.jsx`: How it works is `hidden: true` — not in the header or phone Menu, but `/how-it-works` still works with its title, and it stays linked from Home ("How it works" in the links row) and Model performance (Method & limits). No files removed.
+- Menu: Home · Flood Map · Shelters · Report an incident · Telegram alerts · Model performance · Admin.
+- With seven items the normal header fits again, so the compact laptop style added for eight items (hidden icons and subtitle, 12 px links) is removed; kept only the fix for the wrap at exactly 1100 px and gap 0 at 1100–1199 px. Measured: one line with icons at 1100, 1150, 1199, 1200, 1280, 1366 and 1920 px (at least 14 px between brand and menu); Menu button below 1100 px.
+
+Tests: unit 324/324 (menu test: seven items in order; new: How it works still loads with its title and is absent from the menu); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
