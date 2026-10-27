@@ -161,7 +161,7 @@ def test_concurrent_claim_is_durable_before_network(notice):
     api,store,sender=notice;headers,row=preview(notice);approval=ApprovalInput(approve=True,content_sha256=row['content_sha256']);actor={'id':api[4]}
     def claim():return store.claim(row['id'],approval,actor,api[2])
     with ThreadPoolExecutor(max_workers=2) as pool:results=list(pool.map(lambda _:claim(),range(2)))
-    assert sum(config is not None for _,config,_ in results)==1
+    assert sum(config is not None for _,config,*_ in results)==1
     assert store.history()['notifications'][0]['status']=='sending'
     assert all(r[0]['status']=='sending' for r in results)
 
@@ -191,11 +191,12 @@ def test_least_privilege_notification_role_can_audit_but_not_delete(notice):
         admin.execute(sql.SQL('GRANT USAGE ON SCHEMA public TO {}').format(sql.Identifier(role)))
         admin.execute(sql.SQL('GRANT SELECT,INSERT,UPDATE ON admin_notifications TO {}').format(sql.Identifier(role)))
         admin.execute(sql.SQL('GRANT SELECT ON telegram_subscriptions TO {}').format(sql.Identifier(role)))
+        admin.execute(sql.SQL('GRANT SELECT ON district_notifications TO {}').format(sql.Identifier(role)))  # operator notices check for a district summary
         admin.execute(sql.SQL('GRANT SELECT,INSERT,UPDATE ON shelter_login_limits TO {}').format(sql.Identifier(role)))
         limited=database_engine(db.url.set(username=role,password=password).render_as_string(hide_password=False))
         n=NotificationStore(limited)
         assert n.history()['total']==1
-        claimed,config,destination=n.claim(row['id'],ApprovalInput(approve=True,content_sha256=row['content_sha256']),{'id':api[4]},api[2])
+        claimed,config,destination,_=n.claim(row['id'],ApprovalInput(approve=True,content_sha256=row['content_sha256']),{'id':api[4]},api[2])
         assert config is not None and claimed['status']=='sending'
         assert n.finish(row['id'],DeliveryResult('rejected','telegram_rejected',403,telegram_error_code=403))['status']=='rejected'
         # A dedicated notification grant cannot mutate the directory, credentials or audit history.

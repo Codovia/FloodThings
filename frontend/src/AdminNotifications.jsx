@@ -9,6 +9,9 @@ const resultText = row => ({
   rejected: 'Telegram rejected the message. It has not been automatically retried.',
   delivery_unknown: 'Delivery is uncertain. Inspect Telegram before composing another notice; do not assume it failed.',
 }[row.status] || 'Outcome unavailable')
+// District alerts go to each subscriber of one district; the counts are recorded per recipient.
+const districtText = d => d.recipients == null ? 'Goes to the current subscribers of ' + d.district_name + ' (counted again when you approve).'
+  : `Sent to ${d.recipients} ${d.district_name} subscriber${d.recipients === 1 ? '' : 's'}: ${d.accepted} accepted by Telegram, ${d.rejected} rejected, ${d.uncertain} uncertain.`
 
 export default function AdminNotifications({ session, request }) {
   const [options, setOptions] = useState(null), [history, setHistory] = useState(null), [offset, setOffset] = useState(0)
@@ -31,7 +34,7 @@ export default function AdminNotifications({ session, request }) {
 
   async function load(start = offset) {
     const [config, rows] = await Promise.all([call('/api/admin/notifications/options'), call('/api/admin/notifications?limit=50&offset=' + start)])
-    if (typeof config.configured !== 'boolean' || !Array.isArray(config.destinations) || !Array.isArray(config.shelters) || !Array.isArray(rows.notifications)) throw Error('Notification service response unavailable')
+    if (typeof config.configured !== 'boolean' || !Array.isArray(config.destinations) || !Array.isArray(config.shelters) || !Array.isArray(rows.notifications) || (config.districts !== undefined && !Array.isArray(config.districts))) throw Error('Notification service response unavailable')
     if (!stopped.current) { setOptions(config); setHistory(rows) }
   }
 
@@ -54,6 +57,9 @@ export default function AdminNotifications({ session, request }) {
   useEffect(() => { loadSuggestions(); loadOfficial() }, [session])
   function applySuggestion(item, source) {
     change(setMessage, item.suggested_message); if (item.suggested_kind) setKind(item.suggested_kind); setDraftSource(source)
+    // An official IMD district warning is most useful to that district's subscribers.
+    const target = options?.districts?.find(d => d.name === item.district && d.subscribers > 0)
+    if (target) setDestination('district:' + target.id)
     requestAnimationFrame(() => { messageBox.current?.scrollIntoView?.({ block: 'center', behavior: 'smooth' }); messageBox.current?.focus({ preventScroll: true }) })
   }
   function change(setter, value) { setter(value); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
@@ -67,7 +73,8 @@ export default function AdminNotifications({ session, request }) {
     e.preventDefault()
     await operation(async () => {
       requestId.current ||= crypto.randomUUID()
-      const row = await call('/api/admin/notifications', { method: 'POST', body: JSON.stringify({ request_id: requestId.current, destination_id: destination, kind, message, shelter_id: shelter || null }) })
+      const target = destination.startsWith('district:') ? { district_id: destination.slice(9) } : { destination_id: destination }
+      const row = await call('/api/admin/notifications', { method: 'POST', body: JSON.stringify({ request_id: requestId.current, ...target, kind, message, shelter_id: shelter || null }) })
       if (!stopped.current) { setPreview(row); setApproved(false); await load() }
     })
   }
@@ -76,25 +83,27 @@ export default function AdminNotifications({ session, request }) {
     await operation(async () => {
       // A lost HTTP response does not prove the external delivery failed.
       setPreview({ ...preview, status: 'sending' }); setApproved(false)
-      const row = await call('/api/admin/notifications/' + preview.id + '/send', { method: 'POST', body: JSON.stringify({ approve: true, content_sha256: preview.content_sha256 }) }, 30000)
+      // A district alert is paced (about 25 messages a second), so allow longer before treating the wait as lost.
+      const row = await call('/api/admin/notifications/' + preview.id + '/send', { method: 'POST', body: JSON.stringify({ approve: true, content_sha256: preview.content_sha256 }) }, preview.district ? 300000 : 30000)
       if (!stopped.current) { setPreview(row); setApproved(false); await load() }
     })
   }
   function reset() { setDraftSource(null); setMessage(''); setShelter(''); setPreview(null); setApproved(false); requestId.current = null; setError(null) }
-  const enabled = options?.configured && options.destinations.some(d=>d.opted_in!==false)
+  const enabled = options?.configured && (options.destinations.some(d=>d.opted_in!==false) || (options.districts || []).some(d => d.subscribers > 0))
   return <section className="panel" aria-labelledby="admin-notifications-title">
     <h2 id="admin-notifications-title">Alerts — administrator-controlled Telegram notices</h2>
     <ol className="workflow-steps" aria-label="Notification workflow"><li>Choose destination and compose</li><li>Review exact preview</li><li>Approve and send once</li><li>Inspect the result</li></ol><p>Every notice requires your review and explicit approval. Experimental rainfall outputs never trigger notifications. This prototype is not an official disaster-management service.</p>
     {session.mode === 'demonstration' && <p className="notice error">DEMONSTRATION ONLY. Only explicitly configured private test destinations are permitted. Simulated test results do not verify real Telegram delivery.</p>}
     {!options && !error && <p role="status">Loading notification configuration…</p>}
     {options && !enabled && <p role="status">{options.reason || 'No authorized destination is available for this environment'}. No messages will be sent.</p>}
-    {options?.send_limit&&<p>{options.send_limit}. Private recipients must send /start floodpulse to opt in; /stop opts out. Consent is checked again before an attempt.</p>}
+    {options?.send_limit&&<p>{options.send_limit} (a district alert counts as one). Operator destinations opt in with /start floodpulse; the public subscribes to a district with /start floodpulse &lt;district&gt;. /stop opts out, and consent is checked again before an attempt.</p>}
     {error && <p role="alert">{error}</p>}
     <div className="notify-layout">
     <div className="notify-compose"><h3>Compose and send</h3>
     {draftSource && message && <p className="notify-draft-note" role="status">Draft filled from the {draftSource}. Edit it, then review the exact message before sending.</p>}
     <form className="shelter-form" aria-label="Telegram notification composer" onSubmit={review}>
-      <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose authorized destination</option>{options?.destinations.map(d => <option key={d.id} value={d.id} disabled={d.opted_in===false}>{d.label}{d.test_only ? ' — private test only' : ''}{d.opted_in===false ? ' — not opted in' : ''}</option>)}</select>
+      <label htmlFor="notice-destination">Telegram destination</label><select id="notice-destination" required disabled={busy || !enabled} value={destination} onChange={e => change(setDestination, e.target.value)}><option value="">Choose a destination or district</option><optgroup label="Configured destinations">{options?.destinations.map(d => <option key={d.id} value={d.id} disabled={d.opted_in===false}>{d.label}{d.test_only ? ' — private test only' : ''}{d.opted_in===false ? ' — not opted in' : ''}</option>)}</optgroup>
+        {options?.districts?.length > 0 && <optgroup label="District subscribers">{options.districts.map(d => <option key={d.id} value={'district:' + d.id} disabled={!d.subscribers}>{d.name} — {d.subscribers ? d.subscribers + ' subscriber' + (d.subscribers === 1 ? '' : 's') : 'no subscribers yet'}</option>)}</optgroup>}</select>
       <label htmlFor="notice-kind">Notification type</label><select id="notice-kind" disabled={busy || !enabled} value={kind} onChange={e => change(setKind, e.target.value)}><option value="informational">Informational</option><option value="emergency">Emergency — independently verified by administrator</option></select>
       <label>Notification message<textarea ref={messageBox} rows={6} required maxLength={3500} disabled={busy || !enabled} value={message} onChange={e => change(setMessage, e.target.value)} /></label>
       <label htmlFor="notice-shelter">Include currently verified Open shelter</label><select id="notice-shelter" disabled={busy || !enabled} value={shelter} onChange={e => change(setShelter, e.target.value)}><option value="">No shelter information</option>{options?.shelters.map(s => <option key={s.id} value={s.id}>{s.name} — {s.district_name}</option>)}</select>
@@ -105,6 +114,7 @@ export default function AdminNotifications({ session, request }) {
       <h3 ref={previewHeading} tabIndex={-1}>Exact message preview — {preview.destination_label}</h3>
       <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', font: 'inherit' }}>{preview.text}</pre>
       <p role="status">{resultText(preview)}</p>
+      {preview.district && <p>{districtText(preview.district)}</p>}
       {preview.status === 'draft' && <>
         <label><input type="checkbox" checked={approved} disabled={busy} onChange={e => setApproved(e.target.checked)} /> I reviewed this exact message and destination, verified its factual claims, and am authorized to send it.</label>
         <button disabled={busy || !approved || !enabled} onClick={send}>{busy ? 'Sending…' : 'Approve and send once through Telegram'}</button>
@@ -144,6 +154,7 @@ export default function AdminNotifications({ session, request }) {
     {history && <><p>{history.notifications.length} of {history.total} records shown.</p><ul aria-label="Notification history" className="shelter-list">{history.notifications.map(row => <li key={row.id}>
       <div className="admin-shelter-head"><strong>{row.kind === 'emergency' ? 'Emergency' : 'Informational'} — {row.destination_label}</strong><span className={'notify-status ' + row.status}>{{ draft: 'Preview', sending: 'Sending', accepted: 'Accepted', rejected: 'Rejected', delivery_unknown: 'Uncertain' }[row.status] || row.status}</span></div><p>{resultText(row)}</p>
       <p>Created: {stamp(row.created_at)}. Approved: {stamp(row.confirmed_at)}. Attempt: {stamp(row.attempted_at)}. Result: {stamp(row.completed_at)}.</p>
+      {row.district && <p>{districtText(row.district)}</p>}
       <p>Administrator: {row.created_by}. Result code: {row.result_code || 'None'}{row.telegram_error_code ? ' · Telegram code ' + row.telegram_error_code : ''}.</p>
       <details><summary>View recorded message</summary><pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', font: 'inherit' }}>{row.text}</pre></details>
     </li>)}</ul><button disabled={busy || offset === 0} onClick={() => setOffset(n => Math.max(0, n - 50))}>Previous notifications</button><button disabled={busy || offset + 50 >= history.total} onClick={() => setOffset(n => n + 50)}>Next notifications</button></>}

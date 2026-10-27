@@ -797,3 +797,16 @@ main.app-content { max-width: 1340px; padding: 0 32px 40px; }
 .location-quality.approximate{background:#fde8e6;color:#8a1c13}
 .location-advice{color:#5a3b00;background:#fff8ea;border-left:3px solid #c98a00;padding:4px 8px;border-radius:4px;font-size:.8rem}
 
+/* Alerts page district finder: matches as tappable buttons, and the exact Telegram command with a copy button. */
+.district-subscribe input[type=search]{width:100%;max-width:28rem}
+.district-matches{list-style:none;padding:0;margin:6px 0;display:flex;flex-wrap:wrap;gap:6px}
+.district-matches button{margin:0;min-height:40px;padding:6px 12px;background:#fff;color:#17313c;border:1px solid #9fb3ae}
+.district-matches button:hover:not(:disabled){background:#eef5f3;color:#17313c}
+.district-command{margin-top:8px;padding:8px 10px;border:1px solid #d7dfdd;border-radius:8px;background:#f6faf9}
+.district-command p{margin:4px 0}
+.district-command .command-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.district-command code{flex:1 1 14rem;font-size:.95rem;padding:6px 8px;border-radius:4px;background:#fff;border:1px solid #d7dfdd;white-space:nowrap;overflow-x:auto}
+.district-command button{margin:0;min-height:36px;padding:4px 10px}
+/* Phones: the three steps repeat what the district finder already says; hiding them keeps the page on one screen. */
+@media (max-width:700px){.page-alerts .alert-steps{display:none}.district-subscribe select{max-width:100%}}
+

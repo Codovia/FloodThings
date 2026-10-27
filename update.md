@@ -2755,3 +2755,40 @@ Request: remove How it works from the navbar without deleting it from the code b
 - With seven items the normal header fits again, so the compact laptop style added for eight items (hidden icons and subtitle, 12 px links) is removed; kept only the fix for the wrap at exactly 1100 px and gap 0 at 1100–1199 px. Measured: one line with icons at 1100, 1150, 1199, 1200, 1280, 1366 and 1920 px (at least 14 px between brand and menu); Menu button below 1100 px.
 
 Tests: unit 324/324 (menu test: seven items in order; new: How it works still loads with its title and is absent from the menu); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
+
+## 2026-10-27 — District Telegram alerts (/start floodpulse <district>)
+
+Request: customised Telegram alerts per district: a user sends `/start floodpulse <district name>` and receives that district's alerts only. Design chosen by the user from three options: bot subscriptions with a one-time confirmation reply (not per-district channels, not silent).
+
+Before: the bot accepted `/start floodpulse` only from up to 20 operator-configured chats (`TELEGRAM_DESTINATIONS`), stored only a keyed hash (no chat ID) and sent each notice to one configured chat.
+
+Research: Telegram deep links `?start=<payload>` arrive as `/start <payload>` (A-Z a-z 0-9 _ -, ≤64 chars; core.telegram.org/bots/features); bulk sending about 30 messages/second, 1 per second per chat (bots FAQ); a method can be returned in the webhook answer, without knowing whether it succeeded (Bot API "Making requests when getting updates"). Both webhook paths (laptop proxy, server Caddy) relay the answer body.
+
+Changes:
+- `district_alerts.py`: commands (`/start floodpulse <district>` or `floodpulse_<district>` link, `/mydistricts`, `/stop <district>`, `/stop`, help), matching to the active directory's 31 districts plus project-chosen former names (no partial-name guessing), subscription store with ordering/duplicate protection through the append-only audit log.
+- Tables (migration `0007_telegram_district_alerts`, additive; `admin_notifications` unchanged): `telegram_district_subscribers` (chat ID kept only to deliver; deleted on `/stop`, when no district is left, or when Telegram reports the bot blocked), `telegram_district_subscriptions`, `telegram_district_audit` (keyed hash only, append-only), `district_notifications` (per-alert summary), `telegram_district_deliveries` (per-recipient result). Application-role grants added; audit-mutation check extended to the new audit tables.
+- Webhook: district commands accepted from any private chat in live mode, only configured test chats in demonstration mode; the operator `/start floodpulse` and `/stop` flow is unchanged (`/stop` also ends district alerts). The confirmation is the webhook answer; no other automatic message.
+- Admin alerts: a district is a target (subscriber counts; empty districts disabled; preview refused with no subscribers). The exact preview adds "District: X" and how to stop. Approval keeps the existing safeguards (composer-only approval of the exact hash, durable claim before any send, global 20/15 min limit with one approval counted once, no retries); recipients are counted again at approval; sends paced at 25/s, at most 1,000 recipients; parent status accepted / rejected / delivery_unknown with per-recipient counts in history. An IMD Orange/Red suggestion preselects its district when it has subscribers.
+- Alerts page: district chooser giving that district's Telegram link and command; links not pointing at the configured bot with a `floodpulse_<district>` code are dropped.
+- `scripts/upgrade-database.sh`: laptop maintenance helper (same private maintenance connection as setup-admin; `--check` read-only) that migrates to head, grants the application role and verifies as that role.
+
+Checked: disposable PostGIS container (127.0.0.1:55499, random password, removed afterwards) with the project's isolated-database suite: 73/73 twice in a row, including new end-to-end tests — subscribe/confirm/list/unsubscribe/stop (chat ID deleted, audit kept, retried and older updates ignored), live-mode public subscription vs demonstration isolation, an approved Udupi alert reaching only Udupi's subscriber exactly once, blocked (403) subscriber forgotten, uncertain delivery, leaving before approval → 409 with nothing sent; upgrade helper 0006 → 0007 keeps existing rows and grants exactly the intended privileges. In the first full run one new test also failed alongside three expected test updates; after those it passed in both full runs (cause not identified). No real Telegram message was sent (mocked sender only).
+
+Tests: backend 594/594 (new: commands, names and former names, start-link validity for all 31 districts, draft target rule); frontend unit 326/326 (district chooser, admin district target); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout, shelters.spec.js:56).
+
+Not done here: the laptop database is still at 0006 — the maintenance password file is not in this checkout, so `./scripts/upgrade-database.sh` must be run by the user (`--maintenance-prompt`); until then `./floodpulse.sh` stops at its database check. A real Telegram subscription and alert were not exercised.
+
+## 2026-10-27 — Help people name their district correctly (website and bot)
+
+Request: make it easy to connect a person to the right district, because people may type the district name wrongly; help them build the correct Telegram command.
+
+Research: Telegram ReplyKeyboardMarkup (`keyboard`, `one_time_keyboard`, `resize_keyboard`, `input_field_placeholder` 1–64 characters), KeyboardButton text "sent as a message when the button is pressed", ReplyKeyboardRemove `remove_keyboard` (core.telegram.org/bots/api/types). The place directory covers only 6 towns (2 districts), so town-to-district lookup was not added.
+
+Bot:
+- `/start` or `/start floodpulse` replies with a button for each of the 31 districts (3 per row, names only so they fit a phone); tapping one sends the name, and a plain message that exactly matches a district or former name now subscribes. The confirmation removes the buttons.
+- Misspellings: "did you mean …?" with buttons for the closest districts (SequenceMatcher on names and former names; only names within 0.1 of the best score, so "mangalor" offers only Dakshina Kannada). Nothing is subscribed until a button is tapped. Plain messages are answered only when clearly close (≥0.75); other chat stays ignored.
+- Former names are now `FORMER_NAMES` (district → names) and are sent to the website as `also`.
+
+Website (Alerts page): "Find your district" search (names, former names, small spelling mistakes via edit distance; up to 4 matches, misspellings shown as "Did you mean …?"), the dropdown kept as "Or choose from the list", and for the chosen district a one-tap "Get <district> alerts in Telegram" link plus the exact command with a Copy button (clipboard, or the text is selected where copying is blocked). On phones the three-step list is hidden and the generic bot line disappears once a district is chosen, so the page fits one screen at 390×844 and 412×915 (360×740 uses the scroll fallback).
+
+Tests: backend 609/609 (new: misspelling suggestions, plain-message threshold, buttons cover every district and each button subscribes); disposable-PostGIS suite 74/74 (new: Start shows 31 buttons, tapping "Udupi" subscribes and removes the buttons, "udpi" and "/start floodpulse dakshin kanada" get one suggestion button and change nothing, "thank you" is ignored; test DB removed afterwards); frontend unit 328/328 (search rules; typo → exact command → copy); build passes; browser suite 81 passed, 8 skipped, 1 failed (known admin layout). One earlier full browser run also had home-weather, risk-features and one other test fail; the next two runs passed them (intermittent under load). No real Telegram message was sent.

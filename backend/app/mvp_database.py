@@ -18,6 +18,11 @@ APP_PRIVILEGES = {
     'citizen_report_audit': ('SELECT','INSERT'),
     'telegram_subscriptions': ('SELECT','INSERT','UPDATE'),
     'telegram_subscription_audit': ('SELECT','INSERT'),
+    'telegram_district_subscribers': ('SELECT','INSERT','UPDATE','DELETE'),
+    'telegram_district_subscriptions': ('SELECT','INSERT','DELETE'),
+    'telegram_district_audit': ('SELECT','INSERT'),
+    'district_notifications': ('SELECT','INSERT','UPDATE'),
+    'telegram_district_deliveries': ('SELECT','INSERT'),
 }
 
 
@@ -51,7 +56,7 @@ def check_app_connection(connection):
         for privilege in privileges:
             if not connection.execute(text('SELECT has_table_privilege(current_user,:table,:privilege)'),{'table':table,'privilege':privilege}).scalar_one():
                 raise ValueError('Missing '+privilege+' privilege on '+table)
-    for table in ('shelter_audit','citizen_report_audit','telegram_subscription_audit'):
+    for table in ('shelter_audit','citizen_report_audit','telegram_subscription_audit','telegram_district_audit','telegram_district_deliveries'):
         for privilege in ('UPDATE','DELETE'):
             if connection.execute(text('SELECT has_table_privilege(current_user,:table,:privilege)'),{'table':table,'privilege':privilege}).scalar_one():
                 raise ValueError('Application role must not alter audit history')
