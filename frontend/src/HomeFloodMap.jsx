@@ -119,17 +119,21 @@ export default function HomeFloodMap({ fitViewport, point, navigate, onReportHer
   }, [focus])
   function statewide() { if (stateBounds.current) map.current?.fitBounds(stateBounds.current, { padding: [20, 20], maxZoom: 7, animate: false }) }
   const hasArea = area?.cells?.length > 0
+  // Phones: the layer switches and legend would cover most of a small map, so they open from one button.
+  // Laptops always show them (CSS ignores this state above phone width).
+  const [overlays, setOverlays] = useState(false)
   return <section className="panel workspace-map home-map-stage" aria-labelledby="home-map-title">
     <div className="home-map-toolbar"><div className="home-map-heading"><h2 id="home-map-title">Karnataka Map</h2><PageLink to="/flood-map" navigate={navigate}>Full map</PageLink></div>
       <div className="map-actions"><button onClick={statewide}>Show Karnataka</button><button onClick={()=>point&&map.current?.setView([point.latitude,point.longitude],12,{animate:false})} disabled={!point}>Show selected point</button></div></div>
-    <div className="home-map-frame">
+    <div className={overlays ? 'home-map-frame' : 'home-map-frame overlays-closed'}>
       <div ref={element} className="home-flood-map" role="region" aria-label="Karnataka emergency map" />
-      <div className="map-overlay map-layers" role="group" aria-label="Map layers">
+      <button type="button" className="map-overlay-toggle" aria-expanded={overlays} aria-controls="home-map-layers home-map-legend" onClick={() => setOverlays(v => !v)}>{overlays ? 'Hide layers' : 'Layers'}</button>
+      <div id="home-map-layers" className="map-overlay map-layers" role="group" aria-label="Map layers">
         <label><input type="checkbox" checked={showOfficial} onChange={e => setShowOfficial(e.target.checked)} /> Official IMD warnings</label>
         <label><input type="checkbox" checked={showRisk} onChange={e => setShowRisk(e.target.checked)} disabled={!hasArea} /> 24 h prediction</label>
         {hasArea && showRisk && <KindToggle kind={kind} onKind={onKind} label="Map prediction type" />}
       </div>
-      <div className="map-overlay map-legend-card" aria-label="Map legend">
+      <div id="home-map-legend" className="map-overlay map-legend-card" aria-label="Map legend">
         {showOfficial && <p><span className="legend-title">IMD today</span>{['red', 'orange', 'yellow', 'green'].map(l => <span key={l} className="legend-item"><i className="legend-fill" style={{ background: OFFICIAL_COLOURS[l] }} />{cap(l)}</span>)}</p>}
         {hasArea && showRisk && <p><span className="legend-title">{KIND_NAME[kind]} 24 h</span>{['moderate', 'high', 'severe'].map(l => <span key={l} className="legend-item"><i className="legend-zone" style={{ background: LEVEL_COLORS[l] }} />{LEVEL_NAMES[l]}</span>)}<span className="legend-item muted">clear = Low</span></p>}
         <p><span className="legend-item"><i className="legend-dot gps" />GPS point</span><span className="legend-item"><i className="legend-dot locality" />Selected place</span></p>

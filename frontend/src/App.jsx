@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import useWeatherSession from './useWeatherSession.js'
-import { AppHeader, PageLink, usePage } from './AppNavigation.jsx'
+import { AppHeader, BottomNav, PageLink, usePage } from './AppNavigation.jsx'
 import PublicShelters from './PublicShelters.jsx'
 import FloodIntelligenceMap from './FloodIntelligenceMap.jsx'
 import WeatherLocationSelector, { DEFAULT_POINT } from './WeatherLocationSelector.jsx'
@@ -77,5 +77,6 @@ export default function App() {
    {!info&&<nav className="not-found" aria-label="Suggested pages"><PageLink to="/" navigate={navigate} className="button-link">Return Home</PageLink><PageLink to="/flood-map" navigate={navigate}>Flood Map</PageLink><PageLink to="/shelters" navigate={navigate}>Shelters</PageLink><PageLink to="/report" navigate={navigate}>Report an incident</PageLink></nav>}
   </main>
   <footer className="app-footer"><p><strong>FloodPulse</strong> · <span className="footer-long">Weather, river and elevation data: </span><span className="footer-short">Data: </span><a href="https://open-meteo.com/">Open-Meteo</a> (<a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>) · <span className="footer-long">Risk levels are experimental, not an official warning. Follow IMD, KSNDMC and district advice.</span><span className="footer-short">Experimental, not an official warning.</span></p></footer>
+  <BottomNav path={path} navigate={navigate} />
  </>
 }

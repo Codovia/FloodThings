@@ -40,3 +40,10 @@ export function AppHeader({path,navigate,mode=null}){
  <nav id="primary-navigation" className={expanded?'primary-nav expanded':'primary-nav'} aria-label="Main navigation">{PAGES.filter(page=>!page.hidden).map(page=><PageLink key={page.path} to={page.path} navigate={navigate} onClick={()=>setExpanded(false)} aria-current={path===page.path?'page':undefined}><Icon name={page.icon}/>{page.name}</PageLink>)}</nav>
  </div></header></>
 }
+// Phones: the four main tasks stay visible at the bottom, within thumb reach (visible navigation is easier to
+// find than a hidden menu; Android recommends 3–5 destinations). "Menu" in the header keeps every page.
+const QUICK_PAGES=[{path:'/',name:'Home',icon:'home'},{path:'/flood-map',name:'Map',icon:'map'},{path:'/report',name:'Report',icon:'report'},{path:'/shelters',name:'Shelters',icon:'shelter'}]
+export function BottomNav({path,navigate}){
+ return <nav className="bottom-nav" aria-label="Quick navigation">{QUICK_PAGES.map(page=><PageLink key={page.path} to={page.path} navigate={navigate} aria-current={path===page.path?'page':undefined}><Icon name={page.icon}/><span>{page.name}</span></PageLink>)}</nav>
+}
+

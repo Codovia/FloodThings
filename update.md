@@ -2703,3 +2703,17 @@ Changes:
 Checked (Chrome, phone size, simulated fixes): ±850 → ±240 → ±12 m showed progress then "Precise GPS ±12 m" with the place named (16 s); a single ±4.2 km fix showed "Approximate GPS ±4.2 km" and the settings advice; laptop 1366×768 still one screen, no sideways scroll. Not checked on a real phone.
 
 Tests: unit 320/320 (Home hook tests rewritten for the watch: refinement, progress, best fix, window replaces the 10 s timeout, impossible fixes ignored; picker: progress, best fix, timestamp, approximate advice); build passes. Browser: home-emergency 14/14 (stub now answers `watchPosition`; asserts exactly one watch, stopped), ui-repair, location-weather, location-directory pass. The full browser suite was not re-run after the last change; its earlier run's only other failure was the known admin layout test (shelters.spec.js:56). Seen, not caused here: after midnight IST the weather card showed "Forecast dates must be unique, ordered and within the requested local week".
+
+## 2026-10-27 — Mobile slice 2: bottom navigation bar and a usable map on phones
+
+Request: same as slice 1 (better mobile UI for the demonstration). Applies the research there: visible navigation beats a hidden menu (NN/g), 3–5 destinations in a phone navigation bar (Android), touch targets well above WCAG's 24×24 px, and map controls that do not cover the map.
+
+- `AppNavigation.jsx` `BottomNav` (phones ≤700 px): Home · Map · Report · Shelters at the bottom, current page marked (`aria-current`), 50 px tall targets. It is part of the page column, so the one-screen layout gets shorter rather than covered; when a page falls back to scrolling (`useFitGuard`) the bar sticks to the bottom. "Menu" keeps every page (Telegram alerts, How it works, Admin).
+- Home Map tab on phones: one-row toolbar ("Karnataka Map" title kept for screen readers; the tab says Map), layers and legend behind a "Layers" button (closed by default; laptops always show them), and the Report/Nearest-shelter row steps aside while the Map tab is open (other tabs keep it; the bar remains).
+- `App.test.jsx`: two link look-ups scoped to "Main navigation" (the bar also has Home/Shelters links).
+
+Measured (live app, Playwright phone sizes): Home Map tab map 228 → 302 px at 390×844 with a GPS place (384 px without a place), 210 px at 320×720 without a place; nothing scrolls; layers panel opens below its button without overlap. Home, Map and Report fit one screen with the bar. Shelters at 390×844 was already at the limit: with the bar it uses the scroll fallback (59 px), the bar staying visible — compacting Shelters is a next step.
+
+Tests: unit 321/321 (new: bottom bar links, order and current page); build passes; browser suite 80 passed, 8 skipped, 2 failed — shelters.spec.js:56 (known admin layout) and flood-intelligence.spec.js:7, which passes when run alone (known to be intermittent under full-suite load). Not checked on a real phone.
+
+Next mobile slices: compact Shelters (the place is shown twice), and the Report steps on small screens.

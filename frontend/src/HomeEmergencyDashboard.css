@@ -172,4 +172,21 @@
 .page-home .home-place .location-quality.precise{color:#1d5a2b}.page-home .home-place .location-quality.rough{color:#6b4300}.page-home .home-place .location-quality.approximate{color:#8a1c13}.page-home .home-place .location-advice{color:#5a3b00}
 /* While locating the button shows live accuracy; keep it readable rather than greyed out. */
 .page-home .home-location-actions .locate-button[aria-busy=true]{opacity:1;cursor:progress;background:#1b625d;color:#fff}
+/* Phones: the map gets the room. One-row map toolbar (the tab already says "Map"), layers and legend behind a
+   "Layers" button, and the citizen-action row steps aside while the Map tab is open (the bottom bar remains). */
+.page-home .map-overlay-toggle{display:none}
+@media (max-width:700px){
+ .page-home .home-map-stage.workspace-map{padding:6px;gap:4px}
+ .page-home .home-map-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+ .page-home .home-map-heading{order:2;margin-left:auto}
+ .page-home .home-map-heading h2{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+ .page-home .home-map-stage .map-actions{margin-top:0;gap:4px}
+ .page-home .home-map-stage .map-actions button{font-size:.72rem;padding:4px 8px;min-height:32px}
+ .page-home .map-overlay-toggle{display:block;position:absolute;top:8px;right:8px;z-index:900;margin:0;min-height:36px;padding:6px 12px;font-size:.8rem;background:#fff;color:#17313c;border:1px solid #9fb3ae;box-shadow:0 2px 8px #17313c33}
+ .page-home .map-overlay-toggle:hover:not(:disabled){background:#eef5f3;color:#17313c}
+ .page-home .home-map-frame.overlays-closed .map-overlay{display:none}
+ .page-home .tab-map .home-primary-actions{display:none}
+ .page-home .tab-map .home-essential-status{padding:0}
+ .page-home .home-map-frame:not(.overlays-closed) .map-layers{top:52px}
+}
 

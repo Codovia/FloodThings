@@ -477,3 +477,16 @@ html[data-fit=scroll] main.app-content :is(.home-flood-map,.intelligence-map,.sh
 .intelligence-sources{margin:4px 0 6px;padding-left:1.1em;font-size:.8rem;line-height:1.4}
 .intelligence-sources li{margin:2px 0}
 .risk-legend .legend-ai-ring::before{background:transparent;border:2px dashed #b71c1c;border-radius:50%;box-sizing:border-box}
+
+/* Phone bottom bar (BottomNav): part of the page column, so the one-screen layout simply gets shorter. */
+.bottom-nav{display:none}
+@media (max-width:700px){
+ .bottom-nav{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;flex-shrink:0;padding:3px 6px calc(3px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #d4e1ef;box-shadow:0 -2px 8px rgba(15,40,70,.06)}
+ .bottom-nav a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:50px;border-radius:10px;color:#3b5570;font-size:12px;font-weight:600;text-decoration:none}
+ .bottom-nav a svg{width:22px;height:22px}
+ .bottom-nav a[aria-current=page]{background:#e2f0ee;color:#0f4f63}
+ .bottom-nav a[aria-current=page] svg{stroke-width:2.3}
+}
+/* When a page falls back to scrolling (useFitGuard), the bar stays on screen instead of moving below the content. */
+html[data-fit=scroll] .bottom-nav{position:sticky;bottom:0;z-index:1000}
+
