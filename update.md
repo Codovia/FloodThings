@@ -2812,3 +2812,29 @@ Tests: backend 618/618 (new: client error validation, origin check, masking, acc
 
 - `scripts/verify_backup_restore.sh`: a throwaway copy of the server database (postgis/postgis:16-3.4, owner `floodpulse_admin`, `deploy/db-init` role script, random passwords, 127.0.0.1 only, removed afterwards), migrated, place directory imported and application role granted as `deploy/setup.sh` does; then the exact `deploy/backup.sh` `pg_dump` and `deploy/restore.sh` `pg_restore --clean --if-exists --single-transaction` commands. Result: before backup 0007, 24 tables, 8,548 rows; after a post-backup change and the restore, identical counts in every table, the change gone, and the application role still passes `check_app_connection` (19 tables, audit not alterable). PASSED.
 - `scripts/load_check.py`: simultaneous visitors on read-only requests that call no outside provider (page, health with database, districts, shelters, alert setup, model results). On the laptop (Vite dev server → FastAPI → local PostgreSQL): 40 visitors, 240 requests in 1.6 s, all 200, median 178 ms, 95th percentile 661 ms, slowest 824 ms. 100 visitors from one address: 340 × 200 and 260 × 429 from the per-address public limit (300/min), no errors or 5xx; median 814 ms, slowest 4.1 s. Real visitors have different addresses, so the limit applies per person. Not measured on the server (production build behind Caddy).
+
+## 2026-10-28 — Fix: Past floods and drainage study unavailable on the server; dev requirements; admin map browser test
+
+Found by a read-only live check (Chrome DevTools): `/api/flood-map/historical`, `/api/historical-floods`, `/api/drainage-research` and `/api/flood-map/drainage` all return 503 on the hosted server. The live `/api/risk` inside the mapped 2005 Udupi flood area reports the history factor as `no_data`.
+
+Cause: the history and drainage stores verify every file their manifest lists by SHA-256. The 7 small GeoTIFFs those manifests list (2 GFD event rasters, 5 Udupi DEM/land-cover/slope rasters, 202 KB together) were never committed, because `.gitignore` has `*.tif`, so a fresh server checkout cannot load either dataset. They load locally (56 polygons; drainage OK). `.dockerignore`'s `*.tif` matches only the context root: a throwaway build copying `data/processed` contained all 7 files, so it was not involved.
+
+Acceptance test: every file listed by a `data/processed/*/manifest.json` is committed (new `backend/tests/test_published_data_tracked.py`; failed before the fix for drainage and flood-spatial, passes after). The staged bytes equal each manifest's SHA-256 (`-text` attribute keeps them binary).
+
+Changes:
+- `.gitignore`: `!data/processed/**/*.tif`; the 7 rasters are committed. No checksum, loader or validation control was relaxed.
+- `backend/requirements-dev.txt`: removed `-r ../scripts/requirements-boundaries.txt`. That file was deleted in `8d66740`, so `pip install -r backend/requirements-dev.txt` failed ("Could not open requirements file"). Its shapely and pyproj pins are already in `requirements-spatial.txt`; nothing imports pyshp. A dry-run install now resolves.
+- `frontend/tests/shelters.spec.js:56` (failing since 24 Oct, "known admin layout"):
+  - Every functional assertion passed; only the map-fit check failed (map bottom 755.8 px, limit 723 px at 1366×768).
+  - Measured cause: `scrollIntoViewIfNeeded()` scrolls minimally, so a map that starts below the fold always ends about 12 px from the bottom. The check therefore failed once more admin content sat above the map.
+  - With the panel stuck, the map bottom is about 696 px, so the app layout is fine. A CSS shrink was tried and reverted as unnecessary.
+  - The test now centres the map and keeps the same invariant (height ≥ 190 px, bottom ≤ viewport − 45 px). A map taller than the window still fails it.
+
+Verification on branch `fix/history-files-devreqs-admin-test`:
+- backend 792 passed, 1 deselected (+3 new);
+- disposable-PostGIS suite 74/74 (container removed);
+- frontend unit 330/330;
+- production build passes;
+- Playwright 82 passed, 8 skipped, **0 failed** (was 81/8/1).
+
+Not done: deploying to the server (manual release procedure, `docs/RELEASE_PROCEDURE.md`). After deployment, check that `/api/flood-map/historical` returns 200 and that the risk history factor is no longer `no_data` in Udupi.
