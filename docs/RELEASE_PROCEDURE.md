@@ -42,8 +42,8 @@ All must pass before you commit. Run them from the project folder:
 (cd frontend && npm run test:map)                    # browser tests (about 4 minutes)
 ```
 
-Browser tests: one admin-form test fails until the Admin page fits one screen; any other failure must
-be fixed (or re-run once if it is a timing failure that then passes on its own, and say so in `update.md`).
+Browser tests: all must pass (the long-standing admin-form failure was fixed on 28 October 2026). A failure
+must be fixed, or re-run once if it is a timing failure that then passes on its own; say so in `update.md`.
 
 **Also build the server image** when you changed `Dockerfile`, `deploy/`, `backend/requirements.txt`,
 `frontend/package.json`, or anything the server starts with. This is the same build the server does and

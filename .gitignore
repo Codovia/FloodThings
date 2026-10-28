@@ -18,6 +18,8 @@ tmp/
 exports/
 *.tif
 *.tiff
+# Small published rasters the app verifies by manifest checksum; without them the server returns 503.
+!data/processed/**/*.tif
 *.nc
 *.h5
 *.hdf
